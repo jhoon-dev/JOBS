@@ -6,11 +6,12 @@ namespace jobs {
 void Document::create(std::string name, std::string date, const std::vector<std::string>& tasks) {
     Project p;
     p.documentId = store_.newId(); p.name = std::move(name); p.startDate = std::move(date);
-    for (const auto& name : tasks) p.tasks.push_back({store_.newId(), name, std::nullopt, {}});
+    for (const auto& taskName : tasks) p.tasks.push_back({store_.newId(), taskName, std::nullopt, {}});
     validate(p);
     project_ = std::move(p); path_.clear(); fingerprint_.clear(); lease_.reset();
     dirty_ = true; readOnly_ = false;
     calculation_.reset(); requiresSaveAs_ = false;
+    savedState_.reset(); recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced);
 }
 void Document::open(const std::string& path, bool readOnly) {
     auto normalized = store_.normalizePath(path);
@@ -19,7 +20,7 @@ void Document::open(const std::string& path, bool readOnly) {
         project_ = std::move(loaded.project); fingerprint_ = std::move(loaded.fingerprint);
         requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset();
         if (readOnly) lease_.reset();
-        dirty_ = false; readOnly_ = readOnly; return;
+        dirty_ = false; readOnly_ = readOnly; savedState_ = project_; recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced); return;
     }
     auto lease = readOnly ? nullptr : store_.lock(normalized);
     auto loaded = store_.load(normalized);
@@ -27,35 +28,36 @@ void Document::open(const std::string& path, bool readOnly) {
     fingerprint_ = std::move(loaded.fingerprint); lease_ = std::move(lease);
     requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset();
     dirty_ = false; readOnly_ = readOnly;
+    savedState_ = project_; recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced);
 }
 void Document::renameTask(std::size_t row, std::string name) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; p.tasks.at(row).name = std::move(name);
-    edit(std::move(p));
+    edit(std::move(p), "작업 이름 변경");
 }
 void Document::addTask(std::string name, std::string wbsId) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; p.tasks.push_back({store_.newId(), std::move(name), std::nullopt, {}, std::move(wbsId)});
-    edit(std::move(p));
+    edit(std::move(p), "작업 추가");
 }
 std::string Document::addWbs(std::string name, std::string parentId) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; auto id = store_.newId();
-    p.wbsNodes.push_back({id, std::move(name), std::move(parentId)}); edit(std::move(p)); return id;
+    p.wbsNodes.push_back({id, std::move(name), std::move(parentId)}); edit(std::move(p), "WBS 추가"); return id;
 }
 void Document::renameWbs(const std::string& id, std::string name) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto& n) { return n.id == id; });
     if (it == p.wbsNodes.end()) throw std::runtime_error("WBS가 존재하지 않습니다.");
-    it->name = std::move(name); edit(std::move(p));
+    it->name = std::move(name); edit(std::move(p), "WBS 이름 변경");
 }
 void Document::moveWbs(const std::string& id, std::string parentId) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto& n) { return n.id == id; });
     if (it == p.wbsNodes.end()) throw std::runtime_error("WBS가 존재하지 않습니다.");
-    it->parentId = std::move(parentId); edit(std::move(p));
+    it->parentId = std::move(parentId); edit(std::move(p), "WBS 이동");
 }
 void Document::removeWbs(const std::string& id) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -64,27 +66,27 @@ void Document::removeWbs(const std::string& id) {
     for (const auto& t : p.tasks) if (t.wbsId == id) throw std::runtime_error("소속 작업을 먼저 다른 WBS로 이동하세요.");
     const auto count = std::erase_if(p.wbsNodes, [&](const auto& n) { return n.id == id; });
     if (!count) throw std::runtime_error("WBS가 존재하지 않습니다.");
-    edit(std::move(p));
+    edit(std::move(p), "빈 WBS 삭제");
 }
 void Document::assignWbs(std::size_t row, std::string id) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).wbsId = std::move(id); edit(std::move(p));
+    auto p = *project_; p.tasks.at(row).wbsId = std::move(id); edit(std::move(p), "작업 WBS 변경");
 }
 void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).durationMinutes = minutes; edit(std::move(p));
+    auto p = *project_; p.tasks.at(row).durationMinutes = minutes; edit(std::move(p), "작업 기간 변경");
 }
 void Document::setPredecessors(std::size_t row, std::vector<std::string> ids) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).predecessors = std::move(ids); edit(std::move(p));
+    auto p = *project_; p.tasks.at(row).predecessors = std::move(ids); edit(std::move(p), "선행관계 변경");
 }
 void Document::setHolidays(std::vector<std::string> dates) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.holidays = std::move(dates); edit(std::move(p));
+    auto p = *project_; p.holidays = std::move(dates); edit(std::move(p), "휴일 변경");
 }
 void Document::setStatusAt(std::optional<std::string> stamp) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.statusAt = std::move(stamp); edit(std::move(p));
+    auto p = *project_; p.statusAt = std::move(stamp); edit(std::move(p), "상태일 변경");
 }
 std::string Document::appendBaseline(Baseline b) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -122,13 +124,13 @@ void Document::setCurrency(std::string currency) {
     for (const auto& b : project_->baselines) used = used || monetary(b.input);
     for (const auto& s : project_->scenarios) used = used || monetary(s.input);
     if (used) throw std::runtime_error("단가·예산·원가 이력이 있는 문서의 통화를 재해석할 수 없습니다. 새 프로젝트에서 통화를 먼저 설정하세요.");
-    auto p = *project_; p.currency = std::move(currency); edit(std::move(p));
+    auto p = *project_; p.currency = std::move(currency); edit(std::move(p), "프로젝트 통화 변경");
 }
 void Document::setTaskCost(TaskCost cost) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; auto it = std::find_if(p.taskCosts.begin(), p.taskCosts.end(), [&](const auto& c) { return c.taskId == cost.taskId; });
     if (it == p.taskCosts.end()) p.taskCosts.push_back(std::move(cost)); else *it = std::move(cost);
-    edit(std::move(p));
+    edit(std::move(p), "작업 예산 변경");
 }
 void Document::recordCost(CostEntry entry) {
     if (!project_ || readOnly_ || !project_->statusAt) throw std::runtime_error("원가 보고 전에 편집 가능한 프로젝트와 상태일이 필요합니다.");
@@ -146,14 +148,14 @@ std::string Document::putResource(Resource r) {
         if (it == p.resources.end()) throw std::runtime_error("자원이 존재하지 않습니다.");
         *it = r;
     }
-    auto id = r.id; edit(std::move(p)); return id;
+    auto id = r.id; edit(std::move(p), "자원 등록·변경"); return id;
 }
 void Document::removeResource(const std::string& id) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_;
     for (const auto& a : p.assignments) if (a.resourceId == id) throw std::runtime_error("작업 배정을 먼저 해제하세요.");
     if (!std::erase_if(p.resources, [&](const auto& r) { return r.id == id; })) throw std::runtime_error("자원이 존재하지 않습니다.");
-    edit(std::move(p));
+    edit(std::move(p), "자원 삭제");
 }
 void Document::setAssignments(const std::string& id, std::vector<Assignment> assignments) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -161,7 +163,7 @@ void Document::setAssignments(const std::string& id, std::vector<Assignment> ass
     if (std::none_of(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == id; })) throw std::runtime_error("작업이 존재하지 않습니다.");
     for (auto& a : assignments) { if (a.taskId != id) throw std::runtime_error("다른 작업의 배정이 포함되었습니다."); }
     std::erase_if(p.assignments, [&](const auto& a) { return a.taskId == id; });
-    p.assignments.insert(p.assignments.end(), assignments.begin(), assignments.end()); edit(std::move(p));
+    p.assignments.insert(p.assignments.end(), assignments.begin(), assignments.end()); edit(std::move(p), "작업 자원 배정");
 }
 std::string Document::saveScenario(std::string name, std::string priority, int horizon, std::string utc,
                                   const std::string& sourceId, std::uint64_t sourceRevision) {
@@ -174,9 +176,35 @@ std::string Document::saveScenario(std::string name, std::string priority, int h
     s.input = static_cast<const PlanInput&>(p); s.statusAt = p.statusAt; s.progress = p.progress;
     auto id = s.id; p.scenarios.push_back(std::move(s)); edit(std::move(p)); return id;
 }
-void Document::edit(Project p) {
+void Document::edit(Project p, std::string label) {
     if (p == *project_) return;
-    ++p.revision; validate(p); project_ = std::move(p); dirty_ = true; staleCalculation();
+    ++p.revision; validate(p);
+    const bool immutable = p.baselines != project_->baselines || p.progress != project_->progress || p.costEntries != project_->costEntries || p.scenarios != project_->scenarios;
+    if (immutable) clearHistory("승인 기준선·제출 실적/원가·저장 시나리오는 이력으로 보존합니다. 실적/원가는 정정 보고를 사용하세요.");
+    else {
+        HistoryStep step{{static_cast<const PlanInput&>(*project_), project_->statusAt}, {static_cast<const PlanInput&>(p), p.statusAt}, std::move(label), 0};
+        auto weight = [](const InputState& s) {
+            const auto& v = s.plan; std::size_t n = sizeof(InputState) + v.name.size() + v.startDate.size() + v.calendar.size() + v.calculationProfile.size() + v.currency.size() + v.costProfile.size();
+            if (s.statusAt) n += s.statusAt->size();
+            for (const auto& t : v.tasks) { n += sizeof(Task) + t.id.size() + t.name.size() + t.wbsId.size(); for (const auto& id : t.predecessors) n += sizeof(std::string) + id.size(); }
+            for (const auto& w : v.wbsNodes) n += sizeof(WbsNode) + w.id.size() + w.name.size() + w.parentId.size();
+            for (const auto& h : v.holidays) n += sizeof(std::string) + h.size();
+            for (const auto& r : v.resources) { n += sizeof(Resource) + r.id.size() + r.name.size() + r.type.size(); for (const auto& d : r.exceptions) n += sizeof(CapacityDay) + d.date.size(); for (const auto& rate : r.rates) n += sizeof(Resource::Rate) + rate.effectiveDate.size(); }
+            for (const auto& a : v.assignments) n += sizeof(Assignment) + a.taskId.size() + a.resourceId.size();
+            for (const auto& c : v.taskCosts) n += sizeof(TaskCost) + c.taskId.size() + c.accrual.size() + c.credit.size();
+            return n;
+        };
+        step.weight = weight(step.before) + weight(step.after) + step.label.size();
+        while (history_.size() > historyCursor_) { historyWeight_ -= history_.back().weight; history_.pop_back(); }
+        constexpr std::size_t maxWeight = 32 * 1024 * 1024;
+        if (step.weight > maxWeight) clearHistory("이번 변경은 실행 취소 이력의 추정 입력 32 MiB 한도를 초과했습니다.");
+        else {
+            historyWeight_ += step.weight; history_.push_back(std::move(step));
+            while (history_.size() > 100 || historyWeight_ > maxWeight) { historyWeight_ -= history_.front().weight; history_.erase(history_.begin()); historyNotice_ = "최근 100단계 / 추정 입력 32 MiB 범위의 실행 취소 이력입니다."; }
+            historyCursor_ = history_.size();
+        }
+    }
+    project_ = std::move(p); updateDirty(); staleCalculation(); notify(Event::Edited);
 }
 void Document::applyCalculation(ScheduleResult result) {
     if (!project_) return;
@@ -188,6 +216,7 @@ void Document::save() {
     if (!project_ || path_.empty() || readOnly_ || requiresSaveAs_) throw std::runtime_error("다른 이름으로 저장하세요. 이전 형식의 원본은 보존합니다.");
     auto fingerprint = store_.save(path_, *project_, fingerprint_);
     fingerprint_ = std::move(fingerprint); dirty_ = false;
+    savedState_ = project_; recoveryOrigin_.reset(); notify(Event::Saved);
 }
 void Document::saveAs(const std::string& path) {
     if (!project_) throw std::runtime_error("열린 프로젝트가 없습니다.");
@@ -197,11 +226,45 @@ void Document::saveAs(const std::string& path) {
     }
     auto lease = store_.lock(normalized);
     auto p = *project_;
+    const bool independent = !path_.empty();
     if (!path_.empty()) { p.derivedFrom = p.documentId; p.documentId = store_.newId(); }
     auto fingerprint = store_.save(normalized, p, {});
     project_ = std::move(p); path_ = std::move(normalized); fingerprint_ = std::move(fingerprint);
     lease_ = std::move(lease); dirty_ = false; readOnly_ = false;
     requiresSaveAs_ = false;
     if (calculation_ && calculation_->documentId != project_->documentId) staleCalculation();
+    savedState_ = project_; recoveryOrigin_.reset(); if (independent) clearHistory(); ++sessionGeneration_; notify(Event::Saved);
+}
+void Document::clearHistory(std::string notice) { history_.clear(); historyCursor_ = historyWeight_ = 0; historyNotice_ = std::move(notice); }
+std::string Document::undoLabel() const { return canUndo() ? history_[historyCursor_ - 1].label : std::string{}; }
+std::string Document::redoLabel() const { return canRedo() ? history_[historyCursor_].label : std::string{}; }
+void Document::updateDirty() {
+    if (!project_ || !savedState_) { dirty_ = project_.has_value(); return; }
+    const auto& a = *project_; const auto& b = *savedState_;
+    dirty_ = static_cast<const PlanInput&>(a) != static_cast<const PlanInput&>(b) || a.statusAt != b.statusAt || a.documentId != b.documentId || a.derivedFrom != b.derivedFrom || a.baselines != b.baselines || a.progress != b.progress || a.scenarios != b.scenarios || a.costEntries != b.costEntries;
+}
+void Document::applyHistory(const InputState& state) {
+    auto p = *project_; static_cast<PlanInput&>(p) = state.plan; p.statusAt = state.statusAt; ++p.revision; validate(p);
+    project_ = std::move(p); updateDirty(); staleCalculation();
+}
+void Document::undo() { if (!canUndo()) throw std::runtime_error("실행 취소할 편집이 없습니다."); applyHistory(history_[historyCursor_ - 1].before); --historyCursor_; notify(Event::Edited); }
+void Document::redo() { if (!canRedo()) throw std::runtime_error("다시 실행할 편집이 없습니다."); applyHistory(history_[historyCursor_].after); ++historyCursor_; notify(Event::Edited); }
+std::uint64_t Document::subscribe(std::function<void(Event)> listener) { auto token = ++listenerToken_; listeners_.emplace(token, std::move(listener)); return token; }
+void Document::unsubscribe(std::uint64_t token) { listeners_.erase(token); }
+void Document::notify(Event event) noexcept {
+    // Observers schedule work only; a failed observer cannot roll back a committed edit.
+    try { auto listeners = listeners_; for (const auto& [id, listener] : listeners) { (void)id; try { listener(event); } catch (...) {} } } catch (...) {}
+}
+RecoverySnapshot Document::recoverySnapshot(std::string utc) const {
+    if (!project_ || readOnly_ || !dirty_ || !validUtcStamp(utc)) throw std::runtime_error("자동 복구 저장할 편집 가능한 미저장 문서/시각이 없습니다.");
+    return {*project_, path_, fingerprint_, std::move(utc), readOnly_, requiresSaveAs_, savedState_ ? std::optional{savedState_->revision} : std::nullopt};
+}
+void Document::recover(const RecoverySnapshot& snapshot) {
+    validate(snapshot.project); if (!validUtcStamp(snapshot.capturedAt)) throw std::runtime_error("복구 시각이 잘못되었습니다.");
+    auto p = snapshot.project; p.derivedFrom = p.documentId; p.documentId = store_.newId(); validate(p);
+    RecoveryOrigin origin{snapshot.project.documentId, snapshot.sourcePath, snapshot.capturedAt, snapshot.project.revision, snapshot.lastSavedRevision};
+    project_ = std::move(p); path_.clear(); fingerprint_.clear(); lease_.reset(); savedState_.reset(); calculation_.reset();
+    dirty_ = true; readOnly_ = false; requiresSaveAs_ = true; recoveryOrigin_ = std::move(origin);
+    clearHistory("복구한 입력에서 새 편집 이력을 시작합니다. 복구 전 실행 취소 이력은 포함하지 않습니다."); ++sessionGeneration_; notify(Event::Replaced);
 }
 }

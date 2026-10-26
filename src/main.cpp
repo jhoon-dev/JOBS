@@ -1,5 +1,6 @@
 #include "persistence/JsonProjectStore.h"
 #include "ui/MainWindow.h"
+#include "persistence/JsonRecoveryStore.h"
 #include <QApplication>
 
 int main(int argc, char* argv[]) {
@@ -9,7 +10,8 @@ int main(int argc, char* argv[]) {
     QCoreApplication::setOrganizationName("ToolMoa");
     jobs::JsonProjectStore store;
     jobs::Document document(store);
-    jobs::MainWindow window(document);
+    jobs::JsonRecoveryStore recovery(jobs::JsonRecoveryStore::defaultDirectory());
+    jobs::MainWindow window(document, &recovery);
     window.show();
     return app.exec();
 }

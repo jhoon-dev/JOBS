@@ -1,8 +1,12 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "ui/ReportDialog.h"
+#include "ui/AutoSaveController.h"
 #include "domain/Wbs.h"
 #include <QAction>
+#include <QApplication>
+#include <QPointer>
+#include <QAbstractItemDelegate>
 #include <QCloseEvent>
 #include <QDateEdit>
 #include <QDialog>
@@ -11,6 +15,7 @@
 #include <QFormLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QInputMethod>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenuBar>
@@ -36,16 +41,28 @@
 
 namespace jobs {
 namespace {
+class TaskTable final : public QTableWidget {
+public:
+    using QTableWidget::QTableWidget;
+    void commitEditors() {
+        const auto editors = findChildren<QLineEdit*>();
+        for (auto* editor : editors) if (editor->isVisible()) {
+            QPointer<QWidget> guard(editor);
+            commitData(editor);
+            if (guard) closeEditor(guard.data(), QAbstractItemDelegate::NoHint);
+        }
+    }
+};
 QString qs(const std::string& s) { return QString::fromUtf8(s.data(), qsizetype(s.size())); }
 std::string str(const QString& s) { return s.toUtf8().toStdString(); }
 }
-MainWindow::MainWindow(Document& document) : document_(document) {
+MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : document_(document) {
     resize(1560, 900);
     auto* menu = menuBar()->addMenu("파일(&F)");
     auto* tools = addToolBar("파일 및 작업"); tools->setMovable(false);
     auto action = [&](const QString& name, const QKeySequence& shortcut, std::function<void()> callback) {
         auto* a = menu->addAction(name); a->setShortcut(shortcut);
-        connect(a, &QAction::triggered, this, std::move(callback)); tools->addAction(a); return a;
+        connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { commitPendingCell(); callback(); }); tools->addAction(a); return a;
     };
     action("새로 만들기(&N)", QKeySequence::New, [this] { create(); });
     action("열기(&O)…", QKeySequence::Open, [this] { open(); });
@@ -54,8 +71,18 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     menu->addSeparator();
     auto* quit = menu->addAction("종료(&X)"); quit->setShortcut(QKeySequence::Quit);
     connect(quit, &QAction::triggered, this, &QWidget::close);
+    auto* editMenu = menuBar()->addMenu("편집(&E)");
+    undo_ = editMenu->addAction("실행 취소"); undo_->setObjectName("undoEdit"); undo_->setShortcuts(QKeySequence::Undo);
+    redo_ = editMenu->addAction("다시 실행"); redo_->setObjectName("redoEdit"); redo_->setShortcuts(QKeySequence::Redo);
+    editMenu->setToolTipsVisible(true); editMenu->addSeparator();
+    editMenu->addAction("승인·제출 기록은 보존 · 실적/원가는 정정 보고로 변경")->setEnabled(false);
+    connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::commitPendingCell);
+    connect(undo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canUndo()) document_.undo(); refresh(); } catch (const std::exception& e) { report(e); } });
+    connect(redo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canRedo()) document_.redo(); refresh(); } catch (const std::exception& e) { report(e); } });
+    historyListener_ = document_.subscribe([this](auto) { updateHistoryActions(); });
     add_ = tools->addAction("작업 추가"); add_->setShortcut(QKeySequence("Ctrl+Insert"));
     connect(add_, &QAction::triggered, this, [this] {
+        commitPendingCell();
         bool ok = false;
         auto name = QInputDialog::getText(this, "작업 추가", "작업명", QLineEdit::Normal, {}, &ok).trimmed();
         if (!ok) return;
@@ -70,7 +97,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     addToolBarBreak(); auto* wbsTools = addToolBar("WBS 편집"); wbsTools->setMovable(false);
     auto wbsAction = [&](const QString& label, std::function<void()> callback) {
         auto* a = wbsMenu->addAction(label); wbsTools->addAction(a);
-        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+        connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { commitPendingCell(); callback(); }); return a;
     };
     addWbs_ = wbsAction("WBS 추가", [this] { createWbs(); });
     renameWbs_ = wbsAction("WBS 이름 변경", [this] { renameWbs(); });
@@ -85,7 +112,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     auto* trackingMenu = menuBar()->addMenu("추적(&T)");
     auto trackingAction = [&](const QString& label, std::function<void()> callback) {
         auto* a = trackingMenu->addAction(label); wbsTools->addAction(a);
-        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+        connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { commitPendingCell(); callback(); }); return a;
     };
     wbsTools->addSeparator();
     baselineSave_ = trackingAction("기준선 저장", [this] { saveBaseline(); });
@@ -101,7 +128,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     addToolBarBreak(); auto* resourceTools = addToolBar("자원 및 평준화"); resourceTools->setMovable(false);
     auto resourceAction = [&](const QString& label, const char* object, std::function<void()> callback) {
         auto* a = resourceMenu->addAction(label); a->setObjectName(object); resourceTools->addAction(a);
-        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+        connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { commitPendingCell(); callback(); }); return a;
     };
     resources_ = resourceAction("자원 등록·가용량", "manageResources", [this] { manageResources(); });
     assignResources_ = resourceAction("선택 작업 자원 배정", "assignResources", [this] { assignResources(); });
@@ -109,7 +136,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     auto* costMenu = menuBar()->addMenu("원가(&C)");
     auto costAction = [&](const QString& label, const char* object, std::function<void()> callback) {
         auto* a = costMenu->addAction(label); a->setObjectName(object); resourceTools->addAction(a);
-        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+        connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { commitPendingCell(); callback(); }); return a;
     };
     resourceTools->addSeparator();
     rates_ = costAction("통화·자원 단가", "resourceRates", [this] { editRates(); });
@@ -119,7 +146,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     auto* reportsMenu = menuBar()->addMenu("보고서(&B)");
     reports_ = reportsMenu->addAction("프로젝트 대시보드·보고서…"); reports_->setObjectName("projectReports");
     resourceTools->addSeparator(); resourceTools->addAction(reports_);
-    connect(reports_, &QAction::triggered, this, [this] { if (document_.project()) { ReportDialog dialog(document_, selectedWbs_, selectedBaseline_, this); dialog.exec(); } });
+    connect(reports_, &QAction::triggered, this, [this] { commitPendingCell(); if (document_.project()) { ReportDialog dialog(document_, selectedWbs_, selectedBaseline_, this); dialog.exec(); } });
     auto* central = new QWidget(this); auto* layout = new QVBoxLayout(central);
     auto* heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
     layout->addWidget(heading);
@@ -130,7 +157,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     auto* split = new QSplitter(Qt::Horizontal, central); layout->addWidget(split, 1);
     wbsTree_ = new QTreeWidget(split); wbsTree_->setObjectName("wbsTree"); wbsTree_->setAccessibleName("WBS 탐색");
     wbsTree_->setHeaderLabel("WBS · 프로젝트 구조"); wbsTree_->setMinimumWidth(170);
-    table_ = new QTableWidget(0, 9, split);
+    table_ = new TaskTable(0, 9, split);
     table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "FS 선행(행 번호)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -204,10 +231,12 @@ MainWindow::MainWindow(Document& document) : document_(document) {
         catch (const std::exception& e) { report(e); }
         refresh();
     });
-    refresh();
+    setupRecovery(recoveryStore); refresh();
 }
+MainWindow::~MainWindow() { document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
 void MainWindow::refresh(bool rebuildTree) {
+    updateHistoryActions();
     const QSignalBlocker blocker(table_);
     const auto& p = document_.project();
     if (p && treeDocument_ != p->documentId) {
@@ -240,7 +269,9 @@ void MainWindow::refresh(bool rebuildTree) {
         + "  |  상태일 " + (p->statusAt ? qs(*p->statusAt) : "미설정 · 현재 계획 모드")
         + "  |  기준선 " + QString::number(p->baselines.size()) + "개 · 실적 이력 " + QString::number(p->progress.size()) + "건"
         + "\n" + (document_.path().empty() ? "아직 저장하지 않은 프로젝트" : qs(document_.path()))
-        + (document_.requiresSaveAs() ? " · 이전 형식: 저장 시 새 파일 필요" : ""));
+        + (document_.recoveryOrigin() ? " · 복구 사본: 새 파일에 저장 필요" : document_.requiresSaveAs() ? " · 이전 형식: 저장 시 새 파일 필요" : "")
+        + (document_.recoveryOrigin() ? "\n복구 시각 UTC " + qs(document_.recoveryOrigin()->capturedAt) + " · 원본 r" + QString::number(document_.recoveryOrigin()->revision) + " · " + (document_.recoveryOrigin()->path.empty() ? "처음 저장 전" : qs(document_.recoveryOrigin()->path)) : "")
+        + (document_.historyNotice().empty() ? QString{} : "\n편집 이력: " + qs(document_.historyNotice())));
     const auto& calculation = document_.calculation();
     const bool valid = calculation && calculation->status == CalculationStatus::Valid;
     std::unordered_map<std::string, const TaskSchedule*> schedules;
@@ -311,16 +342,17 @@ void MainWindow::refresh(bool rebuildTree) {
         }
     }
     diagnostics_->setPlainText(calculating_ ? "계산 중 · 편집할 수 있습니다. 변경 시 계산 결과는 오래됨으로 처리됩니다." : state);
-    statusBar()->showMessage(QString(document_.readOnly() ? "읽기 전용 · " : document_.dirty() ? "미저장 변경 있음 · " : "저장된 revision · ")
+    statusBar()->showMessage(QString(document_.readOnly() ? "읽기 전용 · " : document_.dirty() ? "미저장 변경 있음 · " : "명시 저장본과 같은 입력 · ")
         + (valid ? (calculation->isForecast ? "실적·잔여 예측 · 자원 미검증" : "기간·FS 논리 일정 · 자원 미검증") : "유효한 최신 일정 없음"));
 }
 void MainWindow::calculateSchedule() {
+    commitPendingCell();
     if (!document_.project() || calculating_) return;
     const auto snapshot = *document_.project(); calculating_ = true; refresh();
     auto* watcher = new QFutureWatcher<ScheduleResult>(this);
-    connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher] {
+    connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher, session = document_.sessionGeneration()] {
         calculating_ = false;
-        try { document_.applyCalculation(watcher->result()); } catch (const std::exception& e) { report(e); }
+        try { if (document_.sessionGeneration() == session) document_.applyCalculation(watcher->result()); } catch (const std::exception& e) { report(e); }
         watcher->deleteLater(); refresh();
     });
     watcher->setFuture(QtConcurrent::run([snapshot] { return jobs::calculate(snapshot); }));
@@ -393,6 +425,7 @@ void MainWindow::chooseWbs(bool moveNode) {
     } catch (const std::exception& e) { report(e); }
 }
 void MainWindow::editHolidays() {
+    commitPendingCell();
     if (!document_.project() || document_.readOnly()) return;
     QDialog dialog(this); dialog.setWindowTitle("휴일 편집"); dialog.resize(400, 350);
     auto* layout = new QVBoxLayout(&dialog);
@@ -409,6 +442,7 @@ void MainWindow::editHolidays() {
     try { document_.setHolidays(std::move(holidays)); refresh(); } catch (const std::exception& e) { report(e); }
 }
 bool MainWindow::confirmChanges() {
+    commitPendingCell();
     if (!document_.dirty()) return true;
     auto result = QMessageBox::warning(this, "미저장 변경", "현재 프로젝트의 변경 내용을 저장하시겠습니까?",
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
@@ -416,6 +450,7 @@ bool MainWindow::confirmChanges() {
     return result != QMessageBox::Save || save(false);
 }
 bool MainWindow::save(bool as) {
+    commitPendingCell();
     if (!document_.project()) return false;
     try {
         if (as || document_.path().empty() || document_.readOnly() || document_.requiresSaveAs()) {
@@ -427,6 +462,13 @@ bool MainWindow::save(bool as) {
         } else document_.save();
         refresh(); statusBar()->showMessage("저장 완료"); return true;
     } catch (const std::exception& e) { report(e); return false; }
+}
+void MainWindow::commitPendingCell() {
+    auto* focused = QApplication::focusWidget();
+    if (focused && qobject_cast<QLineEdit*>(focused) && table_->isAncestorOf(focused)) {
+        if (auto* input = QApplication::inputMethod()) input->commit();
+    }
+    static_cast<TaskTable*>(table_)->commitEditors();
 }
 void MainWindow::create() {
     QDialog dialog(this); dialog.setWindowTitle("새 프로젝트"); dialog.resize(480, 440);
@@ -465,6 +507,6 @@ void MainWindow::open() {
 }
 void MainWindow::closeEvent(QCloseEvent* event) {
     if (baselinePreparing_) { QMessageBox::information(this, "기준선 저장 중", "기준선 계산을 마친 후 창을 닫으세요."); event->ignore(); return; }
-    if (confirmChanges()) event->accept(); else event->ignore();
+    if (confirmChanges()) { if (autosave_) autosave_->finishDocument(); event->accept(); } else event->ignore();
 }
 }

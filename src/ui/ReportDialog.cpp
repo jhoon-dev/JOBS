@@ -88,20 +88,20 @@ ReportDialog::ReportDialog(Document& d, const std::string& wbs, const std::strin
     auto* timer = new QTimer(this); timer->setInterval(250); connect(timer, &QTimer::timeout, this, [this] { if (report_ && !current()) { clear(); message_->setText("문서가 변경되었습니다. 재계산 후 내보내세요."); } }); timer->start();
     prepare();
 }
-bool ReportDialog::current() const { return report_ && document_.project() && report_->documentId == document_.project()->documentId && report_->revision == document_.project()->revision && report_->options.unsaved == document_.dirty(); }
+bool ReportDialog::current() const { return report_ && document_.project() && report_->documentId == document_.project()->documentId && report_->revision == document_.project()->revision && report_->options.unsaved == !document_.revisionSaved(); }
 void ReportDialog::exportEnabled() { auto enabled = current() && !exporting_; xlsx_->setEnabled(enabled); pdf_->setEnabled(enabled); }
 void ReportDialog::clear() { report_.reset(); while (tabs_->count()) { auto* w = tabs_->widget(0); tabs_->removeTab(0); delete w; } exportEnabled(); }
 void ReportDialog::prepare() {
     if (exporting_) return;
     const auto generation = ++generation_; clear(); if (!document_.project()) return;
     auto project = *document_.project(); ReportOptions options; options.wbsId = scope_->currentData().toString().toStdString(); options.baselineId = baseline_->currentData().toString().toStdString(); options.formula = formula_->currentData().toString().toStdString();
-    options.reportId = QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString(); options.generatedAt = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd'T'HH:mm:ss'Z'").toStdString(); options.unsaved = document_.dirty();
+    options.reportId = QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString(); options.generatedAt = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd'T'HH:mm:ss'Z'").toStdString(); options.unsaved = !document_.revisionSaved();
     if (period_->isChecked()) { options.fromDate = from_->date().toString(Qt::ISODate).toStdString(); options.toDate = to_->date().toString(Qt::ISODate).toStdString(); }
     message_->setText("보고서 스냅샷 계산 중…");
     auto* watcher = new QFutureWatcher<Prepared>(this);
-    connect(watcher, &QFutureWatcher<Prepared>::finished, this, [this, watcher, generation, id = project.documentId, revision = project.revision, dirty = options.unsaved] {
+    connect(watcher, &QFutureWatcher<Prepared>::finished, this, [this, watcher, generation, id = project.documentId, revision = project.revision, unsaved = options.unsaved] {
         const auto result = watcher->result(); watcher->deleteLater(); if (generation != generation_) return;
-        if (!document_.project() || document_.project()->documentId != id || document_.project()->revision != revision || document_.dirty() != dirty) { message_->setText("문서가 변경되었습니다. 재계산 후 내보내세요."); return; }
+        if (!document_.project() || document_.project()->documentId != id || document_.project()->revision != revision || (!document_.revisionSaved()) != unsaved) { message_->setText("문서가 변경되었습니다. 재계산 후 내보내세요."); return; }
         if (!result.error.isEmpty()) { message_->setText("보고서 오류: " + result.error); return; }
         report_ = result.report; showReport(); exportEnabled();
     });

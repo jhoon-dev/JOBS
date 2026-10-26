@@ -9,9 +9,12 @@ class QTreeWidget;
 class QComboBox;
 namespace jobs {
 class GanttView;
+class JsonRecoveryStore;
+class AutoSaveController;
 class MainWindow final : public QMainWindow {
 public:
-    explicit MainWindow(Document& document);
+    explicit MainWindow(Document& document, JsonRecoveryStore* recoveryStore = nullptr);
+    ~MainWindow() override;
 protected:
     void closeEvent(QCloseEvent* event) override;
 private:
@@ -23,6 +26,14 @@ private:
     QLabel* summary_;
     QPlainTextEdit* diagnostics_;
     QAction *save_, *saveAs_, *add_;
+    QAction *undo_ = nullptr, *redo_ = nullptr, *recover_ = nullptr, *autosaveEnabled_ = nullptr, *autosaveNow_ = nullptr;
+    std::uint64_t historyListener_ = 0;
+    std::unique_ptr<JsonRecoveryStore> recoveryStore_;
+    AutoSaveController* autosave_ = nullptr;
+    QLabel* autosaveStatus_ = nullptr;
+    void setupRecovery(JsonRecoveryStore*);
+    void showRecovery(bool startup = false);
+    void updateHistoryActions();
     QAction *calculate_, *calendar_;
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;
     QAction *baselineSave_, *statusEdit_, *progressEdit_, *comparison_;
@@ -43,6 +54,7 @@ private:
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;
     bool confirmChanges();
+    void commitPendingCell();
     bool save(bool as);
     void create();
     void open();
