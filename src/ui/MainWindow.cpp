@@ -1,6 +1,7 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "ui/ReportDialog.h"
+#include "ui/TaskInput.h"
 #include "ui/AutoSaveController.h"
 #include "domain/Wbs.h"
 #include "calculation/WorkCalendar.h"
@@ -82,8 +83,8 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::commitPendingCell);
     connect(undo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canUndo()) document_.undo(); refresh(); } catch (const std::exception& e) { report(e); } });
     connect(redo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canRedo()) document_.redo(); refresh(); } catch (const std::exception& e) { report(e); } });
-    historyListener_ = document_.subscribe([this](auto) { if(calculationControl_&&calculationSession_!=document_.sessionGeneration()){calculationControl_->cancel();queuedCalculation_.reset();}updateHistoryActions(); });
-    add_ = tools->addAction("작업 추가"); add_->setShortcut(QKeySequence("Ctrl+Insert"));
+    historyListener_ = document_.subscribe([this](auto event) { if(event==Document::Event::Replaced)taskViewReset_=true; if(calculationControl_&&calculationSession_!=document_.sessionGeneration()){calculationControl_->cancel();queuedCalculation_.reset();}updateHistoryActions(); });
+    add_ = tools->addAction("작업 추가"); add_->setShortcut(QKeySequence("Ctrl+Shift+Insert"));
     connect(add_, &QAction::triggered, this, [this] {
         commitPendingCell();
         bool ok = false;
@@ -194,20 +195,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     connect(wbsTree_, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* item) {
         selectedWbs_ = item ? str(item->data(0, Qt::UserRole).toString()) : std::string{}; refresh(false);
     });
-    connect(table_, &QTableWidget::itemSelectionChanged, this, [this] {
-        const auto row = table_->currentRow();
-        if (document_.project() && row >= 0 && std::size_t(row) < visibleRows_.size() && !table_->selectedItems().isEmpty())
-            selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
-        else selectedTask_.clear();
-        assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
-        taskCalendar_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
-        constraints_->setEnabled(!selectedTask_.empty());
-        effort_->setEnabled(!selectedTask_.empty());
-        taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
-        costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
-        gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
-        progressEdit_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
-    });
+    connect(table_, &QTableWidget::itemSelectionChanged,this,&MainWindow::syncTaskSelection);
     gantt_->taskSelected = [this](const std::string& id) {
         for (std::size_t i = 0; i < visibleRows_.size(); ++i)
             if (document_.project()->tasks[visibleRows_[i]].id == id) { table_->selectRow(int(i)); table_->scrollToItem(table_->item(int(i), 0)); break; }
@@ -224,40 +212,16 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
         try {
             const auto text = table_->item(row, column)->text().trimmed();
             const auto taskRow = visibleRows_.at(std::size_t(row));
-            if (column == 0) document_.renameTask(taskRow, str(text));
-            else if (column == 1) {
-                std::optional<std::int64_t> minutes;
-                if (QRegularExpression("^[0-9]+m$").match(text).hasMatch()) {
-                    bool ok = false; auto value = text.chopped(1).toULongLong(&ok);
-                    if (!ok || value > 5000000) throw std::runtime_error("기간은 5,000,000분 이하여야 합니다.");
-                    minutes = static_cast<std::int64_t>(value);
-                } else if (!text.isEmpty()) {
-                    if (!QRegularExpression("^[0-9]+(?:\\.[0-9]{1,3})?$").match(text).hasMatch())
-                        throw std::runtime_error("기간은 음수가 아닌 시간 수로 입력하세요. 예: 8, 1.5 (최소 단위 1분)");
-                    bool ok = false; auto value = text.toDouble(&ok) * 60;
-                    if (!ok || !std::isfinite(value) || value > 5000000 || std::abs(value - std::round(value)) > 0.000001)
-                        throw std::runtime_error("기간은 정수 근무분으로 환산되어야 하며 5,000,000분 이하여야 합니다.");
-                    minutes = static_cast<std::int64_t>(std::round(value));
-                }
-                document_.setDuration(taskRow, minutes);
-            } else {
-                std::vector<Dependency> edges;
-                for (const auto& token : text.split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts)) {
-                    const auto match=QRegularExpression("^([0-9]+)(FS|SS|FF|SF)?([+-][0-9]+(?:\\.[0-9]+)?[mhd])?$",QRegularExpression::CaseInsensitiveOption).match(token);
-                    bool ok = false; auto number = match.captured(1).toULongLong(&ok);
-                    if (!ok || number < 1 || number > document_.project()->tasks.size())
-                        throw std::runtime_error("선행 입력: 1, 2SS+2h, 3FF-30m, 4SF+1d (d=480 근무분). 자기 참조·중복은 허용하지 않습니다.");
-                    const auto lag=match.captured(3).toLower(); double minutes=0;
-                    if (!lag.isEmpty()) { minutes=lag.chopped(1).toDouble(&ok)*(lag.endsWith('d')?480:lag.endsWith('h')?60:1); if (!ok || !std::isfinite(minutes) || std::abs(minutes)>5000000 || std::abs(minutes-std::round(minutes))>0.000001) throw std::runtime_error("지연/선행은 ±5,000,000 정수 근무분 이내입니다."); }
-                    if (number-1==taskRow) throw std::runtime_error("자기 자신을 선행 작업으로 지정할 수 없습니다.");
-                    edges.push_back({document_.project()->tasks[std::size_t(number - 1)].id,match.captured(2).isEmpty()?"FS":str(match.captured(2).toUpper()),std::int64_t(std::round(minutes))});
-                }
-                document_.setDependencies(taskRow, std::move(edges));
-            }
+            const auto& id=document_.project()->tasks.at(taskRow).id;
+            if(column==0)document_.renameTask(taskRow,str(text));
+            else if(column==1)document_.setDuration(taskRow,taskDurationInput(text));
+            else document_.setDependencies(taskRow,taskDependencyInput(text,*document_.project(),id));
         }
         catch (const std::exception& e) { report(e); }
         refresh();
     });
+    setupTaskEditing(editMenu,layout);
+    connect(table_,&QTableWidget::currentCellChanged,this,&MainWindow::syncTaskSelection);
     setupRecovery(recoveryStore); refresh();
 }
 MainWindow::~MainWindow() { if(calculationControl_)calculationControl_->cancel();document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
@@ -268,8 +232,11 @@ void MainWindow::refresh(bool rebuildTree) {
     struct RestoreUpdates { QWidget* widget;bool enabled;~RestoreUpdates(){widget->setUpdatesEnabled(enabled);} } restoreUpdates{table_,updates};
     updateHistoryActions();
     const QSignalBlocker blocker(table_);
+    const int selectedColumn=std::max(0,table_->currentColumn());
     const auto& p = document_.project();
-    if (p && treeDocument_ != p->documentId) {
+    if (p && (treeDocument_ != p->documentId || taskViewReset_)) {
+        taskViewReset_=false;selectedTaskIds_.clear();
+        const QSignalBlocker searchBlock(taskSearch_),filterBlock(taskFilter_),sortBlock(taskSort_);taskSearch_->clear();taskFilter_->setCurrentIndex(0);taskSort_->setCurrentIndex(0);
         selectedWbs_.clear(); selectedTask_.clear(); treeDocument_ = p->documentId;
         selectedBaseline_ = p->baselines.empty() ? std::string{} : p->baselines.back().id;
     }
@@ -288,6 +255,7 @@ void MainWindow::refresh(bool rebuildTree) {
     const bool nodeEditable = p.has_value() && !document_.readOnly() && !selectedWbs_.empty();
     renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
     visibleRows_ = p ? wbsTaskRows(*p, selectedWbs_) : std::vector<std::size_t>{};
+    applyTaskView();
     table_->setRowCount(int(visibleRows_.size())); table_->clearSelection(); table_->setCurrentCell(-1, -1);
     refreshTracking();
     resources_->setEnabled(p.has_value());
@@ -315,11 +283,9 @@ void MainWindow::refresh(bool rebuildTree) {
     std::unordered_map<std::string,QStringList> assignedLabels;std::unordered_map<std::string,std::string> resourceNames;
     for(const auto& r:p->resources)resourceNames[r.id]=r.name;
     for(const auto& a:p->assignments)assignedLabels[a.taskId]<<qs(resourceNames.at(a.resourceId))+" "+QString::number(a.units)+"%";
-    int selectedRow = -1;
     for (int row = 0; row < int(visibleRows_.size()); ++row) {
         const auto taskIndex = visibleRows_[std::size_t(row)]; const auto& t = p->tasks[taskIndex];
         table_->setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(taskIndex + 1)));
-        if (t.id == selectedTask_) selectedRow = row;
         QStringList predecessors;
         for (const auto& d : dependencies(t)) predecessors << (numbers.contains(d.predecessorId) ? QString::number(numbers.at(d.predecessorId)) : "누락:" + qs(d.predecessorId)) + (d.type=="FS" && !d.lagMinutes?QString{}:qs(d.type)+(d.lagMinutes>=0?"+":"")+QString::number(d.lagMinutes)+"m");
         auto found = schedules.find(t.id); const auto* s = found == schedules.end() ? nullptr : found->second;
@@ -343,7 +309,7 @@ void MainWindow::refresh(bool rebuildTree) {
             table_->setItem(row, column, item);
         }
     }
-    if (selectedRow >= 0) table_->selectRow(selectedRow); else selectedTask_.clear();
+    restoreTaskSelection(selectedColumn);
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && p->statusAt.has_value());

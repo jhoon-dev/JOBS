@@ -33,6 +33,15 @@ jobs:
           python scripts/verify-report-fixtures.py build
       - name: Measure deterministic 1k and 10k schedules and UI
         run: python scripts/run-performance-probes.py --repeats 3
+      - name: Capture native task editing screen
+        run: python scripts/capture-task-editing-ui.py build
+      - name: Preserve native UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-editing-ui-${{ runner.os }}
+          path: build/task-editing-native-smoke.png
+          if-no-files-found: warn
       - name: Preserve performance evidence
         if: always()
         uses: actions/upload-artifact@v4

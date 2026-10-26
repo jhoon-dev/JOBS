@@ -163,3 +163,6 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 
 
 성능·통합 검증 증분은 PRD PERF-01~04를 구현 전에 커밋하고 계산 진행/협력 취소, 요청/session 보호, 동일 스냅샷의 달력/공수 격자 공유와 화면 주변 간트를 추가했다. `calculation_cancellation`, `integrated_project_workflow`, `performance_cancellation_ui`로 CTest 26개를 구성한다. 로컬 26/26·Windows 네이티브 새 UI·독립 XLSX 5/PDF 6 검사를 통과했다. [측정 계약·원시 결과·한계](performance-integration.md)를 따르며 CI는 1천/1만 기본·공수 사례를 별도 프로세스에서 실행해 JSON/log artifact를 남긴다. 파일 schema/기존 계산 정책은 유지한다.
+
+
+작업 편집 증분은 PRD EDIT-01~05를 먼저 정의한 뒤 `TaskEditing`의 Qt 독립 원자적 명령과 표 입력/TSV 공통 파서, ID 기반 검색/필터/정렬/선택을 구현했다. `task_editing_contract`, `task_editing_ui`로 CTest 28개이며 로컬 전체 28/28·네이티브 Windows UI·독립 XLSX/PDF 검사를 통과했다. [작업 편집 계약](task-editing.md)에 삭제 보호·복제 범위·붙여넣기 한도·완료 증거와 후속 범위를 기록한다.

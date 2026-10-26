@@ -8,6 +8,16 @@
 #include <map>
 
 namespace jobs {
+struct TaskEdit {
+    std::string taskId;
+    std::optional<std::string> name;
+    std::optional<std::optional<std::int64_t>> duration;
+    std::optional<std::vector<Dependency>> edges;
+};
+struct TaskRemoval {
+    std::size_t tasks=0, links=0, assignments=0, costs=0;
+    std::vector<std::string> protectedTaskIds;
+};
 class Document {
 public:
     enum class Event { Edited, Saved, Replaced };
@@ -36,6 +46,11 @@ public:
     void open(const std::string& path, bool readOnly = false);
     void renameTask(std::size_t row, std::string name);
     void addTask(std::string name, std::string wbsId = {});
+    std::vector<std::string> insertTasks(const std::vector<std::string>& names, const std::string& beforeId={}, const std::string& wbsId={});
+    TaskRemoval previewRemoveTasks(const std::vector<std::string>& ids) const;
+    void removeTasks(const std::vector<std::string>& ids);
+    std::vector<std::string> duplicateTasks(const std::vector<std::string>& ids);
+    void editTasks(const std::vector<TaskEdit>& changes);
     std::string addWbs(std::string name, std::string parentId = {});
     void renameWbs(const std::string& id, std::string name);
     void moveWbs(const std::string& id, std::string parentId);
