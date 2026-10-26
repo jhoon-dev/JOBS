@@ -18,6 +18,25 @@ struct WbsNode {
     std::string id, name, parentId;
     bool operator==(const WbsNode&) const = default;
 };
+// Renewable capacity, in hundredths of a unit (100 = one person/machine).
+// Unknown capacity is distinct from zero. Exceptions replace the daily maximum.
+struct CapacityDay {
+    std::string date;
+    std::optional<int> units;
+    bool operator==(const CapacityDay&) const = default;
+};
+struct Resource {
+    std::string id, name;
+    std::string type = "labor";
+    std::optional<int> maxUnits = 100;
+    std::vector<CapacityDay> exceptions;
+    bool operator==(const Resource&) const = default;
+};
+struct Assignment {
+    std::string taskId, resourceId;
+    int units = 100;
+    bool operator==(const Assignment&) const = default;
+};
 struct PlanInput {
     std::string name;
     std::string startDate;
@@ -26,6 +45,8 @@ struct PlanInput {
     std::vector<std::string> holidays;
     std::string calculationProfile = "native-fs0-workminutes-v1";
     std::vector<WbsNode> wbsNodes;
+    std::vector<Resource> resources;
+    std::vector<Assignment> assignments;
     bool operator==(const PlanInput&) const = default;
 };
 struct Baseline {
@@ -47,6 +68,17 @@ struct ProgressEntry {
     std::int64_t remainingMinutes = 0;
     bool operator==(const ProgressEntry&) const = default;
 };
+struct LevelingScenario {
+    std::string id, name, createdAt, sourceDocumentId;
+    std::uint64_t inputRevision = 0;
+    std::string policy = "serial-no-split-v1";
+    std::string priority = "task-order";
+    int horizonWorkDays = 260;
+    PlanInput input;
+    std::optional<std::string> statusAt;
+    std::vector<ProgressEntry> progress;
+    bool operator==(const LevelingScenario&) const = default;
+};
 struct Project : PlanInput {
     std::string documentId;
     std::string derivedFrom;
@@ -54,6 +86,7 @@ struct Project : PlanInput {
     std::vector<Baseline> baselines;
     std::vector<ProgressEntry> progress;
     std::optional<std::string> statusAt;
+    std::vector<LevelingScenario> scenarios;
     bool operator==(const Project&) const = default;
 };
 // Domain uses ISO civil dates, without a UI locale or implicit timezone.

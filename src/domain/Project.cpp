@@ -71,6 +71,22 @@ void validatePlan(const PlanInput& p) {
         for (const auto& id : t.predecessors)
             if (blank(id) || !refs.insert(id).second) throw std::runtime_error("선행 작업 ID 누락 또는 중복입니다.");
     }
+    std::unordered_set<std::string> resources, pairs;
+    const auto validUnits = [](const std::optional<int>& n) { return !n || (*n >= 0 && *n <= 100000); };
+    for (const auto& r : p.resources) {
+        if (blank(r.id) || blank(r.name) || !resources.insert(r.id).second || ids.contains(r.id) || nodes.contains(r.id) ||
+            (r.type != "labor" && r.type != "equipment") || !validUnits(r.maxUnits))
+            throw std::runtime_error("자원 ID·이름·종류·가용량이 잘못되었습니다. 가용량은 미정 또는 0~100,000%입니다.");
+        std::unordered_set<std::string> dates;
+        for (const auto& d : r.exceptions) if (!validDate(d.date) || !dates.insert(d.date).second || !validUnits(d.units))
+            throw std::runtime_error("자원 가용량 예외 날짜 중복 또는 값 오류입니다.");
+    }
+    for (const auto& a : p.assignments) {
+        // Length prefix avoids collisions even if imported IDs contain separators.
+        auto pair = std::to_string(a.taskId.size()) + ":" + a.taskId + a.resourceId;
+        if (!ids.contains(a.taskId) || !resources.contains(a.resourceId) || a.units <= 0 || a.units > 100000 || !pairs.insert(pair).second)
+            throw std::runtime_error("배정할 작업·자원이 없거나 배정률 중복/범위 오류입니다. 1~100,000%를 사용하세요.");
+    }
 }
 void validate(const Project& p) {
     validatePlan(p);
@@ -112,6 +128,18 @@ void validate(const Project& p) {
         if (e.actualStart && e.actualDurationMinutes > civilMinute(e.actualFinish.value_or(e.statusAt)) - civilMinute(*e.actualStart))
             throw std::runtime_error("실제 소요 기간이 실제 시작부터 완료/상태일까지의 경과시간보다 큽니다. 공수와 기간을 구분해 입력하세요.");
         previous[e.taskId] = e.id;
+    }
+    std::unordered_set<std::string> scenarios;
+    for (const auto& s : p.scenarios) {
+        if (blank(s.id) || !scenarios.insert(s.id).second || blank(s.name) || !validUtcStamp(s.createdAt) || blank(s.sourceDocumentId) ||
+            !s.inputRevision || s.inputRevision >= p.revision || s.policy != "serial-no-split-v1" ||
+            (s.priority != "task-order" && s.priority != "shortest-first" && s.priority != "longest-first") ||
+            s.horizonWorkDays < 1 || s.horizonWorkDays > 5200)
+            throw std::runtime_error("평준화 시나리오의 메타데이터·정책·탐색 범위가 잘못되었습니다.");
+        Project snapshot; static_cast<PlanInput&>(snapshot) = s.input;
+        snapshot.documentId = s.sourceDocumentId; snapshot.revision = s.inputRevision;
+        snapshot.statusAt = s.statusAt; snapshot.progress = s.progress;
+        validate(snapshot);
     }
 }
 const ProgressEntry* progressAsOf(const Project& p, const std::string& taskId) {

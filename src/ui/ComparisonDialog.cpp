@@ -82,13 +82,16 @@ void ComparisonDialog::display(const ComparisonReport& r) {
             hours(row.actualMinutes), hours(row.remainingMinutes), row.durationProgressPercent ? QString::number(*row.durationProgressPercent, 'f', 1) : "미정",
             stamp(row.forecastFinish), variance(row.forecastFinishVariance), changes.isEmpty() ? "계획 입력 동일" : changes.join(" · "),
             stamp(row.baselineStart), stamp(row.planStart), stamp(row.forecastStart)};
-        QStringList oldPred, newPred;
+        QStringList oldPred, newPred, oldResources, newResources;
         for (const auto& id : row.baselinePredecessors) oldPred << qs(id);
         for (const auto& id : row.planPredecessors) newPred << qs(id);
+        for (const auto& a : row.baselineAssignments) oldResources << qs(a);
+        for (const auto& a : row.planAssignments) newResources << qs(a);
         const auto detail = "작업 ID: " + qs(row.taskId) + "\n이름: " + (row.baselineName.empty() ? "—" : qs(row.baselineName)) + " → " + qs(row.name)
             + " | 계획 기간: " + hours(row.baselineDuration) + "h → " + hours(row.planDuration) + "h"
             + "\nWBS: " + qs(row.baselineWbsPath) + " → " + qs(row.planWbsPath)
-            + "\nFS 선행 ID: " + (oldPred.isEmpty() ? "없음/미설정" : oldPred.join(", ")) + " → " + (newPred.isEmpty() ? "없음/미설정" : newPred.join(", "));
+            + "\nFS 선행 ID: " + (oldPred.isEmpty() ? "없음/미설정" : oldPred.join(", ")) + " → " + (newPred.isEmpty() ? "없음/미설정" : newPred.join(", "))
+            + "\n자원 배정: " + (oldResources.isEmpty() ? "없음" : oldResources.join(", ")) + " → " + (newResources.isEmpty() ? "없음" : newResources.join(", "));
         for (int col = 0; col < values.size(); ++col) {
             auto* item = new QTableWidgetItem(values[col]); item->setData(Qt::UserRole, qs(row.taskId));
             item->setData(Qt::UserRole + 1, detail);

@@ -96,6 +96,15 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     connect(baselineChoice_, &QComboBox::currentIndexChanged, this, [this] {
         selectedBaseline_ = str(baselineChoice_->currentData().toString()); refresh(false);
     });
+    auto* resourceMenu = menuBar()->addMenu("자원(&R)");
+    addToolBarBreak(); auto* resourceTools = addToolBar("자원 및 평준화"); resourceTools->setMovable(false);
+    auto resourceAction = [&](const QString& label, const char* object, std::function<void()> callback) {
+        auto* a = resourceMenu->addAction(label); a->setObjectName(object); resourceTools->addAction(a);
+        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+    };
+    resources_ = resourceAction("자원 등록·가용량", "manageResources", [this] { manageResources(); });
+    assignResources_ = resourceAction("선택 작업 자원 배정", "assignResources", [this] { assignResources(); });
+    resourceComparison_ = resourceAction("기간별 부하·평준화 비교", "resourceComparison", [this] { showResources(); });
     auto* central = new QWidget(this); auto* layout = new QVBoxLayout(central);
     auto* heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
     layout->addWidget(heading);
@@ -130,6 +139,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
         if (document_.project() && row >= 0 && std::size_t(row) < visibleRows_.size() && !table_->selectedItems().isEmpty())
             selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
         else selectedTask_.clear();
+        assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         progressEdit_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
     });
@@ -200,6 +210,9 @@ void MainWindow::refresh(bool rebuildTree) {
     visibleRows_ = p ? wbsTaskRows(*p, selectedWbs_) : std::vector<std::size_t>{};
     table_->setRowCount(int(visibleRows_.size())); table_->clearSelection(); table_->setCurrentCell(-1, -1);
     refreshTracking();
+    resources_->setEnabled(p.has_value());
+    assignResources_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
+    resourceComparison_->setEnabled(p.has_value());
     if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
         gantt_->setPlan(nullptr, nullptr, {}); assignWbs_->setEnabled(false); statusBar()->showMessage("준비"); return; }
     summary_->setText(qs(p->name) + "  |  시작일 " + qs(p->startDate) + "  |  revision " + QString::number(p->revision)
@@ -228,6 +241,10 @@ void MainWindow::refresh(bool rebuildTree) {
             predecessors.join(","), s ? qs(s->start) : "미계산", s ? qs(s->finish) : "미계산",
             s && !calculation->isForecast ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—",
             s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id)};
+        QStringList assigned;
+        for (const auto& a : p->assignments) if (a.taskId == t.id) for (const auto& r : p->resources) if (r.id == a.resourceId)
+            assigned << qs(r.name) + " " + QString::number(a.units) + "%";
+        if (!assigned.isEmpty()) values[7] = assigned.join(", ");
         for (int column = 0; column < values.size(); ++column) {
             auto* item = new QTableWidgetItem(values[column]);
             if (column > 2 || document_.readOnly()) item->setFlags(item->flags() & ~Qt::ItemIsEditable);
@@ -238,6 +255,7 @@ void MainWindow::refresh(bool rebuildTree) {
     if (selectedRow >= 0) table_->selectRow(selectedRow); else selectedTask_.clear();
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     refreshTracking();
+    assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_); gantt_->setSelectedTask(selectedTask_);
     const Baseline* baseline = nullptr;
     for (const auto& b : p->baselines) if (b.id == selectedBaseline_) baseline = &b;

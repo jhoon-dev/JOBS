@@ -30,6 +30,11 @@ public:
     std::string appendBaseline(Baseline prepared);
     std::string captureBaseline(std::string name, std::string approvedBy, std::string reason, std::string createdAt);
     void recordProgress(ProgressEntry entry);
+    std::string putResource(Resource resource);
+    void removeResource(const std::string& id);
+    void setAssignments(const std::string& taskId, std::vector<Assignment> assignments);
+    std::string saveScenario(std::string name, std::string priority, int horizonWorkDays, std::string createdAt,
+                             const std::string& sourceId, std::uint64_t sourceRevision);
     void applyCalculation(ScheduleResult result);
     void save();
     void saveAs(const std::string& path);

@@ -6,14 +6,14 @@ DESK-01/04/05 및 FILE-01/02/03/05/07/09의 초기 수직 흐름이다.
 
 ## 구성
 
-- `jobs_domain`: 표준 C++20 프로젝트·작업·WBS·기준선·실적 원장·날짜·revision 검증 및 계층 탐색. Qt 의존 없음.
-- `jobs_calculation`: 표준 C++20 FS0 CPM, 달력, retained remaining 예측, 기준선 준비/검증, 계획/예측 비교. Qt 의존 없음.
+- `jobs_domain`: 표준 C++20 프로젝트·작업·WBS·기준선·실적 원장·자원/배정·불변 시나리오·날짜·revision 검증 및 계층 탐색. Qt 의존 없음.
+- `jobs_calculation`: 표준 C++20 FS0 CPM, 달력, retained remaining 예측, 기준선 준비/검증, 계획/예측 비교, 자원 수요/가용량 및 비분할 직렬 평준화. Qt 의존 없음.
 - `jobs_application`: 문서 세션, 생성/열기/편집/저장/사본, 추상 저장 포트.
 - `jobs_persistence`: Qt Core JSON, checksum, 잠금, 외부 변경 감지, 원자적 교체.
-- `jobs_ui`: Qt Widgets WBS·표·간트, 기준선/상태일/실적 대화상자, 비동기 비교 표·변경 상세, 미저장 변경 확인.
+- `jobs_ui`: Qt Widgets WBS·표·간트, 기준선/상태일/실적 대화상자, 자원 등록/배정·비동기 부하/시나리오 A/B 비교, 변경 상세, 미저장 변경 확인.
 
 기간 미정(null)과 마일스톤(0분)을 구분한다. 기간·FS 선행·휴일을 입력하면 F9로
-기간 중심 논리 일정을 계산한다. 자원은 미설정·미검증으로 표시한다.
+기간 중심 논리 일정을 계산한다. F9는 자원과 독립인 논리 일정이다. 자원 메뉴에서 별도로 배정·일별 부하와 평준화 시나리오를 비교한다.
 기본 달력은 월~금 09–12/13–18이며 날짜는 시간대 없는 ISO civil date다.
 WBS는 별도 그룹 트리로 편집하며 작업을 그룹에 배치한다. 간트에 최신 계산 결과·마일스톤·FS 연결선을 표시한다.
 추적 메뉴에서 기준선을 새 버전으로 저장하고 상태일·실제 시작/완료·실제 소요/잔여 근무분을 입력한다.
@@ -23,6 +23,7 @@ WBS는 별도 그룹 트리로 편집하며 작업을 그룹에 배치한다. �
 [현재 계산 정책·수용시험·입력 예제](calculation-native-v1.md)를 참고한다.
 [WBS·표·간트 사용법과 검증 계약](wbs-gantt.md)을 함께 따른다.
 [기준선·실적·변경 비교 계약](baseline-progress.md)에 재현 예제와 예측 범위를 기록한다.
+[자원·평준화 계약](resources-leveling.md)은 정률 배정·일별 최대 부하·별도 시나리오·재계산/출처와 후속 범위를 정의한다.
 
 ## 빌드와 실행
 
@@ -61,11 +62,11 @@ open build/JOBS.app
 GitHub Actions는 Windows/macOS 빌드와 계산·파일·화면 테스트를 수행한다.
 macOS는 `macos-15`와 Xcode 16.4를 고정한다. 최신 SDK에서 Qt 6.8.3의 AGL 링크 실패를 확인했다.
 
-## 현재 `.jobs` 형식 (schema 4)
+## 현재 `.jobs` 형식 (schema 5)
 
-UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 4`, `payload`, `sha256`을 보존한다.
+UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 5`, `payload`, `sha256`을 보존한다.
 payload에는 documentId, derivedFrom, revision, name, startDate, calendar, tasks, holidays,
-calculationProfile, wbsNodes, statusAt, baselines, progress가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·FS 선행 ID 목록·wbsId를 갖는다.
+calculationProfile, wbsNodes, resources, assignments, statusAt, baselines, progress, scenarios가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·FS 선행 ID 목록·wbsId를 갖는다.
 WBS 노드는 ID·이름·parentId를 가지며 빈 부모/소속 ID는 프로젝트 루트다. 순환·누락 부모·누락 소속을 거절한다.
 현재 계산 결과는 세션 cache이며 재열기 후 F9로 재계산한다. 기준선의 동결 결과는 파일에 보존한다.
 기준선 입력과 결과는 열기/저장 시 고정 엔진으로 재검산한다. 실적은 source document/revision·상태일·UTC 기록시각·보고자·사유·이전 보고 ID를 보존한다.
@@ -82,8 +83,8 @@ QSaveFile로 임시 파일을 쓰고 flush 후 commit한다. 직접 덮어쓰기
 QLockFile sidecar는 전달 파일이 아니며 단일 writer를 위한 협조적 잠금이다.
 잠금 실패 시 읽기 전용 열기와 다른 이름 저장을 제공한다.
 외부 비협조 writer의 검사 직후 변경, 네트워크/동기화 폴더 원자성, 정전 내구성은 보장하지 않는다.
-schema 1/2/3은 ID·revision·기존 입력을 유지하여 읽고 새 필드에 null/빈 목록/미분류/빈 이력을 적용한다.
-이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 4 사본을 만들며
+schema 1/2/3/4는 ID·revision·기존 입력을 유지하여 읽고 새 필드에 null/빈 목록/미분류/빈 이력을 적용한다.
+이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 5 사본을 만들며
 원본 bytes를 보존한다. 일반적인 다단계 이관·자동복구 checkpoint·백업은 아직 없다.
 미지원 버전은 원본을 수정하지 않는다.
 
@@ -93,7 +94,7 @@ schema 1/2/3은 ID·revision·기존 입력을 유지하여 읽고 새 필드에
 사본의 ID/계보·원본 bytes 보존, 중복 writer 잠금, 읽기 전용 사본, 외부 변경 거절,
 JSON 손상/checksum/신버전/알 수 없는 필드/중복 ID, 열기·저장 실패 시 세션 보존,
 단일 파일 복사, 계산 입력 왕복, revision/문서 ID가 다른 결과의 STALE 처리,
-schema 1/2→4 사본 이관·WBS 계층/작업 소속 왕복·손상 계층 거절을 검사한다. 이는 FILE-T01/T02/T06/T08/T09 일부에 해당한다.
+schema 1/2→5 사본 이관·WBS 계층/작업 소속 왕복·손상 계층 거절을 검사한다. 이는 FILE-T01/T02/T06/T08/T09 일부에 해당한다.
 
 GUI 수동 점검: 새로 만들기→작업 목록 입력→저장→작업명 편집→열기/종료 시
 저장·버리기·취소→다른 이름 저장→원본 재열기. 두 앱으로 같은 파일 열기와 읽기 전용 사본도 확인한다.
@@ -111,7 +112,7 @@ GUI 수동 점검: 새로 만들기→작업 목록 입력→저장→작업명 
 
 `jobs_tracking_tests`는 F09의 +8h·기준선 불변/버전·계획/예측 분리, F08 잔여 논리, 완료 실제 고정,
 상태일 조회·과거일 정정·잘못된 보고 거절·미보고/미정·읽기 전용을 검사한다.
-`jobs_tracking_file_tests`는 기준선/실적 원장 왕복·사본의 원본 계보·달력 불변·기준선 재계산 무결성·잘못된 원장·schema 3→4 사본 저장을 검사한다.
+`jobs_tracking_file_tests`는 기준선/실적 원장 왕복·사본의 원본 계보·달력 불변·기준선 재계산 무결성·잘못된 원장·schema 3→5 사본 저장을 검사한다.
 `jobs_tracking_ui_tests`는 기준선/상태일/실적/비교 대화상자, +8h 표시·미보고 coverage·회색 기준선 선택,
 모순 보고 오류·정정 이력·새 기준선 버전·저장/재열기를 검사한다.
 
@@ -130,3 +131,9 @@ WBS·간트 화면 테스트도 Windows 네이티브 플랫폼에서 통과했�
 앱이 생성한 화면 이미지에서 한글·날짜·진단 표시를 확인했다. offscreen 테스트 이미지는
 Windows의 폰트 로딩 차이로 글리프가 사각형으로 보이므로 시각 검토에 사용하지 않았다.
 macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
+
+자원 증분은 `resource_contract_file`, `resource_ui`를 포함한 10개 테스트로 확장했다.
+자원/배정·날짜 예외·불변 시나리오/기준선·schema 4→5 이관 및 분 단위 독립 수요 검산을 포함한다.
+
+이번 증분에서 로컬 Release 전체 10/10 및 Windows 네이티브 자원 화면 테스트를 통과했다.
+등록·A/B 일정 비교·원본 과부하·주 화면 이미지를 확인하고 다크 테마의 경고 행 글자 대비를 보정했다.

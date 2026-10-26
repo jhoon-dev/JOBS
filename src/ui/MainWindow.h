@@ -29,6 +29,10 @@ private:
     QComboBox* baselineChoice_;
     std::string selectedBaseline_;
     bool baselinePreparing_ = false;
+    QAction *resources_, *assignResources_, *resourceComparison_;
+    void manageResources();
+    void assignResources();
+    void showResources();
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;

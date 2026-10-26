@@ -13,6 +13,15 @@ std::optional<std::int64_t> delta(const WorkCalendar& calendar, const std::optio
     try { return calendar.offset(*now) - calendar.offset(*old); } catch (const std::exception&) { return std::nullopt; }
 }
 std::vector<std::string> sorted(std::vector<std::string> input) { std::sort(input.begin(), input.end()); return input; }
+std::vector<std::string> assignments(const PlanInput& p, const std::string& taskId, bool names) {
+    std::vector<std::string> result;
+    for (const auto& a : p.assignments) if (a.taskId == taskId) {
+        std::string label;
+        if (names) for (const auto& r : p.resources) if (r.id == a.resourceId) label = r.name + " ";
+        result.push_back(label + "[" + a.resourceId + "] " + std::to_string(a.units) + "%");
+    }
+    return sorted(std::move(result));
+}
 std::string wbsPath(const PlanInput& p, std::string id) {
     std::unordered_map<std::string, const WbsNode*> nodes;
     for (const auto& n : p.wbsNodes) nodes.emplace(n.id, &n);
@@ -54,12 +63,14 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
         if (baseline->input.calendar != p.calendar || sorted(baseline->input.holidays) != sorted(p.holidays)) report.contextChanges.push_back("달력/휴일 변경");
         if (baseline->input.calculationProfile != p.calculationProfile) report.contextChanges.push_back("계산 정책 변경");
         if (baseline->input.wbsNodes != p.wbsNodes) report.contextChanges.push_back("프로젝트 WBS 정의 변경");
+        if (baseline->input.resources != p.resources) report.contextChanges.push_back("자원 정의/날짜별 가용량 변경");
     }
     if (report.plan.status == CalculationStatus::Valid) for (const auto& row : report.plan.tasks) planDates.emplace(row.taskId, &row);
     if (report.forecast.status == CalculationStatus::Valid) for (const auto& row : report.forecast.tasks) forecastDates.emplace(row.taskId, &row);
     for (const auto& t : p.tasks) {
         TaskComparison row; row.taskId = t.id; row.name = t.name;
         row.planDuration = t.durationMinutes; row.planPredecessors = t.predecessors; row.planWbsPath = wbsPath(p, t.wbsId);
+        row.planAssignments = assignments(p, t.id, true);
         if (baselineDates.contains(t.id)) { row.baselineStart = baselineDates.at(t.id)->start; row.baselineFinish = baselineDates.at(t.id)->finish; }
         if (planDates.contains(t.id)) { row.planStart = planDates.at(t.id)->start; row.planFinish = planDates.at(t.id)->finish; }
         if (forecastDates.contains(t.id)) { row.forecastStart = forecastDates.at(t.id)->start; row.forecastFinish = forecastDates.at(t.id)->finish; }
@@ -77,10 +88,12 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
                 const auto& old = *before.at(t.id);
                 row.baselineName = old.name; row.baselineDuration = old.durationMinutes;
                 row.baselinePredecessors = old.predecessors; row.baselineWbsPath = wbsPath(baseline->input, old.wbsId);
+                row.baselineAssignments = assignments(baseline->input, t.id, true);
                 if (old.name != t.name) row.changes.push_back("이름 변경");
                 if (old.durationMinutes != t.durationMinutes) row.changes.push_back("계획 기간 변경");
                 if (sorted(old.predecessors) != sorted(t.predecessors)) row.changes.push_back("선행관계 변경");
                 if (old.wbsId != t.wbsId) row.changes.push_back("WBS 소속 변경");
+                if (assignments(baseline->input, t.id, false) != assignments(p, t.id, false)) row.changes.push_back("자원 배정 변경");
             }
             row.planFinishVariance = delta(*calendar, row.baselineFinish, row.planFinish);
             row.forecastFinishVariance = delta(*calendar, row.baselineFinish, row.forecastFinish);
@@ -91,6 +104,7 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
     if (baseline) for (const auto& old : baseline->input.tasks) if (before.contains(old.id)) {
         TaskComparison row; row.taskId = old.id; row.name = old.name; row.baselineStart = baselineDates.at(old.id)->start;
         row.baselineName = old.name; row.baselineDuration = old.durationMinutes; row.baselinePredecessors = old.predecessors; row.baselineWbsPath = wbsPath(baseline->input, old.wbsId);
+        row.baselineAssignments = assignments(baseline->input, old.id, true);
         row.baselineFinish = baselineDates.at(old.id)->finish; row.changes.push_back("현재 계획에서 삭제된 작업"); report.tasks.push_back(std::move(row));
     }
     return report;

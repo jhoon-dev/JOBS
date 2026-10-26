@@ -42,6 +42,7 @@ QStringList planKeys(int schema) {
     QStringList result{"name", "startDate", "calendar", "tasks"};
     if (schema >= 2) result.append({"holidays", "calculationProfile"});
     if (schema >= 3) result.append("wbsNodes");
+    if (schema >= 5) result.append({"resources", "assignments"});
     return result;
 }
 QJsonObject encodePlan(const PlanInput& p) {
@@ -49,8 +50,16 @@ QJsonObject encodePlan(const PlanInput& p) {
     for (const auto& t : p.tasks) tasks.append(QJsonObject{{"id", qs(t.id)}, {"name", qs(t.name)}, {"wbsId", qs(t.wbsId)},
         {"durationMinutes", t.durationMinutes ? QJsonValue(double(*t.durationMinutes)) : QJsonValue(QJsonValue::Null)}, {"predecessors", strings(t.predecessors)}});
     for (const auto& n : p.wbsNodes) nodes.append(QJsonObject{{"id", qs(n.id)}, {"name", qs(n.name)}, {"parentId", qs(n.parentId)}});
+    QJsonArray resources, assignments;
+    for (const auto& r : p.resources) {
+        QJsonArray exceptions;
+        for (const auto& d : r.exceptions) exceptions.append(QJsonObject{{"date", qs(d.date)}, {"units", d.units ? QJsonValue(*d.units) : QJsonValue(QJsonValue::Null)}});
+        resources.append(QJsonObject{{"id", qs(r.id)}, {"name", qs(r.name)}, {"type", qs(r.type)},
+            {"maxUnits", r.maxUnits ? QJsonValue(*r.maxUnits) : QJsonValue(QJsonValue::Null)}, {"exceptions", exceptions}});
+    }
+    for (const auto& a : p.assignments) assignments.append(QJsonObject{{"taskId", qs(a.taskId)}, {"resourceId", qs(a.resourceId)}, {"units", a.units}});
     return {{"name", qs(p.name)}, {"startDate", qs(p.startDate)}, {"calendar", qs(p.calendar)}, {"tasks", tasks},
-        {"holidays", strings(p.holidays)}, {"calculationProfile", qs(p.calculationProfile)}, {"wbsNodes", nodes}};
+        {"holidays", strings(p.holidays)}, {"calculationProfile", qs(p.calculationProfile)}, {"wbsNodes", nodes}, {"resources", resources}, {"assignments", assignments}};
 }
 PlanInput decodePlan(const QJsonObject& o, int schema) {
     keys(o, planKeys(schema)); PlanInput p;
@@ -58,6 +67,23 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
     if (schema >= 2) { p.holidays = readStrings(o, "holidays"); p.calculationProfile = string(o, "calculationProfile"); }
     if (schema >= 3) for (const auto& v : array(o, "wbsNodes")) {
         auto n = object(v); keys(n, {"id", "name", "parentId"}); p.wbsNodes.push_back({string(n, "id"), string(n, "name"), string(n, "parentId")});
+    }
+    if (schema >= 5) {
+        for (const auto& v : array(o, "resources")) {
+            auto r = object(v); keys(r, {"id", "name", "type", "maxUnits", "exceptions"});
+            Resource resource; resource.id = string(r, "id"); resource.name = string(r, "name"); resource.type = string(r, "type");
+            if (!r.contains("maxUnits")) fail("자원 가용량 누락");
+            resource.maxUnits = r["maxUnits"].isNull() ? std::optional<int>{} : int(integer(r, "maxUnits", 100000));
+            for (const auto& x : array(r, "exceptions")) {
+                auto d = object(x); keys(d, {"date", "units"}); if (!d.contains("units")) fail("자원 가용량 예외 값 누락");
+                resource.exceptions.push_back({string(d, "date"), d["units"].isNull() ? std::optional<int>{} : int(integer(d, "units", 100000))});
+            }
+            p.resources.push_back(std::move(resource));
+        }
+        for (const auto& v : array(o, "assignments")) {
+            auto a = object(v); keys(a, {"taskId", "resourceId", "units"});
+            p.assignments.push_back({string(a, "taskId"), string(a, "resourceId"), int(integer(a, "units", 100000))});
+        }
     }
     for (const auto& v : array(o, "tasks")) {
         auto t = object(v); QStringList fields{"id", "name"};
@@ -99,11 +125,11 @@ QJsonObject encodeBaseline(const Baseline& b) {
         {"sourceDocumentId", qs(b.sourceDocumentId)}, {"inputRevision", double(b.inputRevision)}, {"version", double(b.version)},
         {"input", encodePlan(b.input)}, {"engineVersion", qs(b.engineVersion)}, {"projectFinish", qs(b.projectFinish)}, {"schedule", schedule}};
 }
-Baseline decodeBaseline(const QJsonObject& o) {
+Baseline decodeBaseline(const QJsonObject& o, int schema) {
     keys(o, {"id", "name", "approvedBy", "reason", "createdAt", "sourceDocumentId", "inputRevision", "version", "input", "engineVersion", "projectFinish", "schedule"});
     Baseline b; b.id = string(o, "id"); b.name = string(o, "name"); b.approvedBy = string(o, "approvedBy"); b.reason = string(o, "reason");
     b.createdAt = string(o, "createdAt"); b.sourceDocumentId = string(o, "sourceDocumentId"); b.inputRevision = std::uint64_t(integer(o, "inputRevision"));
-    b.version = std::uint64_t(integer(o, "version")); b.input = decodePlan(object(o.value("input")), 4);
+    b.version = std::uint64_t(integer(o, "version")); b.input = decodePlan(object(o.value("input")), schema);
     b.engineVersion = string(o, "engineVersion"); b.projectFinish = string(o, "projectFinish");
     for (const auto& v : array(o, "schedule")) b.schedule.push_back(decodeRow(object(v)));
     return b;
@@ -124,26 +150,43 @@ ProgressEntry decodeEntry(const QJsonObject& o) {
     e.actualStart = optionalString(o, "actualStart"); e.actualFinish = optionalString(o, "actualFinish");
     e.actualDurationMinutes = integer(o, "actualDurationMinutes", 5000000); e.remainingMinutes = integer(o, "remainingMinutes", 5000000); return e;
 }
+QJsonObject encodeScenario(const LevelingScenario& s) {
+    QJsonArray entries; for (const auto& e : s.progress) entries.append(encodeEntry(e));
+    return {{"id", qs(s.id)}, {"name", qs(s.name)}, {"createdAt", qs(s.createdAt)}, {"sourceDocumentId", qs(s.sourceDocumentId)},
+        {"inputRevision", double(s.inputRevision)}, {"policy", qs(s.policy)}, {"priority", qs(s.priority)}, {"horizonWorkDays", s.horizonWorkDays},
+        {"input", encodePlan(s.input)}, {"statusAt", nullable(s.statusAt)}, {"progress", entries}};
+}
+LevelingScenario decodeScenario(const QJsonObject& o) {
+    keys(o, {"id", "name", "createdAt", "sourceDocumentId", "inputRevision", "policy", "priority", "horizonWorkDays", "input", "statusAt", "progress"});
+    LevelingScenario s; s.id = string(o, "id"); s.name = string(o, "name"); s.createdAt = string(o, "createdAt"); s.sourceDocumentId = string(o, "sourceDocumentId");
+    s.inputRevision = std::uint64_t(integer(o, "inputRevision")); s.policy = string(o, "policy"); s.priority = string(o, "priority");
+    s.horizonWorkDays = int(integer(o, "horizonWorkDays", 5200)); s.input = decodePlan(object(o["input"]), 5); s.statusAt = optionalString(o, "statusAt");
+    for (const auto& v : array(o, "progress")) s.progress.push_back(decodeEntry(object(v)));
+    return s;
+}
 }
 QJsonObject encodeProject(const Project& p) {
     auto o = encodePlan(p); o["documentId"] = qs(p.documentId); o["derivedFrom"] = qs(p.derivedFrom); o["revision"] = double(p.revision);
     o["statusAt"] = nullable(p.statusAt); QJsonArray baselines, progress;
     for (const auto& b : p.baselines) baselines.append(encodeBaseline(b));
     for (const auto& e : p.progress) progress.append(encodeEntry(e));
-    o["baselines"] = baselines; o["progress"] = progress; return o;
+    QJsonArray scenarios; for (const auto& s : p.scenarios) scenarios.append(encodeScenario(s));
+    o["baselines"] = baselines; o["progress"] = progress; o["scenarios"] = scenarios; return o;
 }
 Project decodeProject(const QJsonObject& o, int schema) {
     auto fields = planKeys(schema); fields.append({"documentId", "derivedFrom", "revision"});
     if (schema >= 4) fields.append({"statusAt", "baselines", "progress"});
+    if (schema >= 5) fields.append("scenarios");
     keys(o, fields);
-    auto plan = o; for (const auto& key : {"documentId", "derivedFrom", "revision", "statusAt", "baselines", "progress"}) plan.remove(key);
+    auto plan = o; for (const auto& key : {"documentId", "derivedFrom", "revision", "statusAt", "baselines", "progress", "scenarios"}) plan.remove(key);
     Project p; static_cast<PlanInput&>(p) = decodePlan(plan, schema);
     p.documentId = string(o, "documentId"); p.derivedFrom = string(o, "derivedFrom"); p.revision = std::uint64_t(integer(o, "revision"));
     if (schema >= 4) {
         p.statusAt = optionalString(o, "statusAt");
-        for (const auto& b : array(o, "baselines")) p.baselines.push_back(decodeBaseline(object(b)));
+        for (const auto& b : array(o, "baselines")) p.baselines.push_back(decodeBaseline(object(b), schema));
         for (const auto& e : array(o, "progress")) p.progress.push_back(decodeEntry(object(e)));
     }
+    if (schema >= 5) for (const auto& v : array(o, "scenarios")) p.scenarios.push_back(decodeScenario(object(v)));
     validate(p); for (const auto& b : p.baselines) verifyBaseline(b); return p;
 }
 }

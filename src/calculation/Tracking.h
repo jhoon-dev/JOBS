@@ -14,6 +14,7 @@ struct TaskComparison {
     std::string baselineName, baselineWbsPath, planWbsPath;
     std::optional<std::int64_t> baselineDuration, planDuration;
     std::vector<std::string> baselinePredecessors, planPredecessors;
+    std::vector<std::string> baselineAssignments, planAssignments;
 };
 struct ComparisonReport {
     std::string documentId, baselineId;

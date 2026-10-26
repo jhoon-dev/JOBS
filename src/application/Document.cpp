@@ -112,6 +112,43 @@ void Document::recordProgress(ProgressEntry entry) {
 void Document::staleCalculation() {
     if (calculation_) calculation_->status = CalculationStatus::Stale;
 }
+std::string Document::putResource(Resource r) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    if (r.id.empty()) { r.id = store_.newId(); p.resources.push_back(r); }
+    else {
+        auto it = std::find_if(p.resources.begin(), p.resources.end(), [&](const auto& item) { return item.id == r.id; });
+        if (it == p.resources.end()) throw std::runtime_error("자원이 존재하지 않습니다.");
+        *it = r;
+    }
+    auto id = r.id; edit(std::move(p)); return id;
+}
+void Document::removeResource(const std::string& id) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    for (const auto& a : p.assignments) if (a.resourceId == id) throw std::runtime_error("작업 배정을 먼저 해제하세요.");
+    if (!std::erase_if(p.resources, [&](const auto& r) { return r.id == id; })) throw std::runtime_error("자원이 존재하지 않습니다.");
+    edit(std::move(p));
+}
+void Document::setAssignments(const std::string& id, std::vector<Assignment> assignments) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    if (std::none_of(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == id; })) throw std::runtime_error("작업이 존재하지 않습니다.");
+    for (auto& a : assignments) { if (a.taskId != id) throw std::runtime_error("다른 작업의 배정이 포함되었습니다."); }
+    std::erase_if(p.assignments, [&](const auto& a) { return a.taskId == id; });
+    p.assignments.insert(p.assignments.end(), assignments.begin(), assignments.end()); edit(std::move(p));
+}
+std::string Document::saveScenario(std::string name, std::string priority, int horizon, std::string utc,
+                                  const std::string& sourceId, std::uint64_t sourceRevision) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    if (sourceId != project_->documentId || sourceRevision != project_->revision)
+        throw std::runtime_error("비교 중 문서가 변경되었습니다. 최신 입력으로 다시 계산하세요.");
+    auto p = *project_; LevelingScenario s;
+    s.id = store_.newId(); s.name = std::move(name); s.createdAt = std::move(utc); s.sourceDocumentId = p.documentId; s.inputRevision = p.revision;
+    s.priority = std::move(priority); s.horizonWorkDays = horizon;
+    s.input = static_cast<const PlanInput&>(p); s.statusAt = p.statusAt; s.progress = p.progress;
+    auto id = s.id; p.scenarios.push_back(std::move(s)); edit(std::move(p)); return id;
+}
 void Document::edit(Project p) {
     if (p == *project_) return;
     ++p.revision; validate(p); project_ = std::move(p); dirty_ = true; staleCalculation();
