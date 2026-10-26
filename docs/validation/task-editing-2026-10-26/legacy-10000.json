@@ -1,0 +1,83 @@
+{
+    "build_configuration": "Release",
+    "calculation": {
+        "median_ms": 24.5493,
+        "observed_p95_ms": 33.8822,
+        "samples_ms": [
+            33.8822,
+            24.5493,
+            19.4941
+        ]
+    },
+    "calendar_count": 0,
+    "compiler": "13.1.0",
+    "cpu_architecture": "x86_64",
+    "dependency_count": 9900,
+    "fixture": "jobs-perf-layered-v1",
+    "logical_cpu_count": 16,
+    "maximum_gantt_items": 110,
+    "os": "Windows 11 Version 26H2",
+    "peak_memory_semantics": "OS process high water mark; not an incremental allocation measurement",
+    "peak_process_resident_bytes": 156385280,
+    "profile": "native-fs0-workminutes-v1",
+    "project_finish": "2026-11-11 14:00",
+    "qt": "6.8.3",
+    "repeats": 3,
+    "resource_count": 0,
+    "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+    "scroll": {
+        "median_ms": 28.02915,
+        "observed_p95_ms": 48.8439,
+        "samples_ms": [
+            85.9226,
+            41.02,
+            25.587,
+            35.4785,
+            41.7466,
+            26.0193,
+            25.2953,
+            25.5078,
+            35.5353,
+            30.9712,
+            27.0149,
+            27.8875,
+            0.9224,
+            48.8439,
+            25.9195,
+            24.3492,
+            38.0451,
+            36.268,
+            34.5164,
+            34.8936,
+            32.0534,
+            35.8246,
+            35.5574,
+            34.3053,
+            0.4288,
+            24.8975,
+            24.1809,
+            22.0915,
+            22.8961,
+            23.5633,
+            20.8185,
+            23.6567,
+            28.1488,
+            27.9095,
+            31.2544,
+            36.5548
+        ]
+    },
+    "source_revision": "75b7408",
+    "split_task_count": 0,
+    "status": "success",
+    "task_count": 10000,
+    "ui_preparation": {
+        "median_ms": 793.2891,
+        "observed_p95_ms": 1200.6497,
+        "samples_ms": [
+            1200.6497,
+            793.2891,
+            737.3906
+        ]
+    }
+}

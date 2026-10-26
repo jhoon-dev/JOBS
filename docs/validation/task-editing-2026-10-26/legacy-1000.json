@@ -1,0 +1,83 @@
+{
+    "build_configuration": "Release",
+    "calculation": {
+        "median_ms": 8.7865,
+        "observed_p95_ms": 11.5422,
+        "samples_ms": [
+            8.7865,
+            11.5422,
+            6.3885
+        ]
+    },
+    "calendar_count": 0,
+    "compiler": "13.1.0",
+    "cpu_architecture": "x86_64",
+    "dependency_count": 900,
+    "fixture": "jobs-perf-layered-v1",
+    "logical_cpu_count": 16,
+    "maximum_gantt_items": 110,
+    "os": "Windows 11 Version 26H2",
+    "peak_memory_semantics": "OS process high water mark; not an incremental allocation measurement",
+    "peak_process_resident_bytes": 68669440,
+    "profile": "native-fs0-workminutes-v1",
+    "project_finish": "2026-10-27 11:00",
+    "qt": "6.8.3",
+    "repeats": 3,
+    "resource_count": 0,
+    "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+    "scroll": {
+        "median_ms": 28.44645,
+        "observed_p95_ms": 42.6092,
+        "samples_ms": [
+            84.5202,
+            41.8,
+            42.6092,
+            36.4452,
+            31.9854,
+            26.2923,
+            23.0072,
+            25.1046,
+            22.7883,
+            24.8942,
+            24.6696,
+            30.9677,
+            0.5366,
+            29.5357,
+            24.543,
+            22.5167,
+            25.3877,
+            25.8324,
+            32.9806,
+            27.9887,
+            30.3885,
+            27.4926,
+            24.9822,
+            30.4688,
+            0.6604,
+            37.8061,
+            33.8394,
+            27.0856,
+            31.4073,
+            33.9421,
+            26.9383,
+            29.4767,
+            28.6594,
+            28.4991,
+            36.1247,
+            28.3938
+        ]
+    },
+    "source_revision": "75b7408",
+    "split_task_count": 0,
+    "status": "success",
+    "task_count": 1000,
+    "ui_preparation": {
+        "median_ms": 463.0045,
+        "observed_p95_ms": 767.2831,
+        "samples_ms": [
+            767.2831,
+            429.7225,
+            463.0045
+        ]
+    }
+}

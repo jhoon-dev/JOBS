@@ -39,3 +39,17 @@
 
 
 CI의 `scripts/capture-task-editing-ui.py build`는 표 정렬·선택·계산을 구성한 뒤 앱 자신의 위젯만 네이티브 PNG로 저장한다. 데스크톱 입력을 전송하지 않으며 `task-editing-ui-Windows`, `task-editing-ui-macOS` artifact로 보존한다. 이 화면 증거와 Qt offscreen 상호작용 회귀를 구분한다. 로컬 전체 Windows 키보드/클립보드 UI 시험은 `build/jobs_task_editing_ui_tests.exe -platform windows`다.
+
+
+## 대용량 회귀 · 2026-10-26
+
+깨끗한 구현 커밋 `75b7408` / Windows 11 26H2 x86_64 / 논리 CPU 16 / Qt 6.8.3 / MinGW GCC 13.1.0 / Release에서 기존 `jobs-perf-layered-v1`을 각 사례 별도 프로세스·3회로 실행했다. [원시 JSON](validation/task-editing-2026-10-26/)을 보존한다. 네 사례의 전체 TaskSchedule SHA-256은 직전 성능 증분의 참조와 일치했다. 계산·준비는 각각 3표본, 스크롤은 36표본의 관측값이며 제품 지연 보장이 아니다.
+
+| 사례 | 계산 median / 관측 P95 ms | 표·간트 준비 median / 관측 P95 ms | 스크롤 median / 관측 P95 ms | 최대 resident MiB | 최대 간트 객체 |
+|---|---:|---:|---:|---:|---:|
+| 기본 1,000 | 8.79 / 11.54 | 463.00 / 767.28 | 28.45 / 42.61 | 65.5 | 110 |
+| 기본 10,000 | 24.55 / 33.88 | 793.29 / 1200.65 | 28.03 / 48.84 | 149.1 | 110 |
+| 공수 1,000 | 218.77 / 286.91 | 499.78 / 773.92 | 24.56 / 44.55 | 80.5 | 132 |
+| 공수 10,000 | 827.80 / 894.80 | 733.72 / 987.25 | 23.44 / 49.15 | 167.3 | 132 |
+
+이 결과는 기본 보기에서의 주 일정/표·간트 회귀이며 대량 고정 공수 기간 역산 붙여넣기 성능을 대표하지 않는다. 네이티브 캡처와 일반 네이티브 UI 시험도 통과했고 현재 검색 창/정렬/원본 번호와 간트 배치를 확인했다. OS별 최종 검증은 [Actions](https://github.com/jhoon-dev/JOBS/actions/workflows/build.yml)의 해당 revision과 artifact를 확인한다.
