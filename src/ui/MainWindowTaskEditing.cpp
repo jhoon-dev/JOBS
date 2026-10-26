@@ -40,6 +40,8 @@ void MainWindow::setupTaskEditing(QMenu* menu,QVBoxLayout* layout) {
     duplicateTasks_=action("선택 작업 복제","duplicateTasks",QKeySequence("Ctrl+D"),&MainWindow::duplicateSelectedTasks);
     copyTasks_=action("표 선택 복사","copyTaskCells",QKeySequence::Copy,&MainWindow::copySelectedCells);
     pasteTasks_=action("표 붙여넣기","pasteTaskCells",QKeySequence::Paste,&MainWindow::pasteCells);
+    auto* editCell=menu->addAction("현재 셀 편집");editCell->setObjectName("editTaskCell");editCell->setShortcut(QKeySequence(Qt::Key_F2));editCell->setShortcutContext(Qt::WidgetShortcut);table_->addAction(editCell);
+    connect(editCell,&QAction::triggered,this,[this]{commitPendingCell();auto* item=table_->currentItem();if(item&&(item->flags()&Qt::ItemIsEditable))table_->editItem(item);});
     auto* all=menu->addAction("표 전체 선택");all->setShortcut(QKeySequence::SelectAll);all->setShortcutContext(Qt::WidgetShortcut);table_->addAction(all);connect(all,&QAction::triggered,table_,&QTableWidget::selectAll);
     auto* strip=new QHBoxLayout;taskSearch_=new QLineEdit;taskSearch_->setObjectName("taskSearch");taskSearch_->setAccessibleName("작업 이름·ID 검색");taskSearch_->setPlaceholderText("작업 이름·ID 검색 ("+QKeySequence(QKeySequence::Find).toString(QKeySequence::NativeText)+")");taskSearch_->setClearButtonEnabled(true);taskSearch_->setMinimumWidth(260);taskSearch_->setMaximumWidth(280);taskSearch_->setToolTip("검색은 표·간트 보기만 바꿉니다. 일정은 전체 프로젝트를 계산하고 보고서는 선택 WBS 범위를 사용합니다.");strip->addWidget(taskSearch_);
     taskFilter_=new QComboBox;taskFilter_->setObjectName("taskFilter");taskFilter_->setAccessibleName("작업 필터");taskFilter_->addItems({"전체 작업","계획 임계","마일스톤","미배정"});strip->addWidget(taskFilter_);
