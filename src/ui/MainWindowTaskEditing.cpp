@@ -80,6 +80,7 @@ std::vector<std::string> MainWindow::selectedTaskIds() const {
 void MainWindow::updateTaskActions() {
     if(!insertTasks_)return;
     const bool writable=document_.project()&&!document_.readOnly();const bool selection=!selectedTaskIds().empty();
+    if(auto* edit=findChild<QAction*>("editTaskCell"))edit->setEnabled(writable&&table_->currentItem()&&(table_->currentItem()->flags()&Qt::ItemIsEditable));
     insertTasks_->setEnabled(writable);deleteTasks_->setEnabled(writable&&selection);duplicateTasks_->setEnabled(writable&&selection);copyTasks_->setEnabled(selection);
     pasteTasks_->setEnabled(writable&&table_->currentRow()>=0&&table_->currentColumn()>=0&&table_->currentColumn()<3&&(QApplication::clipboard()->mimeData()&&QApplication::clipboard()->mimeData()->hasText()));
 }
