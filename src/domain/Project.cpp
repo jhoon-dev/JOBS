@@ -1,0 +1,31 @@
+#include "domain/Project.h"
+#include <chrono>
+#include <stdexcept>
+#include <unordered_set>
+#include <algorithm>
+
+namespace jobs {
+bool validDate(const std::string& s) {
+    if (s.size() != 10 || s[4] != '-' || s[7] != '-') return false;
+    for (std::size_t i = 0; i < s.size(); ++i)
+        if (i != 4 && i != 7 && (s[i] < '0' || s[i] > '9')) return false;
+    const int y = std::stoi(s.substr(0, 4));
+    return y >= 1 && std::chrono::year_month_day{
+        std::chrono::year{y}, std::chrono::month{unsigned(std::stoi(s.substr(5, 2)))},
+        std::chrono::day{unsigned(std::stoi(s.substr(8, 2)))}}.ok();
+}
+static bool blank(const std::string& s) {
+    return s.empty() || std::all_of(s.begin(), s.end(), [](unsigned char c) { return c <= ' '; });
+}
+void validate(const Project& p) {
+    if (blank(p.documentId) || blank(p.name)) throw std::runtime_error("프로젝트 ID와 이름은 필수입니다.");
+    if (!validDate(p.startDate)) throw std::runtime_error("시작일은 유효한 YYYY-MM-DD 날짜여야 합니다.");
+    if (p.calendar != "standard-mon-fri-8h-v1") throw std::runtime_error("지원하지 않는 근무달력입니다.");
+    if (p.revision == 0 || p.revision > 9007199254740991ULL)
+        throw std::runtime_error("지원하지 않는 revision입니다.");
+    std::unordered_set<std::string> ids;
+    for (const auto& t : p.tasks)
+        if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second)
+            throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
+}
+}

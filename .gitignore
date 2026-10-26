@@ -1,0 +1,9 @@
+/build*/
+/.deps/
+/.qt/
+/.vs/
+/.idea/
+*.user
+*.jobs.lock
+__pycache__/
+aqtinstall.log
