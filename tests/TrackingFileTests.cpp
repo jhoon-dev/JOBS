@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
         progress[0] = report; changed["progress"] = progress; tamper(changed);
         changed = payload; changed["statusAt"] = 42; tamper(changed);
         // Real schema-3 shape: preserve WBS, tasks, revision; empty new history; never overwrite original.
-        auto v3 = root; auto legacy = payload; legacy.remove("resources"); legacy.remove("assignments"); legacy.remove("scenarios"); legacy.remove("baselines"); legacy.remove("progress"); legacy.remove("statusAt"); v3["schemaVersion"] = 3;
+        auto v3 = root; auto legacy = payload; legacy.remove("costProfile"); legacy.remove("currency"); legacy.remove("taskCosts"); legacy.remove("costEntries"); legacy.remove("resources"); legacy.remove("assignments"); legacy.remove("scenarios"); legacy.remove("baselines"); legacy.remove("progress"); legacy.remove("statusAt"); v3["schemaVersion"] = 3;
         const auto legacyBytes = signedPayload(v3, legacy); const auto legacyPath = dir.filePath("v3.jobs"); write(legacyPath, legacyBytes);
         jobs::Document migrated(store); migrated.open(legacyPath.toStdString());
         check(migrated.requiresSaveAs() && migrated.project()->baselines.empty() && migrated.project()->progress.empty() && !migrated.project()->statusAt &&

@@ -30,12 +30,26 @@ struct Resource {
     std::string type = "labor";
     std::optional<int> maxUnits = 100;
     std::vector<CapacityDay> exceptions;
+    struct Rate {
+        std::string effectiveDate;
+        std::optional<std::int64_t> hourlyMinor;
+        bool operator==(const Rate&) const = default;
+    };
+    std::vector<Rate> rates = {};
     bool operator==(const Resource&) const = default;
 };
 struct Assignment {
     std::string taskId, resourceId;
     int units = 100;
     bool operator==(const Assignment&) const = default;
+};
+inline constexpr std::int64_t maxMoney = 9000000000000LL;
+struct TaskCost {
+    std::string taskId;
+    std::optional<std::int64_t> fixedMinor;
+    std::string accrual = "uniform";
+    std::string credit = "physical";
+    bool operator==(const TaskCost&) const = default;
 };
 struct PlanInput {
     std::string name;
@@ -47,6 +61,9 @@ struct PlanInput {
     std::vector<WbsNode> wbsNodes;
     std::vector<Resource> resources;
     std::vector<Assignment> assignments;
+    std::string currency = "KRW";
+    std::string costProfile = "cost-day-minor-half-up-v1";
+    std::vector<TaskCost> taskCosts;
     bool operator==(const PlanInput&) const = default;
 };
 struct Baseline {
@@ -79,6 +96,13 @@ struct LevelingScenario {
     std::vector<ProgressEntry> progress;
     bool operator==(const LevelingScenario&) const = default;
 };
+struct CostEntry {
+    std::string id, taskId, statusAt, recordedAt, reporter, reason, previousEntryId, sourceDocumentId, currency;
+    std::uint64_t recordedRevision = 0;
+    std::optional<std::int64_t> actualMinor;
+    std::optional<int> physicalBasisPoints;
+    bool operator==(const CostEntry&) const = default;
+};
 struct Project : PlanInput {
     std::string documentId;
     std::string derivedFrom;
@@ -87,6 +111,7 @@ struct Project : PlanInput {
     std::vector<ProgressEntry> progress;
     std::optional<std::string> statusAt;
     std::vector<LevelingScenario> scenarios;
+    std::vector<CostEntry> costEntries;
     bool operator==(const Project&) const = default;
 };
 // Domain uses ISO civil dates, without a UI locale or implicit timezone.
@@ -97,4 +122,6 @@ void validatePlan(const PlanInput& plan);
 void validate(const Project& project);
 // Report-date selection, with later appended corrections winning a tie.
 const ProgressEntry* progressAsOf(const Project& project, const std::string& taskId);
+const CostEntry* costAsOf(const Project&, const std::string& taskId, const std::string& statusAt);
+int currencyDecimals(const std::string& currency);
 }

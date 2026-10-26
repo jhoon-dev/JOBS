@@ -127,8 +127,8 @@ int main(int argc, char* argv[]) {
         clone.saveAs(dir.filePath("copy.jobs").toStdString()); check(clone.project()->scenarios[0].id == scenarioId && clone.project()->scenarios[0] == frozen && read(path) == bytes, "scenario provenance rewritten by copy");
         // A genuine schema-4 shape, including an old baseline input, migrates through a new file.
         auto root = QJsonDocument::fromJson(bytes).object(), payload = root["payload"].toObject(); auto legacy = payload;
-        legacy.remove("resources"); legacy.remove("assignments"); legacy.remove("scenarios");
-        auto baselines = legacy["baselines"].toArray(); for (int i = 0; i < baselines.size(); ++i) { auto item = baselines[i].toObject(), plan = item["input"].toObject(); plan.remove("resources"); plan.remove("assignments"); item["input"] = plan; baselines[i] = item; } legacy["baselines"] = baselines;
+        legacy.remove("costProfile"); legacy.remove("currency"); legacy.remove("taskCosts"); legacy.remove("costEntries"); legacy.remove("resources"); legacy.remove("assignments"); legacy.remove("scenarios");
+        auto baselines = legacy["baselines"].toArray(); for (int i = 0; i < baselines.size(); ++i) { auto item = baselines[i].toObject(), plan = item["input"].toObject(); plan.remove("costProfile"); plan.remove("currency"); plan.remove("taskCosts"); plan.remove("resources"); plan.remove("assignments"); item["input"] = plan; baselines[i] = item; } legacy["baselines"] = baselines;
         root["schemaVersion"] = 4; const auto oldBytes = sign(root, legacy); auto oldPath = dir.filePath("v4.jobs"); write(oldPath, oldBytes);
         jobs::Document migrated(store); migrated.open(oldPath.toStdString()); check(migrated.requiresSaveAs() && migrated.project()->resources.empty() && migrated.project()->scenarios.empty(), "schema-4 defaults failed");
         rejects([&] { migrated.save(); }); migrated.saveAs(dir.filePath("v5.jobs").toStdString()); check(read(oldPath) == oldBytes && store.load(migrated.path()).project == *migrated.project(), "schema-4 original-preserving migration failed");

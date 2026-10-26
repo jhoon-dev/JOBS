@@ -32,7 +32,14 @@ bool validUtcStamp(const std::string& s) {
     auto local = s.substr(0, 16); local[10] = ' ';
     return validStamp(local) && s[17] >= '0' && s[17] <= '5' && s[18] >= '0' && s[18] <= '9';
 }
+int currencyDecimals(const std::string& c) {
+    if (c == "KRW" || c == "JPY") return 0;
+    if (c == "USD" || c == "EUR") return 2;
+    throw std::runtime_error("지원 통화는 KRW/JPY/USD/EUR입니다. 통화 환산은 지원하지 않습니다.");
+}
 void validatePlan(const PlanInput& p) {
+    currencyDecimals(p.currency);
+    if (p.costProfile != "cost-day-minor-half-up-v1") throw std::runtime_error("지원하지 않는 원가 계산 정책입니다.");
     if (blank(p.name)) throw std::runtime_error("프로젝트 이름은 필수입니다.");
     if (!validDate(p.startDate)) throw std::runtime_error("시작일은 유효한 YYYY-MM-DD 날짜여야 합니다.");
     if (p.calendar != "standard-mon-fri-8h-v1") throw std::runtime_error("지원하지 않는 근무달력입니다.");
@@ -80,6 +87,10 @@ void validatePlan(const PlanInput& p) {
         std::unordered_set<std::string> dates;
         for (const auto& d : r.exceptions) if (!validDate(d.date) || !dates.insert(d.date).second || !validUnits(d.units))
             throw std::runtime_error("자원 가용량 예외 날짜 중복 또는 값 오류입니다.");
+        dates.clear();
+        for (const auto& rate : r.rates) if (!validDate(rate.effectiveDate) || !dates.insert(rate.effectiveDate).second ||
+            (rate.hourlyMinor && (*rate.hourlyMinor < 0 || *rate.hourlyMinor > 1000000000LL)))
+            throw std::runtime_error("유효일 단가가 잘못되었습니다. 단가는 미정 또는 시간당 0~1,000,000,000 최소 통화단위입니다.");
     }
     for (const auto& a : p.assignments) {
         // Length prefix avoids collisions even if imported IDs contain separators.
@@ -87,6 +98,12 @@ void validatePlan(const PlanInput& p) {
         if (!ids.contains(a.taskId) || !resources.contains(a.resourceId) || a.units <= 0 || a.units > 100000 || !pairs.insert(pair).second)
             throw std::runtime_error("배정할 작업·자원이 없거나 배정률 중복/범위 오류입니다. 1~100,000%를 사용하세요.");
     }
+    std::unordered_set<std::string> costs;
+    for (const auto& c : p.taskCosts) if (!ids.contains(c.taskId) || !costs.insert(c.taskId).second ||
+        (c.fixedMinor && (*c.fixedMinor < 0 || *c.fixedMinor > maxMoney)) ||
+        (c.accrual != "uniform" && c.accrual != "start" && c.accrual != "finish") ||
+        (c.credit != "physical" && c.credit != "zero-hundred"))
+        throw std::runtime_error("작업 고정비·발생 방식·획득가치 측정법이 잘못되었습니다.");
 }
 void validate(const Project& p) {
     validatePlan(p);
@@ -141,12 +158,27 @@ void validate(const Project& p) {
         snapshot.statusAt = s.statusAt; snapshot.progress = s.progress;
         validate(snapshot);
     }
+    previous.clear(); entryIds.clear();
+    for (const auto& e : p.costEntries) {
+        if (blank(e.id) || !entryIds.insert(e.id).second || !taskIds.contains(e.taskId) || !validStamp(e.statusAt) ||
+            !validUtcStamp(e.recordedAt) || blank(e.reporter) || blank(e.reason) || blank(e.sourceDocumentId) || e.currency != p.currency ||
+            !e.recordedRevision || e.recordedRevision > p.revision || e.previousEntryId != previous[e.taskId] ||
+            (e.actualMinor && (*e.actualMinor < 0 || *e.actualMinor > maxMoney)) ||
+            (e.physicalBasisPoints && (*e.physicalBasisPoints < 0 || *e.physicalBasisPoints > 10000)))
+            throw std::runtime_error("원가·물리 진척 보고의 통화·수치·출처·이력 연결이 잘못되었습니다.");
+        previous[e.taskId] = e.id;
+    }
 }
 const ProgressEntry* progressAsOf(const Project& p, const std::string& taskId) {
     if (!p.statusAt) return nullptr;
     const ProgressEntry* result = nullptr;
     for (const auto& entry : p.progress) if (entry.taskId == taskId && entry.statusAt <= *p.statusAt &&
         (!result || result->statusAt <= entry.statusAt)) result = &entry;
+    return result;
+}
+const CostEntry* costAsOf(const Project& p, const std::string& taskId, const std::string& stamp) {
+    const CostEntry* result = nullptr;
+    for (const auto& e : p.costEntries) if (e.taskId == taskId && e.statusAt <= stamp && (!result || e.statusAt >= result->statusAt)) result = &e;
     return result;
 }
 }

@@ -38,11 +38,17 @@ std::vector<std::string> readStrings(const QJsonObject& o, const QString& key) {
     for (const auto& v : array(o, key)) { if (!v.isString()) fail("문자열 목록 오류: " + key); result.push_back(str(v.toString())); } return result;
 }
 QJsonValue nullable(const std::optional<std::string>& value) { return value ? QJsonValue(qs(*value)) : QJsonValue(QJsonValue::Null); }
+QJsonValue money(const std::optional<std::int64_t>& v) { return v ? QJsonValue(double(*v)) : QJsonValue(QJsonValue::Null); }
+std::optional<std::int64_t> readMoney(const QJsonObject& o, const QString& key, double limit = double(maxMoney)) {
+    if (!o.contains(key)) fail("금액 필드 누락: " + key);
+    return o[key].isNull() ? std::optional<std::int64_t>{} : integer(o, key, limit);
+}
 QStringList planKeys(int schema) {
     QStringList result{"name", "startDate", "calendar", "tasks"};
     if (schema >= 2) result.append({"holidays", "calculationProfile"});
     if (schema >= 3) result.append("wbsNodes");
     if (schema >= 5) result.append({"resources", "assignments"});
+    if (schema >= 6) result.append({"currency", "costProfile", "taskCosts"});
     return result;
 }
 QJsonObject encodePlan(const PlanInput& p) {
@@ -54,12 +60,14 @@ QJsonObject encodePlan(const PlanInput& p) {
     for (const auto& r : p.resources) {
         QJsonArray exceptions;
         for (const auto& d : r.exceptions) exceptions.append(QJsonObject{{"date", qs(d.date)}, {"units", d.units ? QJsonValue(*d.units) : QJsonValue(QJsonValue::Null)}});
+        QJsonArray rates; for (const auto& rate : r.rates) rates.append(QJsonObject{{"effectiveDate", qs(rate.effectiveDate)}, {"hourlyMinor", money(rate.hourlyMinor)}});
         resources.append(QJsonObject{{"id", qs(r.id)}, {"name", qs(r.name)}, {"type", qs(r.type)},
-            {"maxUnits", r.maxUnits ? QJsonValue(*r.maxUnits) : QJsonValue(QJsonValue::Null)}, {"exceptions", exceptions}});
+            {"maxUnits", r.maxUnits ? QJsonValue(*r.maxUnits) : QJsonValue(QJsonValue::Null)}, {"exceptions", exceptions}, {"rates", rates}});
     }
     for (const auto& a : p.assignments) assignments.append(QJsonObject{{"taskId", qs(a.taskId)}, {"resourceId", qs(a.resourceId)}, {"units", a.units}});
+    QJsonArray costs; for (const auto& c : p.taskCosts) costs.append(QJsonObject{{"taskId", qs(c.taskId)}, {"fixedMinor", money(c.fixedMinor)}, {"accrual", qs(c.accrual)}, {"credit", qs(c.credit)}});
     return {{"name", qs(p.name)}, {"startDate", qs(p.startDate)}, {"calendar", qs(p.calendar)}, {"tasks", tasks},
-        {"holidays", strings(p.holidays)}, {"calculationProfile", qs(p.calculationProfile)}, {"wbsNodes", nodes}, {"resources", resources}, {"assignments", assignments}};
+        {"holidays", strings(p.holidays)}, {"calculationProfile", qs(p.calculationProfile)}, {"wbsNodes", nodes}, {"resources", resources}, {"assignments", assignments}, {"currency", qs(p.currency)}, {"costProfile", qs(p.costProfile)}, {"taskCosts", costs}};
 }
 PlanInput decodePlan(const QJsonObject& o, int schema) {
     keys(o, planKeys(schema)); PlanInput p;
@@ -70,7 +78,7 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
     }
     if (schema >= 5) {
         for (const auto& v : array(o, "resources")) {
-            auto r = object(v); keys(r, {"id", "name", "type", "maxUnits", "exceptions"});
+            auto r = object(v); QStringList fields{"id", "name", "type", "maxUnits", "exceptions"}; if (schema >= 6) fields.append("rates"); keys(r, fields);
             Resource resource; resource.id = string(r, "id"); resource.name = string(r, "name"); resource.type = string(r, "type");
             if (!r.contains("maxUnits")) fail("자원 가용량 누락");
             resource.maxUnits = r["maxUnits"].isNull() ? std::optional<int>{} : int(integer(r, "maxUnits", 100000));
@@ -78,12 +86,20 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
                 auto d = object(x); keys(d, {"date", "units"}); if (!d.contains("units")) fail("자원 가용량 예외 값 누락");
                 resource.exceptions.push_back({string(d, "date"), d["units"].isNull() ? std::optional<int>{} : int(integer(d, "units", 100000))});
             }
+            if (schema >= 6) for (const auto& x : array(r, "rates")) {
+                auto rate = object(x); keys(rate, {"effectiveDate", "hourlyMinor"}); resource.rates.push_back({string(rate, "effectiveDate"), readMoney(rate, "hourlyMinor", 1000000000)});
+            }
             p.resources.push_back(std::move(resource));
         }
         for (const auto& v : array(o, "assignments")) {
             auto a = object(v); keys(a, {"taskId", "resourceId", "units"});
             p.assignments.push_back({string(a, "taskId"), string(a, "resourceId"), int(integer(a, "units", 100000))});
         }
+    }
+    if (schema >= 6) {
+        p.currency = string(o, "currency"); p.costProfile = string(o, "costProfile");
+        for (const auto& v : array(o, "taskCosts")) { auto c = object(v); keys(c, {"taskId", "fixedMinor", "accrual", "credit"});
+            p.taskCosts.push_back({string(c, "taskId"), readMoney(c, "fixedMinor"), string(c, "accrual"), string(c, "credit")}); }
     }
     for (const auto& v : array(o, "tasks")) {
         auto t = object(v); QStringList fields{"id", "name"};
@@ -156,13 +172,28 @@ QJsonObject encodeScenario(const LevelingScenario& s) {
         {"inputRevision", double(s.inputRevision)}, {"policy", qs(s.policy)}, {"priority", qs(s.priority)}, {"horizonWorkDays", s.horizonWorkDays},
         {"input", encodePlan(s.input)}, {"statusAt", nullable(s.statusAt)}, {"progress", entries}};
 }
-LevelingScenario decodeScenario(const QJsonObject& o) {
+LevelingScenario decodeScenario(const QJsonObject& o, int schema) {
     keys(o, {"id", "name", "createdAt", "sourceDocumentId", "inputRevision", "policy", "priority", "horizonWorkDays", "input", "statusAt", "progress"});
     LevelingScenario s; s.id = string(o, "id"); s.name = string(o, "name"); s.createdAt = string(o, "createdAt"); s.sourceDocumentId = string(o, "sourceDocumentId");
     s.inputRevision = std::uint64_t(integer(o, "inputRevision")); s.policy = string(o, "policy"); s.priority = string(o, "priority");
-    s.horizonWorkDays = int(integer(o, "horizonWorkDays", 5200)); s.input = decodePlan(object(o["input"]), 5); s.statusAt = optionalString(o, "statusAt");
+    s.horizonWorkDays = int(integer(o, "horizonWorkDays", 5200)); s.input = decodePlan(object(o["input"]), schema); s.statusAt = optionalString(o, "statusAt");
     for (const auto& v : array(o, "progress")) s.progress.push_back(decodeEntry(object(v)));
     return s;
+}
+QJsonObject encodeCostEntry(const CostEntry& e) {
+    return {{"id", qs(e.id)}, {"taskId", qs(e.taskId)}, {"statusAt", qs(e.statusAt)}, {"recordedAt", qs(e.recordedAt)},
+        {"reporter", qs(e.reporter)}, {"reason", qs(e.reason)}, {"previousEntryId", qs(e.previousEntryId)}, {"sourceDocumentId", qs(e.sourceDocumentId)},
+        {"recordedRevision", double(e.recordedRevision)}, {"currency", qs(e.currency)}, {"actualMinor", money(e.actualMinor)},
+        {"physicalBasisPoints", e.physicalBasisPoints ? QJsonValue(*e.physicalBasisPoints) : QJsonValue(QJsonValue::Null)}};
+}
+CostEntry decodeCostEntry(const QJsonObject& o) {
+    keys(o, {"id", "taskId", "statusAt", "recordedAt", "reporter", "reason", "previousEntryId", "sourceDocumentId", "recordedRevision", "currency", "actualMinor", "physicalBasisPoints"});
+    CostEntry e; e.id = string(o, "id"); e.taskId = string(o, "taskId"); e.statusAt = string(o, "statusAt"); e.recordedAt = string(o, "recordedAt");
+    e.reporter = string(o, "reporter"); e.reason = string(o, "reason"); e.previousEntryId = string(o, "previousEntryId"); e.sourceDocumentId = string(o, "sourceDocumentId");
+    e.recordedRevision = std::uint64_t(integer(o, "recordedRevision")); e.currency = string(o, "currency"); e.actualMinor = readMoney(o, "actualMinor");
+    if (!o.contains("physicalBasisPoints")) fail("물리 진척 필드 누락");
+    if (!o["physicalBasisPoints"].isNull()) e.physicalBasisPoints = int(integer(o, "physicalBasisPoints", 10000));
+    return e;
 }
 }
 QJsonObject encodeProject(const Project& p) {
@@ -171,14 +202,16 @@ QJsonObject encodeProject(const Project& p) {
     for (const auto& b : p.baselines) baselines.append(encodeBaseline(b));
     for (const auto& e : p.progress) progress.append(encodeEntry(e));
     QJsonArray scenarios; for (const auto& s : p.scenarios) scenarios.append(encodeScenario(s));
-    o["baselines"] = baselines; o["progress"] = progress; o["scenarios"] = scenarios; return o;
+    QJsonArray costs; for (const auto& e : p.costEntries) costs.append(encodeCostEntry(e));
+    o["baselines"] = baselines; o["progress"] = progress; o["scenarios"] = scenarios; o["costEntries"] = costs; return o;
 }
 Project decodeProject(const QJsonObject& o, int schema) {
     auto fields = planKeys(schema); fields.append({"documentId", "derivedFrom", "revision"});
     if (schema >= 4) fields.append({"statusAt", "baselines", "progress"});
     if (schema >= 5) fields.append("scenarios");
+    if (schema >= 6) fields.append("costEntries");
     keys(o, fields);
-    auto plan = o; for (const auto& key : {"documentId", "derivedFrom", "revision", "statusAt", "baselines", "progress", "scenarios"}) plan.remove(key);
+    auto plan = o; for (const auto& key : {"documentId", "derivedFrom", "revision", "statusAt", "baselines", "progress", "scenarios", "costEntries"}) plan.remove(key);
     Project p; static_cast<PlanInput&>(p) = decodePlan(plan, schema);
     p.documentId = string(o, "documentId"); p.derivedFrom = string(o, "derivedFrom"); p.revision = std::uint64_t(integer(o, "revision"));
     if (schema >= 4) {
@@ -186,7 +219,8 @@ Project decodeProject(const QJsonObject& o, int schema) {
         for (const auto& b : array(o, "baselines")) p.baselines.push_back(decodeBaseline(object(b), schema));
         for (const auto& e : array(o, "progress")) p.progress.push_back(decodeEntry(object(e)));
     }
-    if (schema >= 5) for (const auto& v : array(o, "scenarios")) p.scenarios.push_back(decodeScenario(object(v)));
+    if (schema >= 5) for (const auto& v : array(o, "scenarios")) p.scenarios.push_back(decodeScenario(object(v), schema));
+    if (schema >= 6) for (const auto& v : array(o, "costEntries")) p.costEntries.push_back(decodeCostEntry(object(v)));
     validate(p); for (const auto& b : p.baselines) verifyBaseline(b); return p;
 }
 }

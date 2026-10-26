@@ -64,6 +64,8 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
         if (baseline->input.calculationProfile != p.calculationProfile) report.contextChanges.push_back("계산 정책 변경");
         if (baseline->input.wbsNodes != p.wbsNodes) report.contextChanges.push_back("프로젝트 WBS 정의 변경");
         if (baseline->input.resources != p.resources) report.contextChanges.push_back("자원 정의/날짜별 가용량 변경");
+        if (baseline->input.currency != p.currency || baseline->input.costProfile != p.costProfile) report.contextChanges.push_back("통화/원가 정책 변경");
+        if (baseline->input.taskCosts != p.taskCosts) report.contextChanges.push_back("작업 고정비/비용 발생/EV 측정법 변경");
     }
     if (report.plan.status == CalculationStatus::Valid) for (const auto& row : report.plan.tasks) planDates.emplace(row.taskId, &row);
     if (report.forecast.status == CalculationStatus::Valid) for (const auto& row : report.forecast.tasks) forecastDates.emplace(row.taskId, &row);

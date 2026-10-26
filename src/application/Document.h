@@ -30,6 +30,9 @@ public:
     std::string appendBaseline(Baseline prepared);
     std::string captureBaseline(std::string name, std::string approvedBy, std::string reason, std::string createdAt);
     void recordProgress(ProgressEntry entry);
+    void setCurrency(std::string currency);
+    void setTaskCost(TaskCost cost);
+    void recordCost(CostEntry entry);
     std::string putResource(Resource resource);
     void removeResource(const std::string& id);
     void setAssignments(const std::string& taskId, std::vector<Assignment> assignments);

@@ -112,6 +112,31 @@ void Document::recordProgress(ProgressEntry entry) {
 void Document::staleCalculation() {
     if (calculation_) calculation_->status = CalculationStatus::Stale;
 }
+void Document::setCurrency(std::string currency) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    if (currency == project_->currency) return;
+    auto monetary = [](const PlanInput& p) {
+        return std::any_of(p.resources.begin(), p.resources.end(), [](const auto& r) { return !r.rates.empty(); }) || !p.taskCosts.empty();
+    };
+    bool used = monetary(*project_) || !project_->costEntries.empty();
+    for (const auto& b : project_->baselines) used = used || monetary(b.input);
+    for (const auto& s : project_->scenarios) used = used || monetary(s.input);
+    if (used) throw std::runtime_error("단가·예산·원가 이력이 있는 문서의 통화를 재해석할 수 없습니다. 새 프로젝트에서 통화를 먼저 설정하세요.");
+    auto p = *project_; p.currency = std::move(currency); edit(std::move(p));
+}
+void Document::setTaskCost(TaskCost cost) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; auto it = std::find_if(p.taskCosts.begin(), p.taskCosts.end(), [&](const auto& c) { return c.taskId == cost.taskId; });
+    if (it == p.taskCosts.end()) p.taskCosts.push_back(std::move(cost)); else *it = std::move(cost);
+    edit(std::move(p));
+}
+void Document::recordCost(CostEntry entry) {
+    if (!project_ || readOnly_ || !project_->statusAt) throw std::runtime_error("원가 보고 전에 편집 가능한 프로젝트와 상태일이 필요합니다.");
+    auto p = *project_; entry.id = store_.newId(); entry.statusAt = *p.statusAt; entry.currency = p.currency;
+    entry.recordedRevision = p.revision + 1; entry.sourceDocumentId = p.documentId; entry.previousEntryId.clear();
+    for (auto it = p.costEntries.rbegin(); it != p.costEntries.rend(); ++it) if (it->taskId == entry.taskId) { entry.previousEntryId = it->id; break; }
+    p.costEntries.push_back(std::move(entry)); edit(std::move(p));
+}
 std::string Document::putResource(Resource r) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_;

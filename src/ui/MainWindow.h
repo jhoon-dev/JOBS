@@ -33,6 +33,11 @@ private:
     void manageResources();
     void assignResources();
     void showResources();
+    QAction *rates_, *taskCost_, *costReport_, *evm_;
+    void editRates();
+    void editTaskCost();
+    void reportCost();
+    void showCosts();
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;

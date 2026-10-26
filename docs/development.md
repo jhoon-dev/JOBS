@@ -62,11 +62,11 @@ open build/JOBS.app
 GitHub Actions는 Windows/macOS 빌드와 계산·파일·화면 테스트를 수행한다.
 macOS는 `macos-15`와 Xcode 16.4를 고정한다. 최신 SDK에서 Qt 6.8.3의 AGL 링크 실패를 확인했다.
 
-## 현재 `.jobs` 형식 (schema 5)
+## 현재 `.jobs` 형식 (schema 6)
 
-UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 5`, `payload`, `sha256`을 보존한다.
+UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 6`, `payload`, `sha256`을 보존한다.
 payload에는 documentId, derivedFrom, revision, name, startDate, calendar, tasks, holidays,
-calculationProfile, wbsNodes, resources, assignments, statusAt, baselines, progress, scenarios가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·FS 선행 ID 목록·wbsId를 갖는다.
+calculationProfile, wbsNodes, resources(rates 포함), assignments, currency, costProfile, taskCosts, statusAt, baselines, progress, scenarios, costEntries가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·FS 선행 ID 목록·wbsId를 갖는다.
 WBS 노드는 ID·이름·parentId를 가지며 빈 부모/소속 ID는 프로젝트 루트다. 순환·누락 부모·누락 소속을 거절한다.
 현재 계산 결과는 세션 cache이며 재열기 후 F9로 재계산한다. 기준선의 동결 결과는 파일에 보존한다.
 기준선 입력과 결과는 열기/저장 시 고정 엔진으로 재검산한다. 실적은 source document/revision·상태일·UTC 기록시각·보고자·사유·이전 보고 ID를 보존한다.
@@ -83,8 +83,8 @@ QSaveFile로 임시 파일을 쓰고 flush 후 commit한다. 직접 덮어쓰기
 QLockFile sidecar는 전달 파일이 아니며 단일 writer를 위한 협조적 잠금이다.
 잠금 실패 시 읽기 전용 열기와 다른 이름 저장을 제공한다.
 외부 비협조 writer의 검사 직후 변경, 네트워크/동기화 폴더 원자성, 정전 내구성은 보장하지 않는다.
-schema 1/2/3/4는 ID·revision·기존 입력을 유지하여 읽고 새 필드에 null/빈 목록/미분류/빈 이력을 적용한다.
-이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 5 사본을 만들며
+schema 1/2/3/4/5는 ID·revision·기존 입력을 유지하여 읽고 새 필드에 null/빈 목록/미분류/빈 이력을 적용한다.
+이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 6 사본을 만들며
 원본 bytes를 보존한다. 일반적인 다단계 이관·자동복구 checkpoint·백업은 아직 없다.
 미지원 버전은 원본을 수정하지 않는다.
 
@@ -137,3 +137,10 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 
 이번 증분에서 로컬 Release 전체 10/10 및 Windows 네이티브 자원 화면 테스트를 통과했다.
 등록·A/B 일정 비교·원본 과부하·주 화면 이미지를 확인하고 다크 테마의 경고 행 글자 대비를 보정했다.
+
+원가/EVM 증분은 유효일 단가·작업 고정비/성과 측정법·원가 보고 원장 및 비동기 분석/추이를 추가했다.
+정의·통화/금액 한도·반올림·기준선 코호트·수용시험은 [원가·EVM 계약](costs-evm.md)을 따른다.
+`cost_contract_file`, `cost_ui`를 포함한 전체 12개 테스트로 확장하며 F10·CPI 합계 비율·AC 불변·schema 5→6 이관을 검사한다.
+
+원가/EVM 증분의 로컬 Release 전체 12/12와 Windows 네이티브 원가 화면 테스트를 통과했다.
+단가·F10 EVM 표·PV/EV/AC 추이의 한글/금액 표시와 기존 자원 화면의 단가 보존을 확인했다.

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <stdexcept>
 namespace jobs {
-std::unordered_set<std::string> wbsSubtree(const Project& p, const std::string& id) {
+std::unordered_set<std::string> wbsSubtree(const PlanInput& p, const std::string& id) {
     std::unordered_map<std::string, std::vector<std::string>> children;
     bool found = id.empty();
     for (const auto& node : p.wbsNodes) { children[node.parentId].push_back(node.id); found |= node.id == id; }
@@ -17,7 +17,7 @@ std::unordered_set<std::string> wbsSubtree(const Project& p, const std::string& 
     }
     return result;
 }
-std::vector<std::size_t> wbsTaskRows(const Project& p, const std::string& id) {
+std::vector<std::size_t> wbsTaskRows(const PlanInput& p, const std::string& id) {
     const auto members = wbsSubtree(p, id);
     std::vector<std::size_t> rows;
     for (std::size_t i = 0; i < p.tasks.size(); ++i) if (members.contains(p.tasks[i].wbsId)) rows.push_back(i);

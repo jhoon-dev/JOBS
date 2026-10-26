@@ -24,7 +24,7 @@ void MainWindow::manageResources() {
     if (!document_.project()) return;
     QDialog dialog(this); dialog.setObjectName("resourceDialog"); dialog.setWindowTitle("자원 등록 · 날짜별 가용량"); dialog.resize(820, 740);
     auto* layout = new QVBoxLayout(&dialog);
-    auto* note = new QLabel("인력·장비 · 100% = 1명/1대 · 프로젝트 근무달력 사용\n기간 고정 정률 배정: 공수 = 작업 근무기간 × 배정률. 자재·비용·생산성 환산은 포함하지 않습니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
+    auto* note = new QLabel("인력·장비 · 100% = 1명/1대 · 프로젝트 근무달력 사용\n기간 고정 정률 배정: 공수 = 작업 근무기간 × 배정률. 단가·비용은 원가 메뉴에서 설정합니다. 자재·생산성 환산은 포함하지 않습니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
     auto* table = new QTableWidget(0, 4, &dialog); table->setObjectName("resourceList"); table->setHorizontalHeaderLabels({"자원", "종류", "기본 가용량", "날짜 예외"});
     table->setEditTriggers(QAbstractItemView::NoEditTriggers); table->setSelectionBehavior(QAbstractItemView::SelectRows); table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); layout->addWidget(table);
@@ -64,7 +64,9 @@ void MainWindow::manageResources() {
     connect(fresh, &QPushButton::clicked, &dialog, [&] { selected.clear(); table->clearSelection(); name->clear(); type->setCurrentIndex(0); unknown->setChecked(false); units->setValue(100); dates->clear(); error->clear(); name->setFocus(); });
     connect(put, &QPushButton::clicked, &dialog, [&] {
         try {
-            Resource r; r.id = selected; r.name = str(name->text().trimmed()); r.type = str(type->currentData().toString()); r.maxUnits = unknown->isChecked() ? std::optional<int>{} : units->value();
+            Resource r;
+            for (const auto& old : document_.project()->resources) if (old.id == selected) r = old;
+            r.exceptions.clear(); r.id = selected; r.name = str(name->text().trimmed()); r.type = str(type->currentData().toString()); r.maxUnits = unknown->isChecked() ? std::optional<int>{} : units->value();
             for (auto line : dates->toPlainText().split('\n', Qt::SkipEmptyParts)) {
                 auto parts = line.trimmed().split('=');
                 if (parts.size() != 2) throw std::runtime_error("날짜 예외는 YYYY-MM-DD=정수 또는 ? 형식입니다.");

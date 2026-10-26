@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 6;
+        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 7;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
         // Construct an actual schema-1 payload, then check original-preserving migration by Save As.
         auto legacy = QJsonDocument::fromJson(originalBytes).object();
         auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile"); legacyPayload.remove("wbsNodes");
-        legacyPayload.remove("resources"); legacyPayload.remove("assignments"); legacyPayload.remove("scenarios");
+        legacyPayload.remove("costProfile"); legacyPayload.remove("currency"); legacyPayload.remove("taskCosts"); legacyPayload.remove("costEntries"); legacyPayload.remove("resources"); legacyPayload.remove("assignments"); legacyPayload.remove("scenarios");
         legacyPayload.remove("baselines"); legacyPayload.remove("progress"); legacyPayload.remove("statusAt");
         QJsonArray legacyTasks;
         for (const auto& value : legacyPayload["tasks"].toArray()) {
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
         check(store.load(migrated.path()).project == *migrated.project(), "WBS hierarchy/task assignment roundtrip mismatch");
         // Schema 2 keeps scheduling input and IDs, adds an empty hierarchy/history, and preserves original bytes.
         auto version2 = QJsonDocument::fromJson(read(QString::fromStdString(migrated.path()))).object();
-        auto p2 = version2["payload"].toObject(); p2.remove("resources"); p2.remove("assignments"); p2.remove("scenarios"); p2.remove("wbsNodes"); p2.remove("baselines"); p2.remove("progress"); p2.remove("statusAt");
+        auto p2 = version2["payload"].toObject(); p2.remove("costProfile"); p2.remove("currency"); p2.remove("taskCosts"); p2.remove("costEntries"); p2.remove("resources"); p2.remove("assignments"); p2.remove("scenarios"); p2.remove("wbsNodes"); p2.remove("baselines"); p2.remove("progress"); p2.remove("statusAt");
         QJsonArray tasks2;
         for (auto value : p2["tasks"].toArray()) { auto t = value.toObject(); t.remove("wbsId"); tasks2.append(t); }
         p2["tasks"] = tasks2; version2["payload"] = p2; version2["schemaVersion"] = 2;
