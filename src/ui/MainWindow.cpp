@@ -206,6 +206,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     diagnostics_->setObjectName("calculationDiagnostics"); diagnostics_->setAccessibleName("계산 상태 및 진단");
     layout->addWidget(diagnostics_);
     auto* note = new QLabel("기본 월–금 09–12 / 13–18 · 프로젝트 메뉴에서 작업 달력 등록/배정 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤\n선행: 프로젝트 행 번호 1, 2SS+2h, 3FF-30m, 4SF+1d · d=480 근무분 · 지연/선행=후행 달력 기준 · F9=전체 계산\n간트: 빨강+[임계]=계획 임계, 파랑=계획/예측, 초록+[실제]=실제 완료, ◆=마일스톤, 회색=기준선, 배경 음영=프로젝트 기본 휴무\n드래그=날짜 이동 · 오른쪽 끝/Shift=기간 · 이동량 15분 · Esc 취소 · 계획만 편집 · 적용 후 자동 재계산\n프로젝트 메뉴: 제약·마감일 설정/충돌 진단 · 실제 날짜는 고정 · 예측 여유·임계 미산정", central);
+    note->setObjectName("taskInputHelp");editingHelp_=note;
     note->setWordWrap(true); layout->addWidget(note); setCentralWidget(central);
     connect(table_, &QTableWidget::cellChanged, this, [this](int row, int column) {
         if (column > 2) return;
@@ -222,7 +223,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     });
     setupTaskEditing(editMenu,layout);
     connect(table_,&QTableWidget::currentCellChanged,this,&MainWindow::syncTaskSelection);
-    setupRecovery(recoveryStore); refresh();
+    setupRecovery(recoveryStore); refresh();updateCompactLayout();
 }
 MainWindow::~MainWindow() { if(calculationControl_)calculationControl_->cancel();document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }

@@ -8,6 +8,7 @@ class QAction;
 class QTreeWidget;
 class QComboBox;
 class QTimer;
+class QResizeEvent;
 class QLineEdit;
 class QMenu;
 class QVBoxLayout;
@@ -21,6 +22,7 @@ public:
     ~MainWindow() override;
 protected:
     void closeEvent(QCloseEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 private:
     Document& document_;
     QTableWidget* table_;
@@ -28,7 +30,8 @@ private:
     GanttView* gantt_;
     QLabel* wbsSummary_;
     QLabel* summary_;
-    QPlainTextEdit* diagnostics_;
+    QPlainTextEdit* diagnostics_=nullptr;
+    QLabel* editingHelp_=nullptr;
     QAction *save_, *saveAs_, *add_;
     QAction *undo_ = nullptr, *redo_ = nullptr, *recover_ = nullptr, *autosaveEnabled_ = nullptr, *autosaveNow_ = nullptr;
     std::uint64_t historyListener_ = 0;
@@ -88,6 +91,7 @@ private:
     void setupTaskEditing(QMenu* menu,QVBoxLayout* layout);
     void updateTaskActions();
     void syncTaskSelection();
+    void updateCompactLayout();
     void insertSelectedTasks();
     void deleteSelectedTasks();
     void duplicateSelectedTasks();

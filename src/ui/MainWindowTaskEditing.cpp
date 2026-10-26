@@ -23,6 +23,7 @@
 #include <QStatusBar>
 #include <QTableWidget>
 #include <QTimer>
+#include <QResizeEvent>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <unordered_map>
@@ -53,7 +54,11 @@ void MainWindow::setupTaskEditing(QMenu* menu,QVBoxLayout* layout) {
     connect(reset,&QPushButton::clicked,this,[this]{commitPendingCell();const QSignalBlocker a(taskSearch_),b(taskFilter_),c(taskSort_);taskSearch_->clear();taskFilter_->setCurrentIndex(0);taskSort_->setCurrentIndex(0);refresh(false);});
     table_->horizontalHeader()->setSectionsClickable(true);connect(table_->horizontalHeader(),&QHeaderView::sectionClicked,this,[this](int column){int first=column==0?1:column==1?3:column==3?5:0;if(first)taskSort_->setCurrentIndex(taskSort_->currentIndex()==first?first+1:first);});
     connect(QApplication::clipboard(),&QClipboard::dataChanged,this,&MainWindow::updateTaskActions);
+    auto* help=menu->addAction("입력·단축키 도움말");help->setObjectName("taskEditingHelp");help->setShortcut(QKeySequence(Qt::Key_F1));
+    connect(help,&QAction::triggered,this,[this]{QMessageBox::information(this,"입력·단축키 도움말",editingHelp_->text());});
 }
+void MainWindow::resizeEvent(QResizeEvent* event){QMainWindow::resizeEvent(event);updateCompactLayout();}
+void MainWindow::updateCompactLayout(){if(!editingHelp_||!diagnostics_)return;const bool compact=height()<760;editingHelp_->setVisible(!compact);diagnostics_->setMaximumHeight(compact?80:160);}
 void MainWindow::syncTaskSelection() {
 
         selectedTaskIds_=selectedTaskIds();
