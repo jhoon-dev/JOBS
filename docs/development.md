@@ -160,3 +160,6 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 제약·마감·간트 증분은 schema 8 / native-pdm-constraints-v1 / jobs-pdm-1.1을 사용하며 구 입력/기준선 정책을 보존한다. Constraints는 하드 충돌과 소프트 마감 경고를 구분하고, GanttEditing은 UI 미리보기 후 Document의 ID/revision guard와 단일 edit를 사용한다. [상세 계약](constraints-gantt.md), constraint_contract/constraint_gantt_ui로 CTest 21개와 독립 XLSX/PDF 검증을 제공한다.
 
 공수·작업 유형·자원 달력·분할 증분은 schema 9 / native-effort-split-v1 / jobs-effort-1.0이다. TaskExecution의 달력 교집합/공수 적분·마지막 분 배분을 일정·부하·자원비·출력이 공유한다. [계산/편집/파일 계약](effort-calendars-splits.md), effort_work_calendar_split/effort_ui를 포함해 CTest 23개로 확장하고 새 공수 보고서의 19개 XLSX 시트와 PDF를 독립 reader로 검증한다. schema 1~8의 원본 보존 SaveAs와 이전 계산 엔진, projectSchema 6~9 복구를 유지한다.
+
+
+성능·통합 검증 증분은 PRD PERF-01~04를 구현 전에 커밋하고 계산 진행/협력 취소, 요청/session 보호, 동일 스냅샷의 달력/공수 격자 공유와 화면 주변 간트를 추가했다. `calculation_cancellation`, `integrated_project_workflow`, `performance_cancellation_ui`로 CTest 26개를 구성한다. 로컬 26/26·Windows 네이티브 새 UI·독립 XLSX 5/PDF 6 검사를 통과했다. [측정 계약·원시 결과·한계](performance-integration.md)를 따르며 CI는 1천/1만 기본·공수 사례를 별도 프로세스에서 실행해 JSON/log artifact를 남긴다. 파일 schema/기존 계산 정책은 유지한다.

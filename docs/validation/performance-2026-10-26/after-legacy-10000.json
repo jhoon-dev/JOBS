@@ -1,0 +1,83 @@
+{
+    "build_configuration": "Release",
+    "calculation": {
+        "median_ms": 25.4227,
+        "observed_p95_ms": 26.7643,
+        "samples_ms": [
+            26.7643,
+            25.4227,
+            19.0404
+        ]
+    },
+    "calendar_count": 0,
+    "compiler": "13.1.0",
+    "cpu_architecture": "x86_64",
+    "dependency_count": 9900,
+    "fixture": "jobs-perf-layered-v1",
+    "logical_cpu_count": 16,
+    "maximum_gantt_items": 115,
+    "os": "Windows 11 Version 26H2",
+    "peak_memory_semantics": "OS process high water mark; not an incremental allocation measurement",
+    "peak_process_resident_bytes": 156000256,
+    "profile": "native-fs0-workminutes-v1",
+    "project_finish": "2026-11-11 14:00",
+    "qt": "6.8.3",
+    "repeats": 3,
+    "resource_count": 0,
+    "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+    "scroll": {
+        "median_ms": 26.134700000000002,
+        "observed_p95_ms": 35.8355,
+        "samples_ms": [
+            57.8626,
+            27.5622,
+            25.3579,
+            26.3608,
+            24.3201,
+            23.9091,
+            31.4265,
+            28.705,
+            23.4439,
+            24.1542,
+            24.9003,
+            28.8659,
+            0.4652,
+            33.2213,
+            23.2235,
+            26.8665,
+            25.7728,
+            30.5073,
+            28.7517,
+            25.9086,
+            29.8781,
+            26.396,
+            30.995,
+            30.0029,
+            0.3147,
+            24.9889,
+            22.7129,
+            24.4358,
+            35.8355,
+            24.7079,
+            32.1324,
+            29.6836,
+            24.3743,
+            24.3959,
+            32.0213,
+            22.2729
+        ]
+    },
+    "source_revision": "0c60f8f",
+    "split_task_count": 0,
+    "status": "success",
+    "task_count": 10000,
+    "ui_preparation": {
+        "median_ms": 800.2586,
+        "observed_p95_ms": 1071.9111,
+        "samples_ms": [
+            1071.9111,
+            731.2477,
+            800.2586
+        ]
+    }
+}
