@@ -1,5 +1,6 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
+#include "ui/ReportDialog.h"
 #include "domain/Wbs.h"
 #include <QAction>
 #include <QCloseEvent>
@@ -115,6 +116,10 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     taskCost_ = costAction("선택 작업 예산", "taskCost", [this] { editTaskCost(); });
     costReport_ = costAction("원가·물리 진척 보고", "costReport", [this] { reportCost(); });
     evm_ = costAction("원가·EVM 분석", "costAnalysis", [this] { showCosts(); });
+    auto* reportsMenu = menuBar()->addMenu("보고서(&B)");
+    reports_ = reportsMenu->addAction("프로젝트 대시보드·보고서…"); reports_->setObjectName("projectReports");
+    resourceTools->addSeparator(); resourceTools->addAction(reports_);
+    connect(reports_, &QAction::triggered, this, [this] { if (document_.project()) { ReportDialog dialog(document_, selectedWbs_, selectedBaseline_, this); dialog.exec(); } });
     auto* central = new QWidget(this); auto* layout = new QVBoxLayout(central);
     auto* heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
     layout->addWidget(heading);
@@ -225,7 +230,7 @@ void MainWindow::refresh(bool rebuildTree) {
     resources_->setEnabled(p.has_value());
     assignResources_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     resourceComparison_->setEnabled(p.has_value());
-    rates_->setEnabled(p.has_value()); evm_->setEnabled(p.has_value());
+    rates_->setEnabled(p.has_value()); evm_->setEnabled(p.has_value()); reports_->setEnabled(p.has_value());
     taskCost_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     costReport_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty() && p->statusAt.has_value());
     if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();

@@ -10,6 +10,7 @@ DESK-01/04/05 및 FILE-01/02/03/05/07/09의 초기 수직 흐름이다.
 - `jobs_calculation`: 표준 C++20 FS0 CPM, 달력, retained remaining 예측, 기준선 준비/검증, 계획/예측 비교, 자원 수요/가용량 및 비분할 직렬 평준화. Qt 의존 없음.
 - `jobs_application`: 문서 세션, 생성/열기/편집/저장/사본, 추상 저장 포트.
 - `jobs_persistence`: Qt Core JSON, checksum, 잠금, 외부 변경 감지, 원자적 교체.
+- `jobs_reporting`: Qt Gui 기반 숫자/텍스트 표시·공통 추이, 공개 OOXML XLSX와 페이지를 나누는 PDF 출력. 외부 런타임/Office 라이브러리 없음.
 - `jobs_ui`: Qt Widgets WBS·표·간트, 기준선/상태일/실적 대화상자, 자원 등록/배정·비동기 부하/시나리오 A/B 비교, 변경 상세, 미저장 변경 확인.
 
 기간 미정(null)과 마일스톤(0분)을 구분한다. 기간·FS 선행·휴일을 입력하면 F9로
@@ -144,3 +145,8 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 
 원가/EVM 증분의 로컬 Release 전체 12/12와 Windows 네이티브 원가 화면 테스트를 통과했다.
 단가·F10 EVM 표·PV/EV/AC 추이의 한글/금액 표시와 기존 자원 화면의 단가 보존을 확인했다.
+
+보고서 증분은 `reports_export`, `reports_ui`를 더해 CTest 14개로 확장했다. `jobs_calculation`의 표준 C++ 보고서 스냅샷을 대시보드/표·두 출력기가 공유하며 설정은 `.jobs` 입력을 바꾸지 않는다. Qt Gui는 Widgets 의존 모듈이므로 별도 Qt 패키지 설치가 필요하지 않다.
+[대시보드·보고서·출력 계약](reports-export.md)에 필터와 집계 범위·용지/글자 크기·한도·후속 범위를 기록한다.
+
+로컬 Release 전체 14/14, Windows 네이티브 보고서 UI와 출력 시험을 통과했다. openpyxl/pypdf로 ZIP/숫자/미정/출처, PDF 크기·본문·긴 행 700구간과 마지막 표식을 독립 대조했다. 엑셀 14개 시트와 PDF 페이지를 렌더링해 한글/줄바꿈/정렬을 확인했다. 독립 재열기 검사 스크립트는 `scripts/verify-report-fixtures.py build`이며 Python 의존성은 개발/CI에만 사용한다. Windows/macOS CI에서도 CTest 뒤 같은 파일 검증을 실행한다.

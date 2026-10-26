@@ -133,7 +133,8 @@ Evm combine(const std::vector<CostTaskRow>& rows, const std::set<std::string>& i
     derive(e, formula); return e;
 }
 }
-CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const std::string& formula) {
+CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const std::string& formula,
+                          const std::optional<std::vector<std::string>>& taskScope) {
     validate(p);
     if (formula != "budget-remaining-v1" && formula != "cpi-v1" && formula != "cpi-spi-v1") throw std::runtime_error("지원하지 않는 EAC 산식입니다.");
     CostAnalysis out; out.documentId = p.documentId; out.revision = p.revision; out.statusAt = p.statusAt; out.currency = p.currency; out.baselineId = baselineId; out.formula = formula;
@@ -141,6 +142,12 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     for (const auto& b : p.baselines) if (b.id == baselineId) baseline = &b;
     if (!baselineId.empty() && !baseline) throw std::runtime_error("비교할 원가 기준선이 없습니다.");
     if (baseline) verifyBaseline(*baseline);
+    std::set<std::string> selected;
+    if (taskScope) {
+        std::set<std::string> known; for (const auto& t : p.tasks) known.insert(t.id);
+        if (baseline) for (const auto& t : baseline->input.tasks) known.insert(t.id);
+        for (const auto& id : *taskScope) { if (!known.contains(id)) throw std::runtime_error("원가 집계 범위의 작업이 존재하지 않습니다."); selected.insert(id); }
+    }
     const bool compatible = baseline && baseline->input.currency == p.currency;
     if (baseline && !compatible) out.diagnostics.push_back({"CURRENCY_MISMATCH", "기준선과 현재 통화가 다릅니다. 환산 없이 EVM·혼합 합계를 산정하지 않습니다.", {}});
     if (!baseline) out.diagnostics.push_back({"NO_COST_BASELINE", "기준선을 선택하면 BAC/PV/EV를 계산합니다. 현재 계획 예산은 기준선 예산과 구분합니다.", {}});
@@ -153,8 +160,9 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     std::map<std::string, Budget> current, frozen;
     for (const auto& t : p.tasks) current.emplace(t.id, budget(p, t, dates.contains(t.id) ? dates.at(t.id) : nullptr, calendar));
     if (compatible) for (const auto& t : baseline->input.tasks) frozen.emplace(t.id, budget(baseline->input, t, frozenDates.at(t.id), *baselineCalendar));
-    std::vector<Task> all = p.tasks;
-    if (baseline) for (const auto& t : baseline->input.tasks) if (!current.contains(t.id)) all.push_back(t);
+    if (taskScope) { std::erase_if(current, [&](const auto& item) { return !selected.contains(item.first); }); std::erase_if(frozen, [&](const auto& item) { return !selected.contains(item.first); }); }
+    std::vector<Task> all; for (const auto& t : p.tasks) if (current.contains(t.id)) all.push_back(t);
+    if (baseline) for (const auto& t : baseline->input.tasks) if ((!taskScope || selected.contains(t.id)) && !current.contains(t.id)) all.push_back(t);
     out.plan = 0; out.actual = p.statusAt ? Money{0} : Money{}; std::set<std::string> cohort;
     for (const auto& t : all) {
         CostTaskRow row; row.taskId = t.id; row.name = t.name; row.baselineMember = baseline && frozenDates.contains(t.id);
@@ -179,7 +187,8 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     for (const auto& n : p.wbsNodes) {
         CostGroup group; group.id = n.id; group.name = n.name; group.plan = 0; group.actual = p.statusAt ? Money{0} : Money{};
         for (auto index : wbsTaskRows(p, n.id)) {
-            const auto& id = p.tasks[index].id; group.plan = add(group.plan, current.at(id).at(current.at(id).finishStamp, calendar));
+            const auto& id = p.tasks[index].id; if (!current.contains(id)) continue;
+            group.plan = add(group.plan, current.at(id).at(current.at(id).finishStamp, calendar));
             if (p.statusAt) group.actual = add(group.actual, actual(p, id, *p.statusAt));
         }
         out.currentWbs.push_back(std::move(group));
@@ -198,13 +207,17 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     addDays(current, calendar); if (compatible) addDays(frozen, *baselineCalendar);
     if (p.statusAt) {
         days.insert(p.statusAt->substr(0, 10));
-        for (const auto& e : p.costEntries) if (e.statusAt <= *p.statusAt) days.insert(e.statusAt.substr(0, 10));
-        for (const auto& e : p.progress) if (e.statusAt <= *p.statusAt) days.insert(e.statusAt.substr(0, 10));
+        for (const auto& e : p.costEntries) if (e.statusAt <= *p.statusAt && (!taskScope || selected.contains(e.taskId))) days.insert(e.statusAt.substr(0, 10));
+        for (const auto& e : p.progress) if (e.statusAt <= *p.statusAt && (!taskScope || selected.contains(e.taskId))) days.insert(e.statusAt.substr(0, 10));
     }
     for (const auto& date : days) {
         const auto end = date + " 23:59"; CostDay d; d.date = date; d.plan = 0; d.budget = d.pv = compatible ? Money{0} : Money{};
         for (const auto& [id, b] : current) { (void)id; d.plan = add(d.plan, b.on(date, calendar)); }
         for (const auto& [id, b] : frozen) { (void)id; d.budget = add(d.budget, b.on(date, *baselineCalendar)); d.pv = add(d.pv, b.at(end, *baselineCalendar)); }
+        if (p.statusAt && date <= p.statusAt->substr(0, 10)) {
+            d.currentActual = 0; const auto at = std::min(end, *p.statusAt);
+            for (const auto& [id, b] : current) { (void)b; d.currentActual = add(d.currentActual, actual(p, id, at)); }
+        }
         if (compatible && p.statusAt && date <= p.statusAt->substr(0, 10)) {
             const auto at = std::min(end, *p.statusAt); d.ev = d.ac = 0;
             for (const auto& [id, b] : frozen) { d.ev = add(d.ev, earned(p, id, b, b.at(b.finishStamp, *baselineCalendar), at)); d.ac = add(d.ac, actual(p, id, at)); }
@@ -213,7 +226,7 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
         out.days.push_back(std::move(d));
     }
     for (const auto& row : out.tasks) for (const auto& issue : row.issues) out.diagnostics.push_back({"COST_INPUT_OR_LIMIT", issue, {row.taskId}});
-    std::set<std::string> currentIds; for (const auto& t : p.tasks) currentIds.insert(t.id);
+    std::set<std::string> currentIds; for (const auto& t : p.tasks) if (current.contains(t.id)) currentIds.insert(t.id);
     if (baseline && cohort != currentIds) out.diagnostics.push_back({"BASELINE_SCOPE", "EVM 총계는 선택 기준선의 작업 ID 범위입니다. 기준선 밖 작업 원가는 현재 계획/실제 총계에만 포함합니다.", {}});
     out.diagnostics.push_back({"EVM_POLICY", "금액 반올림: 자원·배정·근무일별 최소 통화단위 half-up. EVM은 기준선 측정법과 상태일 보고를 사용하며 기간 진척을 물리 진척으로 대체하지 않습니다. CPI/SPI는 합계 금액의 비율입니다.", {}});
     return out;

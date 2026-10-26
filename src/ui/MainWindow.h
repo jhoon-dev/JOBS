@@ -38,6 +38,7 @@ private:
     void editTaskCost();
     void reportCost();
     void showCosts();
+    QAction* reports_;
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;
