@@ -35,10 +35,19 @@ std::string stringField(const QJsonObject& o, const QString& key) {
 }
 QJsonObject payload(const Project& p) {
     QJsonArray tasks;
-    for (const auto& t : p.tasks) tasks.append(QJsonObject{{"id", qs(t.id)}, {"name", qs(t.name)}});
+    for (const auto& t : p.tasks) {
+        QJsonArray predecessors;
+        for (const auto& id : t.predecessors) predecessors.append(qs(id));
+        tasks.append(QJsonObject{{"id", qs(t.id)}, {"name", qs(t.name)},
+            {"durationMinutes", t.durationMinutes ? QJsonValue(double(*t.durationMinutes)) : QJsonValue(QJsonValue::Null)},
+            {"predecessors", predecessors}});
+    }
+    QJsonArray holidays;
+    for (const auto& date : p.holidays) holidays.append(qs(date));
     return {{"documentId", qs(p.documentId)}, {"derivedFrom", qs(p.derivedFrom)},
             {"revision", double(p.revision)}, {"name", qs(p.name)},
-            {"startDate", qs(p.startDate)}, {"calendar", qs(p.calendar)}, {"tasks", tasks}};
+            {"startDate", qs(p.startDate)}, {"calendar", qs(p.calendar)}, {"tasks", tasks},
+            {"holidays", holidays}, {"calculationProfile", qs(p.calculationProfile)}};
 }
 Project decode(const QByteArray& bytes) {
     QJsonParseError error;
@@ -47,23 +56,51 @@ Project decode(const QByteArray& bytes) {
     const auto root = json.object();
     keys(root, {"format", "schemaVersion", "payload", "sha256"});
     if (root.value("format") != "JOBS") fail("JOBS 프로젝트 형식이 아닙니다.");
-    if (root.value("schemaVersion") != QJsonValue(1)) fail("지원하지 않는 파일 버전입니다. 원본은 변경하지 않았습니다.");
+    const bool legacy = root.value("schemaVersion") == QJsonValue(1);
+    if (!legacy && root.value("schemaVersion") != QJsonValue(2)) fail("지원하지 않는 파일 버전입니다. 원본은 변경하지 않았습니다.");
     if (!root.value("payload").isObject()) fail("프로젝트 본문이 없습니다.");
     auto o = root.value("payload").toObject();
     if (root.value("sha256").toString().toLatin1() != hash(QJsonDocument(o).toJson(QJsonDocument::Compact)))
         fail("파일 무결성 검사에 실패했습니다.");
-    keys(o, {"documentId", "derivedFrom", "revision", "name", "startDate", "calendar", "tasks"});
+    auto fields = QStringList{"documentId", "derivedFrom", "revision", "name", "startDate", "calendar", "tasks"};
+    if (!legacy) fields.append({"holidays", "calculationProfile"});
+    keys(o, fields);
     Project p;
     p.documentId = stringField(o, "documentId"); p.derivedFrom = stringField(o, "derivedFrom");
     p.name = stringField(o, "name"); p.startDate = stringField(o, "startDate"); p.calendar = stringField(o, "calendar");
+    if (!legacy) {
+        p.calculationProfile = stringField(o, "calculationProfile");
+        if (!o.value("holidays").isArray()) fail("휴일 목록 형식이 잘못되었습니다.");
+        for (const auto& date : o.value("holidays").toArray()) {
+            if (!date.isString()) fail("휴일 날짜는 문자열이어야 합니다.");
+            p.holidays.push_back(str(date.toString()));
+        }
+    }
     double rev = o.value("revision").toDouble(-1);
     if (!std::isfinite(rev) || rev < 1 || rev > 9007199254740991.0 || std::floor(rev) != rev) fail("잘못된 revision입니다.");
     p.revision = static_cast<std::uint64_t>(rev);
     if (!o.value("tasks").isArray()) fail("작업 목록 형식이 잘못되었습니다.");
     for (const auto& value : o.value("tasks").toArray()) {
         if (!value.isObject()) fail("작업 형식이 잘못되었습니다.");
-        auto t = value.toObject(); keys(t, {"id", "name"});
-        p.tasks.push_back({stringField(t, "id"), stringField(t, "name")});
+        auto t = value.toObject();
+        keys(t, legacy ? QStringList{"id", "name"} : QStringList{"id", "name", "durationMinutes", "predecessors"});
+        Task task{stringField(t, "id"), stringField(t, "name"), std::nullopt, {}};
+        if (!legacy) {
+            if (!t.contains("durationMinutes")) fail("기간 필드가 없습니다.");
+            auto duration = t.value("durationMinutes");
+            if (!duration.isNull()) {
+                double minutes = duration.toDouble(-1);
+                if (!duration.isDouble() || !std::isfinite(minutes) || minutes < 0 || minutes > 5000000 || std::floor(minutes) != minutes)
+                    fail("기간은 정수 근무분 또는 null이어야 합니다.");
+                task.durationMinutes = static_cast<std::int64_t>(minutes);
+            }
+            if (!t.value("predecessors").isArray()) fail("선행 작업 목록 형식이 잘못되었습니다.");
+            for (const auto& id : t.value("predecessors").toArray()) {
+                if (!id.isString()) fail("선행 작업 ID는 문자열이어야 합니다.");
+                task.predecessors.push_back(str(id.toString()));
+            }
+        }
+        p.tasks.push_back(std::move(task));
     }
     validate(p); return p;
 }
@@ -93,12 +130,15 @@ std::string JsonProjectStore::normalizePath(const std::string& path) const {
 }
 std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string& path) { return std::make_unique<Lock>(qs(path)); }
 StoredProject JsonProjectStore::load(const std::string& path) const {
-    auto bytes = read(qs(path)); return {decode(bytes), hash(bytes).toStdString()};
+    auto bytes = read(qs(path));
+    auto project = decode(bytes);
+    const bool legacy = QJsonDocument::fromJson(bytes).object().value("schemaVersion") == QJsonValue(1);
+    return {std::move(project), hash(bytes).toStdString(), legacy};
 }
 std::string JsonProjectStore::save(const std::string& path, const Project& project, const std::string& expected) {
     validate(project);
     auto body = payload(project);
-    auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS"}, {"schemaVersion", 1}, {"payload", body},
+    auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS"}, {"schemaVersion", 2}, {"payload", body},
         {"sha256", QString::fromLatin1(hash(QJsonDocument(body).toJson(QJsonDocument::Compact)))}}).toJson();
     if (bytes.size() > 64 * 1024 * 1024) fail("초기 형식의 파일 한도(64 MiB)를 초과했습니다.");
     if (decode(bytes) != project) fail("저장 전 검증에 실패했습니다.");

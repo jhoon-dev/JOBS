@@ -21,11 +21,21 @@ void validate(const Project& p) {
     if (blank(p.documentId) || blank(p.name)) throw std::runtime_error("프로젝트 ID와 이름은 필수입니다.");
     if (!validDate(p.startDate)) throw std::runtime_error("시작일은 유효한 YYYY-MM-DD 날짜여야 합니다.");
     if (p.calendar != "standard-mon-fri-8h-v1") throw std::runtime_error("지원하지 않는 근무달력입니다.");
+    if (p.calculationProfile != "native-fs0-workminutes-v1") throw std::runtime_error("지원하지 않는 계산 정책입니다.");
+    std::unordered_set<std::string> holidays;
+    for (const auto& date : p.holidays)
+        if (!validDate(date) || !holidays.insert(date).second) throw std::runtime_error("휴일 날짜가 잘못되었거나 중복되었습니다.");
     if (p.revision == 0 || p.revision > 9007199254740991ULL)
         throw std::runtime_error("지원하지 않는 revision입니다.");
     std::unordered_set<std::string> ids;
-    for (const auto& t : p.tasks)
+    for (const auto& t : p.tasks) {
         if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second)
             throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
+        if (t.durationMinutes && (*t.durationMinutes < 0 || *t.durationMinutes > 5000000))
+            throw std::runtime_error("기간은 0~5,000,000 근무분 또는 미정이어야 합니다.");
+        std::unordered_set<std::string> refs;
+        for (const auto& id : t.predecessors)
+            if (blank(id) || !refs.insert(id).second) throw std::runtime_error("선행 작업 ID 누락 또는 중복입니다.");
+    }
 }
 }

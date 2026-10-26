@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 2;
+        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 3;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();
@@ -96,7 +96,42 @@ int main(int argc, char* argv[]) {
         second.saveAs(dir.filePath("read-only-copy.jobs").toStdString());
         second.addTask("사본 편집"); second.save();
         check(read(a) == originalBytes, "read-only copy modified source");
-        std::cout << "PASS: validation, Unicode roundtrip, stable IDs/revisions, save-as lineage, locks, read-only, conflict, corruption, schema, failed-open/save, single-file copy\n";
+        // Scheduling inputs survive persistence; results remain a session cache.
+        second.setDuration(0, 480); second.setDuration(1, 240);
+        second.setPredecessors(1, {second.project()->tasks[0].id}); second.setHolidays({"2026-11-02"});
+        auto result = jobs::calculate(*second.project()); second.applyCalculation(result);
+        check(second.calculation()->status == jobs::CalculationStatus::Incomplete, "missing task duration ignored");
+        second.setDuration(2, 60); second.applyCalculation(jobs::calculate(*second.project()));
+        check(second.calculation()->status == jobs::CalculationStatus::Valid, "application calculation rejected");
+        auto oldResult = *second.calculation(); second.setDuration(0, 960);
+        check(second.calculation()->status == jobs::CalculationStatus::Stale, "edit failed to invalidate calculation");
+        second.applyCalculation(oldResult);
+        check(second.calculation()->status == jobs::CalculationStatus::Stale, "old revision overwrote current result");
+        second.save();
+        check(store.load(second.path()).project == *second.project(), "schedule input roundtrip mismatch");
+        auto beforeBadHoliday = *second.project();
+        rejects([&] { second.setHolidays({"2026-02-30"}); });
+        check(*second.project() == beforeBadHoliday, "invalid holiday changed project");
+        second.create("different document", "2026-10-26", {"task"}); second.applyCalculation(oldResult);
+        check(second.calculation()->status == jobs::CalculationStatus::Stale, "wrong document calculation accepted");
+        // Construct an actual schema-1 payload, then check non-destructive migration by Save As.
+        auto legacy = QJsonDocument::fromJson(originalBytes).object();
+        auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile");
+        QJsonArray legacyTasks;
+        for (const auto& value : legacyPayload["tasks"].toArray()) {
+            auto task = value.toObject(); task.remove("durationMinutes"); task.remove("predecessors"); legacyTasks.append(task);
+        }
+        legacyPayload["tasks"] = legacyTasks; legacy["payload"] = legacyPayload; legacy["schemaVersion"] = 1;
+        legacy["sha256"] = QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(legacyPayload).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
+        auto legacyPath = dir.filePath("legacy.jobs"); const auto legacyBytes = QJsonDocument(legacy).toJson(); write(legacyPath, legacyBytes);
+        jobs::Document migrated(store); migrated.open(legacyPath.toStdString());
+        check(migrated.requiresSaveAs() && migrated.project()->documentId == initial.documentId && !migrated.project()->tasks[0].durationMinutes,
+              "legacy defaults/identity mismatch");
+        migrated.setDuration(0, 480); rejects([&] { migrated.save(); });
+        check(read(legacyPath) == legacyBytes && migrated.dirty(), "legacy save modified original");
+        migrated.saveAs(dir.filePath("migrated.jobs").toStdString());
+        check(!migrated.requiresSaveAs() && read(legacyPath) == legacyBytes && store.load(migrated.path()).project == *migrated.project(), "legacy save as failed");
+        std::cout << "PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, stale revision/identity, schema-1 copy migration\n";
         return 0;
     } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
 }

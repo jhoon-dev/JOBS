@@ -6,6 +6,7 @@ namespace jobs {
 struct StoredProject {
     Project project;
     std::string fingerprint;
+    bool requiresSaveAs = false;
 };
 class WriteLease {
 public:
