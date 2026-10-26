@@ -18,6 +18,10 @@ bool validDate(const std::string& s) {
 static bool blank(const std::string& s) {
     return s.empty() || std::all_of(s.begin(), s.end(), [](unsigned char c) { return c <= ' '; });
 }
+static std::int64_t civilMinute(const std::string& s) {
+    const auto date = std::chrono::year{std::stoi(s.substr(0, 4))}/unsigned(std::stoi(s.substr(5, 2)))/unsigned(std::stoi(s.substr(8, 2)));
+    return std::int64_t(std::chrono::sys_days{date}.time_since_epoch().count()) * 1440 + std::stoi(s.substr(11, 2)) * 60 + std::stoi(s.substr(14, 2));
+}
 bool validStamp(const std::string& s) {
     if (s.size() != 16 || s[10] != ' ' || s[13] != ':' || !validDate(s.substr(0, 10))) return false;
     for (auto i : {11, 12, 14, 15}) if (s[std::size_t(i)] < '0' || s[std::size_t(i)] > '9') return false;
@@ -105,6 +109,8 @@ void validate(const Project& p) {
             throw std::runtime_error("실제 날짜·상태일·잔여 기간이 모순됩니다. 완료 시 실제 완료일과 잔여 0을 함께 입력하세요.");
         if (!e.actualStart && e.remainingMinutes == 0 && e.planDurationMinutes.value_or(1) != 0)
             throw std::runtime_error("기간이 있는 작업의 잔여를 0으로 보고하려면 실제 시작·완료를 입력하세요.");
+        if (e.actualStart && e.actualDurationMinutes > civilMinute(e.actualFinish.value_or(e.statusAt)) - civilMinute(*e.actualStart))
+            throw std::runtime_error("실제 소요 기간이 실제 시작부터 완료/상태일까지의 경과시간보다 큽니다. 공수와 기간을 구분해 입력하세요.");
         previous[e.taskId] = e.id;
     }
 }

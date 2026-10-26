@@ -81,6 +81,7 @@ int main() {
         bad = done; bad.reporter.clear(); rejects([&] { history.recordProgress(bad); });
         bad = done; bad.reason.clear(); rejects([&] { history.recordProgress(bad); });
         bad = done; bad.remainingMinutes = -1; rejects([&] { history.recordProgress(bad); });
+        bad = done; bad.actualDurationMinutes = 3000; rejects([&] { history.recordProgress(bad); });
         check(*history.project() == valid, "invalid progress changed ledger/revision");
         // F08 retained logic in the native split-day calendar: data=12h, A finish20h, B remaining20..24h.
         jobs::Document outOfSequence(store); outOfSequence.create("F08", "2026-10-26", {"A", "B"});
