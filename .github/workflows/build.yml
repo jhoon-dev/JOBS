@@ -8,11 +8,14 @@ jobs:
         include:
           - os: windows-latest
             arch: win64_msvc2022_64
-          - os: macos-latest
+          - os: macos-15
             arch: clang_64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Select Qt 6.8 compatible macOS SDK
+        if: runner.os == 'macOS'
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
       - uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
