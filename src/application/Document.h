@@ -16,7 +16,12 @@ public:
     void create(std::string name, std::string startDate, const std::vector<std::string>& tasks);
     void open(const std::string& path, bool readOnly = false);
     void renameTask(std::size_t row, std::string name);
-    void addTask(std::string name);
+    void addTask(std::string name, std::string wbsId = {});
+    std::string addWbs(std::string name, std::string parentId = {});
+    void renameWbs(const std::string& id, std::string name);
+    void moveWbs(const std::string& id, std::string parentId);
+    void removeWbs(const std::string& id);
+    void assignWbs(std::size_t taskRow, std::string wbsId);
     void setDuration(std::size_t row, std::optional<std::int64_t> minutes);
     void setPredecessors(std::size_t row, std::vector<std::string> ids);
     void setHolidays(std::vector<std::string> dates);

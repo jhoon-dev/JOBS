@@ -2,6 +2,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <unordered_set>
+#include <unordered_map>
 #include <algorithm>
 
 namespace jobs {
@@ -28,9 +29,30 @@ void validate(const Project& p) {
     if (p.revision == 0 || p.revision > 9007199254740991ULL)
         throw std::runtime_error("지원하지 않는 revision입니다.");
     std::unordered_set<std::string> ids;
+    std::unordered_map<std::string, std::size_t> nodes;
+    for (std::size_t i = 0; i < p.wbsNodes.size(); ++i) {
+        const auto& node = p.wbsNodes[i];
+        if (blank(node.id) || blank(node.name) || !nodes.emplace(node.id, i).second)
+            throw std::runtime_error("WBS ID 중복 또는 이름 누락입니다.");
+    }
+    for (const auto& node : p.wbsNodes)
+        if (!node.parentId.empty() && !nodes.contains(node.parentId)) throw std::runtime_error("WBS 부모가 존재하지 않습니다.");
+    std::vector<int> color(p.wbsNodes.size(), 0);
+    for (std::size_t i = 0; i < p.wbsNodes.size(); ++i) {
+        auto j = i; std::vector<std::size_t> chain;
+        while (color[j] == 0) {
+            color[j] = 1; chain.push_back(j);
+            const auto& parent = p.wbsNodes[j].parentId;
+            if (parent.empty()) break;
+            j = nodes.at(parent);
+            if (color[j] == 1) throw std::runtime_error("WBS 부모 관계에 순환이 있습니다.");
+        }
+        for (auto index : chain) color[index] = 2;
+    }
     for (const auto& t : p.tasks) {
-        if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second)
+        if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second || nodes.contains(t.id))
             throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
+        if (!t.wbsId.empty() && !nodes.contains(t.wbsId)) throw std::runtime_error("작업의 WBS가 존재하지 않습니다.");
         if (t.durationMinutes && (*t.durationMinutes < 0 || *t.durationMinutes > 5000000))
             throw std::runtime_error("기간은 0~5,000,000 근무분 또는 미정이어야 합니다.");
         std::unordered_set<std::string> refs;

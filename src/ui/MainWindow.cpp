@@ -1,4 +1,6 @@
 #include "ui/MainWindow.h"
+#include "ui/GanttView.h"
+#include "domain/Wbs.h"
 #include <QAction>
 #include <QCloseEvent>
 #include <QDateEdit>
@@ -22,6 +24,11 @@
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
 #include <QRegularExpression>
+#include <QTreeWidget>
+#include <QTreeWidgetItemIterator>
+#include <QSplitter>
+#include <QScrollBar>
+#include <QComboBox>
 #include <functional>
 #include <cmath>
 #include <unordered_map>
@@ -32,7 +39,7 @@ QString qs(const std::string& s) { return QString::fromUtf8(s.data(), qsizetype(
 std::string str(const QString& s) { return s.toUtf8().toStdString(); }
 }
 MainWindow::MainWindow(Document& document) : document_(document) {
-    resize(1320, 800);
+    resize(1560, 900);
     auto* menu = menuBar()->addMenu("파일(&F)");
     auto* tools = addToolBar("파일 및 작업"); tools->setMovable(false);
     auto action = [&](const QString& name, const QKeySequence& shortcut, std::function<void()> callback) {
@@ -51,35 +58,80 @@ MainWindow::MainWindow(Document& document) : document_(document) {
         bool ok = false;
         auto name = QInputDialog::getText(this, "작업 추가", "작업명", QLineEdit::Normal, {}, &ok).trimmed();
         if (!ok) return;
-        try { document_.addTask(str(name)); refresh(); } catch (const std::exception& e) { report(e); }
+        try { document_.addTask(str(name), selectedWbs_); refresh(); } catch (const std::exception& e) { report(e); }
     });
     auto* projectMenu = menuBar()->addMenu("프로젝트(&P)");
     calculate_ = projectMenu->addAction("일정 계산(&C)"); calculate_->setShortcut(QKeySequence(Qt::Key_F9));
     tools->addAction(calculate_); connect(calculate_, &QAction::triggered, this, &MainWindow::calculateSchedule);
     calendar_ = projectMenu->addAction("휴일 편집(&H)…"); tools->addAction(calendar_);
     connect(calendar_, &QAction::triggered, this, &MainWindow::editHolidays);
+    auto* wbsMenu = menuBar()->addMenu("WBS(&W)");
+    addToolBarBreak(); auto* wbsTools = addToolBar("WBS 편집"); wbsTools->setMovable(false);
+    auto wbsAction = [&](const QString& label, std::function<void()> callback) {
+        auto* a = wbsMenu->addAction(label); wbsTools->addAction(a);
+        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+    };
+    addWbs_ = wbsAction("WBS 추가", [this] { createWbs(); });
+    renameWbs_ = wbsAction("WBS 이름 변경", [this] { renameWbs(); });
+    moveWbs_ = wbsAction("WBS 이동", [this] { chooseWbs(true); });
+    removeWbs_ = wbsAction("빈 WBS 삭제", [this] {
+        try { document_.removeWbs(selectedWbs_); selectedWbs_.clear(); refresh(); } catch (const std::exception& e) { report(e); }
+    });
+    assignWbs_ = wbsAction("선택 작업의 WBS 변경", [this] { chooseWbs(false); });
+    wbsTools->addSeparator(); wbsTools->addWidget(new QLabel("간트 배율 ", this));
+    auto* zoom = new QComboBox(this); zoom->setAccessibleName("간트 배율"); zoom->setObjectName("ganttZoom");
+    zoom->addItems({"일", "주"}); wbsTools->addWidget(zoom);
     auto* central = new QWidget(this); auto* layout = new QVBoxLayout(central);
     auto* heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
     layout->addWidget(heading);
     summary_ = new QLabel(central); summary_->setTextFormat(Qt::PlainText); summary_->setWordWrap(true);
     summary_->setTextInteractionFlags(Qt::TextSelectableByMouse); layout->addWidget(summary_);
-    table_ = new QTableWidget(0, 9, central);
+    wbsSummary_ = new QLabel(central); wbsSummary_->setTextFormat(Qt::PlainText); wbsSummary_->setObjectName("wbsSummary");
+    wbsSummary_->setWordWrap(true); layout->addWidget(wbsSummary_);
+    auto* split = new QSplitter(Qt::Horizontal, central); layout->addWidget(split, 1);
+    wbsTree_ = new QTreeWidget(split); wbsTree_->setObjectName("wbsTree"); wbsTree_->setAccessibleName("WBS 탐색");
+    wbsTree_->setHeaderLabel("WBS · 프로젝트 구조"); wbsTree_->setMinimumWidth(170);
+    table_ = new QTableWidget(0, 9, split);
     table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "FS 선행(행 번호)", "시작", "완료", "총여유(h)", "임계", "자원", "안정 ID"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     for (int column = 1; column < 9; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
     table_->setColumnHidden(8, true); // Stable ID remains on the task tooltip; relations persist IDs, never row numbers.
-    table_->setSelectionBehavior(QAbstractItemView::SelectRows); layout->addWidget(table_);
+    table_->setSelectionBehavior(QAbstractItemView::SelectRows); table_->setSelectionMode(QAbstractItemView::SingleSelection);
+    table_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel); table_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    table_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); table_->setMinimumWidth(440);
+    table_->horizontalHeader()->setFixedHeight(GanttView::HeaderHeight);
+    table_->verticalHeader()->setDefaultSectionSize(GanttView::RowHeight);
+    table_->verticalHeader()->setMinimumSectionSize(GanttView::RowHeight);
+    gantt_ = new GanttView(split); gantt_->setMinimumWidth(300); split->setSizes({200, 750, 600});
+    connect(zoom, &QComboBox::currentIndexChanged, this, [this](int i) { gantt_->setDayWidth(i == 0 ? 64 : 16); });
+    connect(table_->verticalScrollBar(), &QScrollBar::valueChanged, gantt_->verticalScrollBar(), &QScrollBar::setValue);
+    connect(gantt_->verticalScrollBar(), &QScrollBar::valueChanged, table_->verticalScrollBar(), &QScrollBar::setValue);
+    connect(wbsTree_, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* item) {
+        selectedWbs_ = item ? str(item->data(0, Qt::UserRole).toString()) : std::string{}; refresh(false);
+    });
+    connect(table_, &QTableWidget::itemSelectionChanged, this, [this] {
+        const auto row = table_->currentRow();
+        if (document_.project() && row >= 0 && std::size_t(row) < visibleRows_.size() && !table_->selectedItems().isEmpty())
+            selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
+        else selectedTask_.clear();
+        gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
+    });
+    gantt_->taskSelected = [this](const std::string& id) {
+        for (std::size_t i = 0; i < visibleRows_.size(); ++i)
+            if (document_.project()->tasks[visibleRows_[i]].id == id) { table_->selectRow(int(i)); table_->scrollToItem(table_->item(int(i), 0)); break; }
+    };
     diagnostics_ = new QPlainTextEdit(central); diagnostics_->setReadOnly(true); diagnostics_->setMaximumHeight(160);
     diagnostics_->setObjectName("calculationDiagnostics"); diagnostics_->setAccessibleName("계산 상태 및 진단");
     layout->addWidget(diagnostics_);
-    auto* note = new QLabel("월–금 09–12 / 13–18 · 1일 8시간 · 휴일 편집 가능 · 날짜는 시간대 없는 현지 근무시각\n기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤 · 선행: 쉼표로 행 번호 입력(예: 1,3), FS 0 lag\nF9: 일정 계산 · 자원 제약·간트·자동복구는 후속 구현입니다.", central);
+    auto* note = new QLabel("월–금 09–12 / 13–18 · 1일 8시간 · 휴일 편집 가능 · 날짜는 시간대 없는 현지 근무시각\n기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤 · 선행: 표 왼쪽의 프로젝트 행 번호(1,3), FS 0 lag\n간트: 빨강+[임계]=임계 작업, 파랑=여유 작업, ◆=마일스톤, 음영=휴무 · 막대는 시작~완료 구간\nWBS는 하위 작업까지 필터합니다. F9는 전체 프로젝트 계산 · 자동복구·자원 제약은 후속 구현입니다.", central);
     note->setWordWrap(true); layout->addWidget(note); setCentralWidget(central);
     connect(table_, &QTableWidget::cellChanged, this, [this](int row, int column) {
         if (column > 2) return;
         try {
             const auto text = table_->item(row, column)->text().trimmed();
-            if (column == 0) document_.renameTask(std::size_t(row), str(text));
+            const auto taskRow = visibleRows_.at(std::size_t(row));
+            if (column == 0) document_.renameTask(taskRow, str(text));
             else if (column == 1) {
                 std::optional<std::int64_t> minutes;
                 if (QRegularExpression("^[0-9]+m$").match(text).hasMatch()) {
@@ -94,7 +146,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
                         throw std::runtime_error("기간은 정수 근무분으로 환산되어야 하며 5,000,000분 이하여야 합니다.");
                     minutes = static_cast<std::int64_t>(std::round(value));
                 }
-                document_.setDuration(std::size_t(row), minutes);
+                document_.setDuration(taskRow, minutes);
             } else {
                 std::vector<std::string> ids;
                 for (const auto& token : text.split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts)) {
@@ -103,7 +155,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
                         throw std::runtime_error("선행 작업은 존재하는 행 번호를 쉼표로 구분해 입력하세요.");
                     ids.push_back(document_.project()->tasks[std::size_t(number - 1)].id);
                 }
-                document_.setPredecessors(std::size_t(row), std::move(ids));
+                document_.setPredecessors(taskRow, std::move(ids));
             }
         }
         catch (const std::exception& e) { report(e); }
@@ -112,17 +164,24 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     refresh();
 }
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
-void MainWindow::refresh() {
+void MainWindow::refresh(bool rebuildTree) {
     const QSignalBlocker blocker(table_);
     const auto& p = document_.project();
+    if (p && treeDocument_ != p->documentId) { selectedWbs_.clear(); selectedTask_.clear(); treeDocument_ = p->documentId; }
+    if (rebuildTree) rebuildWbsTree();
     setWindowTitle((p ? qs(p->name) : "프로젝트를 만들거나 여세요") + "[*] — JOBS");
     setWindowModified(document_.dirty());
     save_->setEnabled(p.has_value()); saveAs_->setEnabled(p.has_value());
     add_->setEnabled(p.has_value() && !document_.readOnly());
     calculate_->setEnabled(p.has_value() && !calculating_);
     calendar_->setEnabled(p.has_value() && !document_.readOnly());
-    table_->setRowCount(p ? int(p->tasks.size()) : 0);
-    if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); statusBar()->showMessage("준비"); return; }
+    addWbs_->setEnabled(p.has_value() && !document_.readOnly());
+    const bool nodeEditable = p.has_value() && !document_.readOnly() && !selectedWbs_.empty();
+    renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
+    visibleRows_ = p ? wbsTaskRows(*p, selectedWbs_) : std::vector<std::size_t>{};
+    table_->setRowCount(int(visibleRows_.size())); table_->clearSelection(); table_->setCurrentCell(-1, -1);
+    if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
+        gantt_->setPlan(nullptr, nullptr, {}); assignWbs_->setEnabled(false); statusBar()->showMessage("준비"); return; }
     summary_->setText(qs(p->name) + "  |  시작일 " + qs(p->startDate) + "  |  revision " + QString::number(p->revision)
         + "  |  휴일 " + QString::number(p->holidays.size()) + "개"
         + "\n" + (document_.path().empty() ? "아직 저장하지 않은 프로젝트" : qs(document_.path()))
@@ -133,8 +192,11 @@ void MainWindow::refresh() {
     if (valid) for (const auto& row : calculation->tasks) schedules.emplace(row.taskId, &row);
     std::unordered_map<std::string, int> numbers;
     for (int row = 0; row < int(p->tasks.size()); ++row) numbers.emplace(p->tasks[std::size_t(row)].id, row + 1);
-    for (int row = 0; row < int(p->tasks.size()); ++row) {
-        const auto& t = p->tasks[std::size_t(row)];
+    int selectedRow = -1;
+    for (int row = 0; row < int(visibleRows_.size()); ++row) {
+        const auto taskIndex = visibleRows_[std::size_t(row)]; const auto& t = p->tasks[taskIndex];
+        table_->setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(taskIndex + 1)));
+        if (t.id == selectedTask_) selectedRow = row;
         QStringList predecessors;
         for (const auto& id : t.predecessors) predecessors << (numbers.contains(id) ? QString::number(numbers.at(id)) : "누락:" + qs(id));
         auto found = schedules.find(t.id); const auto* s = found == schedules.end() ? nullptr : found->second;
@@ -150,6 +212,14 @@ void MainWindow::refresh() {
             table_->setItem(row, column, item);
         }
     }
+    if (selectedRow >= 0) table_->selectRow(selectedRow); else selectedTask_.clear();
+    assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
+    gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_); gantt_->setSelectedTask(selectedTask_);
+    const auto rollup = summarizeWbs(*p, calculation ? &*calculation : nullptr, selectedWbs_);
+    wbsSummary_->setText("선택 범위: " + wbsTree_->currentItem()->text(0) + " · 작업 " + QString::number(rollup.taskCount)
+        + "개 · 알려진 작업 기간 합계 " + QString::number(double(rollup.knownDurationMinutes) / 60, 'g', 10) + "h"
+        + " · 기간 미정 " + QString::number(rollup.missingDurations) + "개 (합계는 WBS 경과기간과 다름)"
+        + (rollup.start ? "\n계산 구간: " + qs(*rollup.start) + " → " + qs(*rollup.finish) : "\n계산 구간: 최신 유효한 결과 없음"));
     QString state = "미계산 · F9로 계산";
     if (calculation) {
         switch (calculation->status) {
@@ -186,6 +256,73 @@ void MainWindow::calculateSchedule() {
         watcher->deleteLater(); refresh();
     });
     watcher->setFuture(QtConcurrent::run([snapshot] { return jobs::calculate(snapshot); }));
+}
+void MainWindow::rebuildWbsTree() {
+    const QSignalBlocker blocker(wbsTree_);
+    QSet<QString> expanded;
+    for (QTreeWidgetItemIterator it(wbsTree_); *it; ++it) if ((*it)->isExpanded()) expanded.insert((*it)->data(0, Qt::UserRole).toString());
+    wbsTree_->clear();
+    if (!document_.project()) return;
+    const auto& p = *document_.project();
+    auto* root = new QTreeWidgetItem(wbsTree_, {qs(p.name) + " · 전체 작업"}); root->setData(0, Qt::UserRole, QString{});
+    root->setToolTip(0, "프로젝트 전체 작업 · 하위 WBS와 미분류 작업 포함"); root->setExpanded(true);
+    std::unordered_map<std::string, QTreeWidgetItem*> items{{"", root}};
+    for (const auto& node : p.wbsNodes) {
+        auto* item = new QTreeWidgetItem(QStringList{qs(node.name)}); item->setData(0, Qt::UserRole, qs(node.id));
+        item->setToolTip(0, "WBS ID: " + qs(node.id)); items.emplace(node.id, item);
+    }
+    for (const auto& node : p.wbsNodes) {
+        items.at(node.parentId)->addChild(items.at(node.id)); items.at(node.id)->setExpanded(expanded.contains(qs(node.id)));
+    }
+    if (!items.contains(selectedWbs_)) selectedWbs_.clear();
+    auto* selected = items.at(selectedWbs_); wbsTree_->setCurrentItem(selected);
+    for (auto* ancestor = selected->parent(); ancestor; ancestor = ancestor->parent()) ancestor->setExpanded(true);
+}
+void MainWindow::createWbs() {
+    bool ok = false;
+    auto name = QInputDialog::getText(this, "WBS 추가", "선택한 WBS 아래에 만들 이름", QLineEdit::Normal, {}, &ok).trimmed();
+    if (!ok) return;
+    try { selectedWbs_ = document_.addWbs(str(name), selectedWbs_); refresh(); } catch (const std::exception& e) { report(e); }
+}
+void MainWindow::renameWbs() {
+    if (selectedWbs_.empty()) return;
+    bool ok = false;
+    auto name = QInputDialog::getText(this, "WBS 이름 변경", "이름", QLineEdit::Normal, wbsTree_->currentItem()->text(0), &ok).trimmed();
+    if (!ok) return;
+    try { document_.renameWbs(selectedWbs_, str(name)); refresh(); } catch (const std::exception& e) { report(e); }
+}
+void MainWindow::chooseWbs(bool moveNode) {
+    if (!document_.project() || document_.readOnly()) return;
+    const auto nodeId = selectedWbs_, taskId = selectedTask_;
+    if ((moveNode && nodeId.empty()) || (!moveNode && taskId.empty())) return;
+    const auto& p = *document_.project();
+    QDialog dialog(this); dialog.setWindowTitle(moveNode ? "WBS 이동" : "작업 WBS 변경"); dialog.resize(450, 180);
+    auto* layout = new QFormLayout(&dialog); auto* choice = new QComboBox(&dialog);
+    choice->setObjectName("wbsDestination"); choice->setAccessibleName("대상 WBS");
+    choice->addItem("프로젝트 루트 / 미분류", QString{});
+    std::unordered_map<std::string, const WbsNode*> nodes;
+    for (const auto& node : p.wbsNodes) nodes.emplace(node.id, &node);
+    const auto excluded = moveNode ? wbsSubtree(p, nodeId) : std::unordered_set<std::string>{};
+    for (const auto& node : p.wbsNodes) {
+        if (excluded.contains(node.id)) continue;
+        QStringList path{qs(node.name)}; auto parent = node.parentId;
+        while (!parent.empty()) { path.prepend(qs(nodes.at(parent)->name)); parent = nodes.at(parent)->parentId; }
+        choice->addItem(path.join(" / "), qs(node.id));
+    }
+    if (moveNode) choice->setCurrentIndex(choice->findData(qs(nodes.at(nodeId)->parentId)));
+    else for (const auto& task : p.tasks) if (task.id == taskId) choice->setCurrentIndex(choice->findData(qs(task.wbsId)));
+    layout->addRow("대상 WBS", choice);
+    layout->addRow(new QLabel("작업 ID와 실행 선행관계는 유지됩니다.", &dialog));
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog); layout->addRow(buttons);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept); connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    if (dialog.exec() != QDialog::Accepted) return;
+    try {
+        auto target = str(choice->currentData().toString());
+        if (moveNode) document_.moveWbs(nodeId, target);
+        else for (std::size_t i = 0; i < document_.project()->tasks.size(); ++i)
+            if (document_.project()->tasks[i].id == taskId) { document_.assignWbs(i, target); break; }
+        refresh();
+    } catch (const std::exception& e) { report(e); }
 }
 void MainWindow::editHolidays() {
     if (!document_.project() || document_.readOnly()) return;

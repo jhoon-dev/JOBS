@@ -10,7 +10,12 @@ struct Task {
     std::string name;
     std::optional<std::int64_t> durationMinutes;
     std::vector<std::string> predecessors;
+    std::string wbsId = {};
     bool operator==(const Task&) const = default;
+};
+struct WbsNode {
+    std::string id, name, parentId;
+    bool operator==(const WbsNode&) const = default;
 };
 struct Project {
     std::string documentId;
@@ -22,6 +27,7 @@ struct Project {
     std::vector<Task> tasks;
     std::vector<std::string> holidays;
     std::string calculationProfile = "native-fs0-workminutes-v1";
+    std::vector<WbsNode> wbsNodes;
     bool operator==(const Project&) const = default;
 };
 // Domain uses ISO civil dates, without a UI locale or implicit timezone.

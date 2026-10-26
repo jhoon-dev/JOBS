@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 3;
+        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 4;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();
@@ -116,10 +116,10 @@ int main(int argc, char* argv[]) {
         check(second.calculation()->status == jobs::CalculationStatus::Stale, "wrong document calculation accepted");
         // Construct an actual schema-1 payload, then check non-destructive migration by Save As.
         auto legacy = QJsonDocument::fromJson(originalBytes).object();
-        auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile");
+        auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile"); legacyPayload.remove("wbsNodes");
         QJsonArray legacyTasks;
         for (const auto& value : legacyPayload["tasks"].toArray()) {
-            auto task = value.toObject(); task.remove("durationMinutes"); task.remove("predecessors"); legacyTasks.append(task);
+            auto task = value.toObject(); task.remove("durationMinutes"); task.remove("predecessors"); task.remove("wbsId"); legacyTasks.append(task);
         }
         legacyPayload["tasks"] = legacyTasks; legacy["payload"] = legacyPayload; legacy["schemaVersion"] = 1;
         legacy["sha256"] = QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(legacyPayload).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
@@ -131,6 +131,28 @@ int main(int argc, char* argv[]) {
         check(read(legacyPath) == legacyBytes && migrated.dirty(), "legacy save modified original");
         migrated.saveAs(dir.filePath("migrated.jobs").toStdString());
         check(!migrated.requiresSaveAs() && read(legacyPath) == legacyBytes && store.load(migrated.path()).project == *migrated.project(), "legacy save as failed");
+        auto parent = migrated.addWbs("단계 α"), child = migrated.addWbs("상세", parent);
+        migrated.assignWbs(0, child); migrated.save();
+        check(store.load(migrated.path()).project == *migrated.project(), "WBS hierarchy/task assignment roundtrip mismatch");
+        // Schema 2 keeps scheduling input and IDs, adds an empty hierarchy, and preserves original bytes.
+        auto version2 = QJsonDocument::fromJson(read(QString::fromStdString(migrated.path()))).object();
+        auto p2 = version2["payload"].toObject(); p2.remove("wbsNodes");
+        QJsonArray tasks2;
+        for (auto value : p2["tasks"].toArray()) { auto t = value.toObject(); t.remove("wbsId"); tasks2.append(t); }
+        p2["tasks"] = tasks2; version2["payload"] = p2; version2["schemaVersion"] = 2;
+        version2["sha256"] = QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(p2).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
+        const auto bytes2 = QJsonDocument(version2).toJson(); auto path2 = dir.filePath("version2.jobs"); write(path2, bytes2);
+        jobs::Document from2(store); from2.open(path2.toStdString());
+        check(from2.requiresSaveAs() && from2.project()->wbsNodes.empty() && from2.project()->tasks[0].wbsId.empty() &&
+              from2.project()->tasks[0].id == migrated.project()->tasks[0].id && from2.project()->tasks[0].durationMinutes == 480,
+              "schema 2 input/identity migration mismatch");
+        rejects([&] { from2.save(); });
+        from2.saveAs(dir.filePath("version3.jobs").toStdString());
+        check(read(path2) == bytes2 && store.load(from2.path()).project == *from2.project(), "schema 2 original changed / new copy failed");
+        auto badWbs = QJsonDocument::fromJson(originalBytes).object()["payload"].toObject();
+        badWbs["wbsNodes"] = QJsonArray{QJsonObject{{"id", "w1"}, {"name", "one"}, {"parentId", "w2"}},
+            QJsonObject{{"id", "w2"}, {"name", "two"}, {"parentId", "w1"}}};
+        sign(badWbs); rejects([&] { store.load(broken.toStdString()); });
         std::cout << "PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, stale revision/identity, schema-1 copy migration\n";
         return 0;
     } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }

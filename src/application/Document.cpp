@@ -1,5 +1,6 @@
 #include "application/Document.h"
 #include <stdexcept>
+#include <algorithm>
 
 namespace jobs {
 void Document::create(std::string name, std::string date, const std::vector<std::string>& tasks) {
@@ -32,10 +33,42 @@ void Document::renameTask(std::size_t row, std::string name) {
     auto p = *project_; p.tasks.at(row).name = std::move(name);
     edit(std::move(p));
 }
-void Document::addTask(std::string name) {
+void Document::addTask(std::string name, std::string wbsId) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.push_back({store_.newId(), std::move(name), std::nullopt, {}});
+    auto p = *project_; p.tasks.push_back({store_.newId(), std::move(name), std::nullopt, {}, std::move(wbsId)});
     edit(std::move(p));
+}
+std::string Document::addWbs(std::string name, std::string parentId) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; auto id = store_.newId();
+    p.wbsNodes.push_back({id, std::move(name), std::move(parentId)}); edit(std::move(p)); return id;
+}
+void Document::renameWbs(const std::string& id, std::string name) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto& n) { return n.id == id; });
+    if (it == p.wbsNodes.end()) throw std::runtime_error("WBS가 존재하지 않습니다.");
+    it->name = std::move(name); edit(std::move(p));
+}
+void Document::moveWbs(const std::string& id, std::string parentId) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto& n) { return n.id == id; });
+    if (it == p.wbsNodes.end()) throw std::runtime_error("WBS가 존재하지 않습니다.");
+    it->parentId = std::move(parentId); edit(std::move(p));
+}
+void Document::removeWbs(const std::string& id) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_;
+    for (const auto& n : p.wbsNodes) if (n.parentId == id) throw std::runtime_error("하위 WBS를 먼저 이동하거나 제거하세요.");
+    for (const auto& t : p.tasks) if (t.wbsId == id) throw std::runtime_error("소속 작업을 먼저 다른 WBS로 이동하세요.");
+    const auto count = std::erase_if(p.wbsNodes, [&](const auto& n) { return n.id == id; });
+    if (!count) throw std::runtime_error("WBS가 존재하지 않습니다.");
+    edit(std::move(p));
+}
+void Document::assignWbs(std::size_t row, std::string id) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; p.tasks.at(row).wbsId = std::move(id); edit(std::move(p));
 }
 void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
