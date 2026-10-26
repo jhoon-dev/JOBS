@@ -93,6 +93,10 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     tools->addAction(calculate_); connect(calculate_, &QAction::triggered, this, &MainWindow::calculateSchedule);
     calendar_ = projectMenu->addAction("휴일 편집(&H)…"); tools->addAction(calendar_);
     connect(calendar_, &QAction::triggered, this, &MainWindow::editHolidays);
+    calendars_=projectMenu->addAction("작업 달력 등록·편집…"); calendars_->setObjectName("manageCalendars");
+    connect(calendars_,&QAction::triggered,this,[this]{commitPendingCell();manageCalendars();});
+    taskCalendar_=projectMenu->addAction("선택 작업 달력 배정…"); taskCalendar_->setObjectName("assignTaskCalendar"); tools->addAction(taskCalendar_);
+    connect(taskCalendar_,&QAction::triggered,this,[this]{commitPendingCell();chooseTaskCalendar();});
     auto* wbsMenu = menuBar()->addMenu("WBS(&W)");
     addToolBarBreak(); auto* wbsTools = addToolBar("WBS 편집"); wbsTools->setMovable(false);
     auto wbsAction = [&](const QString& label, std::function<void()> callback) {
@@ -157,11 +161,11 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     auto* split = new QSplitter(Qt::Horizontal, central); layout->addWidget(split, 1);
     wbsTree_ = new QTreeWidget(split); wbsTree_->setObjectName("wbsTree"); wbsTree_->setAccessibleName("WBS 탐색");
     wbsTree_->setHeaderLabel("WBS · 프로젝트 구조"); wbsTree_->setMinimumWidth(170);
-    table_ = new TaskTable(0, 9, split);
-    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "FS 선행(행 번호)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID"});
+    table_ = new TaskTable(0, 10, split);
+    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "선행(행·종류±지연)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID", "작업 달력"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    for (int column = 1; column < 9; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
+    for (int column = 1; column < 10; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
     table_->setColumnHidden(8, true); // Stable ID remains on the task tooltip; relations persist IDs, never row numbers.
     table_->setSelectionBehavior(QAbstractItemView::SelectRows); table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel); table_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -182,6 +186,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
             selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
         else selectedTask_.clear();
         assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
+        taskCalendar_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
         gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
@@ -194,7 +199,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     diagnostics_ = new QPlainTextEdit(central); diagnostics_->setReadOnly(true); diagnostics_->setMaximumHeight(160);
     diagnostics_->setObjectName("calculationDiagnostics"); diagnostics_->setAccessibleName("계산 상태 및 진단");
     layout->addWidget(diagnostics_);
-    auto* note = new QLabel("월–금 09–12 / 13–18 · 1일 8시간 · 현지 civil 시각 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤\n선행: 표 왼쪽의 프로젝트 행 번호(1,3), FS 0 lag · F9=전체 계산 · 상태일 설정 시 실제를 고정하고 잔여를 재예측\n간트: 빨강+[임계]=계획 임계, 파랑=계획/예측, 초록+[실제]=실제 완료, ◆=마일스톤, 회색 가는 막대=선택 기준선, 음영=휴무\n예측 모드의 여유·임계는 미산정입니다. 기준선·실적·변경 비교는 추적 메뉴에서 관리합니다.", central);
+    auto* note = new QLabel("기본 월–금 09–12 / 13–18 · 프로젝트 메뉴에서 작업 달력 등록/배정 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤\n선행: 프로젝트 행 번호 1, 2SS+2h, 3FF-30m, 4SF+1d · d=480 근무분 · 지연/선행=후행 달력 기준 · F9=전체 계산\n간트: 빨강+[임계]=계획 임계, 파랑=계획/예측, 초록+[실제]=실제 완료, ◆=마일스톤, 회색=기준선, 배경 음영=프로젝트 기본 휴무\n작업 달력 휴무는 막대 툴팁에서 확인하세요. 실제 날짜는 고정하며 예측 모드의 여유·임계는 미산정입니다.", central);
     note->setWordWrap(true); layout->addWidget(note); setCentralWidget(central);
     connect(table_, &QTableWidget::cellChanged, this, [this](int row, int column) {
         if (column > 2) return;
@@ -218,14 +223,18 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
                 }
                 document_.setDuration(taskRow, minutes);
             } else {
-                std::vector<std::string> ids;
+                std::vector<Dependency> edges;
                 for (const auto& token : text.split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts)) {
-                    bool ok = false; auto number = token.toULongLong(&ok);
+                    const auto match=QRegularExpression("^([0-9]+)(FS|SS|FF|SF)?([+-][0-9]+(?:\\.[0-9]+)?[mhd])?$",QRegularExpression::CaseInsensitiveOption).match(token);
+                    bool ok = false; auto number = match.captured(1).toULongLong(&ok);
                     if (!ok || number < 1 || number > document_.project()->tasks.size())
-                        throw std::runtime_error("선행 작업은 존재하는 행 번호를 쉼표로 구분해 입력하세요.");
-                    ids.push_back(document_.project()->tasks[std::size_t(number - 1)].id);
+                        throw std::runtime_error("선행 입력: 1, 2SS+2h, 3FF-30m, 4SF+1d (d=480 근무분). 자기 참조·중복은 허용하지 않습니다.");
+                    const auto lag=match.captured(3).toLower(); double minutes=0;
+                    if (!lag.isEmpty()) { minutes=lag.chopped(1).toDouble(&ok)*(lag.endsWith('d')?480:lag.endsWith('h')?60:1); if (!ok || !std::isfinite(minutes) || std::abs(minutes)>5000000 || std::abs(minutes-std::round(minutes))>0.000001) throw std::runtime_error("지연/선행은 ±5,000,000 정수 근무분 이내입니다."); }
+                    if (number-1==taskRow) throw std::runtime_error("자기 자신을 선행 작업으로 지정할 수 없습니다.");
+                    edges.push_back({document_.project()->tasks[std::size_t(number - 1)].id,match.captured(2).isEmpty()?"FS":str(match.captured(2).toUpper()),std::int64_t(std::round(minutes))});
                 }
-                document_.setPredecessors(taskRow, std::move(ids));
+                document_.setDependencies(taskRow, std::move(edges));
             }
         }
         catch (const std::exception& e) { report(e); }
@@ -250,6 +259,7 @@ void MainWindow::refresh(bool rebuildTree) {
     add_->setEnabled(p.has_value() && !document_.readOnly());
     calculate_->setEnabled(p.has_value() && !calculating_);
     calendar_->setEnabled(p.has_value() && !document_.readOnly());
+    calendars_->setEnabled(p.has_value()); taskCalendar_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     addWbs_->setEnabled(p.has_value() && !document_.readOnly());
     const bool nodeEditable = p.has_value() && !document_.readOnly() && !selectedWbs_.empty();
     renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
@@ -284,14 +294,14 @@ void MainWindow::refresh(bool rebuildTree) {
         table_->setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(taskIndex + 1)));
         if (t.id == selectedTask_) selectedRow = row;
         QStringList predecessors;
-        for (const auto& id : t.predecessors) predecessors << (numbers.contains(id) ? QString::number(numbers.at(id)) : "누락:" + qs(id));
+        for (const auto& d : dependencies(t)) predecessors << (numbers.contains(d.predecessorId) ? QString::number(numbers.at(d.predecessorId)) : "누락:" + qs(d.predecessorId)) + (d.type=="FS" && !d.lagMinutes?QString{}:qs(d.type)+(d.lagMinutes>=0?"+":"")+QString::number(d.lagMinutes)+"m");
         auto found = schedules.find(t.id); const auto* s = found == schedules.end() ? nullptr : found->second;
         const auto duration = !t.durationMinutes ? QString{} : *t.durationMinutes % 3 == 0 ?
             QString::number(double(*t.durationMinutes) / 60, 'g', 12) : QString::number(*t.durationMinutes) + "m";
         QStringList values{qs(t.name), duration,
             predecessors.join(","), s ? qs(s->start) : "미계산", s ? qs(s->finish) : "미계산",
             s && !calculation->isForecast ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—",
-            s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id)};
+            s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id), qs(taskCalendarName(*p,t))};
         QStringList assigned;
         for (const auto& a : p->assignments) if (a.taskId == t.id) for (const auto& r : p->resources) if (r.id == a.resourceId)
             assigned << qs(r.name) + " " + QString::number(a.units) + "%";
@@ -343,7 +353,7 @@ void MainWindow::refresh(bool rebuildTree) {
     }
     diagnostics_->setPlainText(calculating_ ? "계산 중 · 편집할 수 있습니다. 변경 시 계산 결과는 오래됨으로 처리됩니다." : state);
     statusBar()->showMessage(QString(document_.readOnly() ? "읽기 전용 · " : document_.dirty() ? "미저장 변경 있음 · " : "명시 저장본과 같은 입력 · ")
-        + (valid ? (calculation->isForecast ? "실적·잔여 예측 · 자원 미검증" : "기간·FS 논리 일정 · 자원 미검증") : "유효한 최신 일정 없음"));
+        + (valid ? (calculation->isForecast ? "실적·잔여 예측 · 자원 미검증" : "선행관계·작업 달력 일정 · 자원 미검증") : "유효한 최신 일정 없음"));
 }
 void MainWindow::calculateSchedule() {
     commitPendingCell();

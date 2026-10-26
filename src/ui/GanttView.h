@@ -29,7 +29,8 @@ private:
     std::size_t displayRowCount_ = 0;
     std::string selectedId_;
     struct Row { std::string id; QString name, start, finish; bool critical; std::vector<std::string> predecessors, driving;
-        std::optional<std::string> remainingStart; bool completedActual = false; };
+        std::optional<std::string> remainingStart; bool completedActual = false;
+        std::vector<Dependency> edges = {}; QString calendar = {}; };
     std::vector<Row> rows_;
     void rebuild();
     qreal position(const QString& stamp) const;

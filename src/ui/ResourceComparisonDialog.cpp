@@ -134,7 +134,7 @@ void ResourceComparisonDialog::recalculate() {
             + "\n완료: 원본 " + finish(r.original) + " → A " + finish(r.leveled) + " · " + state(r.leveled.status == CalculationStatus::Valid ? r.after.status : r.leveled.status)
             + "\n배정 작업 " + QString::number(r.before.assignedTasks) + "/" + QString::number(r.before.totalTasks) + " · 자원별 과부하 시간 합계 " + overloadText(r.before) + " → " + (r.leveled.status == CalculationStatus::Valid ? overloadText(r.after) : "—")
             + " · 수요 " + units(r.before) + (r.leveled.status == CalculationStatus::Valid ? " → " + units(r.after) : "")
-            + "\n정책 serial-no-split-v1 · " + qs(r.priority) + " · 탐색 " + QString::number(r.horizonWorkDays) + " 근무일 · 원본 자동 적용 없음";
+            + "\n정책 " + qs(r.leveled.calculationPolicy) + " · 탐색 " + QString::number(r.horizonWorkDays) + " 기본 달력 근무일 · 원본 자동 적용 없음";
         if (computed.other && computed.otherProject) {
             summary += "\nB 원본 rev " + QString::number(computed.otherProject->revision) + " · " + qs(computed.other->priority) + " / " + QString::number(computed.other->horizonWorkDays) + " 근무일 · 완료 " + finish(computed.other->leveled) + " · " + state(computed.other->leveled.status == CalculationStatus::Valid ? computed.other->after.status : computed.other->leveled.status);
             if (static_cast<const PlanInput&>(snapshot) != static_cast<const PlanInput&>(*computed.otherProject) || snapshot.statusAt != computed.otherProject->statusAt || snapshot.progress != computed.otherProject->progress)
@@ -149,12 +149,16 @@ void ResourceComparisonDialog::recalculate() {
         if (computed.other) for (const auto& row : computed.other->leveled.tasks) other.emplace(row.taskId, &row);
         std::vector<Task> all = snapshot.tasks;
         if (computed.otherProject) for (const auto& t : computed.otherProject->tasks) if (std::none_of(all.begin(), all.end(), [&](const auto& a) { return a.id == t.id; })) all.push_back(t);
-        WorkCalendar calendar(snapshot); tasks_->setRowCount(int(all.size()));
+        std::map<std::string,WorkCalendar> taskCalendars; tasks_->setRowCount(int(all.size()));
         for (int i = 0; i < tasks_->rowCount(); ++i) {
             const auto& t = all[std::size_t(i)]; const auto* a = original.contains(t.id) ? original.at(t.id) : nullptr;
             const auto* b = leveled.contains(t.id) ? leveled.at(t.id) : nullptr; const auto* c = other.contains(t.id) ? other.at(t.id) : nullptr;
             QString delay = "—";
-            if (a && b) delay = hours(calendar.offset(b->remainingStart.value_or(b->start)) - calendar.offset(a->remainingStart.value_or(a->start)));
+            if (a && b) {
+                if(!taskCalendars.contains(t.calendarId)) taskCalendars.emplace(t.calendarId,WorkCalendar(snapshot,t));
+                const auto& calendar=taskCalendars.at(t.calendarId);
+                delay = hours(calendar.offset(b->remainingStart.value_or(b->start)) - calendar.offset(a->remainingStart.value_or(a->start)));
+            }
             const auto* actual = progressAsOf(snapshot, t.id);
             QStringList values{qs(t.name), a ? qs(a->start) : "—", a ? qs(a->finish) : "—", b ? qs(b->start) : "—", b ? qs(b->finish) : "—", delay, c ? qs(c->start) : "—", c ? qs(c->finish) : "—", actual && actual->actualStart ? "고정 보존" : "—"};
             for (int col = 0; col < values.size(); ++col) { auto* item = new QTableWidgetItem(values[col]); item->setData(Qt::UserRole, qs(t.id)); item->setToolTip(qs(t.id)); tasks_->setItem(i, col, item); }

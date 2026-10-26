@@ -35,6 +35,9 @@ private:
     void showRecovery(bool startup = false);
     void updateHistoryActions();
     QAction *calculate_, *calendar_;
+    QAction *calendars_, *taskCalendar_;
+    void manageCalendars();
+    void chooseTaskCalendar();
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;
     QAction *baselineSave_, *statusEdit_, *progressEdit_, *comparison_;
     QComboBox* baselineChoice_;

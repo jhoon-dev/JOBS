@@ -61,8 +61,8 @@ Record decode(const QByteArray& bytes, const QString& expectedSession, std::uint
     if (root["sha256"] != QJsonValue(hash(QJsonDocument(p).toJson(QJsonDocument::Compact)))) fail("복구본 무결성 검사에 실패했습니다.");
     keys(p, {"sessionId", "sequence", "capturedAt", "sourcePath", "sourceFingerprint", "sourceReadOnly", "sourceRequiresSaveAs", "lastSavedRevision", "projectSchema", "project"});
     Record r; r.session = string(p, "sessionId"); r.sequence = integer(p["sequence"], 999999999);
-    if (r.session != expectedSession || r.sequence != expectedSequence || !uuid(r.session) || p["projectSchema"] != QJsonValue(6) || !p["project"].isObject()) fail("복구 세션·세대·프로젝트 버전이 일치하지 않습니다.");
-    auto& s = r.snapshot; s.project = json::decodeProject(p["project"].toObject(), 6); s.capturedAt = string(p, "capturedAt").toStdString();
+    if (r.session != expectedSession || r.sequence != expectedSequence || !uuid(r.session) || (p["projectSchema"] != QJsonValue(6) && p["projectSchema"] != QJsonValue(7)) || !p["project"].isObject()) fail("복구 세션·세대·프로젝트 버전이 일치하지 않습니다.");
+    auto& s = r.snapshot; s.project = json::decodeProject(p["project"].toObject(), p["projectSchema"].toInt()); s.capturedAt = string(p, "capturedAt").toStdString();
     s.sourcePath = string(p, "sourcePath").toStdString(); s.sourceFingerprint = string(p, "sourceFingerprint").toStdString(); s.sourceReadOnly = boolean(p, "sourceReadOnly"); s.sourceRequiresSaveAs = boolean(p, "sourceRequiresSaveAs");
     if (!p["lastSavedRevision"].isNull()) s.lastSavedRevision = integer(p["lastSavedRevision"], s.project.revision);
     if (!validUtcStamp(s.capturedAt) || (s.sourcePath.empty() && (!s.sourceFingerprint.empty() || s.lastSavedRevision)) || (!s.sourcePath.empty() && (s.sourceFingerprint.empty() || !s.lastSavedRevision))) fail("복구 시각/원본 저장 지점이 잘못되었습니다.");
@@ -70,7 +70,7 @@ Record decode(const QByteArray& bytes, const QString& expectedSession, std::uint
 }
 QByteArray encode(const RecoverySnapshot& s, const QString& session, std::uint64_t seq) {
     validate(s.project);
-    QJsonObject p{{"sessionId", session}, {"sequence", qint64(seq)}, {"capturedAt", QString::fromStdString(s.capturedAt)}, {"sourcePath", QString::fromStdString(s.sourcePath)}, {"sourceFingerprint", QString::fromStdString(s.sourceFingerprint)}, {"sourceReadOnly", s.sourceReadOnly}, {"sourceRequiresSaveAs", s.sourceRequiresSaveAs}, {"lastSavedRevision", s.lastSavedRevision ? QJsonValue(qint64(*s.lastSavedRevision)) : QJsonValue()}, {"projectSchema", 6}, {"project", json::encodeProject(s.project)}};
+    QJsonObject p{{"sessionId", session}, {"sequence", qint64(seq)}, {"capturedAt", QString::fromStdString(s.capturedAt)}, {"sourcePath", QString::fromStdString(s.sourcePath)}, {"sourceFingerprint", QString::fromStdString(s.sourceFingerprint)}, {"sourceReadOnly", s.sourceReadOnly}, {"sourceRequiresSaveAs", s.sourceRequiresSaveAs}, {"lastSavedRevision", s.lastSavedRevision ? QJsonValue(qint64(*s.lastSavedRevision)) : QJsonValue()}, {"projectSchema", 7}, {"project", json::encodeProject(s.project)}};
     auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS-RECOVERY"}, {"schemaVersion", 1}, {"complete", true}, {"payload", p}, {"sha256", hash(QJsonDocument(p).toJson(QJsonDocument::Compact))}}).toJson();
     if (bytes.size() > 64 * 1024 * 1024) fail("자동 복구본 64 MiB 한도를 초과했습니다.");
     auto decoded = decode(bytes, session, seq);
@@ -99,7 +99,7 @@ Original originalState(const RecoverySnapshot& s) {
         if (before.wbsNodes != after.wbsNodes) changes << "WBS 변경";
         if (before.resources != after.resources) changes << "자원·가용량·단가 변경";
         if (before.assignments != after.assignments) changes << "배정 변경";
-        if (before.holidays != after.holidays || before.startDate != after.startDate) changes << "달력/시작일 변경";
+        if (before.holidays != after.holidays || before.startDate != after.startDate || before.calendars != after.calendars) changes << "달력/시작일 변경";
         if (before.currency != after.currency || before.taskCosts != after.taskCosts) changes << "원가 설정 변경";
         if (before.statusAt != after.statusAt) changes << "상태일 " + QString::fromStdString(before.statusAt.value_or("없음")) + " → " + QString::fromStdString(after.statusAt.value_or("없음"));
         if (before.baselines != after.baselines) changes << QString("기준선 %1 → %2").arg(before.baselines.size()).arg(after.baselines.size());

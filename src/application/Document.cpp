@@ -78,7 +78,32 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
 }
 void Document::setPredecessors(std::size_t row, std::vector<std::string> ids) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).predecessors = std::move(ids); edit(std::move(p), "선행관계 변경");
+    std::vector<Dependency> edges; for (auto& id : ids) edges.push_back({std::move(id), "FS", 0}); setDependencies(row, std::move(edges));
+}
+void Document::setDependencies(std::size_t row, std::vector<Dependency> edges) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; auto& t = p.tasks.at(row); t.predecessors.clear(); t.dependencyRules.clear();
+    for (const auto& d : edges) { t.predecessors.push_back(d.predecessorId); if (d.type != "FS" || d.lagMinutes) t.dependencyRules.push_back(d); }
+    if (!t.dependencyRules.empty()) p.calculationProfile = pdmProfile;
+    edit(std::move(p), "선행관계·지연 변경");
+}
+std::string Document::putCalendar(TaskCalendar c) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; if (c.id.empty()) c.id = store_.newId();
+    auto it = std::find_if(p.calendars.begin(), p.calendars.end(), [&](const auto& v) { return v.id == c.id; });
+    if (it == p.calendars.end()) p.calendars.push_back(c); else *it = c;
+    p.calculationProfile = pdmProfile; edit(std::move(p), "작업 달력 등록·변경"); return c.id;
+}
+void Document::removeCalendar(const std::string& id) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; for (const auto& t : p.tasks) if (t.calendarId == id) throw std::runtime_error("작업의 달력을 먼저 변경하세요.");
+    if (!std::erase_if(p.calendars, [&](const auto& c) { return c.id == id; })) throw std::runtime_error("달력이 존재하지 않습니다.");
+    edit(std::move(p), "작업 달력 삭제");
+}
+void Document::setTaskCalendar(std::size_t row, std::string id) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; p.tasks.at(row).calendarId = std::move(id); if (!p.tasks.at(row).calendarId.empty()) p.calculationProfile = pdmProfile;
+    edit(std::move(p), "작업 달력 배정");
 }
 void Document::setHolidays(std::vector<std::string> dates) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -174,6 +199,7 @@ std::string Document::saveScenario(std::string name, std::string priority, int h
     s.id = store_.newId(); s.name = std::move(name); s.createdAt = std::move(utc); s.sourceDocumentId = p.documentId; s.inputRevision = p.revision;
     s.priority = std::move(priority); s.horizonWorkDays = horizon;
     s.input = static_cast<const PlanInput&>(p); s.statusAt = p.statusAt; s.progress = p.progress;
+    if (p.calculationProfile==pdmProfile) s.policy="serial-no-split-pdm-v1";
     auto id = s.id; p.scenarios.push_back(std::move(s)); edit(std::move(p)); return id;
 }
 void Document::edit(Project p, std::string label) {
@@ -192,6 +218,8 @@ void Document::edit(Project p, std::string label) {
             for (const auto& r : v.resources) { n += sizeof(Resource) + r.id.size() + r.name.size() + r.type.size(); for (const auto& d : r.exceptions) n += sizeof(CapacityDay) + d.date.size(); for (const auto& rate : r.rates) n += sizeof(Resource::Rate) + rate.effectiveDate.size(); }
             for (const auto& a : v.assignments) n += sizeof(Assignment) + a.taskId.size() + a.resourceId.size();
             for (const auto& c : v.taskCosts) n += sizeof(TaskCost) + c.taskId.size() + c.accrual.size() + c.credit.size();
+            for (const auto& t : v.tasks) { n += t.calendarId.size(); for (const auto& d : t.dependencyRules) n += sizeof(Dependency) + d.predecessorId.size() + d.type.size(); }
+            for (const auto& c : v.calendars) { n += sizeof(TaskCalendar) + c.id.size() + c.name.size() + c.weekdays.size() * sizeof(int) + c.periods.size() * sizeof(WorkPeriod); for (const auto& d : c.holidays) n += sizeof(std::string) + d.size(); }
             return n;
         };
         step.weight = weight(step.before) + weight(step.after) + step.label.size();

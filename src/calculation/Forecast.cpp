@@ -1,5 +1,6 @@
 #include "calculation/Scheduler.h"
 #include "calculation/WorkCalendar.h"
+#include "calculation/Pdm.h"
 #include <algorithm>
 #include <deque>
 #include <unordered_map>
@@ -9,6 +10,7 @@ ScheduleResult calculate(const Project& p) {
     if (!p.statusAt) return plan;
     plan.isForecast = true; plan.statusAt = p.statusAt; plan.calculationPolicy = "retained-remaining-v1";
     if (plan.status != CalculationStatus::Valid) return plan;
+    if (p.calculationProfile == pdmProfile) return calculatePdmForecast(p, std::move(plan));
     ScheduleResult result = plan; result.tasks.clear(); result.projectFinish.reset(); result.diagnostics.clear();
     try {
         WorkCalendar calendar(p); const auto status = calendar.offset(*p.statusAt);

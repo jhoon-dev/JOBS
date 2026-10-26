@@ -13,7 +13,7 @@ from pypdf import PdfReader
 
 
 def verify(root: Path):
-    for name in ("reports-smoke.xlsx", "reports-resources.xlsx"):
+    for name in ("reports-smoke.xlsx", "reports-resources.xlsx", "reports-pdm.xlsx"):
         with zipfile.ZipFile(root / name) as archive:
             assert archive.testzip() is None, "ZIP checksum failure"
             assert not any("externalLink" in p or "vbaProject" in p for p in archive.namelist())
@@ -36,11 +36,17 @@ def verify(root: Path):
             metadata = dict(book["출처와 설정"].iter_rows(min_row=7, values_only=True))
             assert metadata["보고서 ID"] == "report-contract-fixture"
             assert metadata["원본 상태"] == "미저장 메모리 revision"
+        elif name == "reports-pdm.xlsx":
+            assert len(book.sheetnames) == 14
+            links = book["실행 선행관계"]
+            assert links["E7"].value == "SS" and links["F7"].value == -60
+            assert links["F7"].data_type == "n" and links["G7"].value == "PDM Afternoon"
+            assert book["계획 일정"]["I8"].value == "PDM Afternoon"
         else:
             assert "작업별 원가" not in book.sheetnames and "자원 등록과 가용량" in book.sheetnames
         print(f"PASS: {name}: {len(book.sheetnames)} sheets, ZIP/OOXML/types/unknown/provenance")
 
-    for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf"):
+    for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf", "reports-pdm.pdf"):
         reader = PdfReader(root / name, strict=True)
         compact = re.sub(r"\s+", "", "\n".join(p.extract_text() or "" for p in reader.pages))
         assert reader.pages and all("JOBS" in (p.extract_text() or "") for p in reader.pages)
@@ -50,6 +56,9 @@ def verify(root: Path):
             assert "END_SENTINEL_739" in compact and len(reader.pages) >= 3
             assert abs(float(reader.pages[0].mediabox.width) - 595) < 3
             assert abs(float(reader.pages[0].mediabox.height) - 842) < 3
+        elif name == "reports-pdm.pdf":
+            assert "pdm-report-contract" in compact and "PDMAfternoon" in compact
+            assert "SS" in compact and "-60" in compact
         else:
             assert "report-contract-fixture" in compact and "6.00" in compact
             width = 1191 if name == "reports-a3.pdf" else 842

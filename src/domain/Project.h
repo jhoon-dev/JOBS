@@ -6,12 +6,32 @@
 #include "domain/ScheduleTypes.h"
 
 namespace jobs {
+inline constexpr const char* pdmProfile = "native-pdm-taskcal-v1";
+struct Dependency {
+    std::string predecessorId, type = "FS";
+    std::int64_t lagMinutes = 0;
+    bool operator==(const Dependency&) const = default;
+};
+struct WorkPeriod {
+    int begin = 540, end = 720;
+    bool operator==(const WorkPeriod&) const = default;
+};
+struct TaskCalendar {
+    std::string id, name;
+    std::vector<int> weekdays = {1,2,3,4,5};
+    std::vector<WorkPeriod> periods = {{540,720},{780,1080}};
+    std::vector<std::string> holidays;
+    bool operator==(const TaskCalendar&) const = default;
+};
 struct Task {
     std::string id;
     std::string name;
     std::optional<std::int64_t> durationMinutes;
     std::vector<std::string> predecessors;
     std::string wbsId = {};
+    // IDs are the graph; only non-FS0 edge attributes are stored as overrides.
+    std::vector<Dependency> dependencyRules = {};
+    std::string calendarId = {};
     bool operator==(const Task&) const = default;
 };
 struct WbsNode {
@@ -64,6 +84,7 @@ struct PlanInput {
     std::string currency = "KRW";
     std::string costProfile = "cost-day-minor-half-up-v1";
     std::vector<TaskCost> taskCosts;
+    std::vector<TaskCalendar> calendars;
     bool operator==(const PlanInput&) const = default;
 };
 struct Baseline {
@@ -124,4 +145,7 @@ void validate(const Project& project);
 const ProgressEntry* progressAsOf(const Project& project, const std::string& taskId);
 const CostEntry* costAsOf(const Project&, const std::string& taskId, const std::string& statusAt);
 int currencyDecimals(const std::string& currency);
+std::vector<Dependency> dependencies(const Task&);
+std::vector<std::string> dependencyLabels(const Task&);
+std::string taskCalendarName(const PlanInput&, const Task&);
 }

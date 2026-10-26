@@ -79,6 +79,9 @@ int main(int argc, char* argv[]) {
         auto a3 = QDir::current().filePath("reports-a3.pdf"); QFile::remove(a3); pdfOptions.a3 = true; pdfOptions.landscape = true; jobs::exportPdf(report, a3, jobs::ReportFamily::Schedule, pdfOptions);
         auto resourceFile = QDir::current().filePath("reports-resources.xlsx"); QFile::remove(resourceFile); jobs::exportXlsx(report, resourceFile, jobs::ReportFamily::Resources); auto workbook = sheetXml(read(resourceFile), "xl/workbook.xml"); check(workbook.contains("출처와 설정") && workbook.contains("자원 배정") && !workbook.contains("작업별 원가"), "family filter lost provenance or mixed tables");
         check(*doc.project() == before, "report/export changed original/history");
+        auto pdm=*doc.project();pdm.calculationProfile=jobs::pdmProfile; jobs::TaskCalendar shift;shift.id="afternoon";shift.name="PDM Afternoon";shift.periods={{780,1020}};pdm.calendars={shift};pdm.tasks[1].calendarId=shift.id;pdm.tasks[1].predecessors={one};pdm.tasks[1].dependencyRules={{one,"SS",-60}};
+        auto pdmOptions=options;pdmOptions.wbsId.clear();pdmOptions.fromDate.reset();pdmOptions.toDate.reset();pdmOptions.reportId="pdm-report-contract";auto pdmReport=jobs::buildReport(pdm,pdmOptions);
+        auto pdmXlsx=QDir::current().filePath("reports-pdm.xlsx"),pdmPdf=QDir::current().filePath("reports-pdm.pdf");QFile::remove(pdmXlsx);QFile::remove(pdmPdf);jobs::exportXlsx(pdmReport,pdmXlsx);pdfOptions.a3=false;jobs::exportPdf(pdmReport,pdmPdf,jobs::ReportFamily::Schedule,pdfOptions);
         std::cout << "PASS: snapshot/WBS/shared resources/empty scope/filters/unknown/stale inputs/F10/no-baseline AC/typed OOXML/injection/atomic create-only/PDF pagination; " << pages << " PDF pages\n";
     } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
 }

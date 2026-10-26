@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <limits>
+#include <memory>
 namespace jobs {
 namespace {
 using Minute = std::int64_t;
@@ -35,7 +36,7 @@ void derive(Evm& e, const std::string& formula) {
     }
     e.eac = add(e.ac, e.etc);
 }
-struct Segment { Minute start, finish; int units; Money rate; };
+struct Segment { Minute start, finish; int units; Money rate; Minute dayWorkBefore = 0; };
 struct Bucket { Minute day; std::vector<Segment> spans; Money before = 0, total = 0; };
 struct Budget {
     std::string startStamp, finishStamp, accrual = "uniform", credit = "physical";
@@ -44,18 +45,25 @@ struct Budget {
     std::vector<Bucket> days;
     std::vector<std::string> issues;
     bool valid = false;
+    std::shared_ptr<WorkCalendar> work;
+    Minute elapsed(const std::string& stamp, const WorkCalendar& clock) const {
+        if (stamp <= startStamp) return 0;
+        const auto& cal=work?*work:clock;
+        return cal.offset(std::min(stamp,finishStamp))-cal.offset(startStamp);
+    }
     Money on(const std::string& date, const WorkCalendar& calendar) const {
         if (!valid) return {};
         if (date < startStamp.substr(0, 10) || date > finishStamp.substr(0, 10)) return 0;
         Money resource = 0;
         const auto offset = calendar.offset(date + " 09:00");
-        auto it = std::lower_bound(days.begin(), days.end(), offset / 480, [](const auto& d, Minute day) { return d.day < day; });
-        if (it != days.end() && it->day == offset / 480 && calendar.boundary(it->day * 480, false).substr(0, 10) == date) resource = it->total;
+        auto it = std::lower_bound(days.begin(), days.end(), offset / calendar.dayMinutes(), [](const auto& d, Minute day) { return d.day < day; });
+        if (it != days.end() && it->day == offset / calendar.dayMinutes() && calendar.boundary(it->day * calendar.dayMinutes(), false).substr(0, 10) == date) resource = it->total;
         Money f = 0;
         if (accrual == "uniform" && finish > start) {
-            const auto before = std::clamp(offset - start, Minute{0}, finish - start);
-            const auto after = std::clamp(calendar.offset(date + " 23:59") - start, Minute{0}, finish - start);
-            if (after > before) f = fixed ? subtract(fraction(*fixed, after, finish - start), fraction(*fixed, before, finish - start)) : Money{};
+            const auto before = elapsed(date + " 00:00",calendar);
+            const auto after = elapsed(work?calendar.boundary((offset/calendar.dayMinutes()+1)*calendar.dayMinutes(),true):date + " 23:59",calendar);
+            const auto total=elapsed(finishStamp,calendar);
+            if (after > before && total>0) f = fixed ? subtract(fraction(*fixed, after, total), fraction(*fixed, before, total)) : Money{};
         } else if (date == (accrual == "start" ? startStamp : finishStamp).substr(0, 10)) f = fixed;
         return add(resource, f);
     }
@@ -63,46 +71,53 @@ struct Budget {
         if (!valid) return {};
         if (stamp < startStamp) return 0;
         auto offset = stamp >= finishStamp ? finish : calendar.offset(stamp);
-        auto elapsed = std::clamp(offset - start, Minute{0}, finish - start);
+        auto elapsedWork = elapsed(stamp,calendar);
         Money resource = 0;
-        if (!days.empty() && elapsed > 0) {
-            auto it = std::lower_bound(days.begin(), days.end(), offset / 480, [](const auto& d, Minute day) { return d.day < day; });
+        if (!days.empty() && elapsedWork > 0) {
+            auto it = std::lower_bound(days.begin(), days.end(), offset / calendar.dayMinutes(), [](const auto& d, Minute day) { return d.day < day; });
             if (it == days.end()) resource = add(days.back().before, days.back().total);
             else {
                 resource = it->before;
                 for (const auto& s : it->spans) {
                     auto n = std::clamp(offset - s.start, Minute{0}, s.finish - s.start);
-                    if (n > 0) resource = add(resource, s.rate ? fraction(*s.rate, n * s.units, 6000) : Money{});
+                    if (n > 0) resource = add(resource, s.rate ? subtract(fraction(*s.rate, (s.dayWorkBefore+n)*s.units, 6000),fraction(*s.rate,s.dayWorkBefore*s.units,6000)) : Money{});
                 }
             }
         }
         Money f = 0;
         const bool earned = accrual == "start" ? stamp >= startStamp : stamp >= finishStamp;
         if (accrual == "uniform" && finish > start) {
-            if (elapsed > 0) f = fixed ? fraction(*fixed, elapsed, finish - start) : Money{};
+            if (elapsedWork > 0) f = fixed ? fraction(*fixed, elapsedWork, elapsed(finishStamp,calendar)) : Money{};
         } else if (earned) f = fixed;
         return add(resource, f);
     }
 };
 const TaskCost* config(const PlanInput& p, const std::string& id) { for (const auto& c : p.taskCosts) if (c.taskId == id) return &c; return nullptr; }
-Budget budget(const PlanInput& p, const Task& task, const TaskSchedule* row, const WorkCalendar& calendar) {
+using CalendarCache=std::map<std::string,std::shared_ptr<WorkCalendar>>;
+Budget budget(const PlanInput& p, const Task& task, const TaskSchedule* row, const WorkCalendar& calendar, CalendarCache& cache) {
     Budget b;
     if (const auto* c = config(p, task.id)) { b.fixed = c->fixedMinor; b.accrual = c->accrual; b.credit = c->credit; }
     if (!b.fixed) b.issues.push_back("고정비 미정: 비용 없음은 0으로 입력하세요.");
     if (!row) { b.issues.push_back("유효한 논리 일정이 없어 비용 발생일을 산정할 수 없습니다."); return b; }
     b.valid = true; b.start = row->earlyStartMinutes; b.finish = row->earlyFinishMinutes; b.startStamp = row->start; b.finishStamp = row->finish;
+    if (p.calculationProfile==pdmProfile) { auto& shared=cache[task.calendarId]; if (!shared) shared=std::make_shared<WorkCalendar>(p,task); b.work=shared; }
+    std::vector<std::pair<Minute,Minute>> workSpans;
+    if (b.work) { for (const auto& [begin,end]:b.work->segments(row->start,row->finish)) workSpans.emplace_back(calendar.offset(begin),calendar.offset(end)); }
+    else workSpans.emplace_back(b.start,b.finish);
     std::map<Minute, Bucket> days;
     for (const auto& a : p.assignments) if (a.taskId == task.id) {
         const auto r = std::find_if(p.resources.begin(), p.resources.end(), [&](const auto& x) { return x.id == a.resourceId; });
         bool warned = false;
-        for (auto at = b.start; at < b.finish;) {
-            const auto end = std::min(b.finish, (at / 480 + 1) * 480); auto date = calendar.boundary(at, false).substr(0, 10);
+        std::map<Minute,Minute> workInDay;
+        for (const auto& [begin,finish]:workSpans) for (auto at = begin; at < finish;) {
+            const auto end = std::min(finish, (at / calendar.dayMinutes() + 1) * calendar.dayMinutes()); auto date = calendar.boundary(at, false).substr(0, 10);
             const Resource::Rate* rate = nullptr;
             for (const auto& v : r->rates) if (v.effectiveDate <= date && (!rate || v.effectiveDate > rate->effectiveDate)) rate = &v;
             Money amount = rate ? rate->hourlyMinor : Money{};
             if (!amount && !warned) { b.issues.push_back("단가 미정: " + r->name + " [" + r->id + "] " + date); warned = true; }
-            auto& d = days[at / 480]; d.day = at / 480; d.spans.push_back({at, end, a.units, amount});
-            d.total = add(d.total, amount ? fraction(*amount, (end - at) * a.units, 6000) : Money{}); at = end;
+            auto& d = days[at / calendar.dayMinutes()]; d.day = at / calendar.dayMinutes(); auto& before=workInDay[d.day];
+            d.spans.push_back({at, end, a.units, amount,before});
+            d.total = add(d.total, amount ? subtract(fraction(*amount,(before+end-at)*a.units,6000),fraction(*amount,before*a.units,6000)) : Money{}); before+=end-at; at = end;
         }
     }
     Money prefix = 0;
@@ -158,8 +173,9 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     for (const auto& row : plan.tasks) if (plan.status == CalculationStatus::Valid) dates.emplace(row.taskId, &row);
     if (baseline) for (const auto& row : baseline->schedule) frozenDates.emplace(row.taskId, &row);
     std::map<std::string, Budget> current, frozen;
-    for (const auto& t : p.tasks) current.emplace(t.id, budget(p, t, dates.contains(t.id) ? dates.at(t.id) : nullptr, calendar));
-    if (compatible) for (const auto& t : baseline->input.tasks) frozen.emplace(t.id, budget(baseline->input, t, frozenDates.at(t.id), *baselineCalendar));
+    CalendarCache currentCalendars,frozenCalendars;
+    for (const auto& t : p.tasks) current.emplace(t.id, budget(p, t, dates.contains(t.id) ? dates.at(t.id) : nullptr, calendar,currentCalendars));
+    if (compatible) for (const auto& t : baseline->input.tasks) frozen.emplace(t.id, budget(baseline->input, t, frozenDates.at(t.id), *baselineCalendar,frozenCalendars));
     if (taskScope) { std::erase_if(current, [&](const auto& item) { return !selected.contains(item.first); }); std::erase_if(frozen, [&](const auto& item) { return !selected.contains(item.first); }); }
     std::vector<Task> all; for (const auto& t : p.tasks) if (current.contains(t.id)) all.push_back(t);
     if (baseline) for (const auto& t : baseline->input.tasks) if ((!taskScope || selected.contains(t.id)) && !current.contains(t.id)) all.push_back(t);
@@ -201,7 +217,7 @@ CostAnalysis analyzeCosts(const Project& p, const std::string& baselineId, const
     auto addDays = [&](const auto& budgets, const WorkCalendar& cal) {
         for (const auto& [id, b] : budgets) { (void)id; if (!b.valid) continue;
             days.insert(b.startStamp.substr(0, 10)); days.insert(b.finishStamp.substr(0, 10));
-            for (auto m = b.start / 480 * 480; m < b.finish; m += 480) days.insert(cal.boundary(m, false).substr(0, 10));
+            for (auto m = b.start / cal.dayMinutes() * cal.dayMinutes(); m < b.finish; m += cal.dayMinutes()) days.insert(cal.boundary(m, false).substr(0, 10));
         }
     };
     addDays(current, calendar); if (compatible) addDays(frozen, *baselineCalendar);

@@ -47,6 +47,12 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
             const auto& s = *it->second;
             rows_.push_back({t.id, QString::number(index + 1) + ". " + qs(t.name), qs(s.start), qs(s.finish),
                 s.critical, t.predecessors, s.drivingPredecessors, s.remainingStart, s.completedActual});
+            rows_.back().edges=dependencies(t); rows_.back().calendar=qs(taskCalendarName(*p,t));
+            for(const auto& c:p->calendars) if(c.id==t.calendarId) {
+                rows_.back().calendar+=" · 근무 요일 "; for(int d:c.weekdays) rows_.back().calendar+=QString::number(d)+" ";
+                for(const auto& period:c.periods) rows_.back().calendar+=QString(" %1:%2–%3:%4").arg(period.begin/60,2,10,QChar('0')).arg(period.begin%60,2,10,QChar('0')).arg(period.end/60,2,10,QChar('0')).arg(period.end%60,2,10,QChar('0'));
+                rows_.back().calendar+=" · 휴일 "; for(const auto& date:c.holidays) rows_.back().calendar+=qs(date)+" ";
+            }
         }
         if (!complete) { rows_.clear(); dayCount_ = 0; }
     }
@@ -115,6 +121,7 @@ void GanttView::rebuild() {
         bar->setData(0, qs(row.id)); bar->setData(1, milestone ? "milestone" : "task"); bar->setZValue(2);
         const auto kind = row.completedActual ? "실제 완료" : isForecast_ ? "실적 반영 예측" : milestone ? "마일스톤" : row.critical ? "임계 작업" : "여유 작업";
         QString tooltip = row.name + "\n" + kind + "\n" + row.start + " → " + row.finish + "\nID: " + qs(row.id);
+        tooltip+="\n작업 달력: "+row.calendar+"\n막대는 시작~완료 구간입니다. 비근무 시간은 기간/자원 공수에서 제외합니다.";
         if (row.remainingStart) tooltip += "\n잔여 작업 재개: " + qs(*row.remainingStart);
         int hidden = 0;
         for (const auto& prev : row.predecessors) if (!index.contains(prev)) ++hidden;
@@ -123,11 +130,12 @@ void GanttView::rebuild() {
         auto* label = scene()->addSimpleText(row.name + (row.completedActual ? " [실제]" : isForecast_ ? " [예측]" : milestone ? " ◆" : row.critical ? " [임계]" : ""));
         label->setBrush(palette().color(QPalette::Text)); label->setPos(finish + 9, y - 9); label->setZValue(3);
         label->setData(0, qs(row.id)); label->setData(1, "label"); label->setToolTip(tooltip);
-        for (const auto& predecessor : row.predecessors) {
+        for (const auto& edge : row.edges) {
+            const auto& predecessor=edge.predecessorId;
             auto found = index.find(predecessor); if (found == index.end()) continue;
             const auto& prev = rows_[found->second];
-            auto x1 = position(prev.finish); auto y1 = HeaderHeight + int(found->second) * RowHeight + RowHeight / 2;
-            const auto target = isForecast_ && row.remainingStart ? position(qs(*row.remainingStart)) : start;
+            auto x1 = position(edge.type[0]=='F'?prev.finish:prev.start); auto y1 = HeaderHeight + int(found->second) * RowHeight + RowHeight / 2;
+            const auto target = edge.type[1]=='F'?finish:isForecast_ && row.remainingStart ? position(qs(*row.remainingStart)) : start;
             auto elbow = std::max(x1 + 8, target - 10);
             QPainterPath path(QPointF(x1, y1)); path.lineTo(elbow, y1); path.lineTo(elbow, y - 10); path.lineTo(target - 5, y - 10); path.lineTo(target - 5, y); path.lineTo(target, y);
             const bool driving = row.critical && prev.critical && std::find(row.driving.begin(), row.driving.end(), predecessor) != row.driving.end();
@@ -135,7 +143,7 @@ void GanttView::rebuild() {
             const bool historical = isForecast_ && row.completedActual;
             auto* link = scene()->addPath(path, QPen(color, 1, historical ? Qt::DashLine : Qt::SolidLine)); link->setZValue(1);
             link->setData(0, qs(predecessor + "->" + row.id)); link->setData(1, "dependency");
-            link->setToolTip((historical ? "과거 실제 FS 관계 · 날짜 고정 · " : isForecast_ && row.remainingStart ? "FS 0 · 잔여 작업 재개 기준 · " : "FS 0 · ") + qs(predecessor) + " → " + qs(row.id));
+            link->setToolTip(qs(edge.type)+(edge.lagMinutes>=0?"+":"")+QString::number(edge.lagMinutes)+"m · 후행 달력 근무분 · "+(historical?"실제 날짜 고정 · ":"")+qs(predecessor)+" → "+qs(row.id));
             QPolygonF arrow; arrow << QPointF(target, y) << QPointF(target - 5, y - 3) << QPointF(target - 5, y + 3);
             scene()->addPolygon(arrow, QPen(color), QBrush(color))->setZValue(1);
         }

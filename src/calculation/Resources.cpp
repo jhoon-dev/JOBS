@@ -1,5 +1,6 @@
 #include "calculation/Resources.h"
 #include "calculation/WorkCalendar.h"
+#include "calculation/PdmResources.h"
 #include <algorithm>
 #include <map>
 #include <set>
@@ -25,12 +26,12 @@ void reserve(Events& events, Minute start, Minute finish, int units) {
     events[start] += units; events[finish] -= units;
 }
 // Visit every interval where either demand or daily capacity can change.
-template<class F> void intervals(const Events& events, Minute start, Minute finish, F visit) {
+template<class F> void intervals(const Events& events, Minute start, Minute finish, F visit, int dayMinutes = 480) {
     Minute used = 0;
     auto it = events.begin();
     while (it != events.end() && it->first <= start) { used += it->second; ++it; }
     for (auto at = start; at < finish;) {
-        auto end = std::min(finish, (at / 480 + 1) * 480);
+        auto end = std::min(finish, (at / dayMinutes + 1) * dayMinutes);
         if (it != events.end()) end = std::min(end, it->first);
         if (!visit(at, end, used)) return;
         at = end;
@@ -49,10 +50,17 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
     for (const auto& r : result.tasks) rows.emplace(r.taskId, &r);
     std::set<std::string> assigned;
     std::unordered_map<std::string, std::vector<Span>> spans;
+    std::map<std::string,WorkCalendar> calendars;
     for (const auto& a : p.assignments) {
         assigned.insert(a.taskId);
         const auto [s, e] = span(*rows.at(a.taskId), result, calendar);
-        if (e > s) spans[a.resourceId].push_back({s, e, a.taskId, a.units});
+        if (e > s) {
+            if (p.calculationProfile == pdmProfile) {
+                const auto task=std::find_if(p.tasks.begin(),p.tasks.end(),[&](const auto& t){return t.id==a.taskId;});
+                if(!calendars.contains(task->calendarId)) calendars.emplace(task->calendarId,WorkCalendar(p,*task));
+                for (const auto& [begin,end]:calendars.at(task->calendarId).segments(calendar.boundary(s,false),calendar.boundary(e,true))) spans[a.resourceId].push_back({calendar.offset(begin),calendar.offset(end),a.taskId,a.units});
+            } else spans[a.resourceId].push_back({s, e, a.taskId, a.units});
+        }
     }
     load.assignedTasks = assigned.size(); load.status = CalculationStatus::Valid;
     for (const auto& r : p.resources) {
@@ -62,15 +70,15 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
         std::map<Minute, ResourceDay> days;
         intervals(events, events.begin()->first, events.rbegin()->first, [&](Minute s, Minute e, Minute used) {
             if (!used) return true;
-            auto day = s / 480;
-            auto& d = days[day]; d.resourceId = r.id; d.date = calendar.boundary(day * 480, false).substr(0, 10);
+            auto day = s / calendar.dayMinutes();
+            auto& d = days[day]; d.resourceId = r.id; d.date = calendar.boundary(day * calendar.dayMinutes(), false).substr(0, 10);
             d.capacity = capacity(r, d.date); d.peakUnits = std::max(d.peakUnits, used); d.demandUnitMinutes += used * (e - s);
             if (!d.capacity) load.status = CalculationStatus::Incomplete;
             else if (used > *d.capacity) { d.overloadMinutes += e - s; d.excessUnitMinutes += (used - *d.capacity) * (e - s); }
             return true;
-        });
+        }, calendar.dayMinutes());
         for (auto& [day, d] : days) {
-            for (const auto& s : spans[r.id]) if (s.start < (day + 1) * 480 && s.finish > day * 480) d.taskIds.push_back(s.taskId);
+            for (const auto& s : spans[r.id]) if (s.start < (day + 1) * calendar.dayMinutes() && s.finish > day * calendar.dayMinutes()) d.taskIds.push_back(s.taskId);
             std::sort(d.taskIds.begin(), d.taskIds.end()); d.taskIds.erase(std::unique(d.taskIds.begin(), d.taskIds.end()), d.taskIds.end());
             load.days.push_back(std::move(d));
         }
@@ -86,6 +94,7 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
 LevelingResult levelResources(const Project& p, const std::string& priority, int horizonWorkDays) {
     if ((priority != "task-order" && priority != "shortest-first" && priority != "longest-first") || horizonWorkDays < 1 || horizonWorkDays > 5200)
         throw std::runtime_error("지원하지 않는 우선순위 또는 탐색 범위입니다.");
+    if (p.calculationProfile == pdmProfile) return levelPdmResources(p,priority,horizonWorkDays);
     LevelingResult out; out.priority = priority; out.horizonWorkDays = horizonWorkDays;
     out.original = calculate(p); out.before = resourceLoad(p, out.original); out.leveled = out.original;
     out.leveled.calculationPolicy = "serial-no-split-v1/" + priority;

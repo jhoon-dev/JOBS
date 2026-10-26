@@ -90,7 +90,7 @@ void ComparisonDialog::display(const ComparisonReport& r) {
         const auto detail = "작업 ID: " + qs(row.taskId) + "\n이름: " + (row.baselineName.empty() ? "—" : qs(row.baselineName)) + " → " + qs(row.name)
             + " | 계획 기간: " + hours(row.baselineDuration) + "h → " + hours(row.planDuration) + "h"
             + "\nWBS: " + qs(row.baselineWbsPath) + " → " + qs(row.planWbsPath)
-            + "\nFS 선행 ID: " + (oldPred.isEmpty() ? "없음/미설정" : oldPred.join(", ")) + " → " + (newPred.isEmpty() ? "없음/미설정" : newPred.join(", "))
+            + "\n선행 ID·종류·지연: " + (oldPred.isEmpty() ? "없음/미설정" : oldPred.join(", ")) + " → " + (newPred.isEmpty() ? "없음/미설정" : newPred.join(", "))
             + "\n자원 배정: " + (oldResources.isEmpty() ? "없음" : oldResources.join(", ")) + " → " + (newResources.isEmpty() ? "없음" : newResources.join(", "));
         for (int col = 0; col < values.size(); ++col) {
             auto* item = new QTableWidgetItem(values[col]); item->setData(Qt::UserRole, qs(row.taskId));

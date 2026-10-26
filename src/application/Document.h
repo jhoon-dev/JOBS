@@ -43,6 +43,10 @@ public:
     void assignWbs(std::size_t taskRow, std::string wbsId);
     void setDuration(std::size_t row, std::optional<std::int64_t> minutes);
     void setPredecessors(std::size_t row, std::vector<std::string> ids);
+    void setDependencies(std::size_t row, std::vector<Dependency>);
+    std::string putCalendar(TaskCalendar);
+    void removeCalendar(const std::string&);
+    void setTaskCalendar(std::size_t, std::string);
     void setHolidays(std::vector<std::string> dates);
     void setStatusAt(std::optional<std::string> stamp);
     std::string appendBaseline(Baseline prepared);

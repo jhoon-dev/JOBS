@@ -37,7 +37,7 @@ Project decode(const QByteArray& bytes) {
     auto root = json.object(); keys(root, {"format", "schemaVersion", "payload", "sha256"});
     if (root.value("format") != "JOBS") fail("JOBS 프로젝트 형식이 아닙니다.");
     auto v = root.value("schemaVersion");
-    if (!v.isDouble() || v.toDouble() != v.toInt() || v.toInt() < 1 || v.toInt() > 6)
+    if (!v.isDouble() || v.toDouble() != v.toInt() || v.toInt() < 1 || v.toInt() > 7)
         fail("지원하지 않는 파일 버전입니다. 원본은 변경하지 않았습니다.");
     if (!root.value("payload").isObject()) fail("프로젝트 본문이 없습니다.");
     auto body = root.value("payload").toObject();
@@ -73,13 +73,13 @@ std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string& path) { re
 StoredProject JsonProjectStore::load(const std::string& path) const {
     auto bytes = read(qs(path));
     auto project = decode(bytes);
-    const bool legacy = QJsonDocument::fromJson(bytes).object().value("schemaVersion") != QJsonValue(6);
+    const bool legacy = QJsonDocument::fromJson(bytes).object().value("schemaVersion") != QJsonValue(7);
     return {std::move(project), hash(bytes).toStdString(), legacy};
 }
 std::string JsonProjectStore::save(const std::string& path, const Project& project, const std::string& expected) {
     validate(project);
     auto body = json::encodeProject(project);
-    auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS"}, {"schemaVersion", 6}, {"payload", body},
+    auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS"}, {"schemaVersion", 7}, {"payload", body},
         {"sha256", QString::fromLatin1(hash(QJsonDocument(body).toJson(QJsonDocument::Compact)))}}).toJson();
     if (bytes.size() > 64 * 1024 * 1024) fail("초기 형식의 파일 한도(64 MiB)를 초과했습니다.");
     if (decode(bytes) != project) fail("저장 전 검증에 실패했습니다.");
