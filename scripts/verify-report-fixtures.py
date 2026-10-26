@@ -6,6 +6,7 @@ Usage: python scripts/verify-report-fixtures.py build
 import re
 import sys
 import zipfile
+import unicodedata
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -70,7 +71,10 @@ def verify(root: Path):
 
     for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf", "reports-pdm.pdf", "reports-constraints.pdf", "reports-effort.pdf"):
         reader = PdfReader(root / name, strict=True)
-        compact = re.sub(r"\s+", "", "\n".join(p.extract_text() or "" for p in reader.pages))
+        raw = "\n".join(p.extract_text() or "" for p in reader.pages)
+        # Native PDF fonts can encode typographic ligatures (e.g. ff as U+FB00).
+        # Normalize presentation forms before comparing semantic text/numbers.
+        compact = re.sub(r"\s+", "", unicodedata.normalize("NFKC", raw))
         assert reader.pages and all("JOBS" in (p.extract_text() or "") for p in reader.pages)
         if name == "reports-long-portrait.pdf":
             numbers = [int(n) for n in re.findall(r"Segment_(\d+)", compact)]
@@ -80,7 +84,10 @@ def verify(root: Path):
             assert abs(float(reader.pages[0].mediabox.height) - 842) < 3
         elif name == "reports-effort.pdf":
             assert "effort-report-contract" in compact and "고정공수" in compact
-            assert "DesignerTuesdayoff" in compact and "2026-10-2815:00" in compact
+            forms = sorted({c for c in raw if unicodedata.normalize("NFKC", c) != c})
+            print(f"PDF presentation forms normalized: {forms!r}")
+            assert "DesignerTuesdayoff" in compact, f"resource calendar text missing: {compact!r}"
+            assert "2026-10-2815:00" in compact, f"effort finish stamp missing: {compact!r}"
             assert "실행배정구간" in compact and "48000" in compact
         elif name == "reports-constraints.pdf":
             assert "constraints-report-contract" in compact and "SNET" in compact
