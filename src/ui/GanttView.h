@@ -49,7 +49,8 @@ private:
     struct Row { std::string id; QString name, start, finish; bool critical; std::vector<std::string> predecessors, driving;
         std::optional<std::string> remainingStart; bool completedActual = false;
         std::vector<Dependency> edges = {}; QString calendar = {};
-        bool editable=false; std::string constraintType="ASAP";std::optional<std::string> constraintAt={},deadlineAt={}; };
+        bool editable=false; std::string constraintType="ASAP";std::optional<std::string> constraintAt={},deadlineAt={};
+        std::vector<std::pair<std::string,std::string>> pieces={}; };
     std::vector<Row> rows_;
     void rebuild();
     qreal position(const QString& stamp) const;

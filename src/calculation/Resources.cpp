@@ -1,6 +1,7 @@
 #include "calculation/Resources.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/PdmResources.h"
+#include "calculation/Effort.h"
 #include <algorithm>
 #include <map>
 #include <set>
@@ -51,7 +52,16 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
     std::set<std::string> assigned;
     std::unordered_map<std::string, std::vector<Span>> spans;
     std::map<std::string,WorkCalendar> calendars;
+    if(isEffort(p)) {
+        for(const auto& a:p.assignments)assigned.insert(a.taskId);
+        for(const auto& t:p.tasks) {
+            if(!assigned.contains(t.id))continue;
+            const auto pending=result.isForecast?pendingTask(p,t):t;
+            for(const auto& a:executionSpans(p,pending,*rows.at(t.id)))spans[a.resourceId].push_back({a.start,a.finish,t.id,a.units});
+        }
+    }
     for (const auto& a : p.assignments) {
+        if(isEffort(p))continue;
         assigned.insert(a.taskId);
         const auto [s, e] = span(*rows.at(a.taskId), result, calendar);
         if (e > s) {
@@ -94,6 +104,7 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
 LevelingResult levelResources(const Project& p, const std::string& priority, int horizonWorkDays) {
     if ((priority != "task-order" && priority != "shortest-first" && priority != "longest-first") || horizonWorkDays < 1 || horizonWorkDays > 5200)
         throw std::runtime_error("지원하지 않는 우선순위 또는 탐색 범위입니다.");
+    if(isEffort(p))return levelEffort(p,priority,horizonWorkDays);
     if (isPdm(p)) return levelPdmResources(p,priority,horizonWorkDays);
     LevelingResult out; out.priority = priority; out.horizonWorkDays = horizonWorkDays;
     out.original = calculate(p); out.before = resourceLoad(p, out.original); out.leveled = out.original;

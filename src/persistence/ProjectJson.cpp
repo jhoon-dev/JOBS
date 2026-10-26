@@ -60,7 +60,9 @@ QJsonObject encodePlan(const PlanInput& p) {
         auto t=tasks[i].toObject(); const auto& task=p.tasks[std::size_t(i)]; QJsonArray edges;
         for (const auto& d:task.dependencyRules) edges.append(QJsonObject{{"predecessorId",qs(d.predecessorId)},{"type",qs(d.type)},{"lagMinutes",double(d.lagMinutes)}});
         t["dependencyRules"]=edges; t["calendarId"]=qs(task.calendarId); tasks[i]=t;
-        if(p.calculationProfile==constraintProfile){t["constraintType"]=qs(task.constraintType);t["constraintAt"]=nullable(task.constraintAt);t["deadlineAt"]=nullable(task.deadlineAt);tasks[i]=t;}
+        if(hasConstraints(p)){t["constraintType"]=qs(task.constraintType);t["constraintAt"]=nullable(task.constraintAt);t["deadlineAt"]=nullable(task.deadlineAt);}
+        if(isEffort(p)){QJsonArray gaps;for(const auto& b:task.breaks)gaps.append(QJsonObject{{"start",qs(b.start)},{"finish",qs(b.finish)}});t["taskType"]=qs(task.taskType);t["workDriven"]=task.workDriven;t["workUnitMinutes"]=money(task.workUnitMinutes);t["breaks"]=gaps;}
+        tasks[i]=t;
     }
     for (const auto& n : p.wbsNodes) nodes.append(QJsonObject{{"id", qs(n.id)}, {"name", qs(n.name)}, {"parentId", qs(n.parentId)}});
     QJsonArray resources, assignments;
@@ -70,6 +72,7 @@ QJsonObject encodePlan(const PlanInput& p) {
         QJsonArray rates; for (const auto& rate : r.rates) rates.append(QJsonObject{{"effectiveDate", qs(rate.effectiveDate)}, {"hourlyMinor", money(rate.hourlyMinor)}});
         resources.append(QJsonObject{{"id", qs(r.id)}, {"name", qs(r.name)}, {"type", qs(r.type)},
             {"maxUnits", r.maxUnits ? QJsonValue(*r.maxUnits) : QJsonValue(QJsonValue::Null)}, {"exceptions", exceptions}, {"rates", rates}});
+        if(isEffort(p)){auto resource=resources.last().toObject();resource["calendarId"]=qs(r.calendarId);resources[resources.size()-1]=resource;}
     }
     for (const auto& a : p.assignments) assignments.append(QJsonObject{{"taskId", qs(a.taskId)}, {"resourceId", qs(a.resourceId)}, {"units", a.units}});
     QJsonArray costs; for (const auto& c : p.taskCosts) costs.append(QJsonObject{{"taskId", qs(c.taskId)}, {"fixedMinor", money(c.fixedMinor)}, {"accrual", qs(c.accrual)}, {"credit", qs(c.credit)}});
@@ -89,9 +92,11 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
     p.name = string(o, "name"); p.startDate = string(o, "startDate"); p.calendar = string(o, "calendar");
     if (schema >= 2) { p.holidays = readStrings(o, "holidays"); p.calculationProfile = string(o, "calculationProfile"); }
     const bool pdm=schema>=7 && isPdm(p);
-    const bool constrained=schema>=8 && p.calculationProfile==constraintProfile;
+    const bool constrained=schema>=8 && hasConstraints(p);
+    const bool effort=schema>=9 && isEffort(p);
+    if(isEffort(p)&&!effort)fail("공수·분할 정책에는 schema 9가 필요합니다.");
     if (isPdm(p) && !pdm) fail("PDM 정책에는 schema 7 이상이 필요합니다.");
-    if(p.calculationProfile==constraintProfile&&!constrained)fail("제약 정책에는 schema 8이 필요합니다.");
+    if(hasConstraints(p)&&!constrained)fail("제약 정책에는 schema 8이 필요합니다.");
     if (!pdm && o.contains("calendars")) fail("이전 계산 정책에 작업 달력을 추가할 수 없습니다.");
     if (pdm) for (const auto& v:array(o,"calendars")) {
         auto c=object(v); keys(c,{"id","name","weekdays","periods","holidays"}); TaskCalendar cal; cal.id=string(c,"id"); cal.name=string(c,"name"); cal.weekdays.clear(); cal.periods.clear();
@@ -104,8 +109,9 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
     }
     if (schema >= 5) {
         for (const auto& v : array(o, "resources")) {
-            auto r = object(v); QStringList fields{"id", "name", "type", "maxUnits", "exceptions"}; if (schema >= 6) fields.append("rates"); keys(r, fields);
+            auto r = object(v); QStringList fields{"id", "name", "type", "maxUnits", "exceptions"}; if (schema >= 6) fields.append("rates");if(effort)fields.append("calendarId"); keys(r, fields);
             Resource resource; resource.id = string(r, "id"); resource.name = string(r, "name"); resource.type = string(r, "type");
+            if(effort)resource.calendarId=string(r,"calendarId");
             if (!r.contains("maxUnits")) fail("자원 가용량 누락");
             resource.maxUnits = r["maxUnits"].isNull() ? std::optional<int>{} : int(integer(r, "maxUnits", 100000));
             for (const auto& x : array(r, "exceptions")) {
@@ -133,6 +139,7 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
         if (schema >= 3) fields.append("wbsId");
         if (pdm) fields.append({"dependencyRules","calendarId"});
         if(constrained)fields.append({"constraintType","constraintAt","deadlineAt"});
+        if(effort)fields.append({"taskType","workDriven","workUnitMinutes","breaks"});
         keys(t, fields);
         Task task{string(t, "id"), string(t, "name"), std::nullopt, {}};
         if (schema >= 2) {
@@ -150,6 +157,7 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
             }
         }
         if(constrained){task.constraintType=string(t,"constraintType");task.constraintAt=optionalString(t,"constraintAt");task.deadlineAt=optionalString(t,"deadlineAt");}
+        if(effort){task.taskType=string(t,"taskType");task.workDriven=boolean(t,"workDriven");task.workUnitMinutes=readMoney(t,"workUnitMinutes",double(maxWork));for(const auto& gap:array(t,"breaks")){auto b=object(gap);keys(b,{"start","finish"});task.breaks.push_back({string(b,"start"),string(b,"finish")});}}
         p.tasks.push_back(std::move(task));
     }
     return p;
@@ -188,19 +196,22 @@ Baseline decodeBaseline(const QJsonObject& o, int schema) {
     return b;
 }
 QJsonObject encodeEntry(const ProgressEntry& e) {
-    return {{"id", qs(e.id)}, {"taskId", qs(e.taskId)}, {"statusAt", qs(e.statusAt)}, {"recordedAt", qs(e.recordedAt)},
+    QJsonObject out{{"id", qs(e.id)}, {"taskId", qs(e.taskId)}, {"statusAt", qs(e.statusAt)}, {"recordedAt", qs(e.recordedAt)},
         {"reporter", qs(e.reporter)}, {"reason", qs(e.reason)}, {"previousEntryId", qs(e.previousEntryId)}, {"recordedRevision", double(e.recordedRevision)},
         {"sourceDocumentId", qs(e.sourceDocumentId)}, {"planDurationMinutes", e.planDurationMinutes ? QJsonValue(double(*e.planDurationMinutes)) : QJsonValue(QJsonValue::Null)},
         {"actualStart", nullable(e.actualStart)}, {"actualFinish", nullable(e.actualFinish)}, {"actualDurationMinutes", double(e.actualDurationMinutes)}, {"remainingMinutes", double(e.remainingMinutes)}};
+    if(e.remainingWorkUnitMinutes)out["remainingWorkUnitMinutes"]=double(*e.remainingWorkUnitMinutes);
+    return out;
 }
-ProgressEntry decodeEntry(const QJsonObject& o) {
-    keys(o, {"id", "taskId", "statusAt", "recordedAt", "reporter", "reason", "previousEntryId", "recordedRevision", "sourceDocumentId", "planDurationMinutes", "actualStart", "actualFinish", "actualDurationMinutes", "remainingMinutes"});
+ProgressEntry decodeEntry(const QJsonObject& o,int schema) {
+    QStringList fields{"id", "taskId", "statusAt", "recordedAt", "reporter", "reason", "previousEntryId", "recordedRevision", "sourceDocumentId", "planDurationMinutes", "actualStart", "actualFinish", "actualDurationMinutes", "remainingMinutes"};if(schema>=9)fields.append("remainingWorkUnitMinutes");keys(o,fields);
     ProgressEntry e; e.id = string(o, "id"); e.taskId = string(o, "taskId"); e.statusAt = string(o, "statusAt"); e.recordedAt = string(o, "recordedAt");
     e.reporter = string(o, "reporter"); e.reason = string(o, "reason"); e.previousEntryId = string(o, "previousEntryId"); e.recordedRevision = std::uint64_t(integer(o, "recordedRevision"));
     e.sourceDocumentId = string(o, "sourceDocumentId");
     if (!o.contains("planDurationMinutes")) fail("보고 당시 계획 기간 누락");
     if (!o.value("planDurationMinutes").isNull()) e.planDurationMinutes = integer(o, "planDurationMinutes", 5000000);
     e.actualStart = optionalString(o, "actualStart"); e.actualFinish = optionalString(o, "actualFinish");
+    if(o.contains("remainingWorkUnitMinutes"))e.remainingWorkUnitMinutes=integer(o,"remainingWorkUnitMinutes",double(maxWork));
     e.actualDurationMinutes = integer(o, "actualDurationMinutes", 5000000); e.remainingMinutes = integer(o, "remainingMinutes", 5000000); return e;
 }
 QJsonObject encodeScenario(const LevelingScenario& s) {
@@ -214,7 +225,7 @@ LevelingScenario decodeScenario(const QJsonObject& o, int schema) {
     LevelingScenario s; s.id = string(o, "id"); s.name = string(o, "name"); s.createdAt = string(o, "createdAt"); s.sourceDocumentId = string(o, "sourceDocumentId");
     s.inputRevision = std::uint64_t(integer(o, "inputRevision")); s.policy = string(o, "policy"); s.priority = string(o, "priority");
     s.horizonWorkDays = int(integer(o, "horizonWorkDays", 5200)); s.input = decodePlan(object(o["input"]), schema); s.statusAt = optionalString(o, "statusAt");
-    for (const auto& v : array(o, "progress")) s.progress.push_back(decodeEntry(object(v)));
+    for (const auto& v : array(o, "progress")) s.progress.push_back(decodeEntry(object(v),schema));
     return s;
 }
 QJsonObject encodeCostEntry(const CostEntry& e) {
@@ -254,7 +265,7 @@ Project decodeProject(const QJsonObject& o, int schema) {
     if (schema >= 4) {
         p.statusAt = optionalString(o, "statusAt");
         for (const auto& b : array(o, "baselines")) p.baselines.push_back(decodeBaseline(object(b), schema));
-        for (const auto& e : array(o, "progress")) p.progress.push_back(decodeEntry(object(e)));
+        for (const auto& e : array(o, "progress")) p.progress.push_back(decodeEntry(object(e),schema));
     }
     if (schema >= 5) for (const auto& v : array(o, "scenarios")) p.scenarios.push_back(decodeScenario(object(v), schema));
     if (schema >= 6) for (const auto& v : array(o, "costEntries")) p.costEntries.push_back(decodeCostEntry(object(v)));

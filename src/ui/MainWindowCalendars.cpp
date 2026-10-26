@@ -23,8 +23,8 @@ int minute(const QString& text) {
 }
 void MainWindow::manageCalendars() {
     if (!document_.project()) return;
-    QDialog dialog(this); dialog.setObjectName("calendarDialog"); dialog.setWindowTitle("작업 달력 등록·편집"); dialog.resize(660,530);
-    auto* layout=new QVBoxLayout(&dialog); auto* note=new QLabel("프로젝트 기본 달력은 월–금 09–12 / 13–18과 프로젝트 휴일을 사용합니다.\n사용자 달력은 독립된 근무 요일·시간대·휴일을 사용합니다. 새 정의/수정 후 작업에 배정하세요.\n야간 근무는 자정을 기준으로 나눈 구간으로 입력합니다. 지연/선행 시간은 후행 달력 근무분입니다."); note->setWordWrap(true); layout->addWidget(note);
+    QDialog dialog(this); dialog.setObjectName("calendarDialog"); dialog.setWindowTitle("작업·자원 달력 등록·편집"); dialog.resize(660,530);
+    auto* layout=new QVBoxLayout(&dialog); auto* note=new QLabel("프로젝트 기본 달력은 월–금 09–12 / 13–18과 프로젝트 휴일을 사용합니다.\n사용자 달력은 독립된 근무 요일·시간대·휴일을 사용합니다. 새 정의/수정 후 작업 또는 자원 등록에서 배정하세요.\n야간 근무는 자정을 기준으로 나눈 구간으로 입력합니다. 지연/선행 시간은 후행 달력 근무분입니다."); note->setWordWrap(true); layout->addWidget(note);
     auto* form=new QFormLayout; layout->addLayout(form); auto* choice=new QComboBox; choice->setObjectName("calendarChoice"); form->addRow("달력",choice);
     auto* name=new QLineEdit; name->setObjectName("calendarName"); form->addRow("이름",name);
     auto* weekdays=new QLineEdit; weekdays->setObjectName("calendarWeekdays"); form->addRow("근무 요일 (월1~일7)",weekdays);

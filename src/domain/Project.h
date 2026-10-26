@@ -8,6 +8,12 @@
 namespace jobs {
 inline constexpr const char* pdmProfile = "native-pdm-taskcal-v1";
 inline constexpr const char* constraintProfile = "native-pdm-constraints-v1";
+inline constexpr const char* effortProfile = "native-effort-split-v1";
+inline constexpr std::int64_t maxWork = 500000000000LL;
+struct TaskBreak {
+    std::string start, finish;
+    bool operator==(const TaskBreak&) const = default;
+};
 struct Dependency {
     std::string predecessorId, type = "FS";
     std::int64_t lagMinutes = 0;
@@ -36,6 +42,11 @@ struct Task {
     std::string constraintType = "ASAP";
     std::optional<std::string> constraintAt = {};
     std::optional<std::string> deadlineAt = {};
+    std::string taskType = "fixed-duration";
+    // 100 = one resource-minute, 6000 = one resource-hour. Never inferred actual work.
+    std::optional<std::int64_t> workUnitMinutes = {};
+    bool workDriven = false;
+    std::vector<TaskBreak> breaks = {};
     bool operator==(const Task&) const = default;
 };
 struct WbsNode {
@@ -60,6 +71,7 @@ struct Resource {
         bool operator==(const Rate&) const = default;
     };
     std::vector<Rate> rates = {};
+    std::string calendarId = {};
     bool operator==(const Resource&) const = default;
 };
 struct Assignment {
@@ -108,6 +120,7 @@ struct ProgressEntry {
     std::optional<std::string> actualStart, actualFinish;
     std::int64_t actualDurationMinutes = 0;
     std::int64_t remainingMinutes = 0;
+    std::optional<std::int64_t> remainingWorkUnitMinutes = {};
     bool operator==(const ProgressEntry&) const = default;
 };
 struct LevelingScenario {
@@ -153,6 +166,10 @@ std::vector<Dependency> dependencies(const Task&);
 std::vector<std::string> dependencyLabels(const Task&);
 std::string taskCalendarName(const PlanInput&, const Task&);
 bool isPdm(const PlanInput&);
+bool hasConstraints(const PlanInput&);
+bool isEffort(const PlanInput&);
+bool usesWork(const Task&);
+std::string taskTypeName(const std::string&);
 std::string engineFor(const PlanInput&);
 std::string levelingPolicyFor(const PlanInput&);
 std::string constraintName(const std::string& type);

@@ -88,7 +88,7 @@ ResourceComparisonDialog::ResourceComparisonDialog(Document& doc, QWidget* paren
     after_ = table(this, "loadAfter", columns); tabs->addTab(after_, "A 평준화 후");
     other_ = table(this, "loadOther", columns); tabs->addTab(other_, "B 평준화 후");
     diagnostics_ = new QPlainTextEdit(this); diagnostics_->setObjectName("levelingDiagnostics"); diagnostics_->setReadOnly(true); diagnostics_->setMaximumHeight(110); layout->addWidget(diagnostics_);
-    auto* note = new QLabel("전체 작업 범위 · 정률/기간 고정 · 작업 분할 없음 · 여유 초과 지연 허용 · 원본보다 앞당기지 않음 · 같은 우선순위는 행 순서\n상태일 설정 시 잔여 수요만 비교하고 실제 날짜는 고정합니다. 공수는 인시/장비시이며 서로 합산하지 않습니다. 부하 표는 수요가 있는 날짜만 표시합니다. 평준화 결과의 CPM 여유·임계는 재산정하지 않습니다.", this); note->setWordWrap(true); layout->addWidget(note);
+    auto* note = new QLabel("전체 작업 범위 · 작업 유형/공수와 수동 분할·작업/자원 달력 준수 · 자원에 따른 자동 추가 분할 없음 · 원본보다 앞당기지 않음 · 같은 우선순위는 행 순서\n상태일 설정 시 잔여 수요만 비교하고 실제 날짜는 고정합니다. 부하 공수는 자원별 인시/장비시입니다. 부하 표는 수요가 있는 날짜만 표시합니다. 평준화 결과의 CPM 여유·임계는 재산정하지 않습니다.", this); note->setWordWrap(true); layout->addWidget(note);
     auto* saveRow = new QHBoxLayout; layout->addLayout(saveRow);
     name_ = new QLineEdit(this); name_->setObjectName("scenarioName"); name_->setPlaceholderText("보존할 시나리오 이름");
     save_ = new QPushButton("A 입력·정책을 새 시나리오로 보존", this); save_->setObjectName("saveScenario"); save_->setEnabled(false);

@@ -1,5 +1,6 @@
 #include "calculation/Scheduler.h"
 #include "domain/Wbs.h"
+#include "calculation/WorkCalendar.h"
 #include <unordered_map>
 namespace jobs {
 WbsSummary summarizeWbs(const Project& p, const ScheduleResult* result, const std::string& id) {
@@ -9,9 +10,16 @@ WbsSummary summarizeWbs(const Project& p, const ScheduleResult* result, const st
     std::unordered_map<std::string, const TaskSchedule*> dates;
     if (valid) for (const auto& row : result->tasks) dates.emplace(row.taskId, &row);
     bool complete = valid;
+    ScheduleResult plan;
+    const auto* durationResult=result;
+    if(isEffort(p)&&valid&&result->isForecast){plan=calculatePlan(p);durationResult=&plan;}
+    std::unordered_map<std::string,const TaskSchedule*> durationDates;
+    if(durationResult&&durationResult->status==CalculationStatus::Valid&&(durationResult==&plan||valid))for(const auto& r:durationResult->tasks)durationDates[r.taskId]=&r;
     for (auto index : wbsTaskRows(p, id)) {
         const auto& task = p.tasks[index]; ++summary.taskCount;
-        if (task.durationMinutes) summary.knownDurationMinutes += *task.durationMinutes; else ++summary.missingDurations;
+        if(isEffort(p)&&usesWork(task)) {
+            if(durationDates.contains(task.id)){const auto& r=*durationDates.at(task.id);WorkCalendar cal(p,task);summary.knownDurationMinutes+=cal.offset(r.finish)-cal.offset(r.start);}else ++summary.missingDurations;
+        } else if (task.durationMinutes) summary.knownDurationMinutes += *task.durationMinutes; else ++summary.missingDurations;
         auto it = dates.find(task.id);
         if (it == dates.end()) { complete = false; continue; }
         const auto& row = *it->second;

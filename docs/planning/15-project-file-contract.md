@@ -56,3 +56,5 @@ FILE-06은 별도 사용자 로컬 완료/해시 체크포인트, 정상 3세대
 PDM·작업 달력 후속 구현은 schema 7이며 schema 1~6을 기존 계산 정책으로 읽고 원본 보존 SaveAs를 요구한다. 구 승인 기준선 입력/결과와 새 달력 스냅샷을 함께 검증한다. 복구 envelope schema 1의 projectSchema 6/7을 지원한다. [PDM·달력 계약](../pdm-calendars.md)에 확장 필드와 계산 좌표/호환 범위를 기록한다.
 
 제약/마감 증분은 schema 8로 작업 날짜 제약·마감을 저장한다. schema 1~7 원본·당시 계산 정책을 보존하며, 복구 envelope schema 1의 내부 projectSchema 6/7/8을 지원한다. [제약·간트 파일/편집 계약](../constraints-gantt.md)을 따른다.
+
+공수/작업 유형·자원 달력·분할 증분은 schema 9다. 새 계획 정책의 입력과 기준선·시나리오, 명시 잔여 공수를 보존한다. schema 1~8은 기존 엔진/원본을 보존해 SaveAs로 이관하며 복구 projectSchema 6/7/8/9를 지원한다. [공수·분할 파일/계산 계약](../effort-calendars-splits.md)을 따른다.

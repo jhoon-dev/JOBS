@@ -13,7 +13,7 @@ from pypdf import PdfReader
 
 
 def verify(root: Path):
-    for name in ("reports-smoke.xlsx", "reports-resources.xlsx", "reports-pdm.xlsx", "reports-constraints.xlsx"):
+    for name in ("reports-smoke.xlsx", "reports-resources.xlsx", "reports-pdm.xlsx", "reports-constraints.xlsx", "reports-effort.xlsx"):
         with zipfile.ZipFile(root / name) as archive:
             assert archive.testzip() is None, "ZIP checksum failure"
             assert not any("externalLink" in p or "vbaProject" in p for p in archive.namelist())
@@ -36,6 +36,21 @@ def verify(root: Path):
             metadata = dict(book["출처와 설정"].iter_rows(min_row=7, values_only=True))
             assert metadata["보고서 ID"] == "report-contract-fixture"
             assert metadata["원본 상태"] == "미저장 메모리 revision"
+        elif name == "reports-effort.xlsx":
+            assert len(book.sheetnames) == 19
+            work = book["공수와 작업 유형"]
+            assert work["C7"].value == "고정 공수" and work["D7"].value == "공수"
+            assert work["E7"].value == work["F7"].value == 8
+            assert work["E7"].data_type == work["F7"].data_type == "n"
+            assert work["G7"].value == 13
+            assert book["계획 일정"]["F7"].value == "2026-10-28 15:00"
+            assert book["계획 일정"]["D7"].value == 780
+            assert book["분할 작업 중단"]["C7"].value == "2026-10-26 13:00"
+            assert book["자원별 근무 달력"]["D7"].value == "Designer Tuesday off"
+            spans = list(book["실행 배정 구간"].iter_rows(min_row=7, values_only=True))
+            assert len(spans) == 3 and sum(row[5] for row in spans) == 8
+            assert not any("2026-10-27" in str(row[2]) for row in spans)
+            assert book["작업별 원가"]["C7"].value == 48000
         elif name == "reports-constraints.xlsx":
             assert len(book.sheetnames) == 15
             timing = book["작업 제약과 마감"]
@@ -53,7 +68,7 @@ def verify(root: Path):
             assert "작업별 원가" not in book.sheetnames and "자원 등록과 가용량" in book.sheetnames
         print(f"PASS: {name}: {len(book.sheetnames)} sheets, ZIP/OOXML/types/unknown/provenance")
 
-    for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf", "reports-pdm.pdf", "reports-constraints.pdf"):
+    for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf", "reports-pdm.pdf", "reports-constraints.pdf", "reports-effort.pdf"):
         reader = PdfReader(root / name, strict=True)
         compact = re.sub(r"\s+", "", "\n".join(p.extract_text() or "" for p in reader.pages))
         assert reader.pages and all("JOBS" in (p.extract_text() or "") for p in reader.pages)
@@ -63,6 +78,10 @@ def verify(root: Path):
             assert "END_SENTINEL_739" in compact and len(reader.pages) >= 3
             assert abs(float(reader.pages[0].mediabox.width) - 595) < 3
             assert abs(float(reader.pages[0].mediabox.height) - 842) < 3
+        elif name == "reports-effort.pdf":
+            assert "effort-report-contract" in compact and "고정공수" in compact
+            assert "DesignerTuesdayoff" in compact and "2026-10-2815:00" in compact
+            assert "실행배정구간" in compact and "48000" in compact
         elif name == "reports-constraints.pdf":
             assert "constraints-report-contract" in compact and "SNET" in compact
             assert "-9.00" in compact and "마감초과" in compact

@@ -2,6 +2,7 @@
 #include "calculation/WorkCalendar.h"
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
+#include "calculation/Effort.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -28,8 +29,11 @@ ScheduleResult calculatePlan(const Project& p) {
     bool missing = false, invalid = false;
     for (std::size_t i = 0; i < n; ++i) {
         const auto& task = p.tasks[i];
-        if (!task.durationMinutes) {
+        if (!task.durationMinutes && !(isEffort(p)&&usesWork(task))) {
             missing = true; result.diagnostics.push_back({"MISSING_DURATION", "작업 기간이 미정입니다: " + task.name, {task.id}});
+        }
+        if(isEffort(p)&&usesWork(task)&&task.workUnitMinutes.value_or(0)>0&&std::none_of(p.assignments.begin(),p.assignments.end(),[&](const auto& a){return a.taskId==task.id;})) {
+            missing=true;result.diagnostics.push_back({"MISSING_WORK_ASSIGNMENT","공수 작업에 자원을 배정하세요: "+task.name,{task.id}});
         }
         for (const auto& id : task.predecessors) {
             const auto found = ids.find(id);
@@ -65,6 +69,7 @@ ScheduleResult calculatePlan(const Project& p) {
     if (invalid || missing) {
         result.status = invalid ? CalculationStatus::Conflict : CalculationStatus::Incomplete; return result;
     }
+    if(isEffort(p))return calculateEffort(p);
     if (p.calculationProfile == constraintProfile) return calculateConstrainedPlan(p,order);
     if (isPdm(p)) return calculatePdmPlan(p, order);
     std::vector<TaskSchedule> rows(n);

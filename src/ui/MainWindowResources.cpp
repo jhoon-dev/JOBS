@@ -24,13 +24,14 @@ void MainWindow::manageResources() {
     if (!document_.project()) return;
     QDialog dialog(this); dialog.setObjectName("resourceDialog"); dialog.setWindowTitle("자원 등록 · 날짜별 가용량"); dialog.resize(820, 740);
     auto* layout = new QVBoxLayout(&dialog);
-    auto* note = new QLabel("인력·장비 · 100% = 1명/1대 · 프로젝트 근무달력 사용\n기간 고정 정률 배정: 공수 = 작업 근무기간 × 배정률. 단가·비용은 원가 메뉴에서 설정합니다. 자재·생산성 환산은 포함하지 않습니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
+    auto* note = new QLabel("인력·장비 · 100% = 1명/1대 · 자원 달력과 작업 달력의 교집합에서 작업합니다.\n공수·작업 유형은 프로젝트 메뉴에서, 단가·비용은 원가 메뉴에서 설정합니다. 자원 1단위의 생산성 배수는 1입니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
     auto* table = new QTableWidget(0, 4, &dialog); table->setObjectName("resourceList"); table->setHorizontalHeaderLabels({"자원", "종류", "기본 가용량", "날짜 예외"});
     table->setEditTriggers(QAbstractItemView::NoEditTriggers); table->setSelectionBehavior(QAbstractItemView::SelectRows); table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); layout->addWidget(table);
     auto* form = new QFormLayout; layout->addLayout(form);
     auto* name = new QLineEdit(&dialog); name->setObjectName("resourceName"); form->addRow("이름", name);
     auto* type = new QComboBox(&dialog); type->setObjectName("resourceType"); type->addItem("인력", "labor"); type->addItem("장비", "equipment"); form->addRow("종류", type);
+    auto* calendar=new QComboBox(&dialog);calendar->setObjectName("resourceCalendar");calendar->addItem("프로젝트 기본 달력",QString{});for(const auto& c:document_.project()->calendars)calendar->addItem(qs(c.name),qs(c.id));form->addRow("자원 달력",calendar);calendar->setEnabled(!document_.readOnly());
     auto* units = new QSpinBox(&dialog); units->setObjectName("resourceCapacity"); units->setRange(0, 100000); units->setSuffix("%"); units->setValue(100); form->addRow("기본 가용량", units);
     auto* unknown = new QCheckBox("미정 (0%와 다름)", &dialog); unknown->setObjectName("capacityUnknown"); form->addRow(unknown);
     connect(unknown, &QCheckBox::toggled, units, &QWidget::setDisabled);
@@ -58,15 +59,17 @@ void MainWindow::manageResources() {
         selected = str(table->item(table->currentRow(), 0)->data(Qt::UserRole).toString());
         for (const auto& r : document_.project()->resources) if (r.id == selected) {
             name->setText(qs(r.name)); type->setCurrentIndex(type->findData(qs(r.type))); unknown->setChecked(!r.maxUnits); units->setValue(r.maxUnits.value_or(100)); units->setEnabled(editable && r.maxUnits.has_value());
+            calendar->setCurrentIndex(std::max(0,calendar->findData(qs(r.calendarId))));
             QStringList lines; for (const auto& d : r.exceptions) lines << qs(d.date) + "=" + (d.units ? QString::number(*d.units) : "?"); dates->setPlainText(lines.join('\n')); error->clear();
         }
     });
-    connect(fresh, &QPushButton::clicked, &dialog, [&] { selected.clear(); table->clearSelection(); name->clear(); type->setCurrentIndex(0); unknown->setChecked(false); units->setValue(100); dates->clear(); error->clear(); name->setFocus(); });
+    connect(fresh, &QPushButton::clicked, &dialog, [&] { selected.clear(); table->clearSelection(); name->clear(); type->setCurrentIndex(0);calendar->setCurrentIndex(0); unknown->setChecked(false); units->setValue(100); dates->clear(); error->clear(); name->setFocus(); });
     connect(put, &QPushButton::clicked, &dialog, [&] {
         try {
             Resource r;
             for (const auto& old : document_.project()->resources) if (old.id == selected) r = old;
             r.exceptions.clear(); r.id = selected; r.name = str(name->text().trimmed()); r.type = str(type->currentData().toString()); r.maxUnits = unknown->isChecked() ? std::optional<int>{} : units->value();
+            r.calendarId=calendar->currentData().toString().toStdString();
             for (auto line : dates->toPlainText().split('\n', Qt::SkipEmptyParts)) {
                 auto parts = line.trimmed().split('=');
                 if (parts.size() != 2) throw std::runtime_error("날짜 예외는 YYYY-MM-DD=정수 또는 ? 형식입니다.");
@@ -91,7 +94,7 @@ void MainWindow::assignResources() {
     if (!task) return;
     QDialog dialog(this); dialog.setObjectName("assignmentDialog"); dialog.setWindowTitle("자원 배정 · " + qs(task->name)); dialog.resize(720, 510);
     auto* layout = new QVBoxLayout(&dialog);
-    auto* note = new QLabel("기간 고정 · 배정률 0% = 배정 해제 · 100% = 1명/1대\n배정률 변경은 기간을 변경하지 않습니다. 날짜별 가용량은 자원 등록에서 설정합니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
+    auto* note = new QLabel("배정률 0% = 배정 해제 · 100% = 1명/1대\n고정 기간은 기간을 유지합니다. 고정 공수/단위의 배정률 변경은 공수를 유지해 완료일을 다시 계산합니다. 자원 달력과 날짜별 가용량은 자원 등록에서 설정합니다.", &dialog); note->setWordWrap(true); layout->addWidget(note);
     auto* table = new QTableWidget(int(snapshot.resources.size()), 3, &dialog); table->setObjectName("assignmentTable"); table->setHorizontalHeaderLabels({"자원", "기본 가용량", "배정률"}); table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); table->setEditTriggers(QAbstractItemView::NoEditTriggers); layout->addWidget(table);
     std::vector<QSpinBox*> spins;
     for (int i = 0; i < table->rowCount(); ++i) {

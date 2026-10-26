@@ -3,6 +3,7 @@
 #include "ui/ReportDialog.h"
 #include "ui/AutoSaveController.h"
 #include "domain/Wbs.h"
+#include "calculation/WorkCalendar.h"
 #include <QAction>
 #include <QApplication>
 #include <QPointer>
@@ -93,12 +94,14 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     tools->addAction(calculate_); connect(calculate_, &QAction::triggered, this, &MainWindow::calculateSchedule);
     calendar_ = projectMenu->addAction("휴일 편집(&H)…"); tools->addAction(calendar_);
     connect(calendar_, &QAction::triggered, this, &MainWindow::editHolidays);
-    calendars_=projectMenu->addAction("작업 달력 등록·편집…"); calendars_->setObjectName("manageCalendars");
+    calendars_=projectMenu->addAction("작업·자원 달력 등록·편집…"); calendars_->setObjectName("manageCalendars");
     connect(calendars_,&QAction::triggered,this,[this]{commitPendingCell();manageCalendars();});
     taskCalendar_=projectMenu->addAction("선택 작업 달력 배정…"); taskCalendar_->setObjectName("assignTaskCalendar"); tools->addAction(taskCalendar_);
     connect(taskCalendar_,&QAction::triggered,this,[this]{commitPendingCell();chooseTaskCalendar();});
     constraints_=projectMenu->addAction("선택 작업 제약·마감일…");constraints_->setObjectName("taskConstraints");
     connect(constraints_,&QAction::triggered,this,[this]{commitPendingCell();editTaskConstraints();});
+    effort_=projectMenu->addAction("선택 작업 공수·유형·분할…");effort_->setObjectName("taskEffort");tools->addAction(effort_);
+    connect(effort_,&QAction::triggered,this,[this]{commitPendingCell();editTaskEffort();});
     scheduleIssues_=projectMenu->addAction("일정 충돌 진단…");scheduleIssues_->setObjectName("scheduleIssues");
     connect(scheduleIssues_,&QAction::triggered,this,[this]{commitPendingCell();showScheduleIssues();});
     auto* wbsMenu = menuBar()->addMenu("WBS(&W)");
@@ -165,11 +168,11 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     auto* split = new QSplitter(Qt::Horizontal, central); layout->addWidget(split, 1);
     wbsTree_ = new QTreeWidget(split); wbsTree_->setObjectName("wbsTree"); wbsTree_->setAccessibleName("WBS 탐색");
     wbsTree_->setHeaderLabel("WBS · 프로젝트 구조"); wbsTree_->setMinimumWidth(170);
-    table_ = new TaskTable(0, 12, split);
-    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "선행(행·종류±지연)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID", "작업 달력", "제약", "마감일"});
+    table_ = new TaskTable(0, 14, split);
+    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "선행(행·종류±지연)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID", "작업 달력", "제약", "마감일", "작업 유형 · 입력 공수(h)", "분할 중단"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    for (int column = 1; column < 12; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
+    for (int column = 1; column < 14; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
     table_->setColumnHidden(8, true); // Stable ID remains on the task tooltip; relations persist IDs, never row numbers.
     table_->setSelectionBehavior(QAbstractItemView::SelectRows); table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel); table_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -192,6 +195,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
         assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         taskCalendar_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         constraints_->setEnabled(!selectedTask_.empty());
+        effort_->setEnabled(!selectedTask_.empty());
         taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
         costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
         gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
@@ -268,6 +272,7 @@ void MainWindow::refresh(bool rebuildTree) {
     calendar_->setEnabled(p.has_value() && !document_.readOnly());
     calendars_->setEnabled(p.has_value()); taskCalendar_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     constraints_->setEnabled(p.has_value()&&!selectedTask_.empty());scheduleIssues_->setEnabled(p.has_value());
+    effort_->setEnabled(p.has_value()&&!selectedTask_.empty());
     addWbs_->setEnabled(p.has_value() && !document_.readOnly());
     const bool nodeEditable = p.has_value() && !document_.readOnly() && !selectedWbs_.empty();
     renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
@@ -304,12 +309,14 @@ void MainWindow::refresh(bool rebuildTree) {
         QStringList predecessors;
         for (const auto& d : dependencies(t)) predecessors << (numbers.contains(d.predecessorId) ? QString::number(numbers.at(d.predecessorId)) : "누락:" + qs(d.predecessorId)) + (d.type=="FS" && !d.lagMinutes?QString{}:qs(d.type)+(d.lagMinutes>=0?"+":"")+QString::number(d.lagMinutes)+"m");
         auto found = schedules.find(t.id); const auto* s = found == schedules.end() ? nullptr : found->second;
-        const auto duration = !t.durationMinutes ? QString{} : *t.durationMinutes % 3 == 0 ?
+        auto duration = !t.durationMinutes ? QString{} : *t.durationMinutes % 3 == 0 ?
             QString::number(double(*t.durationMinutes) / 60, 'g', 12) : QString::number(*t.durationMinutes) + "m";
+        if(usesWork(t)&&s&&!calculation->isForecast){WorkCalendar cal(*p,t);duration=QString::number(cal.offset(s->finish)-cal.offset(s->start))+"m";}
         QStringList values{qs(t.name), duration,
             predecessors.join(","), s ? qs(s->start) : "미계산", s ? qs(s->finish) : "미계산",
             s && !calculation->isForecast ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—",
             s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id), qs(taskCalendarName(*p,t)),qs(t.constraintType)+(t.constraintAt?" "+qs(*t.constraintAt):QString{}),t.deadlineAt?qs(*t.deadlineAt):"없음"};
+        values<<qs(taskTypeName(t.taskType))+(t.workUnitMinutes?" · "+QString::number(double(*t.workUnitMinutes)/6000.0,'f',4):" · 기간 기준")<<QString::number(t.breaks.size());
         QStringList assigned;
         for (const auto& a : p->assignments) if (a.taskId == t.id) for (const auto& r : p->resources) if (r.id == a.resourceId)
             assigned << qs(r.name) + " " + QString::number(a.units) + "%";

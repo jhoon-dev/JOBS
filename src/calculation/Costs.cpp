@@ -1,5 +1,6 @@
 #include "calculation/Costs.h"
 #include "calculation/WorkCalendar.h"
+#include "calculation/Effort.h"
 #include "calculation/Tracking.h"
 #include "domain/Wbs.h"
 #include <algorithm>
@@ -80,7 +81,7 @@ struct Budget {
                 resource = it->before;
                 for (const auto& s : it->spans) {
                     auto n = std::clamp(offset - s.start, Minute{0}, s.finish - s.start);
-                    if (n > 0) resource = add(resource, s.rate ? subtract(fraction(*s.rate, (s.dayWorkBefore+n)*s.units, 6000),fraction(*s.rate,s.dayWorkBefore*s.units,6000)) : Money{});
+                    if (n > 0) resource = add(resource, s.rate ? subtract(fraction(*s.rate, s.dayWorkBefore+n*s.units, 6000),fraction(*s.rate,s.dayWorkBefore,6000)) : Money{});
                 }
             }
         }
@@ -100,24 +101,29 @@ Budget budget(const PlanInput& p, const Task& task, const TaskSchedule* row, con
     if (!b.fixed) b.issues.push_back("고정비 미정: 비용 없음은 0으로 입력하세요.");
     if (!row) { b.issues.push_back("유효한 논리 일정이 없어 비용 발생일을 산정할 수 없습니다."); return b; }
     b.valid = true; b.start = row->earlyStartMinutes; b.finish = row->earlyFinishMinutes; b.startStamp = row->start; b.finishStamp = row->finish;
-    if (isPdm(p)) { auto& shared=cache[task.calendarId]; if (!shared) shared=std::make_shared<WorkCalendar>(p,task); b.work=shared; }
+    if (isPdm(p)) { auto& shared=cache[isEffort(p)?task.id:task.calendarId]; if (!shared) shared=std::make_shared<WorkCalendar>(p,task); b.work=shared; }
     std::vector<std::pair<Minute,Minute>> workSpans;
     if (b.work) { for (const auto& [begin,end]:b.work->segments(row->start,row->finish)) workSpans.emplace_back(calendar.offset(begin),calendar.offset(end)); }
     else workSpans.emplace_back(b.start,b.finish);
     std::map<Minute, Bucket> days;
+    const auto effortSpans=isEffort(p)?executionSpans(p,task,*row):std::vector<WorkSpan>{};
     for (const auto& a : p.assignments) if (a.taskId == task.id) {
         const auto r = std::find_if(p.resources.begin(), p.resources.end(), [&](const auto& x) { return x.id == a.resourceId; });
         bool warned = false;
         std::map<Minute,Minute> workInDay;
-        for (const auto& [begin,finish]:workSpans) for (auto at = begin; at < finish;) {
+        std::vector<WorkSpan> assigned;
+        if(isEffort(p)){for(const auto& s:effortSpans)if(s.resourceId==a.resourceId)assigned.push_back(s);}
+        else for(const auto& [begin,finish]:workSpans)assigned.push_back({a.resourceId,begin,finish,a.units});
+        for (const auto& s:assigned) for (auto at = s.start; at < s.finish;) {
+            const auto finish=s.finish;
             const auto end = std::min(finish, (at / calendar.dayMinutes() + 1) * calendar.dayMinutes()); auto date = calendar.boundary(at, false).substr(0, 10);
             const Resource::Rate* rate = nullptr;
             for (const auto& v : r->rates) if (v.effectiveDate <= date && (!rate || v.effectiveDate > rate->effectiveDate)) rate = &v;
             Money amount = rate ? rate->hourlyMinor : Money{};
             if (!amount && !warned) { b.issues.push_back("단가 미정: " + r->name + " [" + r->id + "] " + date); warned = true; }
             auto& d = days[at / calendar.dayMinutes()]; d.day = at / calendar.dayMinutes(); auto& before=workInDay[d.day];
-            d.spans.push_back({at, end, a.units, amount,before});
-            d.total = add(d.total, amount ? subtract(fraction(*amount,(before+end-at)*a.units,6000),fraction(*amount,before*a.units,6000)) : Money{}); before+=end-at; at = end;
+            d.spans.push_back({at, end, s.units, amount,before});
+            d.total = add(d.total, amount ? subtract(fraction(*amount,before+(end-at)*s.units,6000),fraction(*amount,before,6000)) : Money{}); before+=(end-at)*s.units; at = end;
         }
     }
     Money prefix = 0;

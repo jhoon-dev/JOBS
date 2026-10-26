@@ -1,5 +1,6 @@
 #include "ui/GanttView.h"
 #include "calculation/WorkCalendar.h"
+#include "calculation/Effort.h"
 #include <QApplication>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -43,7 +44,10 @@ void GanttView::updateDrag(const QPoint& point) {
         WorkCalendar cal(*input_,*it);const auto raw=shifted(d.resize?d.finish:d.start,delta);if(!validStamp(raw.toStdString()))throw std::runtime_error("지원 날짜 범위 밖입니다.");
         QString start,finish,description;
         if(d.resize){const auto duration=cal.offset(raw.toStdString())-cal.offset(d.start.toStdString());if(duration<=0||duration>5000000)throw std::runtime_error("기간은 시작 뒤의 양수 근무분이어야 합니다.");start=d.start;finish=QString::fromStdString(cal.boundary(cal.offset(d.start.toStdString())+duration,true));d.target=finish;description="기간 "+QString::number(duration)+" 근무분 · 기존 제약 유지";}
-        else{const auto local=*it->durationMinutes?cal.startAtLeast(raw.toStdString()):cal.finishAtLeast(raw.toStdString());start=QString::fromStdString(cal.boundary(local,*it->durationMinutes==0));finish=*it->durationMinutes?QString::fromStdString(cal.boundary(local+*it->durationMinutes,true)):start;d.target=start;description="날짜 이동 · "+QString::fromStdString(it->constraintType=="ASAP"||it->constraintType=="ALAP"?"SNET 시작 이후":it->constraintType)+" 제약 날짜 변경";}
+        else{const bool zero=usesWork(*it)?it->workUnitMinutes.value_or(0)==0:it->durationMinutes.value_or(0)==0;const auto local=zero?cal.finishAtLeast(raw.toStdString()):cal.startAtLeast(raw.toStdString());
+            if(isEffort(*input_)){const auto trial=TaskExecution(*input_,*it).dates(local);start=QString::fromStdString(trial.start);finish=QString::fromStdString(trial.finish);}
+            else{start=QString::fromStdString(cal.boundary(local,zero));finish=!zero?QString::fromStdString(cal.boundary(local+*it->durationMinutes,true)):start;}
+            d.target=start;description="날짜 이동 · "+QString::fromStdString(it->constraintType=="ASAP"||it->constraintType=="ALAP"?"SNET 시작 이후":it->constraintType)+" 제약 날짜 변경";}
         const auto row=std::find_if(rows_.begin(),rows_.end(),[&](const auto& r){return r.id==d.taskId;});const auto y=HeaderHeight+int(row-rows_.begin())*RowHeight+RowHeight/2;
         if(!ghost_){ghost_=scene()->addRect({},QPen(QColor("#177fb8"),2,Qt::DashLine),QBrush(QColor(35,150,220,65)));ghost_->setZValue(10);ghostLabel_=scene()->addSimpleText({});ghostLabel_->setZValue(11);ghostLabel_->setBrush(palette().color(QPalette::Text));}
         ghost_->setRect(QRectF(position(start),y-9,std::max(qreal(4),position(finish)-position(start)),18));ghostLabel_->setText(start+" → "+finish+" · "+description);ghostLabel_->setPos(position(start),y-30);

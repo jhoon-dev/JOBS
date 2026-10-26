@@ -39,6 +39,8 @@ private:
     void manageCalendars();
     void chooseTaskCalendar();
     QAction *constraints_, *scheduleIssues_;
+    QAction* effort_;
+    void editTaskEffort();
     void editTaskConstraints();
     void showScheduleIssues();
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;

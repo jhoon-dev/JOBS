@@ -18,6 +18,7 @@
 #include <QTableWidget>
 #include <QTimeZone>
 #include <QtConcurrent/QtConcurrentRun>
+#include <cmath>
 namespace jobs {
 namespace {
 QString qs(const std::string& s) { return QString::fromUtf8(s.data(), qsizetype(s.size())); }
@@ -112,18 +113,21 @@ void MainWindow::reportProgress() {
     auto* actual = new QSpinBox(&dialog); actual->setRange(0, 5000000); actual->setSuffix(" 분"); actual->setObjectName("actualMinutes");
     auto* remaining = new QSpinBox(&dialog); remaining->setRange(0, 5000000); remaining->setSuffix(" 분"); remaining->setObjectName("remainingMinutes");
     actual->setValue(previous ? int(previous->actualDurationMinutes) : 0); remaining->setValue(int(previous ? previous->remainingMinutes : task->durationMinutes.value_or(0)));
+    if(usesWork(*task)){remaining->setValue(0);remaining->setEnabled(false);remaining->setToolTip("공수 기준 작업은 명시 잔여 공수로 예측합니다. 잔여 기간을 공수로 역산하지 않습니다.");}
     auto* reporter = new QLineEdit(previous ? qs(previous->reporter) : "", &dialog); reporter->setObjectName("progressReporter");
     auto* reason = new QLineEdit(&dialog); reason->setObjectName("progressReason");
     layout->addRow("실제 시작", start); layout->addRow("실제 완료", finish); layout->addRow("실제 소요 근무분", actual); layout->addRow("잔여 근무분", remaining);
+    auto* remainingWork=new QLineEdit(previous&&previous->remainingWorkUnitMinutes?QString::number(double(*previous->remainingWorkUnitMinutes)/6000.0,'f',4):QString{},&dialog);remainingWork->setObjectName("remainingWorkHours");remainingWork->setPlaceholderText("공수 기준 작업은 필수 · 완료는 0 · 실제 공수와 구분");
+    if(isEffort(p))layout->addRow("명시적 잔여 공수(h)",remainingWork);else remainingWork->hide();
     layout->addRow("보고자", reporter); layout->addRow("보고/정정 사유", reason);
-    layout->addRow(new QLabel("8시간=480분. 완료는 실제 시작·완료와 잔여 0을 함께 입력합니다.\n기간 진척은 실제 소요/(실제 소요+잔여)입니다. 기존 보고는 이력으로 보존됩니다.", &dialog));
-    auto* history = new QTableWidget(0, 8, &dialog); history->setObjectName("progressHistory"); history->setMaximumHeight(180);
-    history->setHorizontalHeaderLabels({"상태일", "실제 시작", "실제 완료", "실제(분)", "잔여(분)", "보고자", "사유", "기록(UTC)"});
+    auto* progressNote=new QLabel(usesWork(*task)?"공수 기준: 잔여 기간은 사용하지 않습니다. 명시 잔여 공수로 예측하며 기간 진척률은 미산정입니다.\n완료는 실제 시작·완료와 잔여 공수 0을 함께 보고합니다. 기존 보고는 이력으로 보존됩니다.":"8시간=480분. 완료는 실제 시작·완료와 잔여 0을 함께 입력합니다.\n기간 진척은 실제 소요/(실제 소요+잔여)입니다. 기존 보고는 이력으로 보존됩니다.",&dialog);progressNote->setWordWrap(true);layout->addRow(progressNote);
+    auto* history = new QTableWidget(0, 9, &dialog); history->setObjectName("progressHistory"); history->setMaximumHeight(180);
+    history->setHorizontalHeaderLabels({"상태일", "실제 시작", "실제 완료", "실제(분)", "잔여(분)", "보고자", "사유", "기록(UTC)","명시 잔여 공수(h)"});
     history->setEditTriggers(QAbstractItemView::NoEditTriggers); history->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     for (const auto& e : p.progress) if (e.taskId == taskId) {
         const auto row = history->rowCount(); history->insertRow(row);
         QStringList values{qs(e.statusAt), e.actualStart ? qs(*e.actualStart) : "—", e.actualFinish ? qs(*e.actualFinish) : "—",
-            QString::number(e.actualDurationMinutes), QString::number(e.remainingMinutes), qs(e.reporter), qs(e.reason), qs(e.recordedAt)};
+            QString::number(e.actualDurationMinutes), QString::number(e.remainingMinutes), qs(e.reporter), qs(e.reason), qs(e.recordedAt),e.remainingWorkUnitMinutes?QString::number(double(*e.remainingWorkUnitMinutes)/6000.0,'f',4):"미보고"};
         for (int col = 0; col < values.size(); ++col) { auto* item = new QTableWidgetItem(values[col]); item->setToolTip("ID: " + qs(e.id) + "\n이전 보고: " + qs(e.previousEntryId) + "\n원본 문서: " + qs(e.sourceDocumentId)); history->setItem(row, col, item); }
     }
     layout->addRow("보고 이력", history);
@@ -134,7 +138,12 @@ void MainWindow::reportProgress() {
         ProgressEntry e; e.taskId = taskId; e.actualStart = optional(start->text()); e.actualFinish = optional(finish->text());
         e.actualDurationMinutes = actual->value(); e.remainingMinutes = remaining->value(); e.reporter = str(reporter->text().trimmed());
         e.reason = str(reason->text().trimmed()); e.recordedAt = utcNow();
-        try { document_.recordProgress(std::move(e)); dialog.accept(); } catch (const std::exception& ex) { error->setText(QString::fromUtf8(ex.what())); }
+        try {
+            if(!remainingWork->text().trimmed().isEmpty()){bool ok=false;const auto n=remainingWork->text().trimmed().toDouble(&ok);if(!ok||!std::isfinite(n)||n<0||n>double(maxWork)/6000.0)throw std::runtime_error("잔여 공수 범위를 확인하세요.");e.remainingWorkUnitMinutes=std::llround(n*6000.0);}
+            if(usesWork(*task)&&!e.actualFinish&&!e.remainingWorkUnitMinutes)throw std::runtime_error("공수 기준 작업에는 잔여 공수(h)를 명시적으로 입력하세요.");
+            if(usesWork(*task)&&e.actualFinish)e.remainingWorkUnitMinutes=0;
+            document_.recordProgress(std::move(e)); dialog.accept();
+        } catch (const std::exception& ex) { error->setText(QString::fromUtf8(ex.what())); }
     });
     if (dialog.exec() == QDialog::Accepted) refresh();
 }

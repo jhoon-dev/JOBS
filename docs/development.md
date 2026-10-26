@@ -158,3 +158,5 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 후속 PDM/작업 달력 증분은 `.jobs` schema 7을 사용하며 schema 1~6 원본과 기존 기준선을 보존한다. 복구 envelope schema 1의 내부 projectSchema 6/7을 지원한다. `native-pdm-taskcal-v1`은 civil 분 좌표와 작업별 근무분을 구분하며 `jobs-pdm-1.0`으로 계산한다. 자원/원가는 같은 근무 구간을 사용한다. 기존 `native-fs0-workminutes-v1` / `jobs-cpm-0.2` 결과는 유지한다. [PDM·작업 달력 계약](pdm-calendars.md), `pdm_calendar_contract`/`pdm_calendar_ui`와 독립 reader를 추가해 CTest 19개로 확장했다.
 
 제약·마감·간트 증분은 schema 8 / native-pdm-constraints-v1 / jobs-pdm-1.1을 사용하며 구 입력/기준선 정책을 보존한다. Constraints는 하드 충돌과 소프트 마감 경고를 구분하고, GanttEditing은 UI 미리보기 후 Document의 ID/revision guard와 단일 edit를 사용한다. [상세 계약](constraints-gantt.md), constraint_contract/constraint_gantt_ui로 CTest 21개와 독립 XLSX/PDF 검증을 제공한다.
+
+공수·작업 유형·자원 달력·분할 증분은 schema 9 / native-effort-split-v1 / jobs-effort-1.0이다. TaskExecution의 달력 교집합/공수 적분·마지막 분 배분을 일정·부하·자원비·출력이 공유한다. [계산/편집/파일 계약](effort-calendars-splits.md), effort_work_calendar_split/effort_ui를 포함해 CTest 23개로 확장하고 새 공수 보고서의 19개 XLSX 시트와 PDF를 독립 reader로 검증한다. schema 1~8의 원본 보존 SaveAs와 이전 계산 엔진, projectSchema 6~9 복구를 유지한다.

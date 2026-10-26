@@ -1,5 +1,6 @@
 #include "application/Document.h"
 #include "calculation/WorkCalendar.h"
+#include "calculation/Effort.h"
 #include <stdexcept>
 #include <algorithm>
 
@@ -75,7 +76,13 @@ void Document::assignWbs(std::size_t row, std::string id) {
 }
 void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).durationMinutes = minutes; edit(std::move(p), "작업 기간 변경");
+    auto p = *project_; changeDuration(p,row,minutes); edit(std::move(p), "작업 기간 변경");
+}
+void Document::setTaskEffort(std::size_t row,std::string type,bool workInput,std::optional<std::int64_t> duration,std::optional<std::int64_t> work,std::vector<TaskBreak> breaks) {
+    if(!project_||readOnly_)throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p=*project_;p.calculationProfile=effortProfile;auto& t=p.tasks.at(row);t.taskType=std::move(type);t.durationMinutes=duration;t.breaks=std::move(breaks);t.workDriven=false;t.workUnitMinutes.reset();
+    if(t.taskType=="fixed-work"||workInput){if(!work)throw std::runtime_error("공수 입력이 필요합니다.");changeWork(p,row,*work);if(t.taskType=="fixed-work"&&!workInput)changeDuration(p,row,duration);}
+    edit(std::move(p),"작업 유형·공수·분할 변경");
 }
 void Document::setPredecessors(std::size_t row, std::vector<std::string> ids) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -99,6 +106,7 @@ std::string Document::putCalendar(TaskCalendar c) {
 void Document::removeCalendar(const std::string& id) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; for (const auto& t : p.tasks) if (t.calendarId == id) throw std::runtime_error("작업의 달력을 먼저 변경하세요.");
+    for(const auto& r:p.resources)if(r.calendarId==id)throw std::runtime_error("자원의 달력을 먼저 변경하세요.");
     if (!std::erase_if(p.calendars, [&](const auto& c) { return c.id == id; })) throw std::runtime_error("달력이 존재하지 않습니다.");
     edit(std::move(p), "작업 달력 삭제");
 }
@@ -110,29 +118,32 @@ void Document::setTaskCalendar(std::size_t row, std::string id) {
 void Document::setTaskTiming(std::size_t row,std::string type,std::optional<std::string> at,std::optional<std::string> deadline) {
     if(!project_||readOnly_)throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p=*project_;auto& t=p.tasks.at(row);if(t.constraintType==type&&t.constraintAt==at&&t.deadlineAt==deadline)return;
-    t.constraintType=std::move(type);t.constraintAt=std::move(at);t.deadlineAt=std::move(deadline);p.calculationProfile=constraintProfile;edit(std::move(p),"작업 제약·마감일 변경");
+    t.constraintType=std::move(type);t.constraintAt=std::move(at);t.deadlineAt=std::move(deadline);if(!isEffort(p))p.calculationProfile=constraintProfile;edit(std::move(p),"작업 제약·마감일 변경");
 }
 void Document::editGantt(const std::string& id,std::uint64_t revision,const std::string& taskId,bool resize,const std::string& target) {
     if(!project_||readOnly_||project_->documentId!=id||project_->revision!=revision||!calculation_||calculation_->status!=CalculationStatus::Valid||calculation_->inputRevision!=revision||project_->statusAt)throw std::runtime_error("최신 계획 일정에서만 드래그할 수 있습니다. 실제/잔여 예측은 실적·잔여 입력을 사용하세요.");
     if(!validStamp(target))throw std::runtime_error("드래그 시각이 잘못되었습니다.");
     auto p=*project_;auto it=std::find_if(p.tasks.begin(),p.tasks.end(),[&](const auto& t){return t.id==taskId;});
     auto row=std::find_if(calculation_->tasks.begin(),calculation_->tasks.end(),[&](const auto& t){return t.taskId==taskId;});
-    if(it==p.tasks.end()||row==calculation_->tasks.end()||!it->durationMinutes)throw std::runtime_error("편집할 작업이 없습니다.");
+    if(it==p.tasks.end()||row==calculation_->tasks.end()||(!it->durationMinutes&&!usesWork(*it)))throw std::runtime_error("편집할 작업이 없습니다.");
     if(std::any_of(p.progress.begin(),p.progress.end(),[&](const auto& e){return e.taskId==taskId&&e.actualStart.has_value();}))throw std::runtime_error("실제 시작 이력이 있는 작업은 간트 드래그 대신 실적/잔여를 편집하세요.");
     WorkCalendar cal(p,*it);
     if(resize) {
         const auto duration=cal.offset(target)-cal.offset(row->start);
-        if(duration<=0||duration>5000000||!it->durationMinutes.value())throw std::runtime_error("오른쪽 끝은 시작 뒤의 양수 근무 기간이어야 합니다. 마일스톤은 기간 표에서 편집하세요.");
-        if(duration==it->durationMinutes)return;
-        it->durationMinutes=duration;
+        if(duration<=0||duration>5000000||row->start==row->finish)throw std::runtime_error("오른쪽 끝은 시작 뒤의 양수 근무 기간이어야 합니다. 마일스톤은 기간 표에서 편집하세요.");
+        if(duration==cal.offset(row->finish)-cal.offset(row->start))return;
+        changeDuration(p,std::size_t(it-p.tasks.begin()),duration);
     } else {
-        const auto local=*it->durationMinutes?cal.startAtLeast(target):cal.finishAtLeast(target);
-        const auto start=cal.boundary(local,*it->durationMinutes==0);if(start==row->start)return;
-        const auto finish=*it->durationMinutes?cal.boundary(local+*it->durationMinutes,true):start;
+        const bool zero=usesWork(*it)?it->workUnitMinutes.value_or(0)==0:it->durationMinutes.value_or(0)==0;
+        const auto local=zero?cal.finishAtLeast(target):cal.startAtLeast(target);
+        const auto trial=isEffort(p)?TaskExecution(p,*it).dates(local):TaskSchedule{};
+        const auto start=isEffort(p)?trial.start:cal.boundary(local,zero);if(start==row->start)return;
+        const auto finish=isEffort(p)?trial.finish:!zero?cal.boundary(local+*it->durationMinutes,true):start;
         if(it->constraintType=="ASAP"||it->constraintType=="ALAP")it->constraintType="SNET";
         it->constraintAt=it->constraintType=="FNET"||it->constraintType=="FNLT"||it->constraintType=="MFO"?finish:start;
     }
-    p.calculationProfile=constraintProfile;edit(std::move(p),resize?"간트 기간 변경":"간트 날짜 이동");
+    if(!isEffort(p))p.calculationProfile=constraintProfile;
+    edit(std::move(p),resize?"간트 기간 변경":"간트 날짜 이동");
 }
 void Document::setHolidays(std::vector<std::string> dates) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -161,6 +172,7 @@ void Document::recordProgress(ProgressEntry entry) {
     const auto task = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == entry.taskId; });
     if (task == p.tasks.end()) throw std::runtime_error("보고할 작업이 존재하지 않습니다.");
     entry.planDurationMinutes = task->durationMinutes;
+    if(isEffort(p)&&usesWork(*task)){const auto plan=calculatePlan(p);entry.planDurationMinutes.reset();if(plan.status==CalculationStatus::Valid)for(const auto& row:plan.tasks)if(row.taskId==task->id){const auto duration=TaskExecution(p,*task).duration(row);if(duration<=5000000)entry.planDurationMinutes=duration;}}
     entry.previousEntryId.clear();
     for (auto it = p.progress.rbegin(); it != p.progress.rend(); ++it) if (it->taskId == entry.taskId) { entry.previousEntryId = it->id; break; }
     p.progress.push_back(std::move(entry)); edit(std::move(p));
@@ -196,6 +208,7 @@ void Document::recordCost(CostEntry entry) {
 std::string Document::putResource(Resource r) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_;
+    if(!r.calendarId.empty())p.calculationProfile=effortProfile;
     if (r.id.empty()) { r.id = store_.newId(); p.resources.push_back(r); }
     else {
         auto it = std::find_if(p.resources.begin(), p.resources.end(), [&](const auto& item) { return item.id == r.id; });
@@ -216,6 +229,13 @@ void Document::setAssignments(const std::string& id, std::vector<Assignment> ass
     auto p = *project_;
     if (std::none_of(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == id; })) throw std::runtime_error("작업이 존재하지 않습니다.");
     for (auto& a : assignments) { if (a.taskId != id) throw std::runtime_error("다른 작업의 배정이 포함되었습니다."); }
+    std::vector<Assignment> previous;for(const auto& a:p.assignments)if(a.taskId==id)previous.push_back(a);
+    auto sorted=[](std::vector<Assignment> values){std::sort(values.begin(),values.end(),[](const auto& a,const auto& b){return a.resourceId<b.resourceId;});return values;};
+    if(sorted(previous)==sorted(assignments))return;
+    if(isEffort(p))for(auto& t:p.tasks)if(t.id==id&&t.taskType=="fixed-units"&&!t.workDriven) {
+        const auto plan=calculatePlan(p);
+        if(plan.status==CalculationStatus::Valid)for(const auto& r:plan.tasks)if(r.taskId==id){TaskExecution model(p,t);const auto work=model.work(r);if(work>0){t.workUnitMinutes=work;t.workDriven=true;}}
+    }
     std::erase_if(p.assignments, [&](const auto& a) { return a.taskId == id; });
     p.assignments.insert(p.assignments.end(), assignments.begin(), assignments.end()); edit(std::move(p), "작업 자원 배정");
 }
@@ -244,11 +264,12 @@ void Document::edit(Project p, std::string label) {
             for (const auto& t : v.tasks) { n += sizeof(Task) + t.id.size() + t.name.size() + t.wbsId.size(); for (const auto& id : t.predecessors) n += sizeof(std::string) + id.size(); }
             for (const auto& w : v.wbsNodes) n += sizeof(WbsNode) + w.id.size() + w.name.size() + w.parentId.size();
             for (const auto& h : v.holidays) n += sizeof(std::string) + h.size();
-            for (const auto& r : v.resources) { n += sizeof(Resource) + r.id.size() + r.name.size() + r.type.size(); for (const auto& d : r.exceptions) n += sizeof(CapacityDay) + d.date.size(); for (const auto& rate : r.rates) n += sizeof(Resource::Rate) + rate.effectiveDate.size(); }
+            for (const auto& r : v.resources) { n += sizeof(Resource) + r.id.size() + r.name.size() + r.type.size()+r.calendarId.size(); for (const auto& d : r.exceptions) n += sizeof(CapacityDay) + d.date.size(); for (const auto& rate : r.rates) n += sizeof(Resource::Rate) + rate.effectiveDate.size(); }
             for (const auto& a : v.assignments) n += sizeof(Assignment) + a.taskId.size() + a.resourceId.size();
             for (const auto& c : v.taskCosts) n += sizeof(TaskCost) + c.taskId.size() + c.accrual.size() + c.credit.size();
             for (const auto& t : v.tasks) { n += t.calendarId.size(); for (const auto& d : t.dependencyRules) n += sizeof(Dependency) + d.predecessorId.size() + d.type.size(); }
             for (const auto& t : v.tasks) n+=t.constraintType.size()+(t.constraintAt?t.constraintAt->size():0)+(t.deadlineAt?t.deadlineAt->size():0);
+            for(const auto& t:v.tasks){n+=t.taskType.size();for(const auto& b:t.breaks)n+=sizeof(TaskBreak)+b.start.size()+b.finish.size();}
             for (const auto& c : v.calendars) { n += sizeof(TaskCalendar) + c.id.size() + c.name.size() + c.weekdays.size() * sizeof(int) + c.periods.size() * sizeof(WorkPeriod); for (const auto& d : c.holidays) n += sizeof(std::string) + d.size(); }
             return n;
         };

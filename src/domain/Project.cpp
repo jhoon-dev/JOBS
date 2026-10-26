@@ -6,9 +6,13 @@
 #include <algorithm>
 
 namespace jobs {
-bool isPdm(const PlanInput& p) { return p.calculationProfile==pdmProfile || p.calculationProfile==constraintProfile; }
-std::string engineFor(const PlanInput& p) { return p.calculationProfile==constraintProfile?"jobs-pdm-1.1":isPdm(p)?"jobs-pdm-1.0":"jobs-cpm-0.2"; }
-std::string levelingPolicyFor(const PlanInput& p) { return p.calculationProfile==constraintProfile?"serial-no-split-constrained-v1":isPdm(p)?"serial-no-split-pdm-v1":"serial-no-split-v1"; }
+bool isEffort(const PlanInput& p) { return p.calculationProfile==effortProfile; }
+bool hasConstraints(const PlanInput& p) { return p.calculationProfile==constraintProfile || isEffort(p); }
+bool isPdm(const PlanInput& p) { return p.calculationProfile==pdmProfile || hasConstraints(p); }
+bool usesWork(const Task& t) { return t.taskType=="fixed-work" || t.workDriven; }
+std::string taskTypeName(const std::string& t) { return t=="fixed-work"?"고정 공수":t=="fixed-units"?"고정 단위":"고정 기간"; }
+std::string engineFor(const PlanInput& p) { return isEffort(p)?"jobs-effort-1.0":hasConstraints(p)?"jobs-pdm-1.1":isPdm(p)?"jobs-pdm-1.0":"jobs-cpm-0.2"; }
+std::string levelingPolicyFor(const PlanInput& p) { return isEffort(p)?"serial-effort-split-v1":hasConstraints(p)?"serial-no-split-constrained-v1":isPdm(p)?"serial-no-split-pdm-v1":"serial-no-split-v1"; }
 std::string constraintName(const std::string& type) {
     if(type=="ASAP")return "가능한 빨리";
     if(type=="ALAP")return "가능한 늦게";
@@ -128,11 +132,23 @@ void validatePlan(const PlanInput& p) {
         if ((!t.dependencyRules.empty() || !t.calendarId.empty()) && !isPdm(p)) throw std::runtime_error("확장 선행관계에는 PDM 계산 정책이 필요합니다.");
         const bool dated=t.constraintType!="ASAP" && t.constraintType!="ALAP";
         if ((t.constraintType!="ASAP" && t.constraintType!="ALAP" && t.constraintType!="SNET" && t.constraintType!="SNLT" && t.constraintType!="FNET" && t.constraintType!="FNLT" && t.constraintType!="MSO" && t.constraintType!="MFO") || dated!=t.constraintAt.has_value() || (t.constraintAt&&!validStamp(*t.constraintAt)) || (t.deadlineAt&&!validStamp(*t.deadlineAt))) throw std::runtime_error("작업 제약 종류·제약 시각·마감일이 잘못되었습니다. 날짜는 YYYY-MM-DD HH:mm입니다.");
-        if ((t.constraintType!="ASAP" || t.constraintAt || t.deadlineAt) && p.calculationProfile!=constraintProfile) throw std::runtime_error("작업 제약/마감일에는 제약 계산 정책이 필요합니다.");
+        if ((t.constraintType!="ASAP" || t.constraintAt || t.deadlineAt) && !hasConstraints(p)) throw std::runtime_error("작업 제약/마감일에는 제약 계산 정책이 필요합니다.");
+        if ((t.taskType!="fixed-duration" && t.taskType!="fixed-work" && t.taskType!="fixed-units") ||
+            (t.workUnitMinutes && (*t.workUnitMinutes<0 || *t.workUnitMinutes>maxWork)) ||
+            (t.taskType=="fixed-duration" && (t.workDriven || t.workUnitMinutes)) ||
+            (t.taskType=="fixed-work" && !t.workDriven) || (t.workDriven!=t.workUnitMinutes.has_value())) throw std::runtime_error("작업 유형·계산 기준·공수 값이 일치하지 않습니다.");
+        std::string last;
+        if(t.breaks.size()>1000)throw std::runtime_error("작업 중단 구간은 최대 1,000개입니다.");
+        for(const auto& gap:t.breaks) {
+            if(!validStamp(gap.start)||!validStamp(gap.finish)||gap.start>=gap.finish||(!last.empty()&&gap.start<last)) throw std::runtime_error("중단 구간은 시작 < 재개 시각이며 정렬되고 겹치지 않아야 합니다.");
+            last=gap.finish;
+        }
+        if((t.taskType!="fixed-duration" || t.workDriven || !t.breaks.empty())&&!isEffort(p))throw std::runtime_error("공수·분할 작업에는 공수 일정 정책이 필요합니다.");
     }
     std::unordered_set<std::string> resources, pairs;
     const auto validUnits = [](const std::optional<int>& n) { return !n || (*n >= 0 && *n <= 100000); };
     for (const auto& r : p.resources) {
+        if(!r.calendarId.empty()&&(!isEffort(p)||!calendarIds.contains(r.calendarId)))throw std::runtime_error("자원 달력이 없거나 공수 일정 정책이 아닙니다.");
         if (blank(r.id) || blank(r.name) || !resources.insert(r.id).second || ids.contains(r.id) || nodes.contains(r.id) ||
             (r.type != "labor" && r.type != "equipment") || !validUnits(r.maxUnits))
             throw std::runtime_error("자원 ID·이름·종류·가용량이 잘못되었습니다. 가용량은 미정 또는 0~100,000%입니다.");
@@ -182,6 +198,8 @@ void validate(const Project& p) {
     std::unordered_map<std::string, std::string> previous;
     std::unordered_set<std::string> entryIds;
     for (const auto& e : p.progress) {
+        if(e.remainingWorkUnitMinutes&&!isEffort(p))throw std::runtime_error("명시 잔여 공수에는 공수 일정 정책이 필요합니다.");
+        if(e.remainingWorkUnitMinutes && (*e.remainingWorkUnitMinutes<0 || *e.remainingWorkUnitMinutes>maxWork || (e.actualFinish&&*e.remainingWorkUnitMinutes!=0))) throw std::runtime_error("잔여 공수는 0~500,000,000,000 단위분이며 완료 보고에는 0이어야 합니다.");
         if (blank(e.id) || !entryIds.insert(e.id).second || !taskIds.contains(e.taskId) || !validStamp(e.statusAt) ||
             !validUtcStamp(e.recordedAt) || blank(e.reporter) || blank(e.reason) || blank(e.sourceDocumentId) || e.recordedRevision == 0 || e.recordedRevision > p.revision ||
             e.actualDurationMinutes < 0 || e.actualDurationMinutes > 5000000 || e.remainingMinutes < 0 || e.remainingMinutes > 5000000 ||
@@ -190,7 +208,7 @@ void validate(const Project& p) {
         if ((e.actualStart && (!validStamp(*e.actualStart) || *e.actualStart > e.statusAt)) ||
             (e.actualFinish && (!validStamp(*e.actualFinish) || !e.actualStart || *e.actualFinish < *e.actualStart || *e.actualFinish > e.statusAt)) ||
             (!e.actualStart && e.actualDurationMinutes != 0) || (e.actualFinish && e.remainingMinutes != 0) ||
-            (e.actualStart && !e.actualFinish && e.remainingMinutes == 0))
+            (e.actualStart && !e.actualFinish && e.remainingMinutes == 0 && !e.remainingWorkUnitMinutes))
             throw std::runtime_error("실제 날짜·상태일·잔여 기간이 모순됩니다. 완료 시 실제 완료일과 잔여 0을 함께 입력하세요.");
         if (!e.actualStart && e.remainingMinutes == 0 && e.planDurationMinutes.value_or(1) != 0)
             throw std::runtime_error("기간이 있는 작업의 잔여를 0으로 보고하려면 실제 시작·완료를 입력하세요.");

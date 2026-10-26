@@ -1,4 +1,5 @@
 #include "ui/GanttView.h"
+#include "calculation/Effort.h"
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QMouseEvent>
@@ -51,6 +52,15 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
                 s.critical, t.predecessors, s.drivingPredecessors, s.remainingStart, s.completedActual});
             rows_.back().edges=dependencies(t); rows_.back().calendar=qs(taskCalendarName(*p,t));
             auto& added=rows_.back();added.editable=editable_&&!std::any_of(p->progress.begin(),p->progress.end(),[&](const auto& e){return e.taskId==t.id&&e.actualStart.has_value();});added.constraintType=t.constraintType;added.constraintAt=t.constraintAt;added.deadlineAt=t.deadlineAt;
+            if(isEffort(*p)&&!s.completedActual&&s.start!=s.finish) {
+                const auto pending=result->isForecast?pendingTask(*p,t):t;
+                if(usesWork(pending)) {
+                    auto spans=executionSpans(*p,pending,s);std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.start<b.start;});WorkCalendar clock(*p);
+                    std::vector<std::pair<std::int64_t,std::int64_t>> merged;
+                    for(const auto& a:spans){if(!merged.empty()&&a.start<=merged.back().second)merged.back().second=std::max(merged.back().second,a.finish);else merged.emplace_back(a.start,a.finish);}
+                    for(const auto& [begin,end]:merged)added.pieces.emplace_back(clock.boundary(begin,false),clock.boundary(end,true));
+                } else added.pieces=WorkCalendar(*p,t).segments(s.remainingStart.value_or(s.start),s.finish);
+            }
             if(t.deadlineAt){const auto due=QDate::fromString(qs(*t.deadlineAt).left(10),Qt::ISODate);if(due>=planFirstDay_&&due<=planFirstDay_.addDays(366*20-1))planLastDay_=std::max(planLastDay_,due);}
             for(const auto& c:p->calendars) if(c.id==t.calendarId) {
                 rows_.back().calendar+=" · 근무 요일 "; for(int d:c.weekdays) rows_.back().calendar+=QString::number(d)+" ";
@@ -122,6 +132,13 @@ void GanttView::rebuild() {
         if (milestone) {
             QPolygonF diamond; diamond << QPointF(start, y - 7) << QPointF(start + 7, y) << QPointF(start, y + 7) << QPointF(start - 7, y);
             bar = scene()->addPolygon(diamond);
+        } else if(input_&&isEffort(*input_)&&!row.completedActual) {
+            const auto first=row.remainingStart?qs(*row.remainingStart):row.start;
+            QPainterPath path;
+            if(isForecast_&&first>row.start)path.addRect(QRectF(start,y-3,std::max(qreal(1),position(first)-start),6));
+            for(const auto& [begin,end]:row.pieces)path.addRect(QRectF(position(qs(begin)),y-6,std::max(qreal(1),position(qs(end))-position(qs(begin))),12));
+            bar=scene()->addPath(path);
+            auto* connector=scene()->addLine(start,y,finish,y,QPen(normalColor(),1,Qt::DotLine));connector->setData(0,qs(row.id));connector->setData(1,"splitConnector");connector->setToolTip("점선: 비근무/중단 구간 · 공수·부하에서 제외");connector->setZValue(1);
         } else bar = scene()->addRect(QRectF(start, y - 6, std::max(qreal(3), finish - start), 12));
         bar->setBrush(row.completedActual ? QColor("#51b384") : row.critical ? criticalColor() : normalColor());
         bar->setData(0, qs(row.id)); bar->setData(1, milestone ? "milestone" : "task"); bar->setZValue(2);

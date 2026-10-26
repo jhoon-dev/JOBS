@@ -42,6 +42,7 @@ public:
     void removeWbs(const std::string& id);
     void assignWbs(std::size_t taskRow, std::string wbsId);
     void setDuration(std::size_t row, std::optional<std::int64_t> minutes);
+    void setTaskEffort(std::size_t row,std::string type,bool workInput,std::optional<std::int64_t> duration,std::optional<std::int64_t> work,std::vector<TaskBreak> breaks);
     void setPredecessors(std::size_t row, std::vector<std::string> ids);
     void setDependencies(std::size_t row, std::vector<Dependency>);
     std::string putCalendar(TaskCalendar);

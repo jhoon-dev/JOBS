@@ -1,5 +1,6 @@
 #include "calculation/Reports.h"
 #include "calculation/Constraints.h"
+#include "calculation/Effort.h"
 #include "domain/Wbs.h"
 #include <algorithm>
 #include <set>
@@ -76,16 +77,30 @@ ProjectReport buildReport(const Project& p, const ReportOptions& o) {
     dashboard.rows.push_back({text("과부하 자원·일"), active.status == CalculationStatus::Valid ? number(overloadDays) : ReportCell{}, text("건"), text("선택 자원의 전체 프로젝트 공유 수요. 일별 명세 기간 기준")});
     auto& schedule = table("schedule", "계획 일정", ReportFamily::Schedule, "전체 실행 그래프를 계산한 후 WBS 작업을 선택합니다. 총여유는 각 작업 달력의 근무시간(h)입니다. 미계산/충돌 날짜를 과거 캐시로 채우지 않습니다.", {{"작업 ID", 28}, {"작업", 24}, {"WBS", 24}, {"기간(분)", 12}, {"계획 시작", 21}, {"계획 완료", 21}, {"여유(h)", 12}, {"임계", 10}, {"작업 달력",30}});
     for (auto row : rows) { const auto& t = p.tasks[row]; auto* s = plans.contains(t.id) ? plans.at(t.id) : nullptr;
-        schedule.rows.push_back({text(t.id), text(t.name), text(t.wbsId.empty() ? "미분류" : path(p, t.wbsId)), optional(t.durationMinutes, CellFormat::Integer), s ? text(s->start) : ReportCell{}, s ? text(s->finish) : ReportCell{}, s ? number(s->totalFloatMinutes, CellFormat::Hours) : ReportCell{}, s ? text(s->critical ? "임계" : "여유") : ReportCell{},text(taskCalendarName(p,t))}); }
-    if(p.calculationProfile==constraintProfile){auto& timing=table("constraints","작업 제약과 마감",ReportFamily::Schedule,"날짜 제약은 선행/달력과 함께 적용합니다. 마감일은 경고 기준이며 CPM 여유를 바꾸지 않습니다. 마감 여유는 해당 작업 달력 근무시간입니다. 비근무 경과는 0근무분이어도 civil 시각으로 초과를 판정합니다.",{{"작업 ID",28},{"작업",24},{"제약",20},{"제약 시각",21},{"마감일",21},{"활성 완료",21},{"마감 여유(h)",16},{"마감 상태",14}});
+        schedule.rows.push_back({text(t.id), text(t.name), text(t.wbsId.empty() ? "미분류" : path(p, t.wbsId)), optional(isEffort(p)&&s?std::optional<std::int64_t>{TaskExecution(p,t).duration(*s)}:t.durationMinutes, CellFormat::Integer), s ? text(s->start) : ReportCell{}, s ? text(s->finish) : ReportCell{}, s ? number(s->totalFloatMinutes, CellFormat::Hours) : ReportCell{}, s ? text(s->critical ? "임계" : "여유") : ReportCell{},text(taskCalendarName(p,t))}); }
+    if(hasConstraints(p)){auto& timing=table("constraints","작업 제약과 마감",ReportFamily::Schedule,"날짜 제약은 선행/달력과 함께 적용합니다. 마감일은 경고 기준이며 CPM 여유를 바꾸지 않습니다. 마감 여유는 해당 작업 달력 근무시간입니다. 비근무 경과는 0근무분이어도 civil 시각으로 초과를 판정합니다.",{{"작업 ID",28},{"작업",24},{"제약",20},{"제약 시각",21},{"마감일",21},{"활성 완료",21},{"마감 여유(h)",16},{"마감 상태",14}});
         for(auto row:rows){const auto& t=p.tasks[row];const auto* s=forecasts.contains(t.id)?forecasts.at(t.id):nullptr;timing.rows.push_back({text(t.id),text(t.name),text(t.constraintType+" · "+constraintName(t.constraintType)),stamp(t.constraintAt),stamp(t.deadlineAt),s?text(s->finish):ReportCell{},s?optional(deadlineSlack(p,t,s->finish),CellFormat::Hours):ReportCell{},text(!t.deadlineAt?"미설정":!s?"계산 불가":s->finish>*t.deadlineAt?"마감 초과":"마감 이내")});}
+    }
+    if(isEffort(p)) {
+        auto& effort=table("effort","공수와 작업 유형",ReportFamily::Schedule,"기간은 작업 달력의 활성 근무분, 공수는 자원 달력 교집합 배정량입니다. 잔여 공수는 명시 보고값이며 실제 공수를 역산하지 않습니다. 입력 기간은 공수 기준 작업의 일정 계산에 사용하지 않습니다.",{{"작업 ID",28},{"작업",24},{"유형",16},{"계산 기준",12},{"입력 공수(h)",16},{"계획 공수(h)",16},{"계산 기간(h)",16},{"명시 잔여 공수(h)",20}});
+        for(auto index:rows){const auto& t=p.tasks[index];const auto* e=progressAsOf(p,t.id);std::optional<std::int64_t> work,duration;
+            if(plans.contains(t.id)){TaskExecution model(p,t);work=model.work(*plans.at(t.id));duration=model.duration(*plans.at(t.id));}
+            effort.rows.push_back({text(t.id),text(t.name),text(taskTypeName(t.taskType)),text(usesWork(t)?"공수":"기간"),optional(t.workUnitMinutes,CellFormat::WorkHours),optional(work,CellFormat::WorkHours),optional(duration,CellFormat::Hours),optional(e?e->remainingWorkUnitMinutes:std::optional<std::int64_t>{},CellFormat::WorkHours)});
+        }
+        auto& breaks=table("taskBreaks","분할 작업 중단",ReportFamily::Schedule,"절대 시각 [중단 시작, 재개). 작업만 중단하며 다른 작업의 자원은 계속 사용할 수 있습니다. 일정 이동 후에도 중단 시각은 유지됩니다.",{{"작업 ID",28},{"작업",24},{"중단 시작",21},{"재개 시각",21}});
+        for(auto index:rows)for(const auto& b:p.tasks[index].breaks)breaks.rows.push_back({text(p.tasks[index].id),text(p.tasks[index].name),text(b.start),text(b.finish)});
+        auto& calendars=table("resourceCalendars","자원별 근무 달력",ReportFamily::Resources,"빈 자원 달력은 프로젝트 기본 달력입니다. 작업 달력과 교집합을 사용하며 일별 가용량 예외는 이 근무시간 안의 최대 배정률입니다.",{{"자원 ID",28},{"자원",24},{"달력 ID",28},{"달력",36}});
+        for(const auto& r:p.resources)if(resourceIds.contains(r.id)){Task t;t.calendarId=r.calendarId;calendars.rows.push_back({text(r.id),text(r.name),text(r.calendarId),text(taskCalendarName(p,t))});}
+        auto& spans=table("executionWork","실행 배정 구간",ReportFamily::Resources,"활성 일정의 잔여/계획 배정입니다. 중단·비근무 시간 제외, 마지막 1분 공수 배분 포함. 날짜 필터와 겹치는 구간만 표시하며 공수는 잘린 구간에 한정합니다.",{{"작업 ID",28},{"자원 ID",28},{"시작",21},{"완료",21},{"배정률",12},{"공수(h)",14}});
+        WorkCalendar clock(p);
+        if(active.status==CalculationStatus::Valid)for(auto index:rows){const auto& t=p.tasks[index];auto pending=p.statusAt?pendingTask(p,t):t;for(auto span:executionSpans(p,pending,*forecasts.at(t.id))){const auto begin=clock.boundary(span.start,false),end=clock.boundary(span.finish,true);if(o.fromDate&&end<=*o.fromDate+" 00:00")continue;if(o.toDate&&begin>*o.toDate+" 23:59")continue;if(o.fromDate&&begin<*o.fromDate+" 00:00")span.start=clock.offset(*o.fromDate+" 00:00");if(o.toDate&&end>*o.toDate+" 23:59")span.finish=clock.offset(*o.toDate+" 23:59")+1;if(span.finish>span.start)spans.rows.push_back({text(t.id),text(span.resourceId),text(clock.boundary(span.start,false)),text(clock.boundary(span.finish,true)),number(span.units,CellFormat::Units),number((span.finish-span.start)*span.units,CellFormat::WorkHours)});}}
     }
     auto& forecast = table("forecast", "실적과 예측", ReportFamily::Schedule, "실제 날짜를 보존합니다. 편차는 선택 기준선 달력의 근무시간이며 기준선 없는 작업은 미정입니다.", {{"작업 ID", 28}, {"작업", 24}, {"실제 시작", 21}, {"실제 완료", 21}, {"잔여(h)", 12}, {"예측 완료", 21}, {"완료 편차(h)", 14}, {"기준선 시작", 21}, {"기준선 완료", 21}});
     for (auto row : rows) { const auto& t = p.tasks[row]; const auto& c = *comparisons.at(t.id);
         forecast.rows.push_back({text(t.id), text(t.name), stamp(c.actualStart), stamp(c.actualFinish), optional(c.remainingMinutes, CellFormat::Hours), stamp(c.forecastFinish), optional(c.forecastFinishVariance, CellFormat::Hours), stamp(c.baselineStart), stamp(c.baselineFinish)}); }
     auto& links = table("dependencies", "실행 선행관계", ReportFamily::Schedule, "선택 WBS 밖 관계도 유지합니다. 지연/선행은 후행 작업 달력 근무분입니다.", {{"작업 ID", 28}, {"작업", 30}, {"선행 ID", 28}, {"선행 작업", 30}, {"관계",8}, {"지연/선행(m)",16}, {"후행 달력",30}});
     for (auto row : rows) for (const auto& d : dependencies(p.tasks[row])) { auto it = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == d.predecessorId; }); links.rows.push_back({text(p.tasks[row].id), text(p.tasks[row].name), text(d.predecessorId), text(it == p.tasks.end() ? "누락 참조" : it->name),text(d.type),number(d.lagMinutes),text(taskCalendarName(p,p.tasks[row]))}); }
-    auto& assignments = table("assignments", "자원 배정", ReportFamily::Resources, "정률·기간 고정 배정. 100%는 자원 1단위이며 단가/등급은 생산성 배수가 아닙니다.", {{"작업 ID", 28}, {"작업", 25}, {"자원 ID", 28}, {"자원", 25}, {"종류", 12}, {"배정률", 12}});
+    auto& assignments = table("assignments", "자원 배정", ReportFamily::Resources, "정률 배정. 작업 유형에 따라 기간·공수·단위를 유지합니다. 100%는 자원 1단위이며 단가/등급은 생산성 배수가 아닙니다.", {{"작업 ID", 28}, {"작업", 25}, {"자원 ID", 28}, {"자원", 25}, {"종류", 12}, {"배정률", 12}});
     std::unordered_map<std::string, const Resource*> resources; for (const auto& r : p.resources) resources[r.id] = &r;
     std::unordered_map<std::string, std::string> names; for (const auto& t : p.tasks) names[t.id] = t.name;
     for (const auto& a : scoped.assignments) assignments.rows.push_back({text(a.taskId), text(names.at(a.taskId)), text(a.resourceId), text(resources.at(a.resourceId)->name), text(resources.at(a.resourceId)->type == "labor" ? "인력" : "장비"), number(a.units, CellFormat::Units)});

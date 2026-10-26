@@ -1,6 +1,7 @@
 #include "calculation/Scheduler.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Pdm.h"
+#include "calculation/Effort.h"
 #include <algorithm>
 #include <deque>
 #include <unordered_map>
@@ -10,6 +11,7 @@ ScheduleResult calculate(const Project& p) {
     if (!p.statusAt) return plan;
     plan.isForecast = true; plan.statusAt = p.statusAt; plan.calculationPolicy = p.calculationProfile==constraintProfile?"retained-remaining-constrained-v1":isPdm(p)?"retained-remaining-pdm-v1":"retained-remaining-v1";
     if (plan.status != CalculationStatus::Valid) return plan;
+    if(isEffort(p))return calculateEffort(p,true);
     if (isPdm(p)) return calculatePdmForecast(p, std::move(plan));
     ScheduleResult result = plan; result.tasks.clear(); result.projectFinish.reset(); result.diagnostics.clear();
     try {

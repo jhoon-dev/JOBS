@@ -32,6 +32,29 @@ void WorkCalendar::initialize(const PlanInput& p, const Task* task) {
         auto base = (d-anchor_).count()*1440;
         for (const auto& period : calendar.periods) { intervals_.push_back({base+period.begin, base+period.end, prefix}); prefix += period.end-period.begin; }
     }
+    if(task && isEffort(p) && !task->breaks.empty()) {
+        std::vector<Interval> kept; prefix=0;
+        std::vector<std::pair<std::int64_t,std::int64_t>> gaps;
+        const auto minute=[&](const std::string& s){return (date(s)-anchor_).count()*1440+std::stoi(s.substr(11,2))*60+std::stoi(s.substr(14,2));};
+        for(const auto& gap:task->breaks)gaps.emplace_back(minute(gap.start),minute(gap.finish));
+        std::size_t cursor=0;
+        for(const auto& i:intervals_) {
+            auto at=i.begin;
+            while(cursor<gaps.size()&&gaps[cursor].second<=at)++cursor;
+            for(auto j=cursor;j<gaps.size()&&gaps[j].first<i.end;++j) {
+                const auto [begin,end]=gaps[j];
+                if(begin>at){kept.push_back({at,begin,prefix});prefix+=begin-at;}
+                at=std::max(at,end);if(at>=i.end)break;
+            }
+            if(at<i.end){kept.push_back({at,i.end,prefix});prefix+=i.end-at;}
+        }
+        intervals_=std::move(kept);
+    }
+}
+std::vector<std::pair<std::int64_t,std::int64_t>> WorkCalendar::civilIntervals() const {
+    std::vector<std::pair<std::int64_t,std::int64_t>> out;out.reserve(intervals_.size());
+    for(const auto& i:intervals_)out.emplace_back(i.begin,i.end);
+    return out;
 }
 std::string WorkCalendar::boundary(std::int64_t value, bool finish) const {
     if (value < 0 || intervals_.empty()) throw std::runtime_error("달력 근무분이 음수이거나 20년 범위에 가용 시간이 없습니다.");

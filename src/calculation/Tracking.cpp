@@ -72,6 +72,7 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
     for (const auto& t : p.tasks) {
         TaskComparison row; row.taskId = t.id; row.name = t.name;
         row.planDuration = t.durationMinutes; row.planPredecessors = dependencyLabels(t); row.planWbsPath = wbsPath(p, t.wbsId);
+        if(isEffort(p)&&usesWork(t)){row.planDuration.reset();if(planDates.contains(t.id)){WorkCalendar cal(p,t);row.planDuration=cal.offset(planDates.at(t.id)->finish)-cal.offset(planDates.at(t.id)->start);}}
         row.planAssignments = assignments(p, t.id, true);
         if (baselineDates.contains(t.id)) { row.baselineStart = baselineDates.at(t.id)->start; row.baselineFinish = baselineDates.at(t.id)->finish; }
         if (planDates.contains(t.id)) { row.planStart = planDates.at(t.id)->start; row.planFinish = planDates.at(t.id)->finish; }
@@ -81,14 +82,16 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
             row.reported = true; ++report.reportedTasks; row.actualStart = entry->actualStart; row.actualFinish = entry->actualFinish;
             row.actualMinutes = entry->actualDurationMinutes; row.remainingMinutes = entry->remainingMinutes;
             if (entry->actualFinish) row.durationProgressPercent = 100.0;
-            else if (entry->actualDurationMinutes + entry->remainingMinutes > 0)
+            else if (!usesWork(t) && !(entry->remainingMinutes==0&&entry->remainingWorkUnitMinutes) && entry->actualDurationMinutes + entry->remainingMinutes > 0)
                 row.durationProgressPercent = 100.0 * double(entry->actualDurationMinutes) / double(entry->actualDurationMinutes + entry->remainingMinutes);
         } else row.remainingMinutes = t.durationMinutes;
+        if(usesWork(t)&&(!entry||!entry->actualFinish))row.remainingMinutes.reset();
         if (baseline) {
             if (!before.contains(t.id)) row.changes.push_back("추가된 작업");
             else {
                 const auto& old = *before.at(t.id);
                 row.baselineName = old.name; row.baselineDuration = old.durationMinutes;
+                if(isEffort(baseline->input)&&usesWork(old)){WorkCalendar cal(baseline->input,old);row.baselineDuration=cal.offset(*row.baselineFinish)-cal.offset(*row.baselineStart);}
                 row.baselinePredecessors = dependencyLabels(old); row.baselineWbsPath = wbsPath(baseline->input, old.wbsId);
                 row.baselineAssignments = assignments(baseline->input, t.id, true);
                 if (old.name != t.name) row.changes.push_back("이름 변경");
@@ -97,6 +100,8 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
                 if (old.calendarId != t.calendarId) row.changes.push_back("작업 달력 배정 변경");
                 if(old.constraintType!=t.constraintType||old.constraintAt!=t.constraintAt)row.changes.push_back("작업 날짜 제약 변경");
                 if(old.deadlineAt!=t.deadlineAt)row.changes.push_back("마감일 변경");
+                if(old.taskType!=t.taskType||old.workDriven!=t.workDriven||old.workUnitMinutes!=t.workUnitMinutes)row.changes.push_back("작업 유형·공수·계산 기준 변경");
+                if(old.breaks!=t.breaks)row.changes.push_back("작업 분할 중단 구간 변경");
                 if (old.wbsId != t.wbsId) row.changes.push_back("WBS 소속 변경");
                 if (assignments(baseline->input, t.id, false) != assignments(p, t.id, false)) row.changes.push_back("자원 배정 변경");
             }
