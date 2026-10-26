@@ -49,6 +49,8 @@ int main(int argc, char* argv[]) {
         check(r.leveled.status == jobs::CalculationStatus::Conflict && r.leveled.tasks.empty() && !r.leveled.projectFinish && r.before.status == jobs::CalculationStatus::Conflict, "zero capacity treated as unknown or partial success");
         p.resources[0].maxUnits.reset(); r = jobs::levelResources(p, "task-order", 3);
         check(r.before.status == jobs::CalculationStatus::Incomplete && r.leveled.status == jobs::CalculationStatus::Incomplete && r.leveled.tasks.empty(), "unknown capacity silently treated as zero/available");
+        auto tiny = project(); tiny.tasks[0].durationMinutes = tiny.tasks[1].durationMinutes = 1; tiny.resources[0].maxUnits = 0;
+        check(jobs::levelResources(tiny, "task-order", 5200).leveled.status == jobs::CalculationStatus::Conflict, "long unavailable horizon produced a false schedule");
         p.resources[0].exceptions = {{"2026-10-27", 200}}; r = jobs::levelResources(p, "task-order", 3);
         check(r.leveled.status == jobs::CalculationStatus::Valid && r.after.status == jobs::CalculationStatus::Valid && r.leveled.tasks[0].start == "2026-10-27 09:00", "known capacity exception not used after unknown day");
         p = project(); p.holidays = {"2026-10-27"}; p.resources[0].exceptions = {{"2026-10-26", 0}}; r = jobs::levelResources(p, "task-order", 10);

@@ -139,13 +139,20 @@ LevelingResult levelResources(const Project& p, const std::string& priority, int
                 Minute next = start;
                 for (const auto* a : assignments[task.id]) {
                     const auto& r = *resources.at(a->resourceId);
-                    intervals(reserved[r.id], start, start + duration, [&](Minute s, Minute e, Minute used) {
+                    intervals(reserved[r.id], start, start + duration, [&](Minute s, Minute, Minute used) {
                         auto cap = capacity(r, calendar.boundary(s, false).substr(0, 10));
                         if (!cap) unknown = true;
                         if (!cap || used + a->units > *cap) {
                             if (!blocked.contains(r.id)) blocked.emplace(r.id, r.name + " [" + r.id + "] " + calendar.boundary(s, false) +
                                 " · 수요 " + std::to_string(used + a->units) + "% / 가용 " + (cap ? std::to_string(*cap) + "%" : "미정"));
-                            next = std::max(next, e); return false;
+                            // The demand/capacity stays infeasible until its next real change,
+                            // even when the trial task finishes earlier. Avoid one-minute retries.
+                            Minute change = (s / 480 + 1) * 480;
+                            if (cap && a->units <= *cap) {
+                                auto event = reserved[r.id].upper_bound(s);
+                                if (event != reserved[r.id].end()) change = std::min(change, event->first);
+                            }
+                            next = std::max(next, change); return false;
                         }
                         return true;
                     });

@@ -86,12 +86,37 @@ int main(int argc, char* argv[]) {
         });
         poll.start(); trigger(window, "resourceComparison"); check(stage == 8 && doc.project()->scenarios.size() == 2, "scenario UI did not complete");
         check(static_cast<const jobs::PlanInput&>(*doc.project()) == original, "scenario comparison overwrote original input");
+        const auto frozen = doc.project()->scenarios;
+        auto changed = doc.project()->resources[0]; changed.maxUnits.reset(); doc.putResource(changed);
+        QTimer unknownPoll; unknownPoll.setInterval(20); int unknownStage = 0;
+        QObject::connect(&unknownPoll, &QTimer::timeout, [&] {
+            auto* d = QApplication::activeModalWidget(); if (!d || d->objectName() != "resourceComparisonDialog") return;
+            auto* load = d->findChild<QTableWidget*>("loadBefore");
+            if (unknownStage == 0 && d->findChild<QPushButton*>("saveScenario")->isEnabled()) {
+                callbackCheck(load->rowCount() == 1 && load->item(0, 2)->text() == "미정" && load->item(0, 6)->text() == "미정" && load->item(0, 7)->text() == "미정", "unknown capacity shown as zero overload");
+                callbackCheck(load->item(0, 0)->foreground().color().lightness() < 100, "unknown capacity text lacks contrast");
+                d->findChild<QComboBox*>("levelingOther")->setCurrentIndex(1); unknownStage = 1;
+            } else if (unknownStage == 1 && d->findChild<QLabel*>("levelingSummary")->text().contains("A/B 입력이 다릅니다")) {
+                d->findChild<QTabWidget*>("resourceTabs")->setCurrentIndex(1); d->grab().save("resource-unknown-smoke.png");
+                unknownPoll.stop(); unknownStage = 2; static_cast<QDialog*>(d)->reject();
+            }
+        });
+        unknownPoll.start(); trigger(window, "resourceComparison"); check(unknownStage == 2 && doc.project()->scenarios == frozen, "different-input warning missing or history changed");
         auto path = dir.filePath("resource-ui.jobs").toStdString(); doc.saveAs(path); check(store.load(path).project == *doc.project(), "UI resource/scenario save-open roundtrip failed");
         for (auto* action : window.findChildren<QAction*>()) if (action->text() == "일정 계산(&C)") action->trigger();
         for (int i = 0; i < 300 && (!doc.calculation() || doc.calculation()->status != jobs::CalculationStatus::Valid); ++i) QTest::qWait(10);
         check(doc.calculation() && doc.calculation()->status == jobs::CalculationStatus::Valid, "main plan calculation unavailable after scenario review");
         jobs::Document readOnly(store); readOnly.open(path, true); jobs::MainWindow viewer(readOnly); viewer.show(); QTest::qWait(30);
         check(!viewer.findChild<QAction*>("assignResources")->isEnabled() && viewer.findChild<QAction*>("resourceComparison")->isEnabled(), "readonly resource actions incorrect");
+        QTimer readonlyPoll; readonlyPoll.setInterval(20);
+        QObject::connect(&readonlyPoll, &QTimer::timeout, [&] {
+            auto* d = QApplication::activeModalWidget(); if (!d || d->objectName() != "resourceComparisonDialog") return;
+            if (d->findChild<QTableWidget*>("loadBefore")->rowCount() > 0) {
+                callbackCheck(!d->findChild<QPushButton*>("saveScenario")->isEnabled(), "readonly comparison can save a scenario");
+                readonlyPoll.stop(); static_cast<QDialog*>(d)->reject();
+            }
+        });
+        readonlyPoll.start(); trigger(viewer, "resourceComparison");
         window.grab().save("resources-main-smoke.png");
         std::cout << "PASS: resource registration/exception validation, stable IDs, task assignments, peak/daily load, options invalidate results, saved A/B scenarios, unresolved horizon, source preservation and persistence, readonly\n";
         return 0;
