@@ -72,6 +72,7 @@ def verify(root: Path):
     for name in ("reports-smoke.pdf", "reports-long-portrait.pdf", "reports-a3.pdf", "reports-pdm.pdf", "reports-constraints.pdf", "reports-effort.pdf"):
         reader = PdfReader(root / name, strict=True)
         raw = "\n".join(p.extract_text() or "" for p in reader.pages)
+        assert not any(unicodedata.category(c) == "Cc" and c not in "\n\r\t" for c in raw), f"PDF font emitted control characters: {name}"
         # Native PDF fonts can encode typographic ligatures (e.g. ff as U+FB00).
         # Normalize presentation forms before comparing semantic text/numbers.
         compact = re.sub(r"\s+", "", unicodedata.normalize("NFKC", raw))
@@ -84,8 +85,6 @@ def verify(root: Path):
             assert abs(float(reader.pages[0].mediabox.height) - 842) < 3
         elif name == "reports-effort.pdf":
             assert "effort-report-contract" in compact and "고정공수" in compact
-            forms = sorted({c for c in raw if unicodedata.normalize("NFKC", c) != c})
-            print(f"PDF presentation forms normalized: {forms!r}")
             assert "DesignerTuesdayoff" in compact, f"resource calendar text missing: {compact!r}"
             assert "2026-10-2815:00" in compact, f"effort finish stamp missing: {compact!r}"
             assert "실행배정구간" in compact and "48000" in compact

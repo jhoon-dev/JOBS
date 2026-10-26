@@ -6,6 +6,7 @@
 #include <QTextLayout>
 #include <QTextOption>
 #include <QFontMetricsF>
+#include <QFontDatabase>
 #include <memory>
 #include <algorithm>
 #include <cmath>
@@ -113,7 +114,18 @@ int exportPdf(const ProjectReport& r, const QString& path, ReportFamily family, 
     {
         QPdfWriter writer(&file.file); writer.setResolution(72); writer.setPageSize(QPageSize(options.a3 ? QPageSize::A3 : QPageSize::A4)); writer.setPageOrientation(options.landscape ? QPageLayout::Landscape : QPageLayout::Portrait); writer.setPageMargins(QMarginsF(0, 0, 0, 0)); writer.setCreator("JOBS"); writer.setTitle(reportText(r.projectName) + " 프로젝트 보고서");
         QPainter painter(&writer); if (!painter.isActive()) throw std::runtime_error("PDF 렌더러를 시작할 수 없습니다.");
-        auto font = options.font; font.setPointSize(options.fontPoints); painter.setFont(font); Pages renderer(writer, painter, r, font);
+        auto font = options.font;
+#ifdef Q_OS_MACOS
+        // CoreText's private UI fonts can emit a broken PDF ToUnicode map
+        // (the time colon becomes U+0013). Use an installed public print face;
+        // Qt still supplies the native Korean fallback for missing glyphs.
+        if(font.family().isEmpty()||font.family().startsWith('.')) {
+            const auto families=QFontDatabase::families();bool found=false;
+            for(const auto& family:QStringList{"Arial","Helvetica","Noto Sans"})if(families.contains(family)){font.setFamily(family);found=true;break;}
+            if(!found)throw std::runtime_error("PDF 출력용 Arial/Helvetica/Noto Sans 글꼴을 찾지 못했습니다.");
+        }
+#endif
+        font.setPointSize(options.fontPoints); painter.setFont(font); Pages renderer(writer, painter, r, font);
         for (const auto& t : r.tables) if (includeTable(t, family)) renderer.table(t);
         if ((family == ReportFamily::All || family == ReportFamily::Costs) && !r.costTrend.empty()) renderer.chart();
         pages = renderer.pages; if (!pages || !painter.end()) throw std::runtime_error("PDF를 완료할 수 없습니다.");

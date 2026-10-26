@@ -49,3 +49,5 @@
 native `.jobs` schema 9에 taskType/workDriven/workUnitMinutes/breaks, 자원 calendarId와 명시 잔여 공수를 저장한다. 새 필드는 새 profile의 계획/기준선/시나리오에만 인코딩해 기존 승인 입력을 재해석하지 않는다. 실적의 잔여 공수는 존재할 때만 저장한다. native schema 1~8은 원본 보존 SaveAs로 이관한다. 복구 envelope schema 1은 내부 projectSchema 6/7/8/9를 지원한다. 입력·복구·기준선 재검증, 원자 저장·해시·잠금·충돌 방지, 실행 취소 정책은 기존 계약을 따른다.
 
 `effort_work_calendar_split`은 유형 편집 행렬, 혼합 달력·휴일·교집합 없음, 중단의 공수/원가/부하, 마지막 1분 정확 보존, 4종 관계·제약·ALAP, 평준화·실제 보존·명시 잔여·기준선 PV·schema9·복구/실행 취소를 검증한다. `effort_ui`는 모달 입력·잘못된 구간의 무변경·자동 재계산·간트 중단·자원 달력 선택·읽기 전용을 검증한다. 보고서 fixture는 독립 openpyxl/pypdf로 수치·공백 구간·한국어/출처를 검사한다. 외부 상용 도구 비교, 자동 분할 최적화, 초 단위·타임존/DST·생산량·실제 자원 공수와 대규모 성능은 별도 검증 범위다.
+
+macOS CoreText의 비공개 시스템 UI 글꼴은 Qt PDF의 시각 콜론을 제어문자로 매핑하는 문제가 확인되어, PDF에 설치된 공개 Arial/Helvetica/Noto Sans를 사용하고 한국어는 Qt의 시스템 대체 글꼴을 사용한다. 독립 reader는 제어문자 혼입을 거절하고 날짜·시각의 실제 텍스트를 검사한다. Unicode 합자 표현만 NFKC로 정규화하며 잘못된 제어문자를 콜론으로 치환하지 않는다.
