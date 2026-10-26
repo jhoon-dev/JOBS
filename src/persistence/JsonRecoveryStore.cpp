@@ -61,7 +61,7 @@ Record decode(const QByteArray& bytes, const QString& expectedSession, std::uint
     if (root["sha256"] != QJsonValue(hash(QJsonDocument(p).toJson(QJsonDocument::Compact)))) fail("복구본 무결성 검사에 실패했습니다.");
     keys(p, {"sessionId", "sequence", "capturedAt", "sourcePath", "sourceFingerprint", "sourceReadOnly", "sourceRequiresSaveAs", "lastSavedRevision", "projectSchema", "project"});
     Record r; r.session = string(p, "sessionId"); r.sequence = integer(p["sequence"], 999999999);
-    if (r.session != expectedSession || r.sequence != expectedSequence || !uuid(r.session) || (p["projectSchema"] != QJsonValue(6) && p["projectSchema"] != QJsonValue(7)) || !p["project"].isObject()) fail("복구 세션·세대·프로젝트 버전이 일치하지 않습니다.");
+    if (r.session != expectedSession || r.sequence != expectedSequence || !uuid(r.session) || (p["projectSchema"] != QJsonValue(6) && p["projectSchema"] != QJsonValue(7) && p["projectSchema"] != QJsonValue(8)) || !p["project"].isObject()) fail("복구 세션·세대·프로젝트 버전이 일치하지 않습니다.");
     auto& s = r.snapshot; s.project = json::decodeProject(p["project"].toObject(), p["projectSchema"].toInt()); s.capturedAt = string(p, "capturedAt").toStdString();
     s.sourcePath = string(p, "sourcePath").toStdString(); s.sourceFingerprint = string(p, "sourceFingerprint").toStdString(); s.sourceReadOnly = boolean(p, "sourceReadOnly"); s.sourceRequiresSaveAs = boolean(p, "sourceRequiresSaveAs");
     if (!p["lastSavedRevision"].isNull()) s.lastSavedRevision = integer(p["lastSavedRevision"], s.project.revision);
@@ -70,7 +70,7 @@ Record decode(const QByteArray& bytes, const QString& expectedSession, std::uint
 }
 QByteArray encode(const RecoverySnapshot& s, const QString& session, std::uint64_t seq) {
     validate(s.project);
-    QJsonObject p{{"sessionId", session}, {"sequence", qint64(seq)}, {"capturedAt", QString::fromStdString(s.capturedAt)}, {"sourcePath", QString::fromStdString(s.sourcePath)}, {"sourceFingerprint", QString::fromStdString(s.sourceFingerprint)}, {"sourceReadOnly", s.sourceReadOnly}, {"sourceRequiresSaveAs", s.sourceRequiresSaveAs}, {"lastSavedRevision", s.lastSavedRevision ? QJsonValue(qint64(*s.lastSavedRevision)) : QJsonValue()}, {"projectSchema", 7}, {"project", json::encodeProject(s.project)}};
+    QJsonObject p{{"sessionId", session}, {"sequence", qint64(seq)}, {"capturedAt", QString::fromStdString(s.capturedAt)}, {"sourcePath", QString::fromStdString(s.sourcePath)}, {"sourceFingerprint", QString::fromStdString(s.sourceFingerprint)}, {"sourceReadOnly", s.sourceReadOnly}, {"sourceRequiresSaveAs", s.sourceRequiresSaveAs}, {"lastSavedRevision", s.lastSavedRevision ? QJsonValue(qint64(*s.lastSavedRevision)) : QJsonValue()}, {"projectSchema", 8}, {"project", json::encodeProject(s.project)}};
     auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS-RECOVERY"}, {"schemaVersion", 1}, {"complete", true}, {"payload", p}, {"sha256", hash(QJsonDocument(p).toJson(QJsonDocument::Compact))}}).toJson();
     if (bytes.size() > 64 * 1024 * 1024) fail("자동 복구본 64 MiB 한도를 초과했습니다.");
     auto decoded = decode(bytes, session, seq);

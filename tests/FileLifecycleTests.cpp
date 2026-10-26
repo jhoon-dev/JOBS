@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 8;
+        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 9;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();

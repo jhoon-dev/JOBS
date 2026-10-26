@@ -1,12 +1,13 @@
 #include "calculation/PdmResources.h"
 #include "calculation/Pdm.h"
+#include "calculation/Constraints.h"
 #include <algorithm>
 #include <map>
 #include <unordered_map>
 namespace jobs {
 LevelingResult levelPdmResources(const Project& p,const std::string& priority,int horizonWorkDays) {
     LevelingResult out; out.priority=priority; out.horizonWorkDays=horizonWorkDays; out.original=calculate(p); out.before=resourceLoad(p,out.original); out.leveled=out.original;
-    out.leveled.calculationPolicy="serial-no-split-pdm-v1/"+priority;
+    out.leveled.calculationPolicy=levelingPolicyFor(p)+"/"+priority;
     if (out.original.status!=CalculationStatus::Valid) return out;
     try {
         WorkCalendar clock(p); PlanInput standard=p; standard.calculationProfile="native-fs0-workminutes-v1"; WorkCalendar horizonCalendar(standard);
@@ -27,10 +28,15 @@ LevelingResult levelPdmResources(const Project& p,const std::string& priority,in
             if (row.completedActual) continue;
             const auto& cal=calendars.at(task.calendarId); const auto duration=remaining(i); const auto originalStart=row.remainingStart.value_or(row.start);
             auto local=duration?cal.startAtLeast(originalStart):cal.finishAtLeast(originalStart);
+            if(p.calculationProfile==constraintProfile){auto pending=task;const auto* actual=out.original.isForecast?progressAsOf(p,task.id):nullptr;if(actual&&actual->actualStart&&(task.constraintType=="SNET"||task.constraintType=="SNLT"||task.constraintType=="MSO")){pending.constraintType="ASAP";pending.constraintAt.reset();}local=std::max(local,constraintWindow(p,pending,cal,duration).lower);}
             for (const auto& d:dependencies(task)) local=std::max(local,pdmRequiredStart(cal,d,rows[ids.at(d.predecessorId)],duration));
             bool found=false, unknown=false; TaskSchedule trial; std::vector<std::pair<std::string,std::string>> segments;
             for (;;) {
                 pdmDates(clock,cal,trial,local,duration); if (trial.finish>horizon) break;
+                if(p.calculationProfile==constraintProfile) {
+                    auto checked=trial;const auto* actual=out.original.isForecast?progressAsOf(p,task.id):nullptr;if(actual&&actual->actualStart)checked.start=*actual->actualStart;
+                    if(auto error=timingViolation(task,checked)){out.leveled.status=CalculationStatus::Conflict;out.leveled.tasks.clear();out.leveled.projectFinish.reset();out.diagnostics.push_back(*error);return out;}
+                }
                 segments=cal.segments(trial.start,trial.finish); auto next=local;
                 for (const auto& a:p.assignments) if (a.taskId==task.id) {
                     const auto& r=*std::find_if(p.resources.begin(),p.resources.end(),[&](const auto& v){return v.id==a.resourceId;}); const auto& events=reserved[r.id];
@@ -59,6 +65,7 @@ LevelingResult levelPdmResources(const Project& p,const std::string& priority,in
         out.leveled.tasks=std::move(rows); out.leveled.projectFinish.reset();
         for (const auto& row:out.leveled.tasks) if (!out.leveled.projectFinish || row.finish>*out.leveled.projectFinish) out.leveled.projectFinish=row.finish;
         out.leveled.status=CalculationStatus::Valid; out.after=resourceLoad(p,out.leveled);
+        if(p.calculationProfile==constraintProfile){auto warnings=deadlineDiagnostics(p,out.leveled.tasks);out.diagnostics.insert(out.diagnostics.end(),warnings.begin(),warnings.end());}
         out.diagnostics.push_back({"LEVEL_POLICY","직렬 우선순위 · 작업 달력의 근무 구간만 자원 예약 · 비근무 중단은 허용, 자원에 따른 작업 분할 없음 · 여유/임계 미산정",{}});
     } catch (const std::exception& e) { out.leveled.status=CalculationStatus::Conflict; out.leveled.tasks.clear(); out.leveled.projectFinish.reset(); out.diagnostics.push_back({"LEVEL_HORIZON_EXHAUSTED",e.what(),{}}); }
     return out;

@@ -38,6 +38,9 @@ private:
     QAction *calendars_, *taskCalendar_;
     void manageCalendars();
     void chooseTaskCalendar();
+    QAction *constraints_, *scheduleIssues_;
+    void editTaskConstraints();
+    void showScheduleIssues();
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;
     QAction *baselineSave_, *statusEdit_, *progressEdit_, *comparison_;
     QComboBox* baselineChoice_;

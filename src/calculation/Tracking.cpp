@@ -95,6 +95,8 @@ ComparisonReport compareToBaseline(const Project& p, const std::string& baseline
                 if (old.durationMinutes != t.durationMinutes) row.changes.push_back("계획 기간 변경");
                 if (sorted(dependencyLabels(old)) != sorted(dependencyLabels(t))) row.changes.push_back("선행관계 변경");
                 if (old.calendarId != t.calendarId) row.changes.push_back("작업 달력 배정 변경");
+                if(old.constraintType!=t.constraintType||old.constraintAt!=t.constraintAt)row.changes.push_back("작업 날짜 제약 변경");
+                if(old.deadlineAt!=t.deadlineAt)row.changes.push_back("마감일 변경");
                 if (old.wbsId != t.wbsId) row.changes.push_back("WBS 소속 변경");
                 if (assignments(baseline->input, t.id, false) != assignments(p, t.id, false)) row.changes.push_back("자원 배정 변경");
             }

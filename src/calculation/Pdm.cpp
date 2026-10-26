@@ -1,4 +1,5 @@
 #include "calculation/Pdm.h"
+#include "calculation/Constraints.h"
 #include <algorithm>
 #include <map>
 #include <deque>
@@ -61,7 +62,7 @@ ScheduleResult calculatePdmPlan(const Project& p, const std::vector<std::size_t>
     return out;
 }
 ScheduleResult calculatePdmForecast(const Project& p, ScheduleResult out) {
-    out.tasks.clear(); out.projectFinish.reset(); out.diagnostics.clear(); out.isForecast=true; out.statusAt=p.statusAt; out.calculationPolicy="retained-remaining-pdm-v1";
+    out.tasks.clear(); out.projectFinish.reset(); out.diagnostics.clear(); out.isForecast=true; out.statusAt=p.statusAt; out.calculationPolicy=p.calculationProfile==constraintProfile?"retained-remaining-constrained-v1":"retained-remaining-pdm-v1";
     try {
         WorkCalendar clock(p); Calendars calendars(p); const auto n=p.tasks.size();
         std::unordered_map<std::string,std::size_t> ids; for (std::size_t i=0;i<n;++i) ids[p.tasks[i].id]=i;
@@ -74,6 +75,11 @@ ScheduleResult calculatePdmForecast(const Project& p, ScheduleResult out) {
             if (e && e->actualFinish) { row.start=*e->actualStart; row.finish=*e->actualFinish; row.completedActual=true; row.earlyStartMinutes=clock.offset(row.start); row.earlyFinishMinutes=clock.offset(row.finish); }
             else {
                 const auto duration=e?e->remainingMinutes:*t.durationMinutes; auto local=duration?cal.startAtLeast(*p.statusAt):cal.finishAtLeast(*p.statusAt);
+                if(p.calculationProfile==constraintProfile) {
+                    auto remainingTask=t;
+                    if(e&&e->actualStart&&(t.constraintType=="SNET"||t.constraintType=="SNLT"||t.constraintType=="MSO")){remainingTask.constraintType="ASAP";remainingTask.constraintAt.reset();}
+                    local=std::max(local,constraintWindow(p,remainingTask,cal,duration).lower);
+                }
                 for (const auto& d:dependencies(t)) local=std::max(local,pdmRequiredStart(cal,d,rows[ids.at(d.predecessorId)],duration));
                 pdmDates(clock,cal,row,local,duration); row.remainingStart=row.start;
                 if (e && e->actualStart) { row.start=*e->actualStart; row.earlyStartMinutes=clock.offset(row.start); }
@@ -86,6 +92,13 @@ ScheduleResult calculatePdmForecast(const Project& p, ScheduleResult out) {
             for (auto j:next[i]) if (!--degree[j]) ready.push_back(j);
         }
         out.tasks=std::move(rows); out.status=CalculationStatus::Valid;
+        if(p.calculationProfile==constraintProfile) {
+            for(std::size_t i=0;i<n;++i)if(auto error=timingViolation(p.tasks[i],out.tasks[i])){out.diagnostics.push_back(*error);out.status=CalculationStatus::Conflict;}
+            auto deadlines=deadlineDiagnostics(p,out.tasks);out.diagnostics.insert(out.diagnostics.end(),deadlines.begin(),deadlines.end());
+            if(out.status==CalculationStatus::Conflict)out.projectFinish.reset();
+            out.calculationPolicy="retained-remaining-constrained-v1";
+            if(std::any_of(p.tasks.begin(),p.tasks.end(),[](const auto& t){return t.constraintType=="ALAP";}))out.diagnostics.push_back({"CONSTRAINT_POLICY","잔여 예측은 상태일 이후 가장 이른 재개를 사용합니다. ALAP은 계획 모드에만 적용하며 예측의 늦은 날짜/여유는 미산정입니다.",{}});
+        }
         if (unreported) out.diagnostics.push_back({"UNREPORTED_REMAINING","미보고 작업은 현재 계획 기간을 잔여로 사용합니다.",{}});
         out.diagnostics.push_back({"FORECAST_POLICY","실제 날짜 고정 · 상태일 이후 잔여에 PDM 관계/작업 달력 적용 · 예측 여유/임계 미산정",{}});
     } catch (const std::exception& e) { out.status=CalculationStatus::Conflict; out.tasks.clear(); out.projectFinish.reset(); out.diagnostics.push_back({"FORECAST_HORIZON",e.what(),{}}); }

@@ -6,6 +6,20 @@
 #include <algorithm>
 
 namespace jobs {
+bool isPdm(const PlanInput& p) { return p.calculationProfile==pdmProfile || p.calculationProfile==constraintProfile; }
+std::string engineFor(const PlanInput& p) { return p.calculationProfile==constraintProfile?"jobs-pdm-1.1":isPdm(p)?"jobs-pdm-1.0":"jobs-cpm-0.2"; }
+std::string levelingPolicyFor(const PlanInput& p) { return p.calculationProfile==constraintProfile?"serial-no-split-constrained-v1":isPdm(p)?"serial-no-split-pdm-v1":"serial-no-split-v1"; }
+std::string constraintName(const std::string& type) {
+    if(type=="ASAP")return "가능한 빨리";
+    if(type=="ALAP")return "가능한 늦게";
+    if(type=="SNET")return "시작 이후";
+    if(type=="SNLT")return "시작 이전";
+    if(type=="FNET")return "완료 이후";
+    if(type=="FNLT")return "완료 이전";
+    if(type=="MSO")return "시작 고정";
+    if(type=="MFO")return "완료 고정";
+    return "알 수 없는 제약";
+}
 std::vector<Dependency> dependencies(const Task& task) {
     std::vector<Dependency> out;
     for (const auto& id : task.predecessors) {
@@ -60,7 +74,7 @@ void validatePlan(const PlanInput& p) {
     if (blank(p.name)) throw std::runtime_error("프로젝트 이름은 필수입니다.");
     if (!validDate(p.startDate)) throw std::runtime_error("시작일은 유효한 YYYY-MM-DD 날짜여야 합니다.");
     if (p.calendar != "standard-mon-fri-8h-v1") throw std::runtime_error("지원하지 않는 근무달력입니다.");
-    if (p.calculationProfile != "native-fs0-workminutes-v1" && p.calculationProfile != pdmProfile) throw std::runtime_error("지원하지 않는 계산 정책입니다.");
+    if (p.calculationProfile != "native-fs0-workminutes-v1" && !isPdm(p)) throw std::runtime_error("지원하지 않는 계산 정책입니다.");
     std::unordered_set<std::string> calendarIds;
     for (const auto& c : p.calendars) {
         if (blank(c.id) || blank(c.name) || !calendarIds.insert(c.id).second || c.weekdays.empty() || c.periods.empty()) throw std::runtime_error("작업 달력 ID·이름·근무 요일·시간대가 필요합니다.");
@@ -71,7 +85,7 @@ void validatePlan(const PlanInput& p) {
         std::unordered_set<std::string> dates;
         for (const auto& d : c.holidays) if (!validDate(d) || !dates.insert(d).second) throw std::runtime_error("작업 달력 휴일 오류/중복입니다.");
     }
-    if (!p.calendars.empty() && p.calculationProfile != pdmProfile) throw std::runtime_error("작업 달력에는 PDM 계산 정책이 필요합니다.");
+    if (!p.calendars.empty() && !isPdm(p)) throw std::runtime_error("작업 달력에는 PDM 계산 정책이 필요합니다.");
     std::unordered_set<std::string> holidays;
     for (const auto& date : p.holidays)
         if (!validDate(date) || !holidays.insert(date).second) throw std::runtime_error("휴일 날짜가 잘못되었거나 중복되었습니다.");
@@ -111,7 +125,10 @@ void validatePlan(const PlanInput& p) {
             if (!refs.contains(d.predecessorId) || !rules.insert(d.predecessorId).second ||
                 (d.type != "FS" && d.type != "SS" && d.type != "FF" && d.type != "SF") || d.lagMinutes < -5000000 || d.lagMinutes > 5000000 || (d.type == "FS" && d.lagMinutes == 0)) throw std::runtime_error("선행관계 종류·근무분 지연/선행·중복 속성 오류입니다.");
         }
-        if ((!t.dependencyRules.empty() || !t.calendarId.empty()) && p.calculationProfile != pdmProfile) throw std::runtime_error("확장 선행관계에는 PDM 계산 정책이 필요합니다.");
+        if ((!t.dependencyRules.empty() || !t.calendarId.empty()) && !isPdm(p)) throw std::runtime_error("확장 선행관계에는 PDM 계산 정책이 필요합니다.");
+        const bool dated=t.constraintType!="ASAP" && t.constraintType!="ALAP";
+        if ((t.constraintType!="ASAP" && t.constraintType!="ALAP" && t.constraintType!="SNET" && t.constraintType!="SNLT" && t.constraintType!="FNET" && t.constraintType!="FNLT" && t.constraintType!="MSO" && t.constraintType!="MFO") || dated!=t.constraintAt.has_value() || (t.constraintAt&&!validStamp(*t.constraintAt)) || (t.deadlineAt&&!validStamp(*t.deadlineAt))) throw std::runtime_error("작업 제약 종류·제약 시각·마감일이 잘못되었습니다. 날짜는 YYYY-MM-DD HH:mm입니다.");
+        if ((t.constraintType!="ASAP" || t.constraintAt || t.deadlineAt) && p.calculationProfile!=constraintProfile) throw std::runtime_error("작업 제약/마감일에는 제약 계산 정책이 필요합니다.");
     }
     std::unordered_set<std::string> resources, pairs;
     const auto validUnits = [](const std::optional<int>& n) { return !n || (*n >= 0 && *n <= 100000); };
@@ -150,7 +167,7 @@ void validate(const Project& p) {
         const auto& b = p.baselines[i]; validatePlan(b.input);
         if (blank(b.id) || !baselineIds.insert(b.id).second || blank(b.name) || blank(b.approvedBy) || blank(b.reason) ||
             !validUtcStamp(b.createdAt) || blank(b.sourceDocumentId) || b.inputRevision == 0 || b.inputRevision >= p.revision ||
-            b.version != i + 1 || b.engineVersion != (b.input.calculationProfile == pdmProfile ? "jobs-pdm-1.0" : "jobs-cpm-0.2") || !validStamp(b.projectFinish) || b.schedule.size() != b.input.tasks.size())
+            b.version != i + 1 || b.engineVersion != engineFor(b.input) || !validStamp(b.projectFinish) || b.schedule.size() != b.input.tasks.size())
             throw std::runtime_error("기준선 메타데이터·버전·계산 결과가 잘못되었습니다.");
         std::unordered_set<std::string> taskIds;
         for (const auto& t : b.input.tasks) taskIds.insert(t.id);
@@ -184,7 +201,7 @@ void validate(const Project& p) {
     std::unordered_set<std::string> scenarios;
     for (const auto& s : p.scenarios) {
         if (blank(s.id) || !scenarios.insert(s.id).second || blank(s.name) || !validUtcStamp(s.createdAt) || blank(s.sourceDocumentId) ||
-            !s.inputRevision || s.inputRevision >= p.revision || s.policy != (s.input.calculationProfile==pdmProfile?"serial-no-split-pdm-v1":"serial-no-split-v1") ||
+            !s.inputRevision || s.inputRevision >= p.revision || s.policy != levelingPolicyFor(s.input) ||
             (s.priority != "task-order" && s.priority != "shortest-first" && s.priority != "longest-first") ||
             s.horizonWorkDays < 1 || s.horizonWorkDays > 5200)
             throw std::runtime_error("평준화 시나리오의 메타데이터·정책·탐색 범위가 잘못되었습니다.");

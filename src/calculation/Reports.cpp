@@ -1,4 +1,5 @@
 #include "calculation/Reports.h"
+#include "calculation/Constraints.h"
 #include "domain/Wbs.h"
 #include <algorithm>
 #include <set>
@@ -76,6 +77,9 @@ ProjectReport buildReport(const Project& p, const ReportOptions& o) {
     auto& schedule = table("schedule", "계획 일정", ReportFamily::Schedule, "전체 실행 그래프를 계산한 후 WBS 작업을 선택합니다. 총여유는 각 작업 달력의 근무시간(h)입니다. 미계산/충돌 날짜를 과거 캐시로 채우지 않습니다.", {{"작업 ID", 28}, {"작업", 24}, {"WBS", 24}, {"기간(분)", 12}, {"계획 시작", 21}, {"계획 완료", 21}, {"여유(h)", 12}, {"임계", 10}, {"작업 달력",30}});
     for (auto row : rows) { const auto& t = p.tasks[row]; auto* s = plans.contains(t.id) ? plans.at(t.id) : nullptr;
         schedule.rows.push_back({text(t.id), text(t.name), text(t.wbsId.empty() ? "미분류" : path(p, t.wbsId)), optional(t.durationMinutes, CellFormat::Integer), s ? text(s->start) : ReportCell{}, s ? text(s->finish) : ReportCell{}, s ? number(s->totalFloatMinutes, CellFormat::Hours) : ReportCell{}, s ? text(s->critical ? "임계" : "여유") : ReportCell{},text(taskCalendarName(p,t))}); }
+    if(p.calculationProfile==constraintProfile){auto& timing=table("constraints","작업 제약과 마감",ReportFamily::Schedule,"날짜 제약은 선행/달력과 함께 적용합니다. 마감일은 경고 기준이며 CPM 여유를 바꾸지 않습니다. 마감 여유는 해당 작업 달력 근무시간입니다. 비근무 경과는 0근무분이어도 civil 시각으로 초과를 판정합니다.",{{"작업 ID",28},{"작업",24},{"제약",20},{"제약 시각",21},{"마감일",21},{"활성 완료",21},{"마감 여유(h)",16},{"마감 상태",14}});
+        for(auto row:rows){const auto& t=p.tasks[row];const auto* s=forecasts.contains(t.id)?forecasts.at(t.id):nullptr;timing.rows.push_back({text(t.id),text(t.name),text(t.constraintType+" · "+constraintName(t.constraintType)),stamp(t.constraintAt),stamp(t.deadlineAt),s?text(s->finish):ReportCell{},s?optional(deadlineSlack(p,t,s->finish),CellFormat::Hours):ReportCell{},text(!t.deadlineAt?"미설정":!s?"계산 불가":s->finish>*t.deadlineAt?"마감 초과":"마감 이내")});}
+    }
     auto& forecast = table("forecast", "실적과 예측", ReportFamily::Schedule, "실제 날짜를 보존합니다. 편차는 선택 기준선 달력의 근무시간이며 기준선 없는 작업은 미정입니다.", {{"작업 ID", 28}, {"작업", 24}, {"실제 시작", 21}, {"실제 완료", 21}, {"잔여(h)", 12}, {"예측 완료", 21}, {"완료 편차(h)", 14}, {"기준선 시작", 21}, {"기준선 완료", 21}});
     for (auto row : rows) { const auto& t = p.tasks[row]; const auto& c = *comparisons.at(t.id);
         forecast.rows.push_back({text(t.id), text(t.name), stamp(c.actualStart), stamp(c.actualFinish), optional(c.remainingMinutes, CellFormat::Hours), stamp(c.forecastFinish), optional(c.forecastFinishVariance, CellFormat::Hours), stamp(c.baselineStart), stamp(c.baselineFinish)}); }

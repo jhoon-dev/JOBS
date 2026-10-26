@@ -7,6 +7,7 @@
 
 namespace jobs {
 inline constexpr const char* pdmProfile = "native-pdm-taskcal-v1";
+inline constexpr const char* constraintProfile = "native-pdm-constraints-v1";
 struct Dependency {
     std::string predecessorId, type = "FS";
     std::int64_t lagMinutes = 0;
@@ -32,6 +33,9 @@ struct Task {
     // IDs are the graph; only non-FS0 edge attributes are stored as overrides.
     std::vector<Dependency> dependencyRules = {};
     std::string calendarId = {};
+    std::string constraintType = "ASAP";
+    std::optional<std::string> constraintAt = {};
+    std::optional<std::string> deadlineAt = {};
     bool operator==(const Task&) const = default;
 };
 struct WbsNode {
@@ -148,4 +152,8 @@ int currencyDecimals(const std::string& currency);
 std::vector<Dependency> dependencies(const Task&);
 std::vector<std::string> dependencyLabels(const Task&);
 std::string taskCalendarName(const PlanInput&, const Task&);
+bool isPdm(const PlanInput&);
+std::string engineFor(const PlanInput&);
+std::string levelingPolicyFor(const PlanInput&);
+std::string constraintName(const std::string& type);
 }

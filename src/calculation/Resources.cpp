@@ -55,7 +55,7 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
         assigned.insert(a.taskId);
         const auto [s, e] = span(*rows.at(a.taskId), result, calendar);
         if (e > s) {
-            if (p.calculationProfile == pdmProfile) {
+            if (isPdm(p)) {
                 const auto task=std::find_if(p.tasks.begin(),p.tasks.end(),[&](const auto& t){return t.id==a.taskId;});
                 if(!calendars.contains(task->calendarId)) calendars.emplace(task->calendarId,WorkCalendar(p,*task));
                 for (const auto& [begin,end]:calendars.at(task->calendarId).segments(calendar.boundary(s,false),calendar.boundary(e,true))) spans[a.resourceId].push_back({calendar.offset(begin),calendar.offset(end),a.taskId,a.units});
@@ -94,7 +94,7 @@ ResourceLoad resourceLoad(const Project& p, const ScheduleResult& result) {
 LevelingResult levelResources(const Project& p, const std::string& priority, int horizonWorkDays) {
     if ((priority != "task-order" && priority != "shortest-first" && priority != "longest-first") || horizonWorkDays < 1 || horizonWorkDays > 5200)
         throw std::runtime_error("지원하지 않는 우선순위 또는 탐색 범위입니다.");
-    if (p.calculationProfile == pdmProfile) return levelPdmResources(p,priority,horizonWorkDays);
+    if (isPdm(p)) return levelPdmResources(p,priority,horizonWorkDays);
     LevelingResult out; out.priority = priority; out.horizonWorkDays = horizonWorkDays;
     out.original = calculate(p); out.before = resourceLoad(p, out.original); out.leveled = out.original;
     out.leveled.calculationPolicy = "serial-no-split-v1/" + priority;

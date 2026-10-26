@@ -1,6 +1,7 @@
 #include "calculation/Scheduler.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Pdm.h"
+#include "calculation/Constraints.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -12,7 +13,7 @@
 namespace jobs {
 ScheduleResult calculatePlan(const Project& p) {
     ScheduleResult result; result.documentId = p.documentId; result.inputRevision = p.revision; result.profile = p.calculationProfile;
-    if (p.calculationProfile==pdmProfile) result.engineVersion="jobs-pdm-1.0";
+    result.engineVersion=engineFor(p);
     try { validate(p); }
     catch (const std::exception& e) {
         result.status = CalculationStatus::Conflict;
@@ -64,7 +65,8 @@ ScheduleResult calculatePlan(const Project& p) {
     if (invalid || missing) {
         result.status = invalid ? CalculationStatus::Conflict : CalculationStatus::Incomplete; return result;
     }
-    if (p.calculationProfile == pdmProfile) return calculatePdmPlan(p, order);
+    if (p.calculationProfile == constraintProfile) return calculateConstrainedPlan(p,order);
+    if (isPdm(p)) return calculatePdmPlan(p, order);
     std::vector<TaskSchedule> rows(n);
     std::int64_t finish = 0;
     for (auto i : order) {

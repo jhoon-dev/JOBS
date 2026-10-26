@@ -56,10 +56,11 @@ QJsonObject encodePlan(const PlanInput& p) {
     QJsonArray tasks, nodes;
     for (const auto& t : p.tasks) tasks.append(QJsonObject{{"id", qs(t.id)}, {"name", qs(t.name)}, {"wbsId", qs(t.wbsId)},
         {"durationMinutes", t.durationMinutes ? QJsonValue(double(*t.durationMinutes)) : QJsonValue(QJsonValue::Null)}, {"predecessors", strings(t.predecessors)}});
-    if (p.calculationProfile == pdmProfile) for (int i=0;i<tasks.size();++i) {
+    if (isPdm(p)) for (int i=0;i<tasks.size();++i) {
         auto t=tasks[i].toObject(); const auto& task=p.tasks[std::size_t(i)]; QJsonArray edges;
         for (const auto& d:task.dependencyRules) edges.append(QJsonObject{{"predecessorId",qs(d.predecessorId)},{"type",qs(d.type)},{"lagMinutes",double(d.lagMinutes)}});
         t["dependencyRules"]=edges; t["calendarId"]=qs(task.calendarId); tasks[i]=t;
+        if(p.calculationProfile==constraintProfile){t["constraintType"]=qs(task.constraintType);t["constraintAt"]=nullable(task.constraintAt);t["deadlineAt"]=nullable(task.deadlineAt);tasks[i]=t;}
     }
     for (const auto& n : p.wbsNodes) nodes.append(QJsonObject{{"id", qs(n.id)}, {"name", qs(n.name)}, {"parentId", qs(n.parentId)}});
     QJsonArray resources, assignments;
@@ -74,7 +75,7 @@ QJsonObject encodePlan(const PlanInput& p) {
     QJsonArray costs; for (const auto& c : p.taskCosts) costs.append(QJsonObject{{"taskId", qs(c.taskId)}, {"fixedMinor", money(c.fixedMinor)}, {"accrual", qs(c.accrual)}, {"credit", qs(c.credit)}});
     QJsonObject result{{"name", qs(p.name)}, {"startDate", qs(p.startDate)}, {"calendar", qs(p.calendar)}, {"tasks", tasks},
         {"holidays", strings(p.holidays)}, {"calculationProfile", qs(p.calculationProfile)}, {"wbsNodes", nodes}, {"resources", resources}, {"assignments", assignments}, {"currency", qs(p.currency)}, {"costProfile", qs(p.costProfile)}, {"taskCosts", costs}};
-    if (p.calculationProfile == pdmProfile) {
+    if (isPdm(p)) {
         QJsonArray calendars; for (const auto& c:p.calendars) {
             QJsonArray weekdays,periods; for (int day:c.weekdays) weekdays.append(day);
             for (const auto& s:c.periods) periods.append(QJsonObject{{"begin",s.begin},{"end",s.end}});
@@ -87,8 +88,10 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
     keys(o, planKeys(schema)); PlanInput p;
     p.name = string(o, "name"); p.startDate = string(o, "startDate"); p.calendar = string(o, "calendar");
     if (schema >= 2) { p.holidays = readStrings(o, "holidays"); p.calculationProfile = string(o, "calculationProfile"); }
-    const bool pdm=schema>=7 && p.calculationProfile==pdmProfile;
-    if (p.calculationProfile==pdmProfile && !pdm) fail("PDM 정책에는 schema 7이 필요합니다.");
+    const bool pdm=schema>=7 && isPdm(p);
+    const bool constrained=schema>=8 && p.calculationProfile==constraintProfile;
+    if (isPdm(p) && !pdm) fail("PDM 정책에는 schema 7 이상이 필요합니다.");
+    if(p.calculationProfile==constraintProfile&&!constrained)fail("제약 정책에는 schema 8이 필요합니다.");
     if (!pdm && o.contains("calendars")) fail("이전 계산 정책에 작업 달력을 추가할 수 없습니다.");
     if (pdm) for (const auto& v:array(o,"calendars")) {
         auto c=object(v); keys(c,{"id","name","weekdays","periods","holidays"}); TaskCalendar cal; cal.id=string(c,"id"); cal.name=string(c,"name"); cal.weekdays.clear(); cal.periods.clear();
@@ -129,6 +132,7 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
         if (schema >= 2) fields.append({"durationMinutes", "predecessors"});
         if (schema >= 3) fields.append("wbsId");
         if (pdm) fields.append({"dependencyRules","calendarId"});
+        if(constrained)fields.append({"constraintType","constraintAt","deadlineAt"});
         keys(t, fields);
         Task task{string(t, "id"), string(t, "name"), std::nullopt, {}};
         if (schema >= 2) {
@@ -139,12 +143,13 @@ PlanInput decodePlan(const QJsonObject& o, int schema) {
         if (schema >= 3) task.wbsId = string(t, "wbsId");
         if (pdm) {
             task.calendarId=string(t,"calendarId");
-            for (const auto& v:array(t,"dependencyRules")) {
-                auto d=object(v); keys(d,{"predecessorId","type","lagMinutes"}); const auto lag=d["lagMinutes"].toDouble(9000000);
+            for (const auto& edgeValue:array(t,"dependencyRules")) {
+                auto d=object(edgeValue); keys(d,{"predecessorId","type","lagMinutes"}); const auto lag=d["lagMinutes"].toDouble(9000000);
                 if (!d["lagMinutes"].isDouble() || !std::isfinite(lag) || std::floor(lag)!=lag || std::abs(lag)>5000000) fail("선행/지연은 정수 근무분이어야 합니다.");
                 task.dependencyRules.push_back({string(d,"predecessorId"),string(d,"type"),std::int64_t(lag)});
             }
         }
+        if(constrained){task.constraintType=string(t,"constraintType");task.constraintAt=optionalString(t,"constraintAt");task.deadlineAt=optionalString(t,"deadlineAt");}
         p.tasks.push_back(std::move(task));
     }
     return p;

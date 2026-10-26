@@ -17,7 +17,7 @@ WorkCalendar::WorkCalendar(const PlanInput& p) { initialize(p, nullptr); }
 WorkCalendar::WorkCalendar(const PlanInput& p, const Task& t) { initialize(p, &t); }
 void WorkCalendar::initialize(const PlanInput& p, const Task* task) {
     TaskCalendar calendar; calendar.holidays = p.holidays;
-    elapsed_ = !task && p.calculationProfile == pdmProfile;
+    elapsed_ = !task && isPdm(p);
     if (elapsed_) { calendar.weekdays = {1,2,3,4,5,6,7}; calendar.periods = {{0,1440}}; calendar.holidays.clear(); }
     else if (task && !task->calendarId.empty()) {
         auto it = std::find_if(p.calendars.begin(), p.calendars.end(), [&](const auto& c) { return c.id == task->calendarId; });
@@ -61,10 +61,10 @@ std::vector<std::pair<std::string,std::string>> WorkCalendar::segments(const std
     std::vector<std::pair<std::string,std::string>> out;
     offset(start); offset(finish);
     const auto civil=[&](const std::string& s){return (date(s)-anchor_).count()*1440+std::stoi(s.substr(11,2))*60+std::stoi(s.substr(14,2));};
-    const auto first=std::int64_t(civil(start)),last=std::int64_t(civil(finish));
+    const auto first=std::int64_t(civil(start)),endMinute=std::int64_t(civil(finish));
     for (const auto& i : intervals_) {
-        if (i.begin >= last) break;
-        if (i.end > first) out.emplace_back(stamp(anchor_,std::max(i.begin,first)),stamp(anchor_,std::min(i.end,last)));
+        if (i.begin >= endMinute) break;
+        if (i.end > first) out.emplace_back(stamp(anchor_,std::max(i.begin,first)),stamp(anchor_,std::min(i.end,endMinute)));
     }
     return out;
 }

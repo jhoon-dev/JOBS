@@ -18,5 +18,6 @@ public:
     std::string shift(const std::string&, std::int64_t minutes) const;
     std::vector<std::pair<std::string,std::string>> segments(const std::string& start, const std::string& finish) const;
     int dayMinutes() const { return elapsed_ ? 1440 : 480; }
+    std::int64_t maxOffset() const { return intervals_.empty()?0:intervals_.back().prefix+intervals_.back().end-intervals_.back().begin; }
 };
 }

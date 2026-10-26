@@ -27,12 +27,14 @@ qreal GanttView::position(const QString& stamp) const {
     const auto time = QTime::fromString(stamp.mid(11), "HH:mm");
     return (qreal(firstDay_.daysTo(day)) + qreal(time.hour() * 60 + time.minute()) / 1440) * dayWidth_;
 }
-void GanttView::setPlan(const Project* p, const ScheduleResult* result, const std::vector<std::size_t>& indices) {
+void GanttView::setPlan(const Project* p, const ScheduleResult* result, const std::vector<std::size_t>& indices,bool editable) {
+    cancelDrag();input_.reset();editable_=false;
     const auto x = horizontalScrollBar()->value(), y = verticalScrollBar()->value();
     rows_.clear(); dayCount_ = 0; holidays_.clear(); displayRowCount_ = indices.size();
     isForecast_ = result && result->isForecast;
     if (p && result && result->status == CalculationStatus::Valid && result->documentId == p->documentId &&
         result->inputRevision == p->revision && result->profile == p->calculationProfile && result->projectFinish) {
+        input_=static_cast<const PlanInput&>(*p);documentId_=p->documentId;revision_=p->revision;editable_=editable&&!isForecast_;
         firstDay_ = QDate::fromString(qs(p->startDate), Qt::ISODate);
         const auto last = QDate::fromString(qs(*result->projectFinish).left(10), Qt::ISODate);
         planFirstDay_ = firstDay_; planLastDay_ = last;
@@ -48,6 +50,8 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
             rows_.push_back({t.id, QString::number(index + 1) + ". " + qs(t.name), qs(s.start), qs(s.finish),
                 s.critical, t.predecessors, s.drivingPredecessors, s.remainingStart, s.completedActual});
             rows_.back().edges=dependencies(t); rows_.back().calendar=qs(taskCalendarName(*p,t));
+            auto& added=rows_.back();added.editable=editable_&&!std::any_of(p->progress.begin(),p->progress.end(),[&](const auto& e){return e.taskId==t.id&&e.actualStart.has_value();});added.constraintType=t.constraintType;added.constraintAt=t.constraintAt;added.deadlineAt=t.deadlineAt;
+            if(t.deadlineAt){const auto due=QDate::fromString(qs(*t.deadlineAt).left(10),Qt::ISODate);if(due>=planFirstDay_&&due<=planFirstDay_.addDays(366*20-1))planLastDay_=std::max(planLastDay_,due);}
             for(const auto& c:p->calendars) if(c.id==t.calendarId) {
                 rows_.back().calendar+=" · 근무 요일 "; for(int d:c.weekdays) rows_.back().calendar+=QString::number(d)+" ";
                 for(const auto& period:c.periods) rows_.back().calendar+=QString(" %1:%2–%3:%4").arg(period.begin/60,2,10,QChar('0')).arg(period.begin%60,2,10,QChar('0')).arg(period.end/60,2,10,QChar('0')).arg(period.end%60,2,10,QChar('0'));
@@ -77,9 +81,11 @@ void GanttView::setSelectedTask(const std::string& id) {
         auto* shape = dynamic_cast<QAbstractGraphicsShapeItem*>(item);
         if (shape) shape->setPen(QPen(selected ? palette().color(QPalette::Text) : QColor("#202833"), selected ? 3.0 : 1.0));
     }
+    for(auto* item:scene()->items())if(item->data(1)=="resizeHandle")item->setVisible(item->data(0).toString()==qs(id));
     viewport()->update();
 }
 void GanttView::rebuild() {
+    cancelDrag();
     scene()->clear();
     if (dayCount_ == 0) {
         auto* message = scene()->addText("F9로 최신 유효한 일정을 계산하세요.\n오래됨·누락·충돌 상태에서는 막대를 표시하지 않습니다.");
@@ -122,11 +128,15 @@ void GanttView::rebuild() {
         const auto kind = row.completedActual ? "실제 완료" : isForecast_ ? "실적 반영 예측" : milestone ? "마일스톤" : row.critical ? "임계 작업" : "여유 작업";
         QString tooltip = row.name + "\n" + kind + "\n" + row.start + " → " + row.finish + "\nID: " + qs(row.id);
         tooltip+="\n작업 달력: "+row.calendar+"\n막대는 시작~완료 구간입니다. 비근무 시간은 기간/자원 공수에서 제외합니다.";
+        tooltip+="\n제약: "+qs(constraintName(row.constraintType))+" ("+qs(row.constraintType)+")"+(row.constraintAt?" "+qs(*row.constraintAt):QString{})+"\n마감: "+(row.deadlineAt?qs(*row.deadlineAt):"없음");
+        tooltip+=row.editable?"\n드래그=날짜 이동 · 오른쪽 끝/Shift+드래그=기간 · 15분 격자 · Esc=취소 · 적용 후 자동 재계산":"\n현재 작업은 드래그할 수 없습니다 (읽기 전용/예측/실제 시작 이력).";
         if (row.remainingStart) tooltip += "\n잔여 작업 재개: " + qs(*row.remainingStart);
         int hidden = 0;
         for (const auto& prev : row.predecessors) if (!index.contains(prev)) ++hidden;
         if (hidden) tooltip += "\n현재 WBS 밖 선행: " + QString::number(hidden) + "개 (전체 프로젝트 계산에 반영됨)";
         bar->setToolTip(tooltip);
+        if(row.editable&&!milestone){auto* handle=scene()->addRect(QRectF(finish-3,y-8,6,16),QPen(QColor("#153b5a")),QBrush(QColor("#d6eafa")));handle->setData(0,qs(row.id));handle->setData(1,"resizeHandle");handle->setZValue(5);handle->setToolTip("오른쪽 끝 드래그: 작업 달력 근무 기간 변경 · 기존 제약 유지");handle->setVisible(row.id==selectedId_);}
+        if(row.deadlineAt){const auto x=position(qs(*row.deadlineAt));const auto color=row.finish>qs(*row.deadlineAt)?QColor("#e66140"):QColor("#bd7d15");if(x>=0&&x<=width){auto* marker=scene()->addLine(x,y-14,x,y+13,QPen(color,2,Qt::DashLine));marker->setData(0,qs(row.id));marker->setData(1,"deadline");marker->setToolTip("마감 "+qs(*row.deadlineAt)+" · 완료 "+row.finish+" · 경고 기준 (날짜 강제 이동 없음)");marker->setZValue(1);}}
         auto* label = scene()->addSimpleText(row.name + (row.completedActual ? " [실제]" : isForecast_ ? " [예측]" : milestone ? " ◆" : row.critical ? " [임계]" : ""));
         label->setBrush(palette().color(QPalette::Text)); label->setPos(finish + 9, y - 9); label->setZValue(3);
         label->setData(0, qs(row.id)); label->setData(1, "label"); label->setToolTip(tooltip);
@@ -149,12 +159,6 @@ void GanttView::rebuild() {
         }
     }
     setSelectedTask(selectedId_);
-}
-void GanttView::mousePressEvent(QMouseEvent* event) {
-    auto* item = itemAt(event->pos());
-    if (item && taskSelected && (item->data(1) == "task" || item->data(1) == "milestone" || item->data(1) == "label"))
-        taskSelected(item->data(0).toString().toUtf8().toStdString());
-    QGraphicsView::mousePressEvent(event);
 }
 void GanttView::drawBackground(QPainter* painter, const QRectF& rect) {
     painter->fillRect(rect, palette().brush(QPalette::Base));

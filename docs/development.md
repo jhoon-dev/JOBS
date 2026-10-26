@@ -21,7 +21,7 @@ WBS는 별도 그룹 트리로 편집하며 작업을 그룹에 배치한다. �
 추적 메뉴에서 기준선을 새 버전으로 저장하고 상태일·실제 시작/완료·실제 소요/잔여 근무분을 입력한다.
 기준선은 불변 입력·달력·결과 스냅샷, 실적은 정정 사유를 가진 append-only 보고 원장이다.
 현재 계획과 상태일 이후 잔여 예측을 나누어 비교하며, 간트에서 선택 기준선을 회색으로 표시한다.
-간트 드래그 편집·공수 중심 일정은 후속 범위다. FS·SS·FF·SF/lag와 작업별 달력, 일반 입력 실행 취소/다시 실행과 EVM용 물리 진척은 별도 구현 계약을 따른다.
+공수 중심 일정·왼쪽 끝 resize/관계 생성 드래그는 후속 범위다. 간트 날짜/기간 드래그, 작업 제약·마감, FS·SS·FF·SF/lag와 작업별 달력, 일반 입력 실행 취소/다시 실행과 EVM용 물리 진척은 별도 구현 계약을 따른다.
 [현재 계산 정책·수용시험·입력 예제](calculation-native-v1.md)를 참고한다.
 [WBS·표·간트 사용법과 검증 계약](wbs-gantt.md)을 함께 따른다.
 [기준선·실적·변경 비교 계약](baseline-progress.md)에 재현 예제와 예측 범위를 기록한다.
@@ -156,3 +156,5 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 [자동 저장·복구·편집 이력 계약](recovery-undo.md)에 저장 위치/간격·사본 복구·잠금/세대·중단·한도·후속 검증을 기록한다. `.jobs`는 schema 6이며 복구 envelope는 별도 schema 1이다. 회귀 시험용 저장 단계 observer는 실제 flush/commit 사이에서 중단·경쟁을 재현하며 제품 UI에서는 설정하지 않는다.
 
 후속 PDM/작업 달력 증분은 `.jobs` schema 7을 사용하며 schema 1~6 원본과 기존 기준선을 보존한다. 복구 envelope schema 1의 내부 projectSchema 6/7을 지원한다. `native-pdm-taskcal-v1`은 civil 분 좌표와 작업별 근무분을 구분하며 `jobs-pdm-1.0`으로 계산한다. 자원/원가는 같은 근무 구간을 사용한다. 기존 `native-fs0-workminutes-v1` / `jobs-cpm-0.2` 결과는 유지한다. [PDM·작업 달력 계약](pdm-calendars.md), `pdm_calendar_contract`/`pdm_calendar_ui`와 독립 reader를 추가해 CTest 19개로 확장했다.
+
+제약·마감·간트 증분은 schema 8 / native-pdm-constraints-v1 / jobs-pdm-1.1을 사용하며 구 입력/기준선 정책을 보존한다. Constraints는 하드 충돌과 소프트 마감 경고를 구분하고, GanttEditing은 UI 미리보기 후 Document의 ID/revision guard와 단일 edit를 사용한다. [상세 계약](constraints-gantt.md), constraint_contract/constraint_gantt_ui로 CTest 21개와 독립 XLSX/PDF 검증을 제공한다.

@@ -47,6 +47,8 @@ public:
     std::string putCalendar(TaskCalendar);
     void removeCalendar(const std::string&);
     void setTaskCalendar(std::size_t, std::string);
+    void setTaskTiming(std::size_t, std::string type, std::optional<std::string> at, std::optional<std::string> deadline);
+    void editGantt(const std::string& documentId, std::uint64_t revision, const std::string& taskId, bool resize, const std::string& target);
     void setHolidays(std::vector<std::string> dates);
     void setStatusAt(std::optional<std::string> stamp);
     std::string appendBaseline(Baseline prepared);
