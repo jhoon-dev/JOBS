@@ -59,6 +59,7 @@ private:
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;
+    std::optional<std::uint64_t> queuedCalculation_;
     bool confirmChanges();
     void commitPendingCell();
     bool save(bool as);

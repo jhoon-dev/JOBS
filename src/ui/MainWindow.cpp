@@ -368,13 +368,16 @@ void MainWindow::refresh(bool rebuildTree) {
 }
 void MainWindow::calculateSchedule() {
     commitPendingCell();
-    if (!document_.project() || calculating_) return;
+    if (!document_.project()) return;
+    if(calculating_){queuedCalculation_=document_.sessionGeneration();return;}
     const auto snapshot = *document_.project(); calculating_ = true; refresh();
     auto* watcher = new QFutureWatcher<ScheduleResult>(this);
     connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher, session = document_.sessionGeneration()] {
         calculating_ = false;
         try { if (document_.sessionGeneration() == session) document_.applyCalculation(watcher->result()); } catch (const std::exception& e) { report(e); }
         watcher->deleteLater(); refresh();
+        const auto queued=queuedCalculation_;queuedCalculation_.reset();
+        if(queued&&*queued==document_.sessionGeneration())calculateSchedule();
     });
     watcher->setFuture(QtConcurrent::run([snapshot] { return jobs::calculate(snapshot); }));
 }
