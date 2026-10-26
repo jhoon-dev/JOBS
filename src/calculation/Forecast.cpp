@@ -7,6 +7,7 @@
 #include <unordered_map>
 namespace jobs {
 ScheduleResult calculate(const Project& p) {
+    EvaluationScope evaluation;
     auto plan = calculatePlan(p);
     if (!p.statusAt) return plan;
     plan.isForecast = true; plan.statusAt = p.statusAt; plan.calculationPolicy = p.calculationProfile==constraintProfile?"retained-remaining-constrained-v1":isPdm(p)?"retained-remaining-pdm-v1":"retained-remaining-v1";
@@ -24,7 +25,9 @@ ScheduleResult calculate(const Project& p) {
         std::deque<std::size_t> ready;
         for (std::size_t i = 0; i < n; ++i) if (!degree[i]) ready.push_back(i);
         std::vector<TaskSchedule> rows(n);
+        std::size_t completed=0;
         for (; !ready.empty(); ready.pop_front()) {
+            calculationProgress(CalculationStage::Forward,completed++,n);
             auto i = ready.front(); const auto& task = p.tasks[i]; auto& row = rows[i]; row.taskId = task.id;
             const auto* entry = progressAsOf(p, task.id);
             std::int64_t anchor = status;
@@ -66,5 +69,10 @@ ScheduleResult calculate(const Project& p) {
         result.diagnostics.push_back({"FORECAST_HORIZON", e.what(), {}});
     }
     return result;
+}
+ScheduleResult calculate(const Project& p,const std::shared_ptr<CalculationControl>& control) {
+    EvaluationScope evaluation(control);
+    try{calculationProgress(CalculationStage::Validation,0,p.tasks.size());auto result=calculate(p);calculationProgress(CalculationStage::Finished,p.tasks.size(),p.tasks.size());return result;}
+    catch(const CalculationCancelled&){ScheduleResult result;result.documentId=p.documentId;result.inputRevision=p.revision;result.profile=p.calculationProfile;result.engineVersion=engineFor(p);result.status=CalculationStatus::Cancelled;result.statusAt=p.statusAt;result.isForecast=p.statusAt.has_value();result.diagnostics.push_back({"CALCULATION_CANCELLED","사용자가 일정 계산을 취소했습니다. 부분 날짜와 완료일은 적용하지 않았습니다.",{}});return result;}
 }
 }

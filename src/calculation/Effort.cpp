@@ -7,39 +7,50 @@
 #include <tuple>
 namespace jobs {
 using Minute=std::int64_t;
-TaskExecution::TaskExecution(const PlanInput& p,const Task& t):task_(t),clock_(p),calendar_(p,t) {
+ExecutionInputs::ExecutionInputs(const PlanInput& p){for(const auto& a:p.assignments){calculationCheckpoint();assignments[a.taskId].push_back(a);}for(const auto& r:p.resources)resources[r.id]=&r;}
+TaskExecution::TaskExecution(const PlanInput& p,const Task& t,const ExecutionInputs* inputs):task_(t),clock_(p),calendar_(p,t) {
+    EvaluationScope evaluation;calculationCheckpoint();
+    std::vector<Assignment> assigned;
+    if(inputs){auto it=inputs->assignments.find(t.id);if(it!=inputs->assignments.end())assigned=it->second;}else for(const auto& a:p.assignments)if(a.taskId==t.id)assigned.push_back(a);
+    std::string key="execution-grid/";auto field=[&](const std::string& value){key+=std::to_string(value.size())+":"+value;};field(calendar_.cacheKey());
+    std::vector<WorkCalendar> resourceCalendars;
+    for(const auto& a:assigned){const Resource* resource=nullptr;if(inputs)resource=inputs->resources.at(a.resourceId);else for(const auto& r:p.resources)if(r.id==a.resourceId){resource=&r;break;}
+        if(!resource)throw std::runtime_error("배정 자원이 없습니다.");
+        Task resourceTask;resourceTask.calendarId=resource->calendarId;resourceCalendars.emplace_back(p,resourceTask);field(a.resourceId);field(std::to_string(a.units));field(resourceCalendars.back().cacheKey());}
+    if(auto cached=evaluationCached(key)){grid_=std::static_pointer_cast<const Grid>(cached);return;}
+    auto grid=std::make_shared<Grid>();
     const auto taskTimes=calendar_.civilIntervals();std::map<Minute,Minute> changes;
-    for(const auto& a:p.assignments)if(a.taskId==t.id) {
-        const auto r=std::find_if(p.resources.begin(),p.resources.end(),[&](const auto& v){return v.id==a.resourceId;});
-        if(r==p.resources.end())throw std::runtime_error("배정 자원이 없습니다.");
-        Task resourceTask;resourceTask.calendarId=r->calendarId;WorkCalendar resourceCalendar(p,resourceTask);
-        const auto resourceTimes=resourceCalendar.civilIntervals();std::size_t i=0,j=0;
+    for(std::size_t assignment=0;assignment<assigned.size();++assignment) {
+        const auto& a=assigned[assignment];const auto resourceTimes=resourceCalendars[assignment].civilIntervals();std::size_t i=0,j=0;
         while(i<taskTimes.size()&&j<resourceTimes.size()) {
+            calculationCheckpoint();
             const auto s=std::max(taskTimes[i].first,resourceTimes[j].first),e=std::min(taskTimes[i].second,resourceTimes[j].second);
-            if(s<e){availability_.push_back({a.resourceId,s,e,a.units});changes[s]+=a.units;changes[e]-=a.units;}
+            if(s<e){grid->availability.push_back({a.resourceId,s,e,a.units});changes[s]+=a.units;changes[e]-=a.units;}
             if(taskTimes[i].second<resourceTimes[j].second)++i;else ++j;
         }
     }
     Minute units=0,prefix=0,last=0;
-    for(const auto& [at,delta]:changes){if(units&&at>last){weighted_.push_back({last,at,units,prefix});prefix+=(at-last)*units;}units+=delta;last=at;}
+    for(const auto& [at,delta]:changes){calculationCheckpoint();if(units&&at>last){grid->weighted.push_back({last,at,units,prefix});prefix+=(at-last)*units;}units+=delta;last=at;}
+    grid_=std::move(grid);evaluationRemember(std::move(key),grid_);
 }
 Minute TaskExecution::integrated(Minute civil) const {
-    auto it=std::upper_bound(weighted_.begin(),weighted_.end(),civil,[](Minute n,const auto& w){return n<w.start;});
-    if(it==weighted_.begin())return 0;
+    const auto& weighted=grid_->weighted;auto it=std::upper_bound(weighted.begin(),weighted.end(),civil,[](Minute n,const auto& w){return n<w.start;});
+    if(it==weighted.begin())return 0;
     --it;return it->prefix+std::clamp(civil-it->start,Minute{0},it->finish-it->start)*it->units;
 }
 TaskSchedule TaskExecution::dates(Minute local) const {
+    calculationCheckpoint();const auto& weighted=grid_->weighted;
     TaskSchedule row;row.taskId=task_.id;
     const auto amount=usesWork(task_)?task_.workUnitMinutes.value():task_.durationMinutes.value();
     row.start=calendar_.boundary(local,amount==0);row.finish=row.start;
     if(amount>0&&usesWork(task_)) {
         const auto first=clock_.offset(row.start);
-        auto it=std::lower_bound(weighted_.begin(),weighted_.end(),first,[](const auto& w,Minute n){return w.finish<=n;});
-        if(it==weighted_.end())throw std::runtime_error("공수 작업의 배정/자원·작업 달력 교집합에 가용 시간이 없습니다.");
+        auto it=std::lower_bound(weighted.begin(),weighted.end(),first,[](const auto& w,Minute n){return w.finish<=n;});
+        if(it==weighted.end())throw std::runtime_error("공수 작업의 배정/자원·작업 달력 교집합에 가용 시간이 없습니다.");
         const auto begin=std::max(first,it->start),target=integrated(begin)+amount;
         row.start=clock_.boundary(begin,false);
-        auto end=std::lower_bound(weighted_.begin(),weighted_.end(),target,[](const auto& w,Minute n){return w.prefix+(w.finish-w.start)*w.units<n;});
-        if(end==weighted_.end())throw std::runtime_error("20년 계산 범위 안에 요구 공수를 완료할 가용 시간이 부족합니다.");
+        auto end=std::lower_bound(weighted.begin(),weighted.end(),target,[](const auto& w,Minute n){return w.prefix+(w.finish-w.start)*w.units<n;});
+        if(end==weighted.end())throw std::runtime_error("20년 계산 범위 안에 요구 공수를 완료할 가용 시간이 부족합니다.");
         const auto finish=end->start+(target-end->prefix+end->units-1)/end->units;
         row.finish=clock_.boundary(finish,true);
     } else if(amount>0) row.finish=calendar_.boundary(local+amount,true);
@@ -56,7 +67,7 @@ std::vector<WorkSpan> TaskExecution::spans(const TaskSchedule& row) const {
     if(row.completedActual)return {};
     const auto begin=clock_.offset(row.remainingStart.value_or(row.start)),end=clock_.offset(row.finish);
     std::vector<WorkSpan> out;
-    for(const auto& a:availability_)if(a.start<end&&a.finish>begin)out.push_back({a.resourceId,std::max(begin,a.start),std::min(end,a.finish),a.units});
+    for(const auto& a:grid_->availability)if(a.start<end&&a.finish>begin)out.push_back({a.resourceId,std::max(begin,a.start),std::min(end,a.finish),a.units});
     if(usesWork(task_)&&end>begin) {
         const auto target=*task_.workUnitMinutes;
         const auto before=integrated(end-1)-integrated(begin),last=target-before,total=integrated(end)-integrated(end-1);

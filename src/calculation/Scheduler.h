@@ -1,8 +1,9 @@
 #pragma once
 #include "domain/Project.h"
+#include "domain/CalculationControl.h"
 
 namespace jobs {
-enum class CalculationStatus { Valid, Incomplete, Conflict, Stale };
+enum class CalculationStatus { Valid, Incomplete, Conflict, Stale, Cancelled };
 struct Diagnostic {
     std::string code;
     std::string message;
@@ -23,6 +24,7 @@ struct ScheduleResult {
 };
 // Pure, deterministic calculation on an immutable snapshot. No Qt, I/O or OS clock.
 ScheduleResult calculate(const Project& snapshot);
+ScheduleResult calculate(const Project& snapshot,const std::shared_ptr<CalculationControl>& control);
 ScheduleResult calculatePlan(const Project& snapshot);
 struct WbsSummary {
     std::size_t taskCount = 0, missingDurations = 0;

@@ -31,7 +31,9 @@ ScheduleResult calculatePdmPlan(const Project& p, const std::vector<std::size_t>
         std::vector<TaskSchedule> rows(n); std::vector<std::int64_t> early(n), late(n);
         std::vector<std::vector<std::pair<std::size_t,Dependency>>> next(n);
         std::string finish=p.startDate+" 00:00";
+        std::size_t completed=0;
         for (auto i:order) {
+            calculationProgress(CalculationStage::Forward,completed++,n);
             const auto& task=p.tasks[i]; const auto& cal=calendars.at(task); const auto duration=*task.durationMinutes;
             auto& row=rows[i]; row.taskId=task.id; auto& start=early[i];
             for (const auto& d:dependencies(task)) { const auto prev=ids.at(d.predecessorId); start=std::max(start,pdmRequiredStart(cal,d,rows[prev],duration)); next[prev].push_back({i,d}); }
@@ -39,6 +41,7 @@ ScheduleResult calculatePdmPlan(const Project& p, const std::vector<std::size_t>
             for (const auto& d:dependencies(task)) if (pdmRequiredStart(cal,d,rows[ids.at(d.predecessorId)],duration)==start) row.drivingPredecessors.push_back(d.predecessorId);
         }
         for (auto it=order.rbegin();it!=order.rend();++it) {
+            calculationProgress(CalculationStage::Backward,std::uint64_t(it-order.rbegin()),n);
             const auto i=*it; const auto& task=p.tasks[i]; const auto& cal=calendars.at(task); const auto duration=*task.durationMinutes;
             auto cap=std::max(early[i],cal.offset(finish)-duration);
             auto latest=[&](bool useLate) {
@@ -69,7 +72,9 @@ ScheduleResult calculatePdmForecast(const Project& p, ScheduleResult out) {
         std::vector<std::vector<std::size_t>> next(n); std::vector<std::size_t> degree(n); std::deque<std::size_t> ready;
         for (std::size_t i=0;i<n;++i) { for (const auto& id:p.tasks[i].predecessors) { next[ids.at(id)].push_back(i); ++degree[i]; } if (!degree[i]) ready.push_back(i); }
         std::vector<TaskSchedule> rows(n); std::size_t unreported=0;
+        std::size_t completed=0;
         for (;!ready.empty();ready.pop_front()) {
+            calculationProgress(CalculationStage::Forward,completed++,n);
             const auto i=ready.front(); const auto& t=p.tasks[i]; const auto& cal=calendars.at(t); auto& row=rows[i]; row.taskId=t.id;
             const auto* e=progressAsOf(p,t.id); if (!e) ++unreported;
             if (e && e->actualFinish) { row.start=*e->actualStart; row.finish=*e->actualFinish; row.completedActual=true; row.earlyStartMinutes=clock.offset(row.start); row.earlyFinishMinutes=clock.offset(row.finish); }

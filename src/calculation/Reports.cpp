@@ -14,7 +14,7 @@ ReportCell number(std::int64_t n, CellFormat format = CellFormat::Integer) { ret
 ReportCell optional(std::optional<std::int64_t> n, CellFormat format) { return n ? number(*n, format) : ReportCell{{}, format}; }
 ReportCell ratio(std::optional<double> n) { return n ? ReportCell{*n, CellFormat::Ratio} : ReportCell{{}, CellFormat::Ratio}; }
 ReportCell stamp(const std::optional<std::string>& s) { return s ? text(*s) : ReportCell{}; }
-std::string state(CalculationStatus s) { return s == CalculationStatus::Valid ? "유효" : s == CalculationStatus::Incomplete ? "입력 불완전" : s == CalculationStatus::Stale ? "오래된 결과" : "충돌"; }
+std::string state(CalculationStatus s) { return s == CalculationStatus::Cancelled ? "취소" : s == CalculationStatus::Valid ? "유효" : s == CalculationStatus::Incomplete ? "입력 불완전" : s == CalculationStatus::Stale ? "오래된 결과" : "충돌"; }
 std::string path(const PlanInput& p, std::string id) {
     std::vector<std::string> names;
     while (!id.empty()) { auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto& n) { return n.id == id; }); if (it == p.wbsNodes.end()) break; names.push_back(it->name); id = it->parentId; }

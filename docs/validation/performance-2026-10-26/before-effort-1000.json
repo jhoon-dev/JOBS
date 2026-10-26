@@ -1,0 +1,82 @@
+{
+    "build_configuration": "Release",
+    "calculation": {
+        "median_ms": 7854.3876,
+        "observed_p95_ms": 8940.9652,
+        "samples_ms": [
+            7854.3876,
+            7392.0248,
+            8940.9652
+        ]
+    },
+    "calendar_count": 1,
+    "compiler": "13.1.0",
+    "cpu_architecture": "x86_64",
+    "dependency_count": 900,
+    "fixture": "jobs-perf-layered-v1",
+    "logical_cpu_count": 16,
+    "maximum_gantt_items": 5800,
+    "os": "Windows 11 Version 26H2",
+    "peak_memory_semantics": "OS process high water mark; not an incremental allocation measurement",
+    "peak_process_resident_bytes": 1409208320,
+    "profile": "native-effort-split-v1",
+    "project_finish": "2026-10-28 17:00",
+    "qt": "6.8.3",
+    "repeats": 3,
+    "resource_count": 8,
+    "scroll": {
+        "median_ms": 23.6485,
+        "observed_p95_ms": 42.9774,
+        "samples_ms": [
+            53.068,
+            25.2101,
+            26.7463,
+            42.9774,
+            21.7076,
+            24.22,
+            22.4929,
+            26.2559,
+            30.7738,
+            33.5165,
+            25.7473,
+            19.8772,
+            0.358,
+            26.547,
+            23.0537,
+            25.6706,
+            25.4643,
+            23.0781,
+            22.3004,
+            22.0638,
+            22.7056,
+            26.2967,
+            23.1569,
+            20.3542,
+            0.3215,
+            27.6178,
+            22.6223,
+            23.5771,
+            23.7146,
+            23.5824,
+            27.3354,
+            33.0625,
+            21.8691,
+            22.2675,
+            25.6876,
+            22.25
+        ]
+    },
+    "source_revision": "6f77b03+dirty",
+    "split_task_count": 40,
+    "status": "success",
+    "task_count": 1000,
+    "ui_preparation": {
+        "median_ms": 1283.6171,
+        "observed_p95_ms": 3954.0207,
+        "samples_ms": [
+            3954.0207,
+            1265.0812,
+            1283.6171
+        ]
+    }
+}

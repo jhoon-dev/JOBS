@@ -287,6 +287,7 @@ void Document::edit(Project p, std::string label) {
 }
 void Document::applyCalculation(ScheduleResult result) {
     if (!project_) return;
+    if(result.status==CalculationStatus::Cancelled){result.tasks.clear();result.projectFinish.reset();}
     if (result.documentId != project_->documentId || result.inputRevision != project_->revision || result.profile != project_->calculationProfile || result.statusAt != project_->statusAt)
         result.status = CalculationStatus::Stale;
     calculation_ = std::move(result);

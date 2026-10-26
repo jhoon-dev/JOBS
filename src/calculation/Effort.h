@@ -1,7 +1,13 @@
 #pragma once
 #include "calculation/WorkCalendar.h"
 #include "calculation/Resources.h"
+#include <unordered_map>
 namespace jobs {
+struct ExecutionInputs {
+    std::unordered_map<std::string,std::vector<Assignment>> assignments;
+    std::unordered_map<std::string,const Resource*> resources;
+    explicit ExecutionInputs(const PlanInput&);
+};
 struct WorkSpan {
     std::string resourceId;
     std::int64_t start=0, finish=0;
@@ -13,11 +19,11 @@ class TaskExecution {
     struct Weighted { std::int64_t start,finish,units,prefix; };
     Task task_;
     WorkCalendar clock_,calendar_;
-    std::vector<WorkSpan> availability_;
-    std::vector<Weighted> weighted_;
+    struct Grid { std::vector<WorkSpan> availability;std::vector<Weighted> weighted; };
+    std::shared_ptr<const Grid> grid_;
     std::int64_t integrated(std::int64_t civil) const;
 public:
-    TaskExecution(const PlanInput&,const Task&);
+    TaskExecution(const PlanInput&,const Task&,const ExecutionInputs* inputs=nullptr);
     const WorkCalendar& calendar() const { return calendar_; }
     TaskSchedule dates(std::int64_t localStart) const;
     std::int64_t required(const std::string& bound,bool targetFinish) const;

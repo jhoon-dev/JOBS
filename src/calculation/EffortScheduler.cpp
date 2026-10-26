@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <stdexcept>
+#include <set>
 namespace jobs {
 namespace {
 using Minute=std::int64_t;
@@ -19,18 +20,24 @@ ScheduleResult calculateEffort(const Project& p,bool forecast,const std::string&
     out.isForecast=forecast;out.statusAt=forecast?p.statusAt:std::nullopt;
     out.calculationPolicy=priority.empty()?(forecast?"retained-remaining-effort-v1":"effort-constrained-v1"):levelingPolicyFor(p)+"/"+priority;
     std::string current;
+    EvaluationScope evaluation;
     try {
         WorkCalendar clock(p);const auto n=p.tasks.size();std::map<std::string,std::size_t> ids;
         const auto source=priority.empty()?ScheduleResult{}:calculate(p);
         std::vector<Task> pending;std::vector<std::unique_ptr<TaskExecution>> models;
+        ExecutionInputs inputs(p);
         for(std::size_t i=0;i<n;++i) {
+            calculationProgress(CalculationStage::Calendars,i,n);
             const auto& t=p.tasks[i];current=t.id;ids[t.id]=i;
             try{pending.push_back(forecast?pendingTask(p,t):t);}catch(const std::exception& e){out.status=CalculationStatus::Incomplete;out.diagnostics.push_back({usesWork(t)?"MISSING_REMAINING_WORK":"MISSING_REMAINING_DURATION",e.what(),{t.id}});return out;}
-            models.push_back(std::make_unique<TaskExecution>(p,pending.back()));
+            models.push_back(std::make_unique<TaskExecution>(p,pending.back(),&inputs));
         }
-        std::vector<TaskSchedule> rows(n);std::vector<Minute> early(n);std::vector<std::size_t> order;std::vector<bool> done(n);
+        std::vector<TaskSchedule> rows(n);std::vector<Minute> early(n);std::vector<std::size_t> order;
         std::vector<std::vector<std::pair<std::size_t,Dependency>>> successors(n);
         for(std::size_t i=0;i<n;++i)for(const auto& d:dependencies(p.tasks[i]))successors[ids.at(d.predecessorId)].push_back({i,d});
+        std::vector<std::size_t> degree(n);std::set<std::pair<Minute,std::size_t>> ready;
+        auto rank=[&](std::size_t i){if(priority.empty()||priority=="task-order")return Minute{0};const auto r=models[i]->dates(0);const auto duration=r.earlyFinishMinutes-r.earlyStartMinutes;return priority=="longest-first"?-duration:duration;};
+        for(std::size_t i=0;i<n;++i){degree[i]=p.tasks[i].predecessors.size();if(!degree[i])ready.emplace(rank(i),i);}
         std::map<std::string,std::map<Minute,Minute>> reserved;
         std::string finish=p.startDate+" 00:00",horizon;
         if(!priority.empty()){PlanInput standard=p;standard.calculationProfile="native-fs0-workminutes-v1";horizon=WorkCalendar(standard).boundary(Minute(horizonDays)*480,true);}
@@ -46,18 +53,12 @@ ScheduleResult calculateEffort(const Project& p,bool forecast,const std::string&
             return local;
         };
         for(std::size_t count=0;count<n;++count) {
-            std::optional<std::size_t> chosen;
-            for(std::size_t i=0;i<n;++i)if(!done[i]&&std::all_of(p.tasks[i].predecessors.begin(),p.tasks[i].predecessors.end(),[&](const auto& id){return done[ids.at(id)];})) {
-                if(!chosen)chosen=i;
-                else if(!priority.empty()&&priority!="task-order") {
-                    auto length=[&](std::size_t j){const auto r=models[j]->dates(0);return r.earlyFinishMinutes-r.earlyStartMinutes;};
-                    if((priority=="shortest-first"&&length(i)<length(*chosen))||(priority=="longest-first"&&length(i)>length(*chosen)))chosen=i;
-                }
-            }
-            if(!chosen)throw std::runtime_error("공수 일정의 선행관계 순환 또는 참조 오류입니다.");
-            const auto i=*chosen;const auto& t=p.tasks[i];current=t.id;const auto& model=*models[i];const auto& cal=model.calendar();
+            calculationProgress(CalculationStage::Forward,count,n);
+            if(ready.empty())throw std::runtime_error("공수 일정의 선행관계 순환 또는 참조 오류입니다.");
+            const auto i=ready.begin()->second;ready.erase(ready.begin());for(const auto& [j,edge]:successors[i]){(void)edge;if(--degree[j]==0)ready.emplace(rank(j),j);}
+            const auto& t=p.tasks[i];current=t.id;const auto& model=*models[i];const auto& cal=model.calendar();
             const auto* actual=forecast?progressAsOf(p,t.id):nullptr;
-            auto& row=rows[i];row.taskId=t.id;done[i]=true;order.push_back(i);
+            auto& row=rows[i];row.taskId=t.id;order.push_back(i);
             if(actual&&actual->actualFinish){row.start=*actual->actualStart;row.finish=*actual->actualFinish;row.completedActual=true;row.earlyStartMinutes=clock.offset(row.start);row.earlyFinishMinutes=clock.offset(row.finish);}
             else {
                 auto local=lower(i);bool unknown=false;
@@ -93,6 +94,7 @@ ScheduleResult calculateEffort(const Project& p,bool forecast,const std::string&
         }
         if(!forecast&&priority.empty()) {
             auto latest=[&](std::size_t i,const std::vector<TaskSchedule>& targets) {
+                calculationCheckpoint();
                 const auto& model=*models[i];const auto& cal=model.calendar();auto lo=early[i],hi=std::max(lo,cal.offset(finish));
                 while(lo<hi){const auto mid=lo+(hi-lo+1)/2;bool fits=false;
                     try{auto trial=model.dates(mid);fits=trial.finish<=finish&&!timingViolation(p.tasks[i],trial);
@@ -101,8 +103,8 @@ ScheduleResult calculateEffort(const Project& p,bool forecast,const std::string&
                 }return lo;
             };
             for(auto it=order.rbegin();it!=order.rend();++it)if(p.tasks[*it].constraintType=="ALAP"){const auto i=*it;early[i]=latest(i,rows);rows[i]=models[i]->dates(early[i]);}
-            auto late=rows;
-            for(auto it=order.rbegin();it!=order.rend();++it){const auto i=*it;auto local=latest(i,late);late[i]=models[i]->dates(local);auto& r=rows[i];r.lateStartMinutes=late[i].earlyStartMinutes;r.lateFinishMinutes=late[i].earlyFinishMinutes;r.totalFloatMinutes=std::max(Minute{0},models[i]->calendar().offset(late[i].start)-early[i]);const auto free=latest(i,rows);r.freeFloatMinutes=std::max(Minute{0},models[i]->calendar().offset(models[i]->dates(free).start)-early[i]);r.critical=r.totalFloatMinutes==0;}
+            auto late=rows;calculationProgress(CalculationStage::Backward,0,n);
+            for(auto it=order.rbegin();it!=order.rend();++it){calculationProgress(CalculationStage::Backward,std::uint64_t(it-order.rbegin()),n);const auto i=*it;auto local=latest(i,late);late[i]=models[i]->dates(local);auto& r=rows[i];r.lateStartMinutes=late[i].earlyStartMinutes;r.lateFinishMinutes=late[i].earlyFinishMinutes;r.totalFloatMinutes=std::max(Minute{0},models[i]->calendar().offset(late[i].start)-early[i]);const auto free=latest(i,rows);r.freeFloatMinutes=std::max(Minute{0},models[i]->calendar().offset(models[i]->dates(free).start)-early[i]);r.critical=r.totalFloatMinutes==0;}
             for(std::size_t i=0;i<n;++i){rows[i].drivingPredecessors.clear();for(const auto& d:dependencies(p.tasks[i]))if(models[i]->dates(models[i]->required(edgeBound(*models[i],d,rows[ids.at(d.predecessorId)]),d.type[1]=='F')).start==rows[i].start)rows[i].drivingPredecessors.push_back(d.predecessorId);}
         }
         out.tasks=std::move(rows);out.projectFinish=finish;out.status=CalculationStatus::Valid;auto deadlines=deadlineDiagnostics(p,out.tasks);out.diagnostics.insert(out.diagnostics.end(),deadlines.begin(),deadlines.end());

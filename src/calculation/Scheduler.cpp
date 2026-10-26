@@ -13,6 +13,7 @@
 
 namespace jobs {
 ScheduleResult calculatePlan(const Project& p) {
+    EvaluationScope evaluation;calculationCheckpoint();
     ScheduleResult result; result.documentId = p.documentId; result.inputRevision = p.revision; result.profile = p.calculationProfile;
     result.engineVersion=engineFor(p);
     try { validate(p); }
@@ -22,17 +23,20 @@ ScheduleResult calculatePlan(const Project& p) {
     }
     if (p.tasks.empty()) { result.diagnostics.push_back({"NO_TASKS", "계산할 작업이 없습니다.", {}}); return result; }
     const auto n = p.tasks.size();
+    calculationProgress(CalculationStage::Network,0,n);
     std::unordered_map<std::string, std::size_t> ids;
     for (std::size_t i = 0; i < n; ++i) ids.emplace(p.tasks[i].id, i);
     std::vector<std::vector<std::size_t>> successors(n), predecessors(n);
     std::vector<std::size_t> degree(n), order;
+    std::unordered_set<std::string> assignedTasks;for(const auto& a:p.assignments)assignedTasks.insert(a.taskId);
     bool missing = false, invalid = false;
     for (std::size_t i = 0; i < n; ++i) {
+        calculationCheckpoint();
         const auto& task = p.tasks[i];
         if (!task.durationMinutes && !(isEffort(p)&&usesWork(task))) {
             missing = true; result.diagnostics.push_back({"MISSING_DURATION", "작업 기간이 미정입니다: " + task.name, {task.id}});
         }
-        if(isEffort(p)&&usesWork(task)&&task.workUnitMinutes.value_or(0)>0&&std::none_of(p.assignments.begin(),p.assignments.end(),[&](const auto& a){return a.taskId==task.id;})) {
+        if(isEffort(p)&&usesWork(task)&&task.workUnitMinutes.value_or(0)>0&&!assignedTasks.contains(task.id)) {
             missing=true;result.diagnostics.push_back({"MISSING_WORK_ASSIGNMENT","공수 작업에 자원을 배정하세요: "+task.name,{task.id}});
         }
         for (const auto& id : task.predecessors) {
@@ -47,6 +51,7 @@ ScheduleResult calculatePlan(const Project& p) {
     std::deque<std::size_t> ready;
     for (std::size_t i = 0; i < n; ++i) if (degree[i] == 0) ready.push_back(i);
     while (!ready.empty()) {
+        calculationCheckpoint();
         auto i = ready.front(); ready.pop_front(); order.push_back(i);
         for (auto next : successors[i]) if (--degree[next] == 0) ready.push_back(next);
     }
@@ -74,7 +79,9 @@ ScheduleResult calculatePlan(const Project& p) {
     if (isPdm(p)) return calculatePdmPlan(p, order);
     std::vector<TaskSchedule> rows(n);
     std::int64_t finish = 0;
+    std::size_t completed=0;
     for (auto i : order) {
+        calculationProgress(CalculationStage::Forward,completed++,n);
         auto& row = rows[i]; row.taskId = p.tasks[i].id;
         for (auto prev : predecessors[i]) row.earlyStartMinutes = std::max(row.earlyStartMinutes, rows[prev].earlyFinishMinutes);
         row.earlyFinishMinutes = row.earlyStartMinutes + *p.tasks[i].durationMinutes;
@@ -83,6 +90,7 @@ ScheduleResult calculatePlan(const Project& p) {
             row.drivingPredecessors.push_back(p.tasks[prev].id);
     }
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
+        calculationProgress(CalculationStage::Backward,std::size_t(it-order.rbegin()),n);
         auto i = *it; auto& row = rows[i]; row.lateFinishMinutes = finish;
         auto freeEnd = finish;
         for (auto next : successors[i]) {

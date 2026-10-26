@@ -15,6 +15,8 @@ QString stamp(const std::optional<std::string>& s) { return s ? qs(*s) : "—"; 
 QString hours(const std::optional<std::int64_t>& n) { return n ? QString::number(double(*n) / 60, 'f', 2) : "—"; }
 QString variance(const std::optional<std::int64_t>& n) { return n ? (*n > 0 ? "+" : "") + hours(n) : "—"; }
 QString state(const ScheduleResult& r) {
+    if (r.status == CalculationStatus::Cancelled) return "취소";
+    if (r.status == CalculationStatus::Stale) return "오래된 결과";
     if (r.status == CalculationStatus::Valid) return "유효";
     if (r.status == CalculationStatus::Incomplete) return "입력 불완전";
     return "충돌";

@@ -28,7 +28,7 @@ std::string str(const QString& s) { return s.toUtf8().toStdString(); }
 QString hours(std::int64_t n) { return QString::number(double(n) / 60, 'f', 2); }
 QString work(std::int64_t n) { return QString::number(double(n) / 6000, 'f', 2); }
 QString state(CalculationStatus s) {
-    return s == CalculationStatus::Valid ? "배정 자원 검증 통과" : s == CalculationStatus::Incomplete ? "미정 / 입력 불완전" : "과부하 / 배치 불가";
+    return s == CalculationStatus::Cancelled ? "취소" : s == CalculationStatus::Stale ? "오래된 결과" : s == CalculationStatus::Valid ? "배정 자원 검증 통과" : s == CalculationStatus::Incomplete ? "미정 / 입력 불완전" : "과부하 / 배치 불가";
 }
 QTableWidget* table(QWidget* parent, const char* name, const QStringList& columns) {
     auto* t = new QTableWidget(0, columns.size(), parent); t->setObjectName(name); t->setHorizontalHeaderLabels(columns);

@@ -7,6 +7,7 @@ class QPlainTextEdit;
 class QAction;
 class QTreeWidget;
 class QComboBox;
+class QTimer;
 namespace jobs {
 class GanttView;
 class JsonRecoveryStore;
@@ -61,6 +62,11 @@ private:
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;
+    QAction* cancelCalculation_ = nullptr;
+    std::shared_ptr<CalculationControl> calculationControl_;
+    std::uint64_t calculationSession_=0;
+    QTimer* calculationProgressTimer_=nullptr;
+    QLabel* calculationProgressLabel_=nullptr;
     std::optional<std::uint64_t> queuedCalculation_;
     bool confirmChanges();
     void commitPendingCell();

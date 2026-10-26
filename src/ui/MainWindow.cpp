@@ -4,6 +4,8 @@
 #include "ui/AutoSaveController.h"
 #include "domain/Wbs.h"
 #include "calculation/WorkCalendar.h"
+#include <QScopedValueRollback>
+#include <QTimer>
 #include <QAction>
 #include <QApplication>
 #include <QPointer>
@@ -80,7 +82,7 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::commitPendingCell);
     connect(undo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canUndo()) document_.undo(); refresh(); } catch (const std::exception& e) { report(e); } });
     connect(redo_, &QAction::triggered, this, [this] { try { commitPendingCell(); if (document_.canRedo()) document_.redo(); refresh(); } catch (const std::exception& e) { report(e); } });
-    historyListener_ = document_.subscribe([this](auto) { updateHistoryActions(); });
+    historyListener_ = document_.subscribe([this](auto) { if(calculationControl_&&calculationSession_!=document_.sessionGeneration()){calculationControl_->cancel();queuedCalculation_.reset();}updateHistoryActions(); });
     add_ = tools->addAction("작업 추가"); add_->setShortcut(QKeySequence("Ctrl+Insert"));
     connect(add_, &QAction::triggered, this, [this] {
         commitPendingCell();
@@ -92,6 +94,11 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     auto* projectMenu = menuBar()->addMenu("프로젝트(&P)");
     calculate_ = projectMenu->addAction("일정 계산(&C)"); calculate_->setShortcut(QKeySequence(Qt::Key_F9));
     tools->addAction(calculate_); connect(calculate_, &QAction::triggered, this, &MainWindow::calculateSchedule);
+    cancelCalculation_=projectMenu->addAction("일정 계산 취소");cancelCalculation_->setObjectName("cancelCalculation");tools->addAction(cancelCalculation_);cancelCalculation_->setEnabled(false);
+    connect(cancelCalculation_,&QAction::triggered,this,[this]{if(calculationControl_){calculationControl_->cancel();queuedCalculation_.reset();cancelCalculation_->setEnabled(false);calculationProgressLabel_->setText("계산 취소 중…");}});
+    calculationProgressLabel_=new QLabel;calculationProgressLabel_->setObjectName("scheduleProgress");tools->addWidget(calculationProgressLabel_);
+    calculationProgressTimer_=new QTimer(this);calculationProgressTimer_->setInterval(100);
+    connect(calculationProgressTimer_,&QTimer::timeout,this,[this]{if(!calculationControl_||calculationControl_->cancelRequested.load())return;const QStringList phases{"입력 검증","선행관계","달력·공수","전진 배치","후진 여유","완료"};const auto stage=std::size_t(calculationControl_->stage.load());calculationProgressLabel_->setText(phases.at(qsizetype(stage))+" · "+QString::number(calculationControl_->completed.load())+" / "+QString::number(calculationControl_->total.load()));});
     calendar_ = projectMenu->addAction("휴일 편집(&H)…"); tools->addAction(calendar_);
     connect(calendar_, &QAction::triggered, this, &MainWindow::editHolidays);
     calendars_=projectMenu->addAction("작업·자원 달력 등록·편집…"); calendars_->setObjectName("manageCalendars");
@@ -253,9 +260,12 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     });
     setupRecovery(recoveryStore); refresh();
 }
-MainWindow::~MainWindow() { document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
+MainWindow::~MainWindow() { if(calculationControl_)calculationControl_->cancel();document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
 void MainWindow::refresh(bool rebuildTree) {
+    EvaluationScope evaluation;
+    const bool updates=table_->updatesEnabled();table_->setUpdatesEnabled(false);
+    struct RestoreUpdates { QWidget* widget;bool enabled;~RestoreUpdates(){widget->setUpdatesEnabled(enabled);} } restoreUpdates{table_,updates};
     updateHistoryActions();
     const QSignalBlocker blocker(table_);
     const auto& p = document_.project();
@@ -269,6 +279,7 @@ void MainWindow::refresh(bool rebuildTree) {
     save_->setEnabled(p.has_value()); saveAs_->setEnabled(p.has_value());
     add_->setEnabled(p.has_value() && !document_.readOnly());
     calculate_->setEnabled(p.has_value() && !calculating_);
+    cancelCalculation_->setEnabled(calculating_&&calculationControl_&&!calculationControl_->cancelRequested.load());
     calendar_->setEnabled(p.has_value() && !document_.readOnly());
     calendars_->setEnabled(p.has_value()); taskCalendar_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     constraints_->setEnabled(p.has_value()&&!selectedTask_.empty());scheduleIssues_->setEnabled(p.has_value());
@@ -301,6 +312,9 @@ void MainWindow::refresh(bool rebuildTree) {
     if (valid) for (const auto& row : calculation->tasks) schedules.emplace(row.taskId, &row);
     std::unordered_map<std::string, int> numbers;
     for (int row = 0; row < int(p->tasks.size()); ++row) numbers.emplace(p->tasks[std::size_t(row)].id, row + 1);
+    std::unordered_map<std::string,QStringList> assignedLabels;std::unordered_map<std::string,std::string> resourceNames;
+    for(const auto& r:p->resources)resourceNames[r.id]=r.name;
+    for(const auto& a:p->assignments)assignedLabels[a.taskId]<<qs(resourceNames.at(a.resourceId))+" "+QString::number(a.units)+"%";
     int selectedRow = -1;
     for (int row = 0; row < int(visibleRows_.size()); ++row) {
         const auto taskIndex = visibleRows_[std::size_t(row)]; const auto& t = p->tasks[taskIndex];
@@ -317,9 +331,7 @@ void MainWindow::refresh(bool rebuildTree) {
             s && !calculation->isForecast ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—",
             s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id), qs(taskCalendarName(*p,t)),qs(t.constraintType)+(t.constraintAt?" "+qs(*t.constraintAt):QString{}),t.deadlineAt?qs(*t.deadlineAt):"없음"};
         values<<qs(taskTypeName(t.taskType))+(t.workUnitMinutes?" · "+QString::number(double(*t.workUnitMinutes)/6000.0,'f',4):" · 기간 기준")<<QString::number(t.breaks.size());
-        QStringList assigned;
-        for (const auto& a : p->assignments) if (a.taskId == t.id) for (const auto& r : p->resources) if (r.id == a.resourceId)
-            assigned << qs(r.name) + " " + QString::number(a.units) + "%";
+        const auto& assigned=assignedLabels[t.id];
         if (!assigned.isEmpty()) values[7] = assigned.join(", ");
         for (int column = 0; column < values.size(); ++column) {
             auto* item = new QTableWidgetItem(values[column]);
@@ -353,6 +365,7 @@ void MainWindow::refresh(bool rebuildTree) {
         case CalculationStatus::Incomplete: state = "입력 불완전 · 전체 완료일 없음"; break;
         case CalculationStatus::Conflict: state = "계산 충돌 · 전체 완료일 없음"; break;
         case CalculationStatus::Stale: state = "오래된 계산 · F9로 다시 계산"; break;
+        case CalculationStatus::Cancelled: state = "계산 취소 · 부분 결과 없음 · F9로 다시 계산"; break;
         }
         state += "\n입력 revision " + QString::number(calculation->inputRevision) + " · " + qs(calculation->engineVersion) + " · " + qs(calculation->profile);
         state += " · " + qs(calculation->calculationPolicy);
@@ -377,16 +390,16 @@ void MainWindow::calculateSchedule() {
     commitPendingCell();
     if (!document_.project()) return;
     if(calculating_){queuedCalculation_=document_.sessionGeneration();return;}
-    const auto snapshot = *document_.project(); calculating_ = true; refresh();
+    const auto snapshot = *document_.project(); calculating_ = true;calculationControl_=std::make_shared<CalculationControl>();const auto control=calculationControl_;calculationSession_=document_.sessionGeneration();calculationProgressLabel_->setText("일정 계산 준비 중…");calculationProgressTimer_->start();refresh();
     auto* watcher = new QFutureWatcher<ScheduleResult>(this);
-    connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher, session = document_.sessionGeneration()] {
-        calculating_ = false;
-        try { if (document_.sessionGeneration() == session) document_.applyCalculation(watcher->result()); } catch (const std::exception& e) { report(e); }
+    connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher, control, session = document_.sessionGeneration()] {
+        calculating_ = false;calculationProgressTimer_->stop();calculationProgressLabel_->clear();calculationControl_.reset();
+        try { if (document_.sessionGeneration() == session) {auto result=watcher->result();if(control->cancelRequested.load()){result.status=CalculationStatus::Cancelled;result.tasks.clear();result.projectFinish.reset();result.diagnostics={{"CALCULATION_CANCELLED","사용자가 일정 계산을 취소했습니다. 부분 결과는 적용하지 않았습니다.",{}}};}document_.applyCalculation(std::move(result));} } catch (const std::exception& e) { report(e); }
         watcher->deleteLater(); refresh();
         const auto queued=queuedCalculation_;queuedCalculation_.reset();
         if(queued&&*queued==document_.sessionGeneration())calculateSchedule();
     });
-    watcher->setFuture(QtConcurrent::run([snapshot] { return jobs::calculate(snapshot); }));
+    watcher->setFuture(QtConcurrent::run([snapshot,control] { return jobs::calculate(snapshot,control); }));
 }
 void MainWindow::rebuildWbsTree() {
     const QSignalBlocker blocker(wbsTree_);
@@ -538,6 +551,6 @@ void MainWindow::open() {
 }
 void MainWindow::closeEvent(QCloseEvent* event) {
     if (baselinePreparing_) { QMessageBox::information(this, "기준선 저장 중", "기준선 계산을 마친 후 창을 닫으세요."); event->ignore(); return; }
-    if (confirmChanges()) { if (autosave_) autosave_->finishDocument(); event->accept(); } else event->ignore();
+    if (confirmChanges()) { if(calculationControl_){calculationControl_->cancel();queuedCalculation_.reset();}if (autosave_) autosave_->finishDocument(); event->accept(); } else event->ignore();
 }
 }

@@ -24,12 +24,13 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     bool event(QEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
     void drawBackground(QPainter* painter, const QRectF& rect) override;
     void drawForeground(QPainter* painter, const QRectF& rect) override;
 private:
     QDate firstDay_;
     QDate planFirstDay_, planLastDay_;
-    struct BaselineDate { std::string id; QString start, finish; };
+    struct BaselineDate { std::string id; QString start, finish; bool operator==(const BaselineDate&) const = default; };
     std::vector<BaselineDate> baselineDates_;
     bool isForecast_ = false;
     QSet<QDate> holidays_;
@@ -37,6 +38,7 @@ private:
     std::size_t displayRowCount_ = 0;
     std::string selectedId_;
     std::optional<PlanInput> input_;
+    std::shared_ptr<EvaluationCache> renderCache_;
     std::string documentId_;
     std::uint64_t revision_=0;
     bool editable_=false;
@@ -50,9 +52,13 @@ private:
         std::optional<std::string> remainingStart; bool completedActual = false;
         std::vector<Dependency> edges = {}; QString calendar = {};
         bool editable=false; std::string constraintType="ASAP";std::optional<std::string> constraintAt={},deadlineAt={};
-        std::vector<std::pair<std::string,std::string>> pieces={}; };
+        std::vector<std::pair<std::string,std::string>> pieces={}; bool piecesReady=false;
+        std::optional<Task> executionTask={}; std::optional<TaskSchedule> executionDates={}; };
     std::vector<Row> rows_;
+    bool rebuilding_=false;
+    int renderedFirst_=-1, renderedLast_=-1;
     void rebuild();
+    void ensureVisibleRows();
     qreal position(const QString& stamp) const;
 };
 }

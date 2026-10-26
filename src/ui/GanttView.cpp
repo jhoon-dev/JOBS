@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QTime>
+#include <QResizeEvent>
+#include <QScopedValueRollback>
 #include <algorithm>
 #include <unordered_map>
 
@@ -21,6 +23,7 @@ GanttView::GanttView(QWidget* parent) : QGraphicsView(parent) {
     setRenderHint(QPainter::Antialiasing); setDragMode(QGraphicsView::NoDrag);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, [this]{ensureVisibleRows();});
     rebuild();
 }
 qreal GanttView::position(const QString& stamp) const {
@@ -29,7 +32,8 @@ qreal GanttView::position(const QString& stamp) const {
     return (qreal(firstDay_.daysTo(day)) + qreal(time.hour() * 60 + time.minute()) / 1440) * dayWidth_;
 }
 void GanttView::setPlan(const Project* p, const ScheduleResult* result, const std::vector<std::size_t>& indices,bool editable) {
-    cancelDrag();input_.reset();editable_=false;
+    EvaluationScope evaluation;
+    cancelDrag();input_.reset();renderCache_=std::make_shared<EvaluationCache>();editable_=false;
     const auto x = horizontalScrollBar()->value(), y = verticalScrollBar()->value();
     rows_.clear(); dayCount_ = 0; holidays_.clear(); displayRowCount_ = indices.size();
     isForecast_ = result && result->isForecast;
@@ -53,13 +57,8 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
             rows_.back().edges=dependencies(t); rows_.back().calendar=qs(taskCalendarName(*p,t));
             auto& added=rows_.back();added.editable=editable_&&!std::any_of(p->progress.begin(),p->progress.end(),[&](const auto& e){return e.taskId==t.id&&e.actualStart.has_value();});added.constraintType=t.constraintType;added.constraintAt=t.constraintAt;added.deadlineAt=t.deadlineAt;
             if(isEffort(*p)&&!s.completedActual&&s.start!=s.finish) {
-                const auto pending=result->isForecast?pendingTask(*p,t):t;
-                if(usesWork(pending)) {
-                    auto spans=executionSpans(*p,pending,s);std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.start<b.start;});WorkCalendar clock(*p);
-                    std::vector<std::pair<std::int64_t,std::int64_t>> merged;
-                    for(const auto& a:spans){if(!merged.empty()&&a.start<=merged.back().second)merged.back().second=std::max(merged.back().second,a.finish);else merged.emplace_back(a.start,a.finish);}
-                    for(const auto& [begin,end]:merged)added.pieces.emplace_back(clock.boundary(begin,false),clock.boundary(end,true));
-                } else added.pieces=WorkCalendar(*p,t).segments(s.remainingStart.value_or(s.start),s.finish);
+                added.executionTask=result->isForecast?pendingTask(*p,t):t;
+                added.executionDates=s;
             }
             if(t.deadlineAt){const auto due=QDate::fromString(qs(*t.deadlineAt).left(10),Qt::ISODate);if(due>=planFirstDay_&&due<=planFirstDay_.addDays(366*20-1))planLastDay_=std::max(planLastDay_,due);}
             for(const auto& c:p->calendars) if(c.id==t.calendarId) {
@@ -70,11 +69,13 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
         }
         if (!complete) { rows_.clear(); dayCount_ = 0; }
     }
-    rebuild(); horizontalScrollBar()->setValue(x); verticalScrollBar()->setValue(y);
+    rebuild(); horizontalScrollBar()->setValue(x); verticalScrollBar()->setValue(y); ensureVisibleRows();
 }
 void GanttView::setBaseline(const Baseline* baseline) {
-    baselineDates_.clear();
-    if (baseline) for (const auto& row : baseline->schedule) baselineDates_.push_back({row.taskId, qs(row.start), qs(row.finish)});
+    std::vector<BaselineDate> dates;
+    if (baseline) for (const auto& row : baseline->schedule) dates.push_back({row.taskId, qs(row.start), qs(row.finish)});
+    if(dates==baselineDates_)return;
+    baselineDates_=std::move(dates);
     rebuild();
 }
 void GanttView::setDayWidth(int width) {
@@ -83,7 +84,16 @@ void GanttView::setDayWidth(int width) {
     dayWidth_ = width; rebuild(); horizontalScrollBar()->setValue(int(day * dayWidth_));
 }
 void GanttView::setSelectedTask(const std::string& id) {
+    const bool changed=selectedId_!=id;
     selectedId_ = id;
+    if(changed&&rows_.size()>200) {
+        const auto row=std::find_if(rows_.begin(),rows_.end(),[&](const auto& r){return r.id==id;});
+        if(row!=rows_.end()) {
+            const auto y=HeaderHeight+int(row-rows_.begin())*RowHeight;
+            const auto top=verticalScrollBar()->value();
+            if(y<top+HeaderHeight||y+RowHeight>top+viewport()->height())verticalScrollBar()->setValue(std::max(0,y-HeaderHeight));
+        }
+    }
     for (auto* item : scene()->items()) {
         const auto kind = item->data(1).toString();
         if (kind != "task" && kind != "milestone") continue;
@@ -94,11 +104,22 @@ void GanttView::setSelectedTask(const std::string& id) {
     for(auto* item:scene()->items())if(item->data(1)=="resizeHandle")item->setVisible(item->data(0).toString()==qs(id));
     viewport()->update();
 }
+void GanttView::ensureVisibleRows() {
+    if(rebuilding_||rows_.size()<=200||!dayCount_)return;
+    const int first=std::max(0,(verticalScrollBar()->value()-HeaderHeight)/RowHeight);
+    const int last=std::min(int(rows_.size())-1,(verticalScrollBar()->value()+viewport()->height())/RowHeight);
+    if(first<renderedFirst_||last>renderedLast_)rebuild();
+}
+void GanttView::resizeEvent(QResizeEvent* event) {QGraphicsView::resizeEvent(event);ensureVisibleRows();}
 void GanttView::rebuild() {
+    if(rebuilding_)return;
+    QScopedValueRollback<bool> guard(rebuilding_,true);
+    EvaluationScope evaluation({},renderCache_);
+    renderedFirst_=renderedLast_=-1;
     cancelDrag();
     scene()->clear();
     if (dayCount_ == 0) {
-        auto* message = scene()->addText("F9로 최신 유효한 일정을 계산하세요.\n오래됨·누락·충돌 상태에서는 막대를 표시하지 않습니다.");
+        auto* message = scene()->addText("F9로 최신 유효한 일정을 계산하세요.\n오래됨·누락·충돌·취소 상태에서는 막대를 표시하지 않습니다.");
         message->setDefaultTextColor(palette().color(QPalette::Text)); message->setPos(12, 16);
         scene()->setSceneRect(0, 0, 380, std::max(120, HeaderHeight + int(displayRowCount_) * RowHeight)); return;
     }
@@ -119,8 +140,21 @@ void GanttView::rebuild() {
     std::unordered_map<std::string, const BaselineDate*> baseline;
     for (const auto& date : baselineDates_) baseline.emplace(date.id, &date);
     for (std::size_t i = 0; i < rows_.size(); ++i) index.emplace(rows_[i].id, i);
-    for (std::size_t i = 0; i < rows_.size(); ++i) {
-        const auto& row = rows_[i]; const auto y = HeaderHeight + int(i) * RowHeight + RowHeight / 2;
+    renderedFirst_=rows_.size()>200?std::max(0,(verticalScrollBar()->value()-HeaderHeight)/RowHeight-4):0;
+    renderedLast_=rows_.size()>200?std::min(int(rows_.size())-1,(verticalScrollBar()->value()+viewport()->height())/RowHeight+4):int(rows_.size())-1;
+    for (int visible=renderedFirst_;visible<=renderedLast_;++visible) {
+        const auto i=std::size_t(visible);auto& row=rows_[i];
+        if(!row.piecesReady&&input_&&row.executionTask&&row.executionDates) {
+            const auto& pending=*row.executionTask;const auto& s=*row.executionDates;
+            if(usesWork(pending)) {
+                auto spans=executionSpans(*input_,pending,s);std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.start<b.start;});WorkCalendar clock(*input_);
+                std::vector<std::pair<std::int64_t,std::int64_t>> merged;
+                for(const auto& span:spans){if(!merged.empty()&&span.start<=merged.back().second)merged.back().second=std::max(merged.back().second,span.finish);else merged.emplace_back(span.start,span.finish);}
+                for(const auto& [begin,end]:merged)row.pieces.emplace_back(clock.boundary(begin,false),clock.boundary(end,true));
+            } else row.pieces=WorkCalendar(*input_,pending).segments(s.remainingStart.value_or(s.start),s.finish);
+            row.piecesReady=true;
+        }
+        const auto y = HeaderHeight + int(i) * RowHeight + RowHeight / 2;
         const auto start = position(row.start), finish = position(row.finish);
         if (baseline.contains(row.id)) {
             const auto& old = *baseline.at(row.id); const auto x = position(old.start), end = position(old.finish);

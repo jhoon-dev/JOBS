@@ -1,4 +1,5 @@
 #include "domain/Project.h"
+#include "domain/CalculationControl.h"
 #include <chrono>
 #include <stdexcept>
 #include <unordered_set>
@@ -81,6 +82,7 @@ void validatePlan(const PlanInput& p) {
     if (p.calculationProfile != "native-fs0-workminutes-v1" && !isPdm(p)) throw std::runtime_error("지원하지 않는 계산 정책입니다.");
     std::unordered_set<std::string> calendarIds;
     for (const auto& c : p.calendars) {
+        calculationCheckpoint();
         if (blank(c.id) || blank(c.name) || !calendarIds.insert(c.id).second || c.weekdays.empty() || c.periods.empty()) throw std::runtime_error("작업 달력 ID·이름·근무 요일·시간대가 필요합니다.");
         std::unordered_set<int> weekdays;
         for (int day : c.weekdays) if (day < 1 || day > 7 || !weekdays.insert(day).second) throw std::runtime_error("근무 요일은 중복 없이 월=1~일=7입니다.");
@@ -115,6 +117,7 @@ void validatePlan(const PlanInput& p) {
         for (auto index : chain) color[index] = 2;
     }
     for (const auto& t : p.tasks) {
+        calculationCheckpoint();
         if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second || nodes.contains(t.id))
             throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
         if (!t.wbsId.empty() && !nodes.contains(t.wbsId)) throw std::runtime_error("작업의 WBS가 존재하지 않습니다.");
@@ -148,6 +151,7 @@ void validatePlan(const PlanInput& p) {
     std::unordered_set<std::string> resources, pairs;
     const auto validUnits = [](const std::optional<int>& n) { return !n || (*n >= 0 && *n <= 100000); };
     for (const auto& r : p.resources) {
+        calculationCheckpoint();
         if(!r.calendarId.empty()&&(!isEffort(p)||!calendarIds.contains(r.calendarId)))throw std::runtime_error("자원 달력이 없거나 공수 일정 정책이 아닙니다.");
         if (blank(r.id) || blank(r.name) || !resources.insert(r.id).second || ids.contains(r.id) || nodes.contains(r.id) ||
             (r.type != "labor" && r.type != "equipment") || !validUnits(r.maxUnits))
@@ -161,6 +165,7 @@ void validatePlan(const PlanInput& p) {
             throw std::runtime_error("유효일 단가가 잘못되었습니다. 단가는 미정 또는 시간당 0~1,000,000,000 최소 통화단위입니다.");
     }
     for (const auto& a : p.assignments) {
+        calculationCheckpoint();
         // Length prefix avoids collisions even if imported IDs contain separators.
         auto pair = std::to_string(a.taskId.size()) + ":" + a.taskId + a.resourceId;
         if (!ids.contains(a.taskId) || !resources.contains(a.resourceId) || a.units <= 0 || a.units > 100000 || !pairs.insert(pair).second)
@@ -180,6 +185,7 @@ void validate(const Project& p) {
     if (p.statusAt && !validStamp(*p.statusAt)) throw std::runtime_error("상태일은 YYYY-MM-DD HH:mm이어야 합니다.");
     std::unordered_set<std::string> baselineIds;
     for (std::size_t i = 0; i < p.baselines.size(); ++i) {
+        calculationCheckpoint();
         const auto& b = p.baselines[i]; validatePlan(b.input);
         if (blank(b.id) || !baselineIds.insert(b.id).second || blank(b.name) || blank(b.approvedBy) || blank(b.reason) ||
             !validUtcStamp(b.createdAt) || blank(b.sourceDocumentId) || b.inputRevision == 0 || b.inputRevision >= p.revision ||
@@ -188,6 +194,7 @@ void validate(const Project& p) {
         std::unordered_set<std::string> taskIds;
         for (const auto& t : b.input.tasks) taskIds.insert(t.id);
         for (const auto& row : b.schedule) {
+        calculationCheckpoint();
             if (!taskIds.erase(row.taskId) || !validStamp(row.start) || !validStamp(row.finish) || row.start > row.finish ||
                 row.completedActual || row.remainingStart)
                 throw std::runtime_error("기준선의 작업 결과가 입력과 일치하지 않습니다.");
@@ -198,6 +205,7 @@ void validate(const Project& p) {
     std::unordered_map<std::string, std::string> previous;
     std::unordered_set<std::string> entryIds;
     for (const auto& e : p.progress) {
+        calculationCheckpoint();
         if(e.remainingWorkUnitMinutes&&!isEffort(p))throw std::runtime_error("명시 잔여 공수에는 공수 일정 정책이 필요합니다.");
         if(e.remainingWorkUnitMinutes && (*e.remainingWorkUnitMinutes<0 || *e.remainingWorkUnitMinutes>maxWork || (e.actualFinish&&*e.remainingWorkUnitMinutes!=0))) throw std::runtime_error("잔여 공수는 0~500,000,000,000 단위분이며 완료 보고에는 0이어야 합니다.");
         if (blank(e.id) || !entryIds.insert(e.id).second || !taskIds.contains(e.taskId) || !validStamp(e.statusAt) ||
@@ -218,6 +226,7 @@ void validate(const Project& p) {
     }
     std::unordered_set<std::string> scenarios;
     for (const auto& s : p.scenarios) {
+        calculationCheckpoint();
         if (blank(s.id) || !scenarios.insert(s.id).second || blank(s.name) || !validUtcStamp(s.createdAt) || blank(s.sourceDocumentId) ||
             !s.inputRevision || s.inputRevision >= p.revision || s.policy != levelingPolicyFor(s.input) ||
             (s.priority != "task-order" && s.priority != "shortest-first" && s.priority != "longest-first") ||
@@ -230,6 +239,7 @@ void validate(const Project& p) {
     }
     previous.clear(); entryIds.clear();
     for (const auto& e : p.costEntries) {
+        calculationCheckpoint();
         if (blank(e.id) || !entryIds.insert(e.id).second || !taskIds.contains(e.taskId) || !validStamp(e.statusAt) ||
             !validUtcStamp(e.recordedAt) || blank(e.reporter) || blank(e.reason) || blank(e.sourceDocumentId) || e.currency != p.currency ||
             !e.recordedRevision || e.recordedRevision > p.revision || e.previousEntryId != previous[e.taskId] ||

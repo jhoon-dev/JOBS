@@ -55,7 +55,9 @@ ScheduleResult calculateConstrainedPlan(const Project& p,const std::vector<std::
         for(std::size_t i=0;i<p.tasks.size();++i){ids[p.tasks[i].id]=i;if(!calendars.contains(p.tasks[i].calendarId))calendars.emplace(p.tasks[i].calendarId,WorkCalendar(p,p.tasks[i]));}
         const auto n=p.tasks.size();std::vector<TaskSchedule> rows(n);std::vector<ConstraintWindow> bounds(n);std::vector<std::int64_t> early(n),late(n);
         std::vector<std::vector<std::pair<std::size_t,Dependency>>> next(n);std::string finish=p.startDate+" 00:00";
+        std::size_t completed=0;
         for(auto i:order) {
+            calculationProgress(CalculationStage::Forward,completed++,n);
             currentTask=p.tasks[i].id;
             const auto& t=p.tasks[i];const auto& cal=calendars.at(t.calendarId);auto& row=rows[i];row.taskId=t.id;
             try {bounds[i]=constraintWindow(p,t,cal,*t.durationMinutes);}catch(const std::exception& e){out.diagnostics.push_back({"CONSTRAINT_CALENDAR",t.name+" · "+constraintName(t.constraintType)+" · "+e.what(),{t.id}});continue;}
@@ -80,7 +82,7 @@ ScheduleResult calculateConstrainedPlan(const Project& p,const std::vector<std::
         for(auto it=order.rbegin();it!=order.rend();++it)if(p.tasks[*it].constraintType=="ALAP"){
             const auto i=*it;early[i]=latest(i,early);pdmDates(clock,calendars.at(p.tasks[i].calendarId),rows[i],early[i],*p.tasks[i].durationMinutes);
         }
-        for(auto it=order.rbegin();it!=order.rend();++it){const auto i=*it;auto& row=rows[i];late[i]=latest(i,late);TaskSchedule trial;pdmDates(clock,calendars.at(p.tasks[i].calendarId),trial,late[i],*p.tasks[i].durationMinutes);row.lateStartMinutes=trial.earlyStartMinutes;row.lateFinishMinutes=trial.earlyFinishMinutes;row.totalFloatMinutes=late[i]-early[i];row.freeFloatMinutes=latest(i,early)-early[i];row.critical=row.totalFloatMinutes==0;
+        for(auto it=order.rbegin();it!=order.rend();++it){calculationProgress(CalculationStage::Backward,std::uint64_t(it-order.rbegin()),n);const auto i=*it;auto& row=rows[i];late[i]=latest(i,late);TaskSchedule trial;pdmDates(clock,calendars.at(p.tasks[i].calendarId),trial,late[i],*p.tasks[i].durationMinutes);row.lateStartMinutes=trial.earlyStartMinutes;row.lateFinishMinutes=trial.earlyFinishMinutes;row.totalFloatMinutes=late[i]-early[i];row.freeFloatMinutes=latest(i,early)-early[i];row.critical=row.totalFloatMinutes==0;
             row.drivingPredecessors.clear();for(const auto& edge:dependencies(p.tasks[i]))if(pdmRequiredStart(calendars.at(p.tasks[i].calendarId),edge,rows[ids.at(edge.predecessorId)],*p.tasks[i].durationMinutes)==early[i])row.drivingPredecessors.push_back(edge.predecessorId);
         }
         out.tasks=std::move(rows);out.projectFinish=finish;out.status=CalculationStatus::Valid;out.diagnostics=deadlineDiagnostics(p,out.tasks);

@@ -1,4 +1,5 @@
 #include "calculation/WorkCalendar.h"
+#include "domain/CalculationControl.h"
 #include <algorithm>
 #include <cstdio>
 #include <stdexcept>
@@ -25,12 +26,23 @@ void WorkCalendar::initialize(const PlanInput& p, const Task* task) {
         calendar = *it;
     }
     anchor_ = date(p.startDate); horizon_ = std::min(anchor_ + days{366*20}, sys_days{year{10000}/1/1});
+    EvaluationScope evaluation;
+    cacheKey_="calendar/"+p.startDate+"/"+std::to_string(elapsed_);
+    auto field=[&](const std::string& value){cacheKey_+="/"+std::to_string(value.size())+":"+value;};
+    for(int day:calendar.weekdays)field(std::to_string(day));
+    field("periods");
+    for(const auto& period:calendar.periods){field(std::to_string(period.begin));field(std::to_string(period.end));}
+    field("holidays");for(const auto& day:calendar.holidays)field(day);
+    if(task&&isEffort(p)){field("breaks");for(const auto& gap:task->breaks){field(gap.start);field(gap.finish);}}
+    if(auto cached=evaluationCached(cacheKey_)){intervals_=std::static_pointer_cast<const std::vector<Interval>>(cached);return;}
+    std::vector<Interval> intervals;
     std::unordered_set<std::int64_t> holidays; for (const auto& h : calendar.holidays) holidays.insert(date(h).time_since_epoch().count());
     std::int64_t prefix = 0;
     for (auto d = anchor_; d < horizon_; d += days{1}) {
+        if((d-anchor_).count()%64==0)calculationCheckpoint();
         if (std::find(calendar.weekdays.begin(), calendar.weekdays.end(), int(weekday{d}.iso_encoding())) == calendar.weekdays.end() || holidays.contains(d.time_since_epoch().count())) continue;
         auto base = (d-anchor_).count()*1440;
-        for (const auto& period : calendar.periods) { intervals_.push_back({base+period.begin, base+period.end, prefix}); prefix += period.end-period.begin; }
+        for (const auto& period : calendar.periods) { intervals.push_back({base+period.begin, base+period.end, prefix}); prefix += period.end-period.begin; }
     }
     if(task && isEffort(p) && !task->breaks.empty()) {
         std::vector<Interval> kept; prefix=0;
@@ -38,7 +50,7 @@ void WorkCalendar::initialize(const PlanInput& p, const Task* task) {
         const auto minute=[&](const std::string& s){return (date(s)-anchor_).count()*1440+std::stoi(s.substr(11,2))*60+std::stoi(s.substr(14,2));};
         for(const auto& gap:task->breaks)gaps.emplace_back(minute(gap.start),minute(gap.finish));
         std::size_t cursor=0;
-        for(const auto& i:intervals_) {
+        for(const auto& i:intervals) {
             auto at=i.begin;
             while(cursor<gaps.size()&&gaps[cursor].second<=at)++cursor;
             for(auto j=cursor;j<gaps.size()&&gaps[j].first<i.end;++j) {
@@ -48,29 +60,34 @@ void WorkCalendar::initialize(const PlanInput& p, const Task* task) {
             }
             if(at<i.end){kept.push_back({at,i.end,prefix});prefix+=i.end-at;}
         }
-        intervals_=std::move(kept);
+        intervals=std::move(kept);
     }
+    intervals_=std::make_shared<const std::vector<Interval>>(std::move(intervals));
+    evaluationRemember(cacheKey_,intervals_);
 }
+
 std::vector<std::pair<std::int64_t,std::int64_t>> WorkCalendar::civilIntervals() const {
-    std::vector<std::pair<std::int64_t,std::int64_t>> out;out.reserve(intervals_.size());
-    for(const auto& i:intervals_)out.emplace_back(i.begin,i.end);
+    std::vector<std::pair<std::int64_t,std::int64_t>> out;out.reserve(intervals_->size());
+    for(const auto& i:*intervals_)out.emplace_back(i.begin,i.end);
     return out;
 }
 std::string WorkCalendar::boundary(std::int64_t value, bool finish) const {
-    if (value < 0 || intervals_.empty()) throw std::runtime_error("달력 근무분이 음수이거나 20년 범위에 가용 시간이 없습니다.");
-    auto it = std::upper_bound(intervals_.begin(), intervals_.end(), value - (finish && value > 0 ? 1 : 0), [](auto n, const auto& i) { return n < i.prefix; });
-    if (it == intervals_.begin()) throw std::runtime_error("달력 범위 밖입니다.");
+    calculationCheckpoint();
+    if (value < 0 || intervals_->empty()) throw std::runtime_error("달력 근무분이 음수이거나 20년 범위에 가용 시간이 없습니다.");
+    auto it = std::upper_bound(intervals_->begin(), intervals_->end(), value - (finish && value > 0 ? 1 : 0), [](auto n, const auto& i) { return n < i.prefix; });
+    if (it == intervals_->begin()) throw std::runtime_error("달력 범위 밖입니다.");
     --it;
     if (value > it->prefix + it->end-it->begin || (!finish && value == it->prefix + it->end-it->begin)) throw std::runtime_error("계획 시작부터 20년 이내에 근무시간이 부족합니다.");
     return stamp(anchor_, it->begin + value-it->prefix);
 }
 std::int64_t WorkCalendar::offset(const std::string& s) const {
+    calculationCheckpoint();
     if (!validStamp(s)) throw std::runtime_error("잘못된 현지 날짜·시각입니다.");
     const auto d = date(s);
     if (d < anchor_ || d >= horizon_) throw std::runtime_error("시각이 프로젝트 시작부터 20년의 계산 범위 밖입니다.");
     auto civil = (d-anchor_).count()*1440 + std::stoi(s.substr(11,2))*60 + std::stoi(s.substr(14,2));
-    auto it = std::upper_bound(intervals_.begin(), intervals_.end(), civil, [](auto n, const auto& i) { return n < i.begin; });
-    if (it == intervals_.begin()) return 0;
+    auto it = std::upper_bound(intervals_->begin(), intervals_->end(), civil, [](auto n, const auto& i) { return n < i.begin; });
+    if (it == intervals_->begin()) return 0;
     --it;
     return it->prefix + std::min(civil-it->begin, it->end-it->begin);
 }
@@ -85,7 +102,7 @@ std::vector<std::pair<std::string,std::string>> WorkCalendar::segments(const std
     offset(start); offset(finish);
     const auto civil=[&](const std::string& s){return (date(s)-anchor_).count()*1440+std::stoi(s.substr(11,2))*60+std::stoi(s.substr(14,2));};
     const auto first=std::int64_t(civil(start)),endMinute=std::int64_t(civil(finish));
-    for (const auto& i : intervals_) {
+    for (const auto& i : *intervals_) {
         if (i.begin >= endMinute) break;
         if (i.end > first) out.emplace_back(stamp(anchor_,std::max(i.begin,first)),stamp(anchor_,std::min(i.end,endMinute)));
     }

@@ -1,0 +1,8 @@
+{
+  "source_revision": "9a401853bb2c42b90ceba354b6671b298a2d8e0f",
+  "fixture": "jobs-perf-layered-v1",
+  "task_count": 1000,
+  "serialization": "PerformanceFixture.h scheduleFingerprint; ordered JSON array of all TaskSchedule fields",
+  "legacy": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+  "effort": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe"
+}
