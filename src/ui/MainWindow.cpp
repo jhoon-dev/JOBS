@@ -81,6 +81,21 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     wbsTools->addSeparator(); wbsTools->addWidget(new QLabel("간트 배율 ", this));
     auto* zoom = new QComboBox(this); zoom->setAccessibleName("간트 배율"); zoom->setObjectName("ganttZoom");
     zoom->addItems({"일", "주"}); wbsTools->addWidget(zoom);
+    auto* trackingMenu = menuBar()->addMenu("추적(&T)");
+    auto trackingAction = [&](const QString& label, std::function<void()> callback) {
+        auto* a = trackingMenu->addAction(label); wbsTools->addAction(a);
+        connect(a, &QAction::triggered, this, std::move(callback)); return a;
+    };
+    wbsTools->addSeparator();
+    baselineSave_ = trackingAction("기준선 저장", [this] { saveBaseline(); });
+    statusEdit_ = trackingAction("상태일 설정", [this] { editStatusAt(); });
+    progressEdit_ = trackingAction("선택 작업 실적", [this] { reportProgress(); });
+    comparison_ = trackingAction("계획 대비 비교", [this] { showComparison(); });
+    baselineChoice_ = new QComboBox(this); baselineChoice_->setObjectName("baselineChoice"); baselineChoice_->setAccessibleName("간트 비교 기준선");
+    baselineChoice_->setMaximumWidth(190); wbsTools->addWidget(baselineChoice_);
+    connect(baselineChoice_, &QComboBox::currentIndexChanged, this, [this] {
+        selectedBaseline_ = str(baselineChoice_->currentData().toString()); refresh(false);
+    });
     auto* central = new QWidget(this); auto* layout = new QVBoxLayout(central);
     auto* heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
     layout->addWidget(heading);
@@ -92,7 +107,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     wbsTree_ = new QTreeWidget(split); wbsTree_->setObjectName("wbsTree"); wbsTree_->setAccessibleName("WBS 탐색");
     wbsTree_->setHeaderLabel("WBS · 프로젝트 구조"); wbsTree_->setMinimumWidth(170);
     table_ = new QTableWidget(0, 9, split);
-    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "FS 선행(행 번호)", "시작", "완료", "총여유(h)", "임계", "자원", "안정 ID"});
+    table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "FS 선행(행 번호)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     for (int column = 1; column < 9; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
@@ -116,6 +131,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
             selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
         else selectedTask_.clear();
         gantt_->setSelectedTask(selectedTask_); assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
+        progressEdit_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
     });
     gantt_->taskSelected = [this](const std::string& id) {
         for (std::size_t i = 0; i < visibleRows_.size(); ++i)
@@ -124,7 +140,7 @@ MainWindow::MainWindow(Document& document) : document_(document) {
     diagnostics_ = new QPlainTextEdit(central); diagnostics_->setReadOnly(true); diagnostics_->setMaximumHeight(160);
     diagnostics_->setObjectName("calculationDiagnostics"); diagnostics_->setAccessibleName("계산 상태 및 진단");
     layout->addWidget(diagnostics_);
-    auto* note = new QLabel("월–금 09–12 / 13–18 · 1일 8시간 · 휴일 편집 가능 · 날짜는 시간대 없는 현지 근무시각\n기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤 · 선행: 표 왼쪽의 프로젝트 행 번호(1,3), FS 0 lag\n간트: 빨강+[임계]=임계 작업, 파랑=여유 작업, ◆=마일스톤, 음영=휴무 · 막대는 시작~완료 구간\nWBS는 하위 작업까지 필터합니다. F9는 전체 프로젝트 계산 · 자동복구·자원 제약은 후속 구현입니다.", central);
+    auto* note = new QLabel("월–금 09–12 / 13–18 · 1일 8시간 · 현지 civil 시각 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤\n선행: 표 왼쪽의 프로젝트 행 번호(1,3), FS 0 lag · F9=전체 계산 · 상태일 설정 시 실제를 고정하고 잔여를 재예측\n간트: 빨강+[임계]=계획 임계, 파랑=계획/예측, 초록+[실제]=실제 완료, ◆=마일스톤, 회색 가는 막대=선택 기준선, 음영=휴무\n예측 모드의 여유·임계는 미산정입니다. 기준선·실적·변경 비교는 추적 메뉴에서 관리합니다.", central);
     note->setWordWrap(true); layout->addWidget(note); setCentralWidget(central);
     connect(table_, &QTableWidget::cellChanged, this, [this](int row, int column) {
         if (column > 2) return;
@@ -167,7 +183,10 @@ void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "J
 void MainWindow::refresh(bool rebuildTree) {
     const QSignalBlocker blocker(table_);
     const auto& p = document_.project();
-    if (p && treeDocument_ != p->documentId) { selectedWbs_.clear(); selectedTask_.clear(); treeDocument_ = p->documentId; }
+    if (p && treeDocument_ != p->documentId) {
+        selectedWbs_.clear(); selectedTask_.clear(); treeDocument_ = p->documentId;
+        selectedBaseline_ = p->baselines.empty() ? std::string{} : p->baselines.back().id;
+    }
     if (rebuildTree) rebuildWbsTree();
     setWindowTitle((p ? qs(p->name) : "프로젝트를 만들거나 여세요") + "[*] — JOBS");
     setWindowModified(document_.dirty());
@@ -180,10 +199,13 @@ void MainWindow::refresh(bool rebuildTree) {
     renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
     visibleRows_ = p ? wbsTaskRows(*p, selectedWbs_) : std::vector<std::size_t>{};
     table_->setRowCount(int(visibleRows_.size())); table_->clearSelection(); table_->setCurrentCell(-1, -1);
+    refreshTracking();
     if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
         gantt_->setPlan(nullptr, nullptr, {}); assignWbs_->setEnabled(false); statusBar()->showMessage("준비"); return; }
     summary_->setText(qs(p->name) + "  |  시작일 " + qs(p->startDate) + "  |  revision " + QString::number(p->revision)
         + "  |  휴일 " + QString::number(p->holidays.size()) + "개"
+        + "  |  상태일 " + (p->statusAt ? qs(*p->statusAt) : "미설정 · 현재 계획 모드")
+        + "  |  기준선 " + QString::number(p->baselines.size()) + "개 · 실적 이력 " + QString::number(p->progress.size()) + "건"
         + "\n" + (document_.path().empty() ? "아직 저장하지 않은 프로젝트" : qs(document_.path()))
         + (document_.requiresSaveAs() ? " · 이전 형식: 저장 시 새 파일 필요" : ""));
     const auto& calculation = document_.calculation();
@@ -204,7 +226,8 @@ void MainWindow::refresh(bool rebuildTree) {
             QString::number(double(*t.durationMinutes) / 60, 'g', 12) : QString::number(*t.durationMinutes) + "m";
         QStringList values{qs(t.name), duration,
             predecessors.join(","), s ? qs(s->start) : "미계산", s ? qs(s->finish) : "미계산",
-            s ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—", s ? (s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id)};
+            s && !calculation->isForecast ? QString::number(double(s->totalFloatMinutes) / 60, 'g', 12) : "—",
+            s ? (calculation->isForecast ? (s->completedActual ? "실제 완료" : "예측") : s->critical ? "임계" : "여유") : "—", "미설정", qs(t.id)};
         for (int column = 0; column < values.size(); ++column) {
             auto* item = new QTableWidgetItem(values[column]);
             if (column > 2 || document_.readOnly()) item->setFlags(item->flags() & ~Qt::ItemIsEditable);
@@ -214,7 +237,11 @@ void MainWindow::refresh(bool rebuildTree) {
     }
     if (selectedRow >= 0) table_->selectRow(selectedRow); else selectedTask_.clear();
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
+    refreshTracking();
     gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_); gantt_->setSelectedTask(selectedTask_);
+    const Baseline* baseline = nullptr;
+    for (const auto& b : p->baselines) if (b.id == selectedBaseline_) baseline = &b;
+    gantt_->setBaseline(baseline);
     const auto rollup = summarizeWbs(*p, calculation ? &*calculation : nullptr, selectedWbs_);
     wbsSummary_->setText("선택 범위: " + wbsTree_->currentItem()->text(0) + " · 작업 " + QString::number(rollup.taskCount)
         + "개 · 알려진 작업 기간 합계 " + QString::number(double(rollup.knownDurationMinutes) / 60, 'g', 10) + "h"
@@ -223,12 +250,13 @@ void MainWindow::refresh(bool rebuildTree) {
     QString state = "미계산 · F9로 계산";
     if (calculation) {
         switch (calculation->status) {
-        case CalculationStatus::Valid: state = "계산 완료 · 프로젝트 완료 " + qs(*calculation->projectFinish); break;
+        case CalculationStatus::Valid: state = (calculation->isForecast ? "실적 반영 예측 완료 · 프로젝트 완료 " : "계산 완료 · 프로젝트 완료 ") + qs(*calculation->projectFinish); break;
         case CalculationStatus::Incomplete: state = "입력 불완전 · 전체 완료일 없음"; break;
         case CalculationStatus::Conflict: state = "계산 충돌 · 전체 완료일 없음"; break;
         case CalculationStatus::Stale: state = "오래된 계산 · F9로 다시 계산"; break;
         }
         state += "\n입력 revision " + QString::number(calculation->inputRevision) + " · " + qs(calculation->engineVersion) + " · " + qs(calculation->profile);
+        state += " · " + qs(calculation->calculationPolicy);
         if (calculation->status != CalculationStatus::Stale) {
             int count = 0;
             for (const auto& d : calculation->diagnostics) {
@@ -244,7 +272,7 @@ void MainWindow::refresh(bool rebuildTree) {
     }
     diagnostics_->setPlainText(calculating_ ? "계산 중 · 편집할 수 있습니다. 변경 시 계산 결과는 오래됨으로 처리됩니다." : state);
     statusBar()->showMessage(QString(document_.readOnly() ? "읽기 전용 · " : document_.dirty() ? "미저장 변경 있음 · " : "저장된 revision · ")
-        + (valid ? "기간·FS 논리 일정 · 자원 미검증" : "유효한 최신 일정 없음"));
+        + (valid ? (calculation->isForecast ? "실적·잔여 예측 · 자원 미검증" : "기간·FS 논리 일정 · 자원 미검증") : "유효한 최신 일정 없음"));
 }
 void MainWindow::calculateSchedule() {
     if (!document_.project() || calculating_) return;
@@ -395,5 +423,8 @@ void MainWindow::open() {
         }
     }
 }
-void MainWindow::closeEvent(QCloseEvent* event) { if (confirmChanges()) event->accept(); else event->ignore(); }
+void MainWindow::closeEvent(QCloseEvent* event) {
+    if (baselinePreparing_) { QMessageBox::information(this, "기준선 저장 중", "기준선 계산을 마친 후 창을 닫으세요."); event->ignore(); return; }
+    if (confirmChanges()) event->accept(); else event->ignore();
+}
 }

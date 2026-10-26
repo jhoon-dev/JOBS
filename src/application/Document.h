@@ -2,6 +2,7 @@
 #include "application/ProjectStore.h"
 #include <optional>
 #include "calculation/Scheduler.h"
+#include "calculation/Tracking.h"
 
 namespace jobs {
 class Document {
@@ -25,6 +26,10 @@ public:
     void setDuration(std::size_t row, std::optional<std::int64_t> minutes);
     void setPredecessors(std::size_t row, std::vector<std::string> ids);
     void setHolidays(std::vector<std::string> dates);
+    void setStatusAt(std::optional<std::string> stamp);
+    std::string appendBaseline(Baseline prepared);
+    std::string captureBaseline(std::string name, std::string approvedBy, std::string reason, std::string createdAt);
+    void recordProgress(ProgressEntry entry);
     void applyCalculation(ScheduleResult result);
     void save();
     void saveAs(const std::string& path);

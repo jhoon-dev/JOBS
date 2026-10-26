@@ -30,10 +30,12 @@ qreal GanttView::position(const QString& stamp) const {
 void GanttView::setPlan(const Project* p, const ScheduleResult* result, const std::vector<std::size_t>& indices) {
     const auto x = horizontalScrollBar()->value(), y = verticalScrollBar()->value();
     rows_.clear(); dayCount_ = 0; holidays_.clear(); displayRowCount_ = indices.size();
+    isForecast_ = result && result->isForecast;
     if (p && result && result->status == CalculationStatus::Valid && result->documentId == p->documentId &&
         result->inputRevision == p->revision && result->profile == p->calculationProfile && result->projectFinish) {
         firstDay_ = QDate::fromString(qs(p->startDate), Qt::ISODate);
         const auto last = QDate::fromString(qs(*result->projectFinish).left(10), Qt::ISODate);
+        planFirstDay_ = firstDay_; planLastDay_ = last;
         dayCount_ = std::max(7, int(firstDay_.daysTo(last)) + 2);
         for (const auto& day : p->holidays) holidays_.insert(QDate::fromString(qs(day), Qt::ISODate));
         std::unordered_map<std::string, const TaskSchedule*> dates;
@@ -44,11 +46,16 @@ void GanttView::setPlan(const Project* p, const ScheduleResult* result, const st
             if (it == dates.end()) { complete = false; break; }
             const auto& s = *it->second;
             rows_.push_back({t.id, QString::number(index + 1) + ". " + qs(t.name), qs(s.start), qs(s.finish),
-                s.critical, t.predecessors, s.drivingPredecessors});
+                s.critical, t.predecessors, s.drivingPredecessors, s.remainingStart, s.completedActual});
         }
         if (!complete) { rows_.clear(); dayCount_ = 0; }
     }
     rebuild(); horizontalScrollBar()->setValue(x); verticalScrollBar()->setValue(y);
+}
+void GanttView::setBaseline(const Baseline* baseline) {
+    baselineDates_.clear();
+    if (baseline) for (const auto& row : baseline->schedule) baselineDates_.push_back({row.taskId, qs(row.start), qs(row.finish)});
+    rebuild();
 }
 void GanttView::setDayWidth(int width) {
     if (width != 16 && width != 64) return;
@@ -73,6 +80,12 @@ void GanttView::rebuild() {
         message->setDefaultTextColor(palette().color(QPalette::Text)); message->setPos(12, 16);
         scene()->setSceneRect(0, 0, 380, std::max(120, HeaderHeight + int(displayRowCount_) * RowHeight)); return;
     }
+    firstDay_ = planFirstDay_; auto lastDay = planLastDay_;
+    for (const auto& date : baselineDates_) {
+        firstDay_ = std::min(firstDay_, QDate::fromString(date.start.left(10), Qt::ISODate));
+        lastDay = std::max(lastDay, QDate::fromString(date.finish.left(10), Qt::ISODate));
+    }
+    dayCount_ = std::max(7, int(firstDay_.daysTo(lastDay)) + 2);
     if (rows_.empty()) {
         auto* message = scene()->addText("선택한 WBS에 작업이 없습니다.");
         message->setDefaultTextColor(palette().color(QPalette::Text)); message->setPos(12, HeaderHeight + 8);
@@ -81,39 +94,49 @@ void GanttView::rebuild() {
     const auto height = HeaderHeight + int(rows_.size()) * RowHeight;
     scene()->setSceneRect(0, 0, width, std::max(height, 120));
     std::unordered_map<std::string, std::size_t> index;
+    std::unordered_map<std::string, const BaselineDate*> baseline;
+    for (const auto& date : baselineDates_) baseline.emplace(date.id, &date);
     for (std::size_t i = 0; i < rows_.size(); ++i) index.emplace(rows_[i].id, i);
     for (std::size_t i = 0; i < rows_.size(); ++i) {
         const auto& row = rows_[i]; const auto y = HeaderHeight + int(i) * RowHeight + RowHeight / 2;
         const auto start = position(row.start), finish = position(row.finish);
+        if (baseline.contains(row.id)) {
+            const auto& old = *baseline.at(row.id); const auto x = position(old.start), end = position(old.finish);
+            auto* oldBar = scene()->addRect(QRectF(x, y + 8, std::max(qreal(3), end - x), 3), QPen(QColor("#a0a0a0"), 1, Qt::DashLine), QBrush(QColor("#a0a0a0")));
+            oldBar->setData(0, qs(row.id)); oldBar->setData(1, "baseline"); oldBar->setToolTip("고정 기준선\n" + old.start + " → " + old.finish); oldBar->setZValue(1);
+        }
         QAbstractGraphicsShapeItem* bar;
         const bool milestone = row.start == row.finish;
         if (milestone) {
             QPolygonF diamond; diamond << QPointF(start, y - 7) << QPointF(start + 7, y) << QPointF(start, y + 7) << QPointF(start - 7, y);
             bar = scene()->addPolygon(diamond);
         } else bar = scene()->addRect(QRectF(start, y - 6, std::max(qreal(3), finish - start), 12));
-        bar->setBrush(row.critical ? criticalColor() : normalColor());
+        bar->setBrush(row.completedActual ? QColor("#51b384") : row.critical ? criticalColor() : normalColor());
         bar->setData(0, qs(row.id)); bar->setData(1, milestone ? "milestone" : "task"); bar->setZValue(2);
-        const auto kind = milestone ? "마일스톤" : row.critical ? "임계 작업" : "여유 작업";
+        const auto kind = row.completedActual ? "실제 완료" : isForecast_ ? "실적 반영 예측" : milestone ? "마일스톤" : row.critical ? "임계 작업" : "여유 작업";
         QString tooltip = row.name + "\n" + kind + "\n" + row.start + " → " + row.finish + "\nID: " + qs(row.id);
+        if (row.remainingStart) tooltip += "\n잔여 작업 재개: " + qs(*row.remainingStart);
         int hidden = 0;
         for (const auto& prev : row.predecessors) if (!index.contains(prev)) ++hidden;
         if (hidden) tooltip += "\n현재 WBS 밖 선행: " + QString::number(hidden) + "개 (전체 프로젝트 계산에 반영됨)";
         bar->setToolTip(tooltip);
-        auto* label = scene()->addSimpleText(row.name + (milestone ? " ◆" : row.critical ? " [임계]" : ""));
+        auto* label = scene()->addSimpleText(row.name + (row.completedActual ? " [실제]" : isForecast_ ? " [예측]" : milestone ? " ◆" : row.critical ? " [임계]" : ""));
         label->setBrush(palette().color(QPalette::Text)); label->setPos(finish + 9, y - 9); label->setZValue(3);
         label->setData(0, qs(row.id)); label->setData(1, "label"); label->setToolTip(tooltip);
         for (const auto& predecessor : row.predecessors) {
             auto found = index.find(predecessor); if (found == index.end()) continue;
             const auto& prev = rows_[found->second];
             auto x1 = position(prev.finish); auto y1 = HeaderHeight + int(found->second) * RowHeight + RowHeight / 2;
-            auto elbow = std::max(x1 + 8, start - 10);
-            QPainterPath path(QPointF(x1, y1)); path.lineTo(elbow, y1); path.lineTo(elbow, y - 10); path.lineTo(start - 5, y - 10); path.lineTo(start - 5, y); path.lineTo(start, y);
+            const auto target = isForecast_ && row.remainingStart ? position(qs(*row.remainingStart)) : start;
+            auto elbow = std::max(x1 + 8, target - 10);
+            QPainterPath path(QPointF(x1, y1)); path.lineTo(elbow, y1); path.lineTo(elbow, y - 10); path.lineTo(target - 5, y - 10); path.lineTo(target - 5, y); path.lineTo(target, y);
             const bool driving = row.critical && prev.critical && std::find(row.driving.begin(), row.driving.end(), predecessor) != row.driving.end();
             const auto color = driving ? criticalColor() : palette().color(QPalette::Text);
-            auto* link = scene()->addPath(path, QPen(color, 1)); link->setZValue(1);
+            const bool historical = isForecast_ && row.completedActual;
+            auto* link = scene()->addPath(path, QPen(color, 1, historical ? Qt::DashLine : Qt::SolidLine)); link->setZValue(1);
             link->setData(0, qs(predecessor + "->" + row.id)); link->setData(1, "dependency");
-            link->setToolTip("FS 0 · " + qs(predecessor) + " → " + qs(row.id));
-            QPolygonF arrow; arrow << QPointF(start, y) << QPointF(start - 5, y - 3) << QPointF(start - 5, y + 3);
+            link->setToolTip((historical ? "과거 실제 FS 관계 · 날짜 고정 · " : isForecast_ && row.remainingStart ? "FS 0 · 잔여 작업 재개 기준 · " : "FS 0 · ") + qs(predecessor) + " → " + qs(row.id));
+            QPolygonF arrow; arrow << QPointF(target, y) << QPointF(target - 5, y - 3) << QPointF(target - 5, y + 3);
             scene()->addPolygon(arrow, QPen(color), QBrush(color))->setZValue(1);
         }
     }

@@ -82,6 +82,33 @@ void Document::setHolidays(std::vector<std::string> dates) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto p = *project_; p.holidays = std::move(dates); edit(std::move(p));
 }
+void Document::setStatusAt(std::optional<std::string> stamp) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    auto p = *project_; p.statusAt = std::move(stamp); edit(std::move(p));
+}
+std::string Document::appendBaseline(Baseline b) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    if (b.sourceDocumentId != project_->documentId || b.inputRevision != project_->revision || b.input != static_cast<const PlanInput&>(*project_))
+        throw std::runtime_error("기준선 준비 중 문서가 변경되었습니다. 최신 계획으로 다시 저장하세요.");
+    verifyBaseline(b);
+    auto p = *project_; b.id = store_.newId(); b.version = p.baselines.size() + 1; auto id = b.id;
+    p.baselines.push_back(std::move(b)); edit(std::move(p)); return id;
+}
+std::string Document::captureBaseline(std::string name, std::string author, std::string reason, std::string utc) {
+    if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    return appendBaseline(prepareBaseline(*project_, std::move(name), std::move(author), std::move(reason), std::move(utc)));
+}
+void Document::recordProgress(ProgressEntry entry) {
+    if (!project_ || readOnly_ || !project_->statusAt) throw std::runtime_error("실적 보고 전에 상태일을 설정하세요.");
+    auto p = *project_; entry.id = store_.newId(); entry.statusAt = *p.statusAt; entry.recordedRevision = p.revision + 1;
+    entry.sourceDocumentId = p.documentId;
+    const auto task = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto& t) { return t.id == entry.taskId; });
+    if (task == p.tasks.end()) throw std::runtime_error("보고할 작업이 존재하지 않습니다.");
+    entry.planDurationMinutes = task->durationMinutes;
+    entry.previousEntryId.clear();
+    for (auto it = p.progress.rbegin(); it != p.progress.rend(); ++it) if (it->taskId == entry.taskId) { entry.previousEntryId = it->id; break; }
+    p.progress.push_back(std::move(entry)); edit(std::move(p));
+}
 void Document::staleCalculation() {
     if (calculation_) calculation_->status = CalculationStatus::Stale;
 }
@@ -91,7 +118,7 @@ void Document::edit(Project p) {
 }
 void Document::applyCalculation(ScheduleResult result) {
     if (!project_) return;
-    if (result.documentId != project_->documentId || result.inputRevision != project_->revision || result.profile != project_->calculationProfile)
+    if (result.documentId != project_->documentId || result.inputRevision != project_->revision || result.profile != project_->calculationProfile || result.statusAt != project_->statusAt)
         result.status = CalculationStatus::Stale;
     calculation_ = std::move(result);
 }

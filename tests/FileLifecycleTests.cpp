@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 4;
+        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 5;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();
@@ -114,9 +114,10 @@ int main(int argc, char* argv[]) {
         check(*second.project() == beforeBadHoliday, "invalid holiday changed project");
         second.create("different document", "2026-10-26", {"task"}); second.applyCalculation(oldResult);
         check(second.calculation()->status == jobs::CalculationStatus::Stale, "wrong document calculation accepted");
-        // Construct an actual schema-1 payload, then check non-destructive migration by Save As.
+        // Construct an actual schema-1 payload, then check original-preserving migration by Save As.
         auto legacy = QJsonDocument::fromJson(originalBytes).object();
         auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile"); legacyPayload.remove("wbsNodes");
+        legacyPayload.remove("baselines"); legacyPayload.remove("progress"); legacyPayload.remove("statusAt");
         QJsonArray legacyTasks;
         for (const auto& value : legacyPayload["tasks"].toArray()) {
             auto task = value.toObject(); task.remove("durationMinutes"); task.remove("predecessors"); task.remove("wbsId"); legacyTasks.append(task);
@@ -134,9 +135,9 @@ int main(int argc, char* argv[]) {
         auto parent = migrated.addWbs("단계 α"), child = migrated.addWbs("상세", parent);
         migrated.assignWbs(0, child); migrated.save();
         check(store.load(migrated.path()).project == *migrated.project(), "WBS hierarchy/task assignment roundtrip mismatch");
-        // Schema 2 keeps scheduling input and IDs, adds an empty hierarchy, and preserves original bytes.
+        // Schema 2 keeps scheduling input and IDs, adds an empty hierarchy/history, and preserves original bytes.
         auto version2 = QJsonDocument::fromJson(read(QString::fromStdString(migrated.path()))).object();
-        auto p2 = version2["payload"].toObject(); p2.remove("wbsNodes");
+        auto p2 = version2["payload"].toObject(); p2.remove("wbsNodes"); p2.remove("baselines"); p2.remove("progress"); p2.remove("statusAt");
         QJsonArray tasks2;
         for (auto value : p2["tasks"].toArray()) { auto t = value.toObject(); t.remove("wbsId"); tasks2.append(t); }
         p2["tasks"] = tasks2; version2["payload"] = p2; version2["schemaVersion"] = 2;

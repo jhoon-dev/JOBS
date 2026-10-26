@@ -25,6 +25,10 @@ private:
     QAction *save_, *saveAs_, *add_;
     QAction *calculate_, *calendar_;
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;
+    QAction *baselineSave_, *statusEdit_, *progressEdit_, *comparison_;
+    QComboBox* baselineChoice_;
+    std::string selectedBaseline_;
+    bool baselinePreparing_ = false;
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     bool calculating_ = false;
@@ -39,6 +43,11 @@ private:
     void createWbs();
     void renameWbs();
     void chooseWbs(bool moveNode);
+    void saveBaseline();
+    void editStatusAt();
+    void reportProgress();
+    void showComparison();
+    void refreshTracking();
     void report(const std::exception& error);
 };
 }

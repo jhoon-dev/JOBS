@@ -5,7 +5,7 @@ PRD-01/03, CAL-01/03/04 일부, F01/F04/F12 일부의 실행 가능한 첫 계�
 
 ## 입력과 시간 의미
 
-정책 ID `native-fs0-workminutes-v1`, 엔진 `jobs-cpm-0.1`.
+정책 ID `native-fs0-workminutes-v1`, 현재 엔진 `jobs-cpm-0.2` (첫 계획 구현은 0.1).
 모든 실행 작업에 같은 프로젝트 달력을 적용한다. 월–금 09:00–12:00 / 13:00–18:00,
 1일 480 근무분이며 사용자가 지정한 날짜는 하루 전체 휴일이다.
 표시 시각은 시간대 없는 현지 civil time이다. UTC/DST 변환, 야간 근무, elapsed duration,
@@ -32,7 +32,7 @@ PRD-01/03, CAL-01/03/04 일부, F01/F04/F12 일부의 실행 가능한 첫 계�
 여러 임계경로와 조기 시작을 결정한 선행 ID 목록을 보존한다.
 required finish, 음수 여유, 별도 deadline, 수동 제약은 아직 없다.
 
-결과는 documentId·inputRevision·engineVersion·profile·진단을 포함한다.
+결과는 documentId·inputRevision·engineVersion·profile·계산 정책·상태일·진단을 포함한다.
 입력이 부족하면 INCOMPLETE, 순환·참조·날짜·horizon 오류면 CONFLICT이며
 전체 완료일과 작업 날짜를 반환하지 않는다. 유효한 결과도 자원 가용성은 미검증이다.
 빈 계획에도 완료일을 붙이지 않는다.
@@ -66,5 +66,7 @@ A의 선행에 D(4)를 입력하면 순환 진단을 보며, 관계를 지우고
 입력→계산→편집→STALE→재계산과 충돌/미정 시 날짜 숨김을 검사한다.
 
 WBS 이동·필터·집계는 [WBS·간트 계약](wbs-gantt.md)에 따라 실행 그래프와 분리하여 구현했다.
-아직 기준선, 실적, 자원, 네 관계/lag, timezone/DST, 강제종료 복구,
+기준선·실적·현재 계획과 예측의 비교는 [추적 계약](baseline-progress.md)에 따라 추가했다.
+상태일이 없으면 본 문서의 계획 CPM, 상태일이 있으면 retained remaining 예측을 사용한다.
+아직 자원, 네 관계/lag, timezone/DST, 강제종료 복구,
 교환 호환성 및 1천/1만/10만 작업 성능은 검증 범위에 포함하지 않는다.
