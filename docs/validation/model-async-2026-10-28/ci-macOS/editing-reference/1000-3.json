@@ -1,0 +1,177 @@
+{
+    "baseline_count": 3,
+    "build_configuration": "Release",
+    "build_source_revision": "d9270cdf8c8fa5f9b7ee778be22a8f8b311a8150",
+    "built_product_source_sha256": "7f2985c3679f6ad3b738ab086fd354644969133bb48eb550872b576c34be5df3",
+    "compiler": "Apple LLVM 17.0.0 (clang-1700.0.13.5)",
+    "estimated_history_bytes": 66970,
+    "fixture": "jobs-perf-editing-v1",
+    "logical_cpu_count": 3,
+    "measurements": {
+        "document_duration": {
+            "median_ms": 2.368708,
+            "observed_p95_ms": 4.470334,
+            "samples_ms": [
+                4.470334,
+                3.202041,
+                2.368708,
+                2.428416,
+                2.101292,
+                1.989834,
+                1.969542
+            ]
+        },
+        "document_duration_redo": {
+            "median_ms": 1.933125,
+            "observed_p95_ms": 4.197833,
+            "samples_ms": [
+                2.813416,
+                1.828416,
+                1.933125,
+                2.473958,
+                4.197833,
+                1.81525,
+                1.900625
+            ]
+        },
+        "document_duration_undo": {
+            "median_ms": 2.26875,
+            "observed_p95_ms": 2.638917,
+            "samples_ms": [
+                2.638917,
+                2.035375,
+                2.48275,
+                2.1835,
+                2.398125,
+                1.872584,
+                2.26875
+            ]
+        },
+        "document_name": {
+            "median_ms": 0.005083,
+            "observed_p95_ms": 0.012042,
+            "samples_ms": [
+                0.009375,
+                0.005709,
+                0.012042,
+                0.005083,
+                0.004334,
+                0.004041,
+                0.0045
+            ]
+        },
+        "document_redo": {
+            "median_ms": 0.000208,
+            "observed_p95_ms": 0.000625,
+            "samples_ms": [
+                5e-04,
+                0.000167,
+                0.000625,
+                0.000208,
+                0.000208,
+                0.000167,
+                0.000208
+            ]
+        },
+        "document_undo": {
+            "median_ms": 0.194125,
+            "observed_p95_ms": 0.439167,
+            "samples_ms": [
+                0.4285,
+                0.184875,
+                0.439167,
+                0.20175,
+                0.175333,
+                0.179375,
+                0.194125
+            ]
+        },
+        "ui_duration_commit_events": {
+            "median_ms": 16.340667,
+            "observed_p95_ms": 34.781208,
+            "samples_ms": [
+                15.454792,
+                17.43075,
+                15.221083,
+                16.340667,
+                14.749,
+                34.781208,
+                23.6385
+            ]
+        },
+        "ui_duration_redo_events": {
+            "median_ms": 19.535833,
+            "observed_p95_ms": 27.968208,
+            "samples_ms": [
+                26.809125,
+                15.718834,
+                13.550209,
+                19.535833,
+                14.839916,
+                20.671667,
+                27.968208
+            ]
+        },
+        "ui_duration_undo_events": {
+            "median_ms": 16.71875,
+            "observed_p95_ms": 26.58025,
+            "samples_ms": [
+                26.58025,
+                16.71875,
+                15.113667,
+                16.711,
+                15.089,
+                25.486792,
+                18.4385
+            ]
+        },
+        "ui_name_commit_events": {
+            "median_ms": 15.328625,
+            "observed_p95_ms": 30.868834,
+            "samples_ms": [
+                30.868834,
+                13.819791,
+                13.198917,
+                12.018375,
+                15.802667,
+                17.043208,
+                15.328625
+            ]
+        },
+        "ui_redo_events": {
+            "median_ms": 11.646625,
+            "observed_p95_ms": 21.29575,
+            "samples_ms": [
+                18.96475,
+                11.139917,
+                11.646625,
+                9.659084,
+                13.405291,
+                21.29575,
+                11.364375
+            ]
+        },
+        "ui_undo_events": {
+            "median_ms": 16.462208,
+            "observed_p95_ms": 24.852709,
+            "samples_ms": [
+                21.258125,
+                19.180084,
+                13.0695,
+                11.08325,
+                16.462208,
+                24.852709,
+                11.957417
+            ]
+        }
+    },
+    "os": "macOS Sequoia (15.7)",
+    "platform": "cocoa",
+    "qt": "6.8.3",
+    "repeats": 7,
+    "retained_undo_after_100_edits": 100,
+    "runtime_source_revision": "d9270cdf8c8fa5f9b7ee778be22a8f8b311a8150",
+    "scope": "Cell commit + synchronous refresh + processEvents; excludes OS presentation latency, autosave, effort inversions and resource/progress edits",
+    "status": "success",
+    "task_count": 1000
+}

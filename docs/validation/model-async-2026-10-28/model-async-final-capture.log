@@ -1,0 +1,6 @@
+stage: responsive running cancellation
+stage: stale session, concurrent and latest-only edits
+stage: deferred save/F9, Gantt and batch inversion
+stage: progress/assignment running cancellation, draft retry, immutable facts and dialog close
+PASS: 10k model/view heartbeat, running/late cancellation, stale/session/latest-only requests, deferred save/F9, Gantt/batch, preview draft and lifetime safety
+PASS: native model/view + cancellable edits; GUI enqueue observation 12.53 ms

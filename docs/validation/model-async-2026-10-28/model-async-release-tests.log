@@ -1,0 +1,79 @@
+Test project C:/Users/dow/Development/ToolMoa/JOBS/build
+      Start  1: prepared_edit_contract
+ 1/37 Test  #1: prepared_edit_contract ...........   Passed    2.07 sec
+      Start  2: task_table_model_contract
+ 2/37 Test  #2: task_table_model_contract ........   Passed    0.60 sec
+      Start  3: async_editing_ui
+ 3/37 Test  #3: async_editing_ui .................   Passed   26.55 sec
+      Start  4: primavera_xer_contract
+ 4/37 Test  #4: primavera_xer_contract ...........   Passed    2.05 sec
+      Start  5: primavera_xer_ui
+ 5/37 Test  #5: primavera_xer_ui .................   Passed    4.50 sec
+      Start  6: project_xml_contract
+ 6/37 Test  #6: project_xml_contract .............   Passed    1.75 sec
+      Start  7: project_xml_ui
+ 7/37 Test  #7: project_xml_ui ...................   Passed    3.74 sec
+      Start  8: task_editing_contract
+ 8/37 Test  #8: task_editing_contract ............   Passed    0.82 sec
+      Start  9: task_editing_ui
+ 9/37 Test  #9: task_editing_ui ..................   Passed    3.30 sec
+      Start 10: calculation_cancellation
+10/37 Test #10: calculation_cancellation .........   Passed    4.94 sec
+      Start 11: integrated_project_workflow
+11/37 Test #11: integrated_project_workflow ......   Passed    3.17 sec
+      Start 12: performance_cancellation_ui
+12/37 Test #12: performance_cancellation_ui ......   Passed    2.36 sec
+      Start 13: effort_work_calendar_split
+13/37 Test #13: effort_work_calendar_split .......   Passed    3.36 sec
+      Start 14: effort_ui
+14/37 Test #14: effort_ui ........................   Passed    2.31 sec
+      Start 15: constraint_contract
+15/37 Test #15: constraint_contract ..............   Passed    0.75 sec
+      Start 16: constraint_gantt_ui
+16/37 Test #16: constraint_gantt_ui ..............   Passed    2.80 sec
+      Start 17: pdm_calendar_contract
+17/37 Test #17: pdm_calendar_contract ............   Passed    1.72 sec
+      Start 18: pdm_calendar_ui
+18/37 Test #18: pdm_calendar_ui ..................   Passed    1.37 sec
+      Start 19: undo_contract
+19/37 Test #19: undo_contract ....................   Passed   30.33 sec
+      Start 20: input_delta_contract
+20/37 Test #20: input_delta_contract .............   Passed    0.19 sec
+      Start 21: editing_performance_ui
+21/37 Test #21: editing_performance_ui ...........   Passed    2.01 sec
+      Start 22: recovery_crash_file
+22/37 Test #22: recovery_crash_file ..............   Passed    2.66 sec
+      Start 23: recovery_ui
+23/37 Test #23: recovery_ui ......................   Passed    3.94 sec
+      Start 24: reports_export
+24/37 Test #24: reports_export ...................   Passed    1.75 sec
+      Start 25: reports_ui
+25/37 Test #25: reports_ui .......................   Passed    3.42 sec
+      Start 26: cost_contract_file
+26/37 Test #26: cost_contract_file ...............   Passed    0.92 sec
+      Start 27: cost_ui
+27/37 Test #27: cost_ui ..........................   Passed    1.72 sec
+      Start 28: resource_contract_file
+28/37 Test #28: resource_contract_file ...........   Passed    0.80 sec
+      Start 29: resource_ui
+29/37 Test #29: resource_ui ......................   Passed    2.54 sec
+      Start 30: tracking_contract
+30/37 Test #30: tracking_contract ................   Passed    0.15 sec
+      Start 31: tracking_file
+31/37 Test #31: tracking_file ....................   Passed    0.45 sec
+      Start 32: wbs_contract
+32/37 Test #32: wbs_contract .....................   Passed    0.09 sec
+      Start 33: schedule_contract
+33/37 Test #33: schedule_contract ................   Passed    0.11 sec
+      Start 34: file_lifecycle
+34/37 Test #34: file_lifecycle ...................   Passed    0.80 sec
+      Start 35: ui_lifecycle
+35/37 Test #35: ui_lifecycle .....................   Passed    2.24 sec
+      Start 36: wbs_gantt_ui
+36/37 Test #36: wbs_gantt_ui .....................   Passed    1.56 sec
+      Start 37: tracking_ui
+37/37 Test #37: tracking_ui ......................   Passed    2.32 sec
+
+100% tests passed out of 37
+
+Total Test time (real) = 126.51 sec

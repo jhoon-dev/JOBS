@@ -1,0 +1,73 @@
+{
+  "databaseId": 40531122729,
+  "headSha": "2e6d31c119d3da451b7acc9dceba6865d45dbf3b",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40531122729",
+  "prd_commit": "d4745c7",
+  "implementation_commit": "8906677",
+  "jobs": [
+    {
+      "name": "build (windows-latest, win64_msvc2022_64)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40531122729/job/122283882719"
+    },
+    {
+      "name": "build (macos-15, clang_64)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40531122729/job/122283883296"
+    }
+  ],
+  "schedule_hash_checks": [
+    {
+      "os": "Windows",
+      "case": "legacy-1000.json",
+      "unchanged": true,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433"
+    },
+    {
+      "os": "Windows",
+      "case": "legacy-10000.json",
+      "unchanged": true,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540"
+    },
+    {
+      "os": "Windows",
+      "case": "effort-1000.json",
+      "unchanged": true,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe"
+    },
+    {
+      "os": "Windows",
+      "case": "effort-10000.json",
+      "unchanged": true,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613"
+    },
+    {
+      "os": "macOS",
+      "case": "legacy-1000.json",
+      "unchanged": true,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433"
+    },
+    {
+      "os": "macOS",
+      "case": "legacy-10000.json",
+      "unchanged": true,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540"
+    },
+    {
+      "os": "macOS",
+      "case": "effort-1000.json",
+      "unchanged": true,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe"
+    },
+    {
+      "os": "macOS",
+      "case": "effort-10000.json",
+      "unchanged": true,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613"
+    }
+  ]
+}
