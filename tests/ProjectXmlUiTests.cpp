@@ -44,7 +44,11 @@ struct Drive {
                 auto* buttons=modal->findChild<QDialogButtonBox*>();callback(buttons,"preview buttons missing");buttons->button(accept?QDialogButtonBox::Ok:QDialogButtonBox::Cancel)->click();return;
             }
             if(auto* box=qobject_cast<QMessageBox*>(modal)){
-                if(box->windowTitle()=="미저장 변경"){box->button(unsaved)->click();return;}
+                // macOS ignores QMessageBox titles. Identify the unsaved-changes
+                // contract by its standard buttons, not by window decoration.
+                const auto buttons=box->standardButtons();
+                if(buttons.testFlag(QMessageBox::Save)&&buttons.testFlag(QMessageBox::Discard)&&buttons.testFlag(QMessageBox::Cancel)){box->button(unsaved)->click();return;}
+                if(!errorExpected)std::cerr<<"Unexpected dialog: "<<box->text().toUtf8().constData()<<'\n';
                 callback(errorExpected,"unexpected error dialog");seenError=true;box->accept();
             }
         });timer.start();
