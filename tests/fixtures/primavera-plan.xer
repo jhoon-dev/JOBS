@@ -1,0 +1,46 @@
+﻿ERMHDR	20.12	2026-10-26	Project	fixture	JOBS tests	dbxDatabaseNoName	Project Management	KRW
+%T	PROJECT
+%F	proj_id	proj_short_name	clndr_id	plan_start_date	last_recalc_date
+%R	100	SITE-01	1	2026-10-26 09:00	2026-10-26 18:00
+%T	SCHEDOPTIONS
+%F	schedoptions_id	proj_id	sched_calendar_on_relationship_lag
+%R	1	100	rcal_Successor
+%T	CALENDAR
+%F	clndr_id	clndr_name	proj_id	base_clndr_id	clndr_data
+%R	1	표준 & 휴일	100		(0||CalendarData()((0||DaysOfWeek()((0||1()())(0||2()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||3()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||4()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||5()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||6()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||7()())))(0||Exceptions()((0||0(d|46322)())))))
+%R	2	상속 달력	100	1	(0||CalendarData()((0||DaysOfWeek()((0||1()())(0||2()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||3()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||4()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||5()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||6()((0||0(s|09:00|f|12:00)())(0||1(s|13:00|f|18:00)())))(0||7()())))(0||Exceptions()((0||0(d|46325)())))))
+%T	PROJWBS
+%F	wbs_id	proj_id	proj_node_flag	wbs_name	parent_wbs_id	seq_num
+%R	10	100	Y	한글 XER 계획		0
+%R	11	100	N	개발	10	1
+%R	12	100	N	검증	11	2
+%T	TASK
+%F	task_id	proj_id	wbs_id	clndr_id	task_code	task_name	task_type	duration_type	target_drtn_hr_cnt	cstr_type	cstr_date	cstr_type2	cstr_date2	status_code	act_start_date
+%R	20	100	11	1	A20	A 설계	TT_Task	DT_FixedDrtn	8					TK_Active	2026-10-26 09:00
+%R	30	100	11	1	A30	B 개발	TT_Task	DT_FixedDrtn	2	CS_MSOA	2026-10-28 10:00			TK_NotStart	
+%R	40	100	11	1	A40	C SS	TT_Task	DT_FixedDrtn	1					TK_NotStart	
+%R	50	100	11	1	A50	D FF	TT_Task	DT_FixedDrtn	2					TK_NotStart	
+%R	60	100	11	1	A60	E SF	TT_Task	DT_FixedDrtn	1					TK_NotStart	
+%R	70	100	12	1	A70	완료점	TT_FinMile	DT_FixedDrtn	0					TK_NotStart	
+%T	TASKPRED
+%F	task_pred_id	task_id	pred_task_id	proj_id	pred_proj_id	pred_type	lag_hr_cnt
+%R	1000	30	20	100	100	PR_FS	1
+%R	1001	40	20	100	100	PR_SS	-1
+%R	1002	50	20	100	100	PR_FF	-1
+%R	1003	60	20	100	100	PR_SF	1
+%T	RSRC
+%F	rsrc_id	rsrc_name	rsrc_type	clndr_id
+%R	99	설계자 <1>	RT_Labor	2
+%R	100	크레인	RT_Equip	1
+%T	RSRCRATE
+%F	rsrc_rate_id	rsrc_id	start_date	max_qty_per_hr	cost_per_qty
+%R	199	99	2026-10-01 00:00	1.50	10000
+%R	200	100	2026-10-01 00:00	0	25000
+%T	TASKRSRC
+%F	taskrsrc_id	task_id	proj_id	rsrc_id	target_qty_per_hr	curv_id	target_cost
+%R	101	20	100	99	0.50		30000
+%R	102	30	100	99	1.25		25000
+%T	NOTEBOOK
+%F	note_id	text
+%R	1	원본에만 보존
+%E

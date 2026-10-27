@@ -81,6 +81,8 @@ private:
     void open();
     void importXml();
     void exportXml();
+    void importXer();
+    void exportXer();
     void refresh(bool rebuildTree = true);
     void calculateSchedule();
     void editHolidays();

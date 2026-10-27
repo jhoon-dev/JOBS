@@ -34,10 +34,31 @@ jobs:
           python scripts/verify-project-xml.py build
       - name: Measure deterministic 1k and 10k schedules and UI
         run: python scripts/run-performance-probes.py --repeats 3
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify XER with independent TSV and MPXJ readers
+        run: |
+          python -m pip install mpxj==16.10.0 JPype1==1.6.0
+          python scripts/verify-primavera-xer.py build
       - name: Capture native task editing screen
         run: python scripts/capture-task-editing-ui.py build
       - name: Exercise native Project XML dialogs
         run: python scripts/capture-project-xml-ui.py build
+      - name: Exercise native Primavera XER dialogs
+        run: python scripts/capture-primavera-xer-ui.py build
+      - name: Preserve Primavera XER evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: primavera-xer-${{ runner.os }}
+          path: |
+            build/primavera-export.xer
+            build/primavera-24h.xer
+            build/primavera-export.json
+            build/primavera-xer-*-native.png
+          if-no-files-found: warn
       - name: Preserve Project XML evidence
         if: always()
         uses: actions/upload-artifact@v4

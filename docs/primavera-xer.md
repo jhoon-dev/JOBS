@@ -29,3 +29,13 @@ conversion.json contract는 `jobs-xer-plan-v1`이다. 방향·원본 헤더/버�
 ## 검증
 
 수작업 골든 fixture의 주간 달력/상속 휴일, FS/SS/FF/SF/음수 지연, 제약/자원/배정과 독립 날짜 기대값을 확인한다. 지원 부분 JOBS→XER→JOBS의 ID 정규화/일정 의미, 1분/미정/0/정밀도·한국어/Windows-1252, 헤더/원본 바이트/해시, 승인·실적·원가 사본과 실패/기존 폴더 보호를 검사한다. UI는 취소·미저장 경고·스냅샷/session 경계·읽기 전용과 native 화면을 검사한다. Python 표준 TSV reader 및 고정 MPXJ 16.10.0/JPype1 1.6.0(Java 21)로 수출물을 독립 재열기한다. 이들은 검증 의존성이며 앱 실행에는 Python/Java가 필요 없다. 기존 XML·계산·성능·보고서 회귀를 함께 실행한다.
+
+## 사용과 현재 검증 산출물
+
+1. 파일 → Primavera XER 가져오기에서 `.xer` 파일을 고르고 원본 인코딩을 선택한다. 변환 건수/손실 진단과 아직 없는 새 폴더 경로를 확인한다.
+2. `변환 확인 · 새 사본 열기` 후 미저장 문서를 저장/버림/취소한다. 새 폴더의 `project.jobs`가 열리며 F9로 JOBS 일정을 계산한다. `original.xer`/`conversion.json`을 원본 증거로 함께 보관한다.
+3. 내보내기는 파일 → Primavera XER 내보내기에서 같은 미리보기를 거친다. `project.xer`/`source.jobs`/`conversion.json`이 생성된다. 원본 Activity Code는 native 필드가 아니므로 수출 Activity Code는 J1…로 생성한다. 프로젝트 코드는 문서 ID 해시에서 생성한 JOBS-…이며 ID/코드 매핑과 기존 P6 프로젝트 업데이트 동일성이 보장되지 않는다는 진단을 기록한다. 기존 P6 DB를 자동 갱신하지 않는다.
+
+`primavera_xer_contract`/`primavera_xer_ui`를 포함해 CTest 32개다. 골든 입력 `tests/fixtures/primavera-plan.xer`는 실제 P6 저장본으로 위장하지 않은 수작업 fixture다. 독립 검사 대상은 C++가 기록한 `primavera-export.xer`/`primavera-24h.xer`이며 Python TSV reader와 MPXJ strict reader가 원본 출력 파일을 직접 읽는다. UTF-8 BOM을 인식하는 MPXJ UniversalProjectReader proxy를 사용한다. 24시간 달력은 시간 구간의 실제 밀리초 합도 확인한다. 이것은 Oracle P6 설치본의 수용/재저장/계산 동등성 시험이 아니다.
+
+네이티브 화면은 `primavera-xer-import-native.png`/`primavera-xer-export-native.png`이고 CI의 `primavera-xer-Windows`/`primavera-xer-macOS` artifact에 출력/진단과 함께 보관한다. 오류/한도·표현할 수 없는 값은 부분 투영하지 않으며, 지원하지 않는 정보는 경로별 진단과 원본/전체 native 사본에 보존한다.

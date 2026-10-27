@@ -77,6 +77,10 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     connect(importXmlAction,&QAction::triggered,this,[this]{commitPendingCell();importXml();});
     auto* exportXmlAction=menu->addAction("Project XML 내보내기…");exportXmlAction->setObjectName("exportProjectXml");
     connect(exportXmlAction,&QAction::triggered,this,[this]{commitPendingCell();exportXml();});
+    auto* importXerAction=menu->addAction("Primavera XER 가져오기…");importXerAction->setObjectName("importPrimaveraXer");
+    connect(importXerAction,&QAction::triggered,this,[this]{commitPendingCell();importXer();});
+    auto* exportXerAction=menu->addAction("Primavera XER 내보내기…");exportXerAction->setObjectName("exportPrimaveraXer");
+    connect(exportXerAction,&QAction::triggered,this,[this]{commitPendingCell();exportXer();});
     menu->addSeparator();
     auto* quit = menu->addAction("종료(&X)"); quit->setShortcut(QKeySequence::Quit);
     connect(quit, &QAction::triggered, this, &QWidget::close);
@@ -251,6 +255,7 @@ void MainWindow::refresh(bool rebuildTree) {
     setWindowModified(document_.dirty());
     save_->setEnabled(p.has_value()); saveAs_->setEnabled(p.has_value());
     findChild<QAction*>("exportProjectXml")->setEnabled(p.has_value());
+    findChild<QAction*>("exportPrimaveraXer")->setEnabled(p.has_value());
     add_->setEnabled(p.has_value() && !document_.readOnly());
     calculate_->setEnabled(p.has_value() && !calculating_);
     cancelCalculation_->setEnabled(calculating_&&calculationControl_&&!calculationControl_->cancelRequested.load());

@@ -1,4 +1,5 @@
 #include "persistence/ProjectXml.h"
+#include "persistence/ExchangePackage.h"
 #include "persistence/JsonProjectStore.h"
 #include <QCryptographicHash>
 #include <QDate>
@@ -412,21 +413,7 @@ ProjectXmlExchange exportProjectXml(const Project& p) {
 }
 
 QString publishProjectXml(const ProjectXmlExchange& e,const QString& destination) {
-    validate(e.project);auto target=QFileInfo(destination);auto parent=target.dir().canonicalPath();
-    if(parent.isEmpty()||target.fileName().isEmpty()||target.fileName()=="."||target.fileName()==".."||target.exists()||target.isSymLink())fail("존재하지 않는 새 교환 폴더를 지정하세요.");
-    QDir directory(parent);auto finalPath=directory.filePath(target.fileName());
-    QTemporaryDir stage(directory.filePath(".jobs-xml-XXXXXX"));if(!stage.isValid())fail("교환 임시 폴더 생성 실패");
-    auto write=[&](const QString& name,const QByteArray& bytes){QSaveFile f(stage.filePath(name));f.setDirectWriteFallback(false);if(!f.open(QIODevice::WriteOnly)||f.write(bytes)!=bytes.size()||!f.commit())fail("교환 파일 쓰기 실패: "+name);QFile check(stage.filePath(name));if(!check.open(QIODevice::ReadOnly)||check.readAll()!=bytes)fail("교환 파일 재열기 검증 실패: "+name);};
-    JsonProjectStore store;auto jobsName=e.importing?"project.jobs":"source.jobs";
-    store.save(str(stage.filePath(jobsName)),e.project,{});
-    if(store.load(str(stage.filePath(jobsName))).project!=e.project)fail("JOBS 사본 검증 실패");
-    write(e.importing?"original.xml":"project.xml",e.xml);
-    auto report=e.report;
-    if(!e.importing){QFile f(stage.filePath(jobsName));if(!f.open(QIODevice::ReadOnly))fail("원본 사본 읽기 실패");auto source=report["source"].toObject();source["sha256"]=hash(f.readAll());report["source"]=source;}
-    write("conversion.json",QJsonDocument(report).toJson());
-    // QDir::rename never replaces an existing directory. The staging folder has the same parent.
-    if(QFileInfo::exists(finalPath)||!directory.rename(QFileInfo(stage.path()).fileName(),target.fileName()))fail("새 교환 폴더 게시 실패 · 기존 대상은 보존했습니다.");
-    stage.setAutoRemove(false);return finalPath;
+    return publishPlanExchange(e.project,e.xml,e.report,e.importing,"xml",destination);
 }
 QString projectXmlPreview(const ProjectXmlExchange& e) {
     auto text=QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n가져오기: %7\n원본 보존: %8\nJOBS 재계산 동등성: 미검증\nMicrosoft Project 왕복: 미검증\n\n원본/진단은 교환 폴더에 보관됩니다. .jobs만 사본 저장/이동하면 동반 파일은 자동 복제되지 않습니다.\n\n")
