@@ -33,6 +33,9 @@ int main(int argc,char** argv){QCoreApplication app(argc,argv);try{
     check(p.tasks[5].durationMinutes==0&&p.progress.empty()&&p.costEntries.empty()&&p.taskCosts.empty(),"no invented actual/cost");
     for(std::size_t i=1;i<5;++i){const auto d=jobs::dependencies(p.tasks[i]);const std::vector<std::string> types{"FS","SS","FF","SF"};check(d.size()==1&&d[0].type==types[i-1]&&d[0].lagMinutes==((i==2||i==3)?-60:60),"four links and tenths lag");}
     check(hasDiagnostic(imported,"ActualWork")&&hasDiagnostic(imported,"FixedCost")&&hasDiagnostic(imported,"StandardRate")&&hasDiagnostic(imported,"CustomFields"),"loss report completeness");
+    auto estimated=changed(fixture,"<Duration>PT8H0M0S</Duration>","<Duration>PT8H0M0S</Duration><DurationFormat>35</DurationFormat>");estimated.replace("<LagFormat>3</LagFormat>","<LagFormat>35</LagFormat>");
+    auto estimatedImport=jobs::importProjectXml(estimated,"estimated.xml");check(estimatedImport.project.tasks[0].durationMinutes==480&&hasDiagnostic(estimatedImport,"DurationFormat")&&hasDiagnostic(estimatedImport,"LagFormat"),"estimated display loss not reported");
+    check(imported.report["targetPolicy"].toObject()["lagCalendar"]=="successor-working-calendar","target policy provenance");
     auto placeholder=changed(fixture,"<Resources>","<Resources><Resource><UID>0</UID><Name/></Resource>");check(jobs::importProjectXml(placeholder,"placeholder.xml").project.resources.size()==1,"unassigned resource placeholder");
     auto placeholderReference=changed(placeholder,"<ResourceUID>99</ResourceUID>","<ResourceUID>0</ResourceUID>");rejects([&]{jobs::importProjectXml(placeholderReference,"placeholder-reference.xml");});
     auto schedule=jobs::calculate(p);check(schedule.status==jobs::CalculationStatus::Valid,"import scheduling");

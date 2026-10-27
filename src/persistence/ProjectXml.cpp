@@ -155,6 +155,8 @@ QJsonObject baseReport(const Project& p,bool importing) {
     return {{"contract","jobs-mspdi-plan-v1"},{"direction",importing?"import":"export"},
         {"format","Microsoft Project XML"},{"namespace",ns},
         {"documentId",qs(p.documentId)},{"revision",QString::number(p.revision)},
+        {"nativeSnapshotProfile",qs(p.calculationProfile)},
+        {"targetPolicy",QJsonObject{{"calculationProfile",effortProfile},{"lagCalendar","successor-working-calendar"},{"projectStartAnchor","09:00"}}},
         {"compatibility",QJsonObject{{"import",importing?"mapped-subset":"not-applicable"},
             {"originalPreservation",importing?"exact-xml-bytes":"exact-native-input-snapshot"},{"jobsRecomputation","unverified"},{"externalRoundTrip","unverified"}}},
         {"companionPolicy","원본과 진단은 이 폴더의 동반 파일입니다. .jobs 사본 저장/이동 시 자동 복제되지 않습니다."}};
@@ -262,7 +264,9 @@ ProjectXmlExchange importProjectXml(const QByteArray& bytes,const QString& sourc
         } else {
             Task t;t.id="xml-task-"+str(id);t.name=name;t.wbsId=parent;t.calendarId=calendar(*n);
             auto d=field(*n,"Duration");if(!d.isEmpty())t.durationMinutes=duration(d,n->path+"/Duration");
-            if(!workingFormat(num(*n,"DurationFormat",0,100,"7")))fail("경과/백분율 기간은 지원하지 않습니다: "+n->path);
+            const auto format=num(*n,"DurationFormat",0,100,"7");
+            if(!workingFormat(format))fail("경과/백분율 기간은 지원하지 않습니다: "+n->path);
+            if(format>=35)diagnostic(diagnostics,n->path+"/DurationFormat","근무분 값만 매핑 · 추정 기간 표시를 변환하지 않음");
             if(flag(*n,"Milestone")&&t.durationMinutes!=0)fail("마일스톤의 기간이 0이 아닙니다: "+n->path);
             if(num(*n,"Type",0,2,"0")!=1)diagnostic(diagnostics,n->path+"/Type","기간 기반 고정 기간으로 투영 · 공수/작업 유형 계산 규칙은 보존 원본 참조");
             static const std::array<const char*,8> constraints{"ASAP","ALAP","MSO","MFO","SNET","SNLT","FNET","FNLT"};
@@ -284,7 +288,9 @@ ProjectXmlExchange importProjectXml(const QByteArray& bytes,const QString& sourc
             if(child(link,"LinkLag")&&!child(link,"LagFormat"))fail("LinkLag에는 LagFormat이 필요합니다: "+link.path);
             auto lag=num(link,"LinkLag",-50000000,50000000,"0");
             if(lag%10)fail("소수 분 LinkLag는 지원하지 않습니다: "+link.path);
-            if(!workingFormat(num(link,"LagFormat",0,100,"7")))fail("경과/백분율 지연은 지원하지 않습니다: "+link.path);
+            const auto format=num(link,"LagFormat",0,100,"7");
+            if(!workingFormat(format))fail("경과/백분율 지연은 지원하지 않습니다: "+link.path);
+            if(format>=35)diagnostic(diagnostics,link.path+"/LagFormat","근무분 값만 매핑 · 추정 지연 표시를 변환하지 않음");
             task.predecessors.push_back(taskIds.at(pred));
             if(QString::fromLatin1(type)!="FS"||lag)task.dependencyRules.push_back({taskIds.at(pred),type,lag/10});
         }
