@@ -22,3 +22,12 @@ conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/
 ## 완료 검사
 
 도메인 골든 fixture와 XML 오류/한도/DTD/누락·중복 UID/고아·요약 참조/순환, 달력 상속·휴일/불가 패턴, 네 관계·음수 지연·정밀도·제약, 자원/배정, 미정 기간, 한국어/escape, 원본 바이트/hash 보존, 실패 시 기존 폴더 보호를 검사한다. 지원 부분의 내보내기→재수입은 ID 정규화 후 입력과 일정 의미를 검사하고 Python 표준 XML reader로 namespace/UID/참조/값을 독립 검사한다. 네이티브 앱에서 미리보기 취소·가져오기/내보내기·읽기 전용 내보내기와 기존 회귀를 실행한다. Microsoft Project 설치본이 없는 CI에서는 실제 제품 호환을 완료로 표시하지 않는다.
+
+## 사용 순서와 검사 도구
+
+1. 파일 → Project XML 가져오기에서 .xml을 선택한다. 작업/자원 수·매핑하지 않는 경로와 미검증 판정을 확인한다.
+2. 아직 없는 새 교환 폴더의 전체 경로를 지정하고 `변환 확인 · 새 사본 열기`를 누른다. 기존 문서가 미저장이면 저장/버림/취소를 선택한다. 취소는 교환 폴더를 만들지 않는다.
+3. 해당 폴더의 `project.jobs`가 새 문서로 열린다. F9로 JOBS 일정을 계산한다. `original.xml`/`conversion.json`은 원본과 판단 근거로 함께 보관한다.
+4. 내보내기는 파일 → Project XML 내보내기에서 같은 미리보기 흐름을 사용한다. `project.xml`/`source.jobs`/`conversion.json`이 생성된다. 읽기 전용 문서와 미저장 입력도 내보낼 수 있으며 열린 원본의 편집 이력/저장 지점을 바꾸지 않는다.
+
+`project_xml_contract`/`project_xml_ui`를 추가해 전체 CTest는 30개다. 고정 fixture는 실제 제품에서 저장한 파일로 위장하지 않은 수작업 골든 입력이다. `scripts/verify-project-xml.py`는 Python 표준 XML reader로 고정 기대값을 독립 검사한다. `scripts/capture-project-xml-ui.py`는 네이티브 대화상자의 취소/가져오기/내보내기/오래된 입력/읽기 전용 동작과 `project-xml-import-native.png`/`project-xml-export-native.png`를 남긴다. CI artifact `project-xml-Windows`/`project-xml-macOS`에서 XML/진단/화면을 확인한다. 공식 근거 조회 시 MicrosoftDocs 소스 revision은 `c77602db4d0733ce57cb0e5514c6fc898c7fe2c2`였다. 내보내기는 schema의 프로젝트 이름 255자, 작업/WBS/자원/달력 이름 512자, 일중 구간 5개 한도도 검사한다.

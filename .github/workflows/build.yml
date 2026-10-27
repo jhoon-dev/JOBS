@@ -31,10 +31,25 @@ jobs:
         run: |
           python -m pip install openpyxl==3.1.5 pypdf==6.10.0
           python scripts/verify-report-fixtures.py build
+          python scripts/verify-project-xml.py build
       - name: Measure deterministic 1k and 10k schedules and UI
         run: python scripts/run-performance-probes.py --repeats 3
       - name: Capture native task editing screen
         run: python scripts/capture-task-editing-ui.py build
+      - name: Exercise native Project XML dialogs
+        run: python scripts/capture-project-xml-ui.py build
+      - name: Preserve Project XML evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-xml-${{ runner.os }}
+          path: |
+            build/project-xml-export.xml
+            build/project-xml-export.json
+            build/project-xml-preview-native.png
+            build/project-xml-import-native.png
+            build/project-xml-export-native.png
+          if-no-files-found: warn
       - name: Preserve native UI evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -79,6 +79,8 @@ private:
     bool save(bool as);
     void create();
     void open();
+    void importXml();
+    void exportXml();
     void refresh(bool rebuildTree = true);
     void calculateSchedule();
     void editHolidays();

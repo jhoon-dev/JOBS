@@ -166,3 +166,5 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 
 
 작업 편집 증분은 PRD EDIT-01~05를 먼저 정의한 뒤 `TaskEditing`의 Qt 독립 원자적 명령과 표 입력/TSV 공통 파서, ID 기반 검색/필터/정렬/선택을 구현했다. `task_editing_contract`, `task_editing_ui`로 CTest 28개이며 로컬 전체 28/28·네이티브 Windows UI·독립 XLSX/PDF 검사를 통과했다. [작업 편집 계약](task-editing.md)에 삭제 보호·복제 범위·붙여넣기 한도·완료 증거와 후속 범위를 기록한다.
+
+Project XML 증분은 PRD XML-01~04를 먼저 커밋하고 `persistence/ProjectXml`의 제한 파서·계획 투영·원본 보존 교환 폴더와 `MainWindowXml` 미리보기를 추가한다. 기존 .jobs schema 9와 계산 코어는 유지한다. `project_xml_contract`, `project_xml_ui`를 포함해 CTest 30개다. 도메인 기대값/지원 부분 왕복/원본 바이트 및 승인·실적·원가 사본, XML 한도/오류, UI 취소/오래된 미리보기/읽기 전용 내보내기를 검사한다. `python scripts/verify-project-xml.py build`는 표준 XML reader의 독립 값 검사이며 실제 Microsoft Project 검증을 대체하지 않는다. `python scripts/capture-project-xml-ui.py build`는 네이티브 UI 동작과 미리보기 PNG를 기록한다. CI에서 기존 XLSX/PDF·1천/1만 성능 검증과 함께 실행한다. [지원 범위·손실·사용법](project-xml.md)을 따른다.

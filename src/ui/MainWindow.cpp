@@ -73,6 +73,11 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     save_ = action("저장(&S)", QKeySequence::Save, [this] { save(false); });
     saveAs_ = action("다른 이름으로 저장(&A)…", QKeySequence::SaveAs, [this] { save(true); });
     menu->addSeparator();
+    auto* importXmlAction=menu->addAction("Project XML 가져오기…");importXmlAction->setObjectName("importProjectXml");
+    connect(importXmlAction,&QAction::triggered,this,[this]{commitPendingCell();importXml();});
+    auto* exportXmlAction=menu->addAction("Project XML 내보내기…");exportXmlAction->setObjectName("exportProjectXml");
+    connect(exportXmlAction,&QAction::triggered,this,[this]{commitPendingCell();exportXml();});
+    menu->addSeparator();
     auto* quit = menu->addAction("종료(&X)"); quit->setShortcut(QKeySequence::Quit);
     connect(quit, &QAction::triggered, this, &QWidget::close);
     auto* editMenu = menuBar()->addMenu("편집(&E)");
@@ -245,6 +250,7 @@ void MainWindow::refresh(bool rebuildTree) {
     setWindowTitle((p ? qs(p->name) : "프로젝트를 만들거나 여세요") + "[*] — JOBS");
     setWindowModified(document_.dirty());
     save_->setEnabled(p.has_value()); saveAs_->setEnabled(p.has_value());
+    findChild<QAction*>("exportProjectXml")->setEnabled(p.has_value());
     add_->setEnabled(p.has_value() && !document_.readOnly());
     calculate_->setEnabled(p.has_value() && !calculating_);
     cancelCalculation_->setEnabled(calculating_&&calculationControl_&&!calculationControl_->cancelRequested.load());

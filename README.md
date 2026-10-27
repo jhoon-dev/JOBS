@@ -53,3 +53,5 @@ PM Canvas는 별도 개인용 프로토타입이다. 그 코드·아키텍처·�
 [대시보드·보고서·엑셀/PDF 내보내기](docs/reports-export.md)에서 필터·집계·출처와 출력 방법을 확인할 수 있다. 보고서 메뉴에서 열며 Excel·Python 설치 없이 출력한다.
 
 [자동 저장·복구·실행 취소 사용법](docs/recovery-undo.md)에서 저장 간격·복구본 선택·사본 저장과 편집 이력의 범위를 확인할 수 있다.
+
+[Project XML 가져오기·내보내기](docs/project-xml.md)는 파일 메뉴에서 실행한다. 작업/WBS·관계·달력·자원/배정의 기간 기반 계획을 변환하고 새 교환 폴더에 원본/현재 JOBS 사본과 손실 진단을 함께 보관한다. 실제 Microsoft Project 재계산/재저장 호환과 MPP/XER는 별도 후속 범위다.
