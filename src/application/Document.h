@@ -34,6 +34,7 @@ public:
     std::string undoLabel() const;
     std::string redoLabel() const;
     const std::string& historyNotice() const { return historyNotice_; }
+    std::size_t historyBytes() const { return historyWeight_; }
     void undo();
     void redo();
     std::uint64_t sessionGeneration() const { return sessionGeneration_; }

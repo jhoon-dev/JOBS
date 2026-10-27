@@ -1,5 +1,6 @@
 #include "ui/MainWindow.h"
 #include "PerformanceFixture.h"
+#include "BuildIdentity.h"
 #include "ui/GanttView.h"
 #include "persistence/JsonProjectStore.h"
 #include <QApplication>
@@ -58,6 +59,7 @@ int main(int argc,char** argv){QApplication app(argc,argv);app.setQuitOnLastWind
 #else
     out["compiler"]=__VERSION__;
 #endif
+    out["built_product_source_sha256"]=JOBS_SOURCE_SHA256;
     if(!preparation.empty()){out["ui_preparation"]=samples(preparation);out["scroll"]=samples(scroll);out["maximum_gantt_items"]=double(maxItems);}
     QFile output(parser.value("output"));if(!output.open(QIODevice::WriteOnly)||output.write(QJsonDocument(out).toJson())<0)throw std::runtime_error("cannot write benchmark output");std::cout<<QJsonDocument(out).toJson(QJsonDocument::Compact).toStdString()<<'\n';
 }catch(const std::exception& e){std::cerr<<"FAIL: "<<e.what()<<'\n';return 1;}}
