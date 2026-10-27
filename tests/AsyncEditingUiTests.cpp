@@ -25,6 +25,7 @@
 #include <QTest>
 #include <QThreadPool>
 #include <QTimer>
+#include <algorithm>
 #include <iostream>
 
 namespace {
@@ -229,6 +230,10 @@ int main(int argc, char** argv) {
         check(wait([&] { return !controller->busy(); }) && *document.project() == before,
             "closing a pending assignment dialog applied results or retained destroyed widgets");
         std::cout << "stage: progress/assignment running cancellation, draft retry, immutable facts and dialog close" << std::endl;
+        calculate(window)->trigger();
+        check(wait([&] { return document.calculation() && document.calculation()->status == jobs::CalculationStatus::Valid &&
+            document.calculation()->inputRevision == document.project()->revision; }), "final progress forecast failed");
+        table->setCurrentCell(0, 0); table->selectRow(0); table->scrollToTop(); app.processEvents();
         check(window.grab().save("async-editing-ui.png"), "async UI screenshot failed");
         window.hide();
         // Closing/destroying a view never leaves a worker holding its Document or widgets.
