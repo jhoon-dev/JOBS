@@ -10,7 +10,7 @@
 - TASK의 target_drtn_hr_cnt를 기간 기반 고정 기간으로 투영한다. 공백은 미정, 0은 마일스톤이다. TT_Task/TT_Rsrc/TT_Mile/TT_FinMile을 지원하며 자원 종속·시작/완료 마일스톤 차이와 duration_type 손실을 진단한다. TT_LOE/TT_WBS·미지 유형은 차단한다. target/early/actual 날짜를 고정 실적이나 하드 제약으로 추론하지 않는다.
 - PR_FS/PR_SS/PR_FF/PR_SF와 lag_hr_cnt를 지원한다. JOBS는 후행 작업 달력 기준이다. SCHEDOPTIONS의 rcal_Successor 외 정책/누락을 진단하고 원본 설정을 보고한다. 여러 SCHEDOPTIONS/다른 프로젝트 ID는 차단한다. 외부 프로젝트 관계는 임의 제거하지 않는다.
 - primary constraint는 공백 ASAP, CS_ALAP, CS_MSOA/MSOB/MEOA/MEOB를 SNET/SNLT/FNET/FNLT, CS_MANDSTART/MANDFIN을 MSO/MFO로 매핑한다. CS_MSO/MEO도 고정 날짜로 투영하되 P6의 Start/Finish On과 native 하드 고정 의미 차이를 진단한다. 보조 제약은 차단한다. native 소프트 마감은 XER expect_end_date로 바꾸지 않고 손실 진단한다.
-- CALENDAR clndr_data의 `(0||CalendarData()(…))`에서 DaysOfWeek의 일=1~토=7을 native 월=1~일=7로 매핑한다. 각 근무 요일의 일중 구간이 같아야 한다. 전일 휴일은 Exceptions d의 1899-12-30 기준 일수로 매핑한다. 부모 달력에서는 휴일만 상속하며 주간 시간은 각각 명시한다. 상속 순환/부모 누락, 근무 예외·서로 다른 요일 시간·누락된 주간 패턴·알 수 없는 일정 구조는 차단한다. UI 표시용 VIEW 정보는 진단 후 원본에만 보존한다. 프로젝트 달력은 수입 작업/자원에 명시 배정하고 새 native 작업은 기존 JOBS 기본 달력을 쓰는 차이를 표시한다.
+- CALENDAR clndr_data의 `(0||CalendarData()(…))`에서 DaysOfWeek의 일=1~토=7을 native 월=1~일=7로 매핑한다. 각 근무 요일의 일중 구간이 같아야 한다. 종료 00:00은 당일 끝 24:00으로 해석해 24시간 달력도 보존한다. 그 밖의 자정을 넘는 구간은 차단한다. 전일 휴일은 Exceptions d의 1899-12-30 기준 일수로 매핑한다. 부모 달력에서는 휴일만 상속하며 주간 시간은 각각 명시한다. 상속 순환/부모 누락, 근무 예외·서로 다른 요일 시간·누락된 주간 패턴·알 수 없는 일정 구조는 차단한다. UI 표시용 VIEW 정보는 진단 후 원본에만 보존한다. 프로젝트 달력은 수입 작업/자원에 명시 배정하고 새 native 작업은 기존 JOBS 기본 달력을 쓰는 차이를 표시한다.
 - RT_Labor/RT_Equip 자원과 TASKRSRC target_qty_per_hr를 1% 정밀도로 매핑한다. material 자원·곡선 배정은 차단한다. RSRCRATE는 한 자원에 시작일이 프로젝트 시작 이전/같은 단일 행일 때 max_qty_per_hr만 기본 가용량으로 매핑한다. 없거나 다중/미래 가용량이면 미정과 진단으로 남긴다. 단가/원가·원장·기준선·역할/코드/사용자 필드·분할/공수 규칙은 XER 계산으로 이식하지 않는다.
 
 ## 직렬화·한도
