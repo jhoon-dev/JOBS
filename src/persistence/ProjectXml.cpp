@@ -33,8 +33,10 @@ struct Node {
     std::vector<Node> children;
     mutable bool used=false;
 };
-Node readNode(QXmlStreamReader& r, const QString& path, int depth, int& count) {
+Node readNode(QXmlStreamReader& r, const QString& path, int depth, int& count, qsizetype& pathCharacters) {
     if(depth>32 || ++count>300000) fail("XML 깊이/요소 수 한도 초과");
+    pathCharacters+=path.size();
+    if(r.name().size()>128||path.size()>4096||pathCharacters>16*1024*1024)fail("XML 요소 이름/진단 경로 메모리 한도 초과");
     if(r.namespaceUri()!=QLatin1StringView(ns)) fail("지원하지 않는 XML namespace: "+r.namespaceUri().toString());
     if(!r.attributes().isEmpty()) fail("지원하지 않는 XML 속성: "+path);
     Node n{r.name().toString(),{},path,{},false}; std::map<QString,int> indices;
@@ -43,7 +45,7 @@ Node readNode(QXmlStreamReader& r, const QString& path, int depth, int& count) {
         if(t==QXmlStreamReader::DTD || t==QXmlStreamReader::EntityReference) fail("DTD/entity는 허용하지 않습니다.");
         if(t==QXmlStreamReader::StartElement) {
             auto name=r.name().toString(); int i=++indices[name];
-            n.children.push_back(readNode(r,path+"/"+name+"["+QString::number(i)+"]",depth+1,count));
+            n.children.push_back(readNode(r,path+"/"+name+"["+QString::number(i)+"]",depth+1,count,pathCharacters));
         } else if(t==QXmlStreamReader::Characters) n.text+=r.text();
         else if(t==QXmlStreamReader::EndElement) break;
     }
@@ -172,11 +174,11 @@ QByteArray readProjectXml(const QString& path) {
 }
 ProjectXmlExchange importProjectXml(const QByteArray& bytes,const QString& sourceName) {
     if(bytes.size()>byteLimit)fail("XML 16 MiB 한도 초과");
-    QXmlStreamReader reader(bytes);reader.setEntityExpansionLimit(0);int count=0;std::optional<Node> root;
+    QXmlStreamReader reader(bytes);reader.setEntityExpansionLimit(0);int count=0;qsizetype pathCharacters=0;std::optional<Node> root;
     while(!reader.atEnd()) {
         auto token=reader.readNext();
         if(token==QXmlStreamReader::DTD||token==QXmlStreamReader::EntityReference)fail("DTD/entity는 허용하지 않습니다.");
-        if(token==QXmlStreamReader::StartElement){if(root||reader.name()!=QLatin1StringView("Project"))fail("단일 Project XML이 필요합니다.");root=readNode(reader,"/Project",1,count);}
+        if(token==QXmlStreamReader::StartElement){if(root||reader.name()!=QLatin1StringView("Project"))fail("단일 Project XML이 필요합니다.");root=readNode(reader,"/Project",1,count,pathCharacters);}
     }
     if(reader.hasError()||!root)fail("XML 구문 오류: "+reader.errorString());
     auto& r=*root; Project p;p.documentId=str(QUuid::createUuid().toString(QUuid::WithoutBraces));
