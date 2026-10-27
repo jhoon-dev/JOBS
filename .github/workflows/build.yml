@@ -36,6 +36,19 @@ jobs:
         run: python scripts/run-performance-probes.py --repeats 3
       - name: Measure cell edits and retained undo at 1k and 10k tasks
         run: python scripts/run-editing-performance-probes.py --repeats 7
+      - name: Check out pre-optimization editing reference
+        uses: actions/checkout@v4
+        with:
+          ref: 3570d28ed176aae2d90fd34e5efb84f6f096753f
+          path: build/editing-reference-source
+      - name: Build reference with the same Qt and compiler
+        run: |
+          cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe --parallel
+      - name: Measure reference and compare paired editing observations
+        run: |
+          python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history
+          python scripts/compare-editing-performance.py build/performance/editing-reference build/performance/editing build/performance/editing-comparison.json
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
