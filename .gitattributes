@@ -5,3 +5,5 @@
 *.yml text eol=lf
 *.json text eol=lf
 *.ps1 text eol=crlf
+# XER is a byte-preserved tabular interchange fixture; trailing empty cells are data.
+*.xer -text -whitespace
