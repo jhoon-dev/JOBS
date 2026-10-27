@@ -22,7 +22,8 @@ jobs:
           arch: ${{ matrix.arch }}
           cache: true
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-      - run: cmake --build build --config Release --parallel
+      # Bound compiler memory for the Qt translation units on hosted runners.
+      - run: cmake --build build --config Release --parallel 3
       - run: ctest --test-dir build -C Release --output-on-failure
       - uses: actions/setup-python@v5
         with:
@@ -44,7 +45,7 @@ jobs:
       - name: Build reference with the same Qt and compiler
         run: |
           cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe --parallel
+          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe --parallel 3
       - name: Measure reference and compare paired editing observations
         run: |
           python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history

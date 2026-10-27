@@ -35,6 +35,12 @@ bool wait(const std::function<bool()>& predicate, int timeout = 30000) {
     while (!predicate() && timer.elapsed() < timeout) QTest::qWait(1);
     return predicate();
 }
+bool calculationRunning(const std::shared_ptr<jobs::CalculationControl>& control) {
+    if (!control) return false;
+    const auto stage = control->stage.load();
+    return (stage == jobs::CalculationStage::Calendars || stage == jobs::CalculationStage::Forward ||
+            stage == jobs::CalculationStage::Backward) && control->completed.load() > 10;
+}
 QByteArray bytes(const std::string& path) { QFile file(QString::fromUtf8(path)); check(file.open(QIODevice::ReadOnly), "read failed"); return file.readAll(); }
 QAction* action(QWidget& window, const char* name) {
     auto* found = window.findChild<QAction*>(name); check(found, "action missing"); return found;
@@ -91,7 +97,7 @@ int main(int argc, char** argv) {
         QTimer cancelWhenRunning; cancelWhenRunning.setInterval(1);
         QObject::connect(&cancelWhenRunning, &QTimer::timeout, [&] {
             const auto control = controller->control();
-            if (control && control->stage.load() == jobs::CalculationStage::Forward && control->completed.load() > 10) {
+            if (calculationRunning(control)) {
                 running = true; cancelWhenRunning.stop(); cancel->trigger();
             }
         }); cancelWhenRunning.start();
@@ -182,6 +188,8 @@ int main(int argc, char** argv) {
         QTimer::singleShot(0, [&] {
             auto* dialog = QApplication::activeModalWidget();
             callbackCheck(dialog && dialog->objectName() == "progressDialog", "progress dialog missing");
+            // Flush initial native expose/paint events before monitoring a worker.
+            QTest::qWait(1);
             dialog->findChild<QLineEdit*>("actualStart")->setText("2026-10-26 09:00");
             dialog->findChild<QSpinBox*>("actualMinutes")->setValue(30);
             auto* remaining = dialog->findChild<QLineEdit*>("remainingWorkHours"); remaining->setText("0.5");
@@ -189,8 +197,7 @@ int main(int argc, char** argv) {
             dialog->findChild<QLineEdit*>("progressReason")->setText("Async progress retry");
             auto* accept = dialog->findChild<QDialogButtonBox*>()->button(QDialogButtonBox::Save);
             accept->click();
-            const bool progressRunning = wait([&] { const auto control = controller->control(); return control &&
-                control->stage.load() == jobs::CalculationStage::Forward && control->completed.load() > 10; });
+            const bool progressRunning = wait([&] { return calculationRunning(controller->control()); });
             if (!progressRunning) std::cerr << "progress state: " << dialog->findChild<QLabel*>("progressError")->text().toStdString() << std::endl;
             callbackCheck(progressRunning, "progress worker never ran");
             dialog->findChild<QPushButton*>("cancelDialogEdit")->click();
@@ -206,10 +213,10 @@ int main(int argc, char** argv) {
         QTimer::singleShot(0, [&] {
             auto* dialog = QApplication::activeModalWidget();
             callbackCheck(dialog && dialog->objectName() == "assignmentDialog", "assignment dialog missing");
+            QTest::qWait(1);
             auto* units = dialog->findChild<QSpinBox*>("assignmentUnits_4"); units->setValue(200);
             auto* accept = dialog->findChild<QDialogButtonBox*>()->button(QDialogButtonBox::Ok); accept->click();
-            callbackCheck(wait([&] { const auto control = controller->control(); return control &&
-                control->stage.load() == jobs::CalculationStage::Forward && control->completed.load() > 10; }), "assignment worker never ran");
+            callbackCheck(wait([&] { return calculationRunning(controller->control()); }), "assignment worker never ran");
             dialog->findChild<QPushButton*>("cancelDialogEdit")->click();
             callbackCheck(wait([&] { return accept->isEnabled(); }) && *document.project() == before && bytes(path) == modalDisk &&
                 units->value() == 200 && dialog->findChild<QLabel*>("assignmentError")->text().contains("취소"),
