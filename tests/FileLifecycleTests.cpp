@@ -45,9 +45,12 @@ int main(int argc, char* argv[]) {
             jobs::Document mixed(store);
             mixed.create("case preservation", "2026-10-26", {"task"});
             mixed.saveAs(mixedUtf8);
-            check(caseDirectory.entryList({"*.jobs"}, QDir::Files) == QStringList{filename},
+            const auto entries = caseDirectory.entryList({"*.jobs"}, QDir::Files);
+            // Filesystems may normalize Unicode without changing letter case.
+            auto nfc = [](const QString& value) { return value.normalized(QString::NormalizationForm_C); };
+            check(entries.size() == 1 && nfc(entries.front()) == nfc(filename),
                   "physical filename changed case");
-            check(QFileInfo(QString::fromUtf8(mixed.path())).fileName() == filename,
+            check(nfc(QFileInfo(QString::fromUtf8(mixed.path())).fileName()) == nfc(filename),
                   "document filename changed case");
             const auto originalId = mixed.project()->documentId;
             const auto originalBytes = read(mixedPath);
@@ -77,8 +80,10 @@ int main(int argc, char* argv[]) {
             check(store.load(mixedUtf8).project.tasks[0].name == "saved edit",
                   "mixed-case save did not roundtrip");
             check(read(mixedPath) != originalBytes, "same-file edit did not save");
-            check(caseDirectory.entryList({filename}, QDir::Files).contains(filename),
-                  "saving an existing file changed its name");
+            bool originalNameFound = false;
+            for (const auto& entry : caseDirectory.entryList({"*.jobs"}, QDir::Files))
+                originalNameFound = originalNameFound || nfc(entry) == nfc(filename);
+            check(originalNameFound, "saving an existing file changed its name");
         }
         jobs::Document doc(store);
         rejects([&] { doc.create("", "2026-10-26", {}); });

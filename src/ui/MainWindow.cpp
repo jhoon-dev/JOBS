@@ -189,6 +189,8 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     table_->setHorizontalHeaderLabels({"작업명", "기간(h / m)", "선행(행·종류±지연)", "시작", "완료", "총여유(h)", "임계/상태", "자원", "안정 ID", "작업 달력", "제약", "마감일", "작업 유형 · 입력 공수(h)", "분할 중단"});
     table_->setAccessibleName("프로젝트 작업 목록");
     table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    // Content sizing must scale with the viewport, not scan 1,000 rows per edit.
+    table_->horizontalHeader()->setResizeContentsPrecision(0);
     for (int column = 1; column < 14; ++column) table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
     table_->setColumnHidden(8, true); // Stable ID remains on the task tooltip; relations persist IDs, never row numbers.
     table_->setSelectionBehavior(QAbstractItemView::SelectRows); table_->setSelectionMode(QAbstractItemView::SingleSelection);
