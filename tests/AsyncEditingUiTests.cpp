@@ -150,9 +150,14 @@ int main(int argc, char** argv) {
             document.calculation()->status == jobs::CalculationStatus::Valid && document.calculation()->inputRevision == document.project()->revision; }),
             "Gantt effort resize did not prepare/recalculate asynchronously");
         before = *document.project();
-        table->setCurrentCell(0, 1); QApplication::clipboard()->setText("2"); action(window, "pasteTaskCells")->trigger();
-        check(controller->busy() && wait([&] { return !controller->busy(); }) && document.project()->tasks[0].durationMinutes == 120,
-              "fixed-work paste did not use asynchronous preparation");
+        table->setCurrentCell(0, 1); QApplication::clipboard()->setText("2");
+        auto* paste = action(window, "pasteTaskCells");
+        check(wait([&] { return QApplication::clipboard()->text() == "2" && paste->isEnabled(); }),
+              "native clipboard/paste action did not become ready");
+        paste->trigger();
+        check(controller->busy(), "fixed-work paste did not submit asynchronous preparation");
+        check(wait([&] { return !controller->busy(); }) && document.project()->tasks[0].durationMinutes == 120,
+              "fixed-work paste did not apply the prepared duration");
         action(window, "undoEdit")->trigger();
         check(static_cast<const jobs::PlanInput&>(*document.project()) == static_cast<const jobs::PlanInput&>(before), "asynchronous paste was not one undo");
         std::cout << "stage: deferred save/F9, Gantt and batch inversion" << std::endl;
@@ -184,8 +189,10 @@ int main(int argc, char** argv) {
             dialog->findChild<QLineEdit*>("progressReason")->setText("Async progress retry");
             auto* accept = dialog->findChild<QDialogButtonBox*>()->button(QDialogButtonBox::Save);
             accept->click();
-            callbackCheck(wait([&] { const auto control = controller->control(); return control &&
-                control->stage.load() == jobs::CalculationStage::Forward && control->completed.load() > 10; }), "progress worker never ran");
+            const bool progressRunning = wait([&] { const auto control = controller->control(); return control &&
+                control->stage.load() == jobs::CalculationStage::Forward && control->completed.load() > 10; });
+            if (!progressRunning) std::cerr << "progress state: " << dialog->findChild<QLabel*>("progressError")->text().toStdString() << std::endl;
+            callbackCheck(progressRunning, "progress worker never ran");
             dialog->findChild<QPushButton*>("cancelDialogEdit")->click();
             callbackCheck(wait([&] { return accept->isEnabled(); }) && *document.project() == before && bytes(path) == modalDisk &&
                 remaining->text() == "0.5" && dialog->findChild<QLabel*>("progressError")->text().contains("취소"),
