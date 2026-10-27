@@ -89,7 +89,9 @@ void MainWindow::manageResources() {
 }
 void MainWindow::assignResources() {
     if (!document_.project() || document_.readOnly() || selectedTask_.empty()) return;
-    const auto snapshot = *document_.project(); const auto taskId = selectedTask_;
+    const auto snapshot = static_cast<const PlanInput&>(*document_.project()); const auto taskId = selectedTask_;
+    const auto sourceId = document_.project()->documentId; const auto sourceRevision = document_.project()->revision;
+    const auto sourceSession = document_.sessionGeneration();
     const Task* task = nullptr; for (const auto& t : snapshot.tasks) if (t.id == taskId) task = &t;
     if (!task) return;
     QDialog dialog(this); dialog.setObjectName("assignmentDialog"); dialog.setWindowTitle("자원 배정 · " + qs(task->name)); dialog.resize(720, 510);
@@ -109,10 +111,11 @@ void MainWindow::assignResources() {
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, [&] {
         try {
-            if (document_.project()->documentId != snapshot.documentId || document_.project()->revision != snapshot.revision) throw std::runtime_error("문서가 변경되었습니다. 배정을 다시 여세요.");
+            if (!document_.project() || document_.project()->documentId != sourceId || document_.project()->revision != sourceRevision || document_.sessionGeneration() != sourceSession) throw std::runtime_error("문서가 변경되었습니다. 배정을 다시 여세요.");
             std::vector<Assignment> assignments;
             for (std::size_t i = 0; i < spins.size(); ++i) if (spins[i]->value()) assignments.push_back({taskId, snapshot.resources[i].id, spins[i]->value()});
-            document_.setAssignments(taskId, std::move(assignments)); dialog.accept();
+            submitDialogEdit(dialog, error, buttons, AssignmentEdit{taskId, std::move(assignments)}, "자원 배정 계산",
+                [table, buttons](bool pending) { table->setEnabled(!pending); buttons->button(QDialogButtonBox::Ok)->setEnabled(!pending); });
         } catch (const std::exception& e) { error->setText(QString::fromUtf8(e.what())); }
     });
     dialog.exec(); refresh();

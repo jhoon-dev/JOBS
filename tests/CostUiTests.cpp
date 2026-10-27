@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "ui/MoneyFields.h"
 #include "persistence/JsonProjectStore.h"
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
         QTemporaryDir dir; jobs::JsonProjectStore store; jobs::Document doc(store); doc.create("EVM 원가 검증", "2026-10-26", {"설계"}); doc.setDuration(0, 960);
         auto id = doc.project()->tasks[0].id; auto wbs = doc.addWbs("설계 단계"); doc.assignWbs(0, wbs);
         auto resource = doc.putResource({{}, "설계팀", "labor", 100, {}}); doc.setAssignments(id, {{id, resource, 100}});
-        jobs::MainWindow window(doc); window.show(); QTest::qWait(50); auto* table = window.findChild<QTableWidget*>();
+        jobs::MainWindow window(doc); window.show(); QTest::qWait(50); auto* table = taskTable(window);
         QTimer::singleShot(30, [&] {
             auto* d = QApplication::activeModalWidget(); callbackCheck(d && d->objectName() == "rateDialog", "rate dialog missing");
             d->findChild<QComboBox*>("costCurrency")->setCurrentText("USD"); d->findChild<QPushButton*>("saveCurrency")->click(); callbackCheck(doc.project()->currency == "USD", "currency setup failed");
@@ -84,7 +85,7 @@ int main(int argc, char* argv[]) {
         }); poll.start(); trigger(window, "costAnalysis"); check(stage == 4, "EVM dialog workflow incomplete");
         table->selectRow(0); submitReport("6.50", "40.00", false); check(doc.project()->costEntries.size() == 2 && doc.project()->costEntries[0] == first, "cost correction mutated history");
         doc.saveAs(dir.filePath("cost-ui.jobs").toStdString()); check(store.load(doc.path()).project == *doc.project(), "cost UI persistence mismatch");
-        jobs::Document reader(store); reader.open(doc.path(), true); jobs::MainWindow viewer(reader); viewer.show(); viewer.findChild<QTableWidget*>()->selectRow(0);
+        jobs::Document reader(store); reader.open(doc.path(), true); jobs::MainWindow viewer(reader); viewer.show(); taskTable(viewer)->selectRow(0);
         check(!viewer.findChild<QAction*>("costReport")->isEnabled() && !viewer.findChild<QAction*>("taskCost")->isEnabled(), "readonly costs editable");
         QTimer::singleShot(30, [] { auto* d = QApplication::activeModalWidget(); callbackCheck(!d->findChild<QPushButton*>("saveRates")->isEnabled() && !d->findChild<QPushButton*>("saveCurrency")->isEnabled(), "readonly rates editable"); static_cast<QDialog*>(d)->reject(); }); trigger(viewer, "resourceRates");
         QTimer readonlyPoll; readonlyPoll.setInterval(20); QObject::connect(&readonlyPoll, &QTimer::timeout, [&] { auto* d = QApplication::activeModalWidget(); if (!d || d->objectName() != "costAnalysisDialog") return; auto* rows = d->findChild<QTableWidget*>("costTasks"); if (rows->rowCount() == 1) { callbackCheck(rows->item(0, 5)->text() == "6.50", "readonly analysis lost corrected actual"); readonlyPoll.stop(); static_cast<QDialog*>(d)->reject(); } }); readonlyPoll.start(); trigger(viewer, "costAnalysis");

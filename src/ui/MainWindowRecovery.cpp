@@ -1,5 +1,6 @@
 #include "ui/MainWindow.h"
 #include "ui/AutoSaveController.h"
+#include "ui/AsyncEditController.h"
 #include "ui/RecoveryDialog.h"
 #include <QApplication>
 #include <QAction>
@@ -14,7 +15,8 @@
 #include <algorithm>
 namespace jobs {
 void MainWindow::updateHistoryActions() {
-    undo_->setEnabled(document_.canUndo()); redo_->setEnabled(document_.canRedo());
+    const bool pending = editController_ && editController_->busy();
+    undo_->setEnabled(pending || document_.canUndo()); redo_->setEnabled(pending || document_.canRedo());
     undo_->setText(document_.canUndo() ? "실행 취소: " + QString::fromStdString(document_.undoLabel()) : "실행 취소");
     redo_->setText(document_.canRedo() ? "다시 실행: " + QString::fromStdString(document_.redoLabel()) : "다시 실행");
     undo_->setToolTip(QString::fromStdString(document_.historyNotice())); redo_->setToolTip(QString::fromStdString(document_.historyNotice()));
@@ -38,9 +40,9 @@ void MainWindow::setupRecovery(JsonRecoveryStore* store) {
     autosave_->statusChanged = [this] { autosaveStatus_->setText(autosave_->status()); autosaveStatus_->setToolTip(autosave_->status() + "\n" + recoveryStore_->directory()); updateHistoryActions(); };
     autosaveStatus_->setText(autosave_->status());
     connect(autosaveEnabled_, &QAction::toggled, this, [this](bool enabled) { autosave_->setEnabled(enabled); QSettings().setValue("recovery/enabled", enabled); });
-    connect(autosaveNow_, &QAction::triggered, this, [this] { commitPendingCell(); autosave_->checkpointNow(); });
+    connect(autosaveNow_, &QAction::triggered, this, [this] { runAfterEdit([this] { autosave_->checkpointNow(); }); });
     connect(interval, &QAction::triggered, this, [this] { bool ok = false; auto value = QInputDialog::getInt(this, "자동 저장 간격", "변경 중 자동 저장 요청 간격(초) · 멈춘 뒤 2초에도 저장", autosave_->intervalMs() / 1000, 5, 300, 5, &ok); if (ok) { autosave_->setIntervalMs(value * 1000); QSettings().setValue("recovery/intervalSeconds", value); } });
-    connect(recover_, &QAction::triggered, this, [this] { showRecovery(); });
+    connect(recover_, &QAction::triggered, this, [this] { runAfterEdit([this] { showRecovery(); }); });
     QTimer::singleShot(0, this, [this] { showRecovery(true); });
 }
 void MainWindow::showRecovery(bool startup) {
@@ -52,7 +54,7 @@ void MainWindow::showRecovery(bool startup) {
             auto result = watcher->result(); watcher->deleteLater();
             if (!result.error.isEmpty()) { autosaveStatus_->setText("복구본 검색 실패: " + result.error); return; }
             if (result.scan.candidates.empty()) return;
-            if (QApplication::activeModalWidget()) { recover_->setText(QString("복구본 선택… (%1세대)").arg(result.scan.candidates.size())); statusBar()->showMessage("이전 복구본이 있습니다. 자동 저장·복구 메뉴에서 확인하세요."); return; }
+            if (QApplication::activeModalWidget() || editController_->busy()) { recover_->setText(QString("복구본 선택… (%1세대)").arg(result.scan.candidates.size())); statusBar()->showMessage("이전 복구본이 있습니다. 자동 저장·복구 메뉴에서 확인하세요."); return; }
             RecoveryDialog dialog(*recoveryStore_, this, std::move(result.scan));
             if (dialog.exec() != QDialog::Accepted) return;
             auto claim = dialog.takeClaim(); if (!claim || !confirmChanges()) return;

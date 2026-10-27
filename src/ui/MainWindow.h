@@ -1,7 +1,7 @@
 #pragma once
 #include "application/Document.h"
+#include "ui/TaskTableView.h"
 #include <QMainWindow>
-class QTableWidget;
 class QLabel;
 class QPlainTextEdit;
 class QAction;
@@ -12,10 +12,15 @@ class QResizeEvent;
 class QLineEdit;
 class QMenu;
 class QVBoxLayout;
+class QToolBar;
+class QDialog;
+class QDialogButtonBox;
 namespace jobs {
 class GanttView;
 class JsonRecoveryStore;
 class AutoSaveController;
+class AsyncEditController;
+class TaskTableModel;
 class MainWindow final : public QMainWindow {
 public:
     explicit MainWindow(Document& document, JsonRecoveryStore* recoveryStore = nullptr);
@@ -25,7 +30,8 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 private:
     Document& document_;
-    QTableWidget* table_;
+    TaskTableView* table_;
+    TaskTableModel* taskModel_;
     QTreeWidget* wbsTree_;
     GanttView* gantt_;
     QLabel* wbsSummary_;
@@ -67,13 +73,6 @@ private:
     QAction* reports_;
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
-    std::vector<std::size_t> renderedRows_;
-    std::vector<std::optional<Task>> renderedTasks_;
-    std::vector<Resource> renderedResources_;
-    std::vector<Assignment> renderedAssignments_;
-    std::vector<TaskCalendar> renderedCalendars_;
-    std::optional<CalculationStatus> renderedStatus_;
-    bool tableRenderReady_ = false, renderedReadOnly_ = false;
     std::string cachedTreeDocument_, cachedTreeName_;
     std::vector<WbsNode> cachedTreeNodes_;
     bool calculating_ = false;
@@ -83,6 +82,19 @@ private:
     QTimer* calculationProgressTimer_=nullptr;
     QLabel* calculationProgressLabel_=nullptr;
     std::optional<std::uint64_t> queuedCalculation_;
+    AsyncEditController* editController_ = nullptr;
+    QAction* cancelEdit_ = nullptr;
+    QLabel* editProgress_ = nullptr;
+    QTimer* editProgressTimer_ = nullptr;
+    std::function<void()> afterEdit_;
+    void setupAsyncEditing(QToolBar*);
+    void runAfterEdit(std::function<void()>);
+    std::shared_ptr<CalculationControl> submitEdit(EditCommand, const QString&, std::function<void(EditState, const QString&)> completion = {});
+    void submitDialogEdit(QDialog&, QLabel*, QDialogButtonBox*, EditCommand, const QString&, std::function<void(bool)>);
+    bool editTaskCell(std::string taskId, int column, const QString& text);
+    void applyGanttEdit(const std::string& id, std::uint64_t revision, const std::string& taskId, bool resize, const std::string& target);
+    bool hasInverseDuration(const std::string& taskId) const;
+    void undoEdit(bool redo);
     bool confirmChanges();
     void commitPendingCell();
     bool save(bool as);

@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "persistence/JsonProjectStore.h"
@@ -22,7 +23,7 @@ int main(int argc,char** argv){QApplication app(argc,argv);app.setQuitOnLastWind
     QTemporaryDir dir;jobs::JsonProjectStore store;jobs::Project p;p.documentId="large-ui";p.name="Large UI";p.startDate="2026-10-26";
     for(int i=0;i<1000;++i){jobs::Task t{"T"+std::to_string(i),"Task "+std::to_string(i),60,{}};if(i>=100)t.predecessors={"T"+std::to_string(i-100)};p.tasks.push_back(t);}
     const auto path=dir.filePath("large.jobs").toStdString();store.save(path,p,{});jobs::Document doc(store);doc.open(path);doc.applyCalculation(jobs::calculate(p));jobs::MainWindow window(doc);window.show();app.processEvents();
-    auto* view=dynamic_cast<jobs::GanttView*>(window.findChild<QGraphicsView*>("ganttView"));auto* table=window.findChild<QTableWidget*>();auto* cancel=window.findChild<QAction*>("cancelCalculation");QAction* calculate=nullptr;for(auto* a:window.findChildren<QAction*>())if(a->shortcut()==QKeySequence(Qt::Key_F9))calculate=a;
+    auto* view=dynamic_cast<jobs::GanttView*>(window.findChild<QGraphicsView*>("ganttView"));auto* table=taskTable(window);auto* cancel=window.findChild<QAction*>("cancelCalculation");QAction* calculate=nullptr;for(auto* a:window.findChildren<QAction*>())if(a->shortcut()==QKeySequence(Qt::Key_F9))calculate=a;
     check(view&&table&&cancel&&calculate&&table->rowCount()==1000,"large table or controls missing");
     const auto bound=[&]{return 8*((view->viewport()->height()+jobs::GanttView::HeaderHeight)/jobs::GanttView::RowHeight+12);};
     check(view->scene()->items().size()<bound(),"gantt created every task graphic");

@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "persistence/JsonProjectStore.h"
 #include <QApplication>
@@ -66,11 +67,11 @@ int main(int argc, char* argv[]) {
             std::cerr << "expected path: " << path.toUtf8().toStdString() << "; selected path: " << doc.path() << '\n';
             throw std::runtime_error("file dialog selected unexpected save path");
         }
-        auto* table = window.findChild<QTableWidget*>();
-        table->item(0, 0)->setText("편집된 설계");
+        auto* table = taskTable(window);
+        setCellText(table, 0, 0, "편집된 설계");
         check(doc.dirty() && doc.project()->tasks[0].name == "편집된 설계", "table edit failed");
-        table->item(0, 1)->setText("8"); table->item(1, 1)->setText("4"); table->item(2, 1)->setText("1m");
-        table->item(1, 2)->setText("1");
+        setCellText(table, 0, 1, "8"); setCellText(table, 1, 1, "4"); setCellText(table, 2, 1, "1m");
+        setCellText(table, 1, 2, "1");
         check(doc.project()->tasks[0].durationMinutes == 480 && doc.project()->tasks[2].durationMinutes == 1 &&
             doc.project()->tasks[1].predecessors == std::vector<std::string>{doc.project()->tasks[0].id}, "duration/FS input failed");
         auto waitResult = [&] {
@@ -82,9 +83,9 @@ int main(int argc, char* argv[]) {
             check(!window.findChild<QPlainTextEdit*>("calculationDiagnostics")->toPlainText().startsWith("계산 중"), "calculation timed out");
         };
         trigger(window, "일정 계산"); waitResult();
-        check(doc.calculation()->status == jobs::CalculationStatus::Valid && table->item(0, 3)->text() != "미계산", "calculation UI failed");
-        table->item(0, 1)->setText("16");
-        check(doc.calculation()->status == jobs::CalculationStatus::Stale && table->item(0, 3)->text() == "미계산", "stale dates remained visible");
+        check(doc.calculation()->status == jobs::CalculationStatus::Valid && cellText(table, 0, 3) != "미계산", "calculation UI failed");
+        setCellText(table, 0, 1, "16");
+        check(doc.calculation()->status == jobs::CalculationStatus::Stale && cellText(table, 0, 3) == "미계산", "stale dates remained visible");
         trigger(window, "일정 계산");
         doc.setDuration(0, 960 + 60); // Edit before the worker completion reaches the event loop.
         waitResult();
@@ -97,12 +98,12 @@ int main(int argc, char* argv[]) {
         });
         trigger(window, "휴일 편집");
         check(doc.project()->holidays == std::vector<std::string>{"2026-11-02"}, "holiday dialog failed");
-        table->item(2, 1)->setText(""); trigger(window, "일정 계산"); waitResult();
-        check(doc.calculation()->status == jobs::CalculationStatus::Incomplete && table->item(0, 3)->text() == "미계산", "incomplete forecast remained visible");
-        table->item(2, 1)->setText("1m"); table->item(0, 2)->setText("2");
+        setCellText(table, 2, 1, ""); trigger(window, "일정 계산"); waitResult();
+        check(doc.calculation()->status == jobs::CalculationStatus::Incomplete && cellText(table, 0, 3) == "미계산", "incomplete forecast remained visible");
+        setCellText(table, 2, 1, "1m"); setCellText(table, 0, 2, "2");
         trigger(window, "일정 계산"); waitResult();
-        check(doc.calculation()->status == jobs::CalculationStatus::Conflict && table->item(0, 3)->text() == "미계산", "cycle forecast remained visible");
-        table->item(0, 2)->setText(""); trigger(window, "일정 계산"); waitResult();
+        check(doc.calculation()->status == jobs::CalculationStatus::Conflict && cellText(table, 0, 3) == "미계산", "cycle forecast remained visible");
+        setCellText(table, 0, 2, ""); trigger(window, "일정 계산"); waitResult();
         check(doc.calculation()->status == jobs::CalculationStatus::Valid, "corrected cycle did not recalculate");
         window.grab().save("ui-smoke.png");
         QTimer::singleShot(50, [] {

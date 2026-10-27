@@ -39,7 +39,7 @@ jobs:
       - name: Check out pre-optimization editing reference
         uses: actions/checkout@v4
         with:
-          ref: 3570d28ed176aae2d90fd34e5efb84f6f096753f
+          ref: d9270cdf8c8fa5f9b7ee778be22a8f8b311a8150
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
@@ -59,6 +59,17 @@ jobs:
           python scripts/verify-primavera-xer.py build
       - name: Capture native task editing screen
         run: python scripts/capture-task-editing-ui.py build
+      - name: Exercise native model and cancellable editing
+        run: python scripts/capture-model-async-ui.py build
+      - name: Preserve model and async editing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-async-editing-${{ runner.os }}
+          path: |
+            build/async-editing-ui.png
+            build/async-editing-ui.json
+          if-no-files-found: warn
       - name: Exercise native Project XML dialogs
         run: python scripts/capture-project-xml-ui.py build
       - name: Exercise native Primavera XER dialogs

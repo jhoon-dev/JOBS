@@ -12,7 +12,7 @@ void Document::create(std::string name, std::string date, const std::vector<std:
     validate(p);
     project_ = std::move(p); path_.clear(); fingerprint_.clear(); lease_.reset();
     dirty_ = true; readOnly_ = false;
-    calculation_.reset(); requiresSaveAs_ = false;
+    calculation_.reset(); ++calculationGeneration_; requiresSaveAs_ = false;
     savedState_.reset(); recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced);
 }
 void Document::open(const std::string& path, bool readOnly) {
@@ -20,7 +20,7 @@ void Document::open(const std::string& path, bool readOnly) {
     if (store_.sameFile(normalized, path_) && (lease_ || readOnly)) {
         auto loaded = store_.load(normalized);
         project_ = std::move(loaded.project); fingerprint_ = std::move(loaded.fingerprint);
-        requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset();
+        requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset(); ++calculationGeneration_;
         if (readOnly) lease_.reset();
         dirty_ = false; readOnly_ = readOnly; savedState_ = project_; recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced); return;
     }
@@ -28,7 +28,7 @@ void Document::open(const std::string& path, bool readOnly) {
     auto loaded = store_.load(normalized);
     project_ = std::move(loaded.project); path_ = std::move(normalized);
     fingerprint_ = std::move(loaded.fingerprint); lease_ = std::move(lease);
-    requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset();
+    requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset(); ++calculationGeneration_;
     dirty_ = false; readOnly_ = readOnly;
     savedState_ = project_; recoveryOrigin_.reset(); clearHistory(); ++sessionGeneration_; notify(Event::Replaced);
 }
@@ -189,7 +189,7 @@ void Document::recordProgress(ProgressEntry entry) {
     p.progress.push_back(std::move(entry)); edit(std::move(p));
 }
 void Document::staleCalculation() {
-    if (calculation_) calculation_->status = CalculationStatus::Stale;
+    if (calculation_ && calculation_->status != CalculationStatus::Stale) { calculation_->status = CalculationStatus::Stale; ++calculationGeneration_; }
 }
 void Document::setCurrency(std::string currency) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -276,10 +276,11 @@ void Document::edit(Project p, std::string label) {
 }
 void Document::applyCalculation(ScheduleResult result) {
     if (!project_) return;
-    if(result.status==CalculationStatus::Cancelled){result.tasks.clear();result.projectFinish.reset();}
+    if(result.status==CalculationStatus::Cancelled){result.tasks.clear();result.plannedTasks.clear();result.projectFinish.reset();}
     if (result.documentId != project_->documentId || result.inputRevision != project_->revision || result.profile != project_->calculationProfile || result.statusAt != project_->statusAt)
         result.status = CalculationStatus::Stale;
     calculation_ = std::move(result);
+    ++calculationGeneration_;
 }
 void Document::save() {
     if (!project_ || path_.empty() || readOnly_ || requiresSaveAs_) throw std::runtime_error("다른 이름으로 저장하세요. 이전 형식의 원본은 보존합니다.");
@@ -356,7 +357,16 @@ std::uint64_t Document::subscribe(std::function<void(Event)> listener) { auto to
 void Document::unsubscribe(std::uint64_t token) { listeners_.erase(token); }
 void Document::notify(Event event) noexcept {
     // Observers schedule work only; a failed observer cannot roll back a committed edit.
-    try { auto listeners = listeners_; for (const auto& [id, listener] : listeners) { (void)id; try { listener(event); } catch (...) {} } } catch (...) {}
+    try {
+        std::vector<std::uint64_t> tokens;
+        for (const auto& [id, listener] : listeners_) { (void)listener; tokens.push_back(id); }
+        for (auto id : tokens) {
+            auto found = listeners_.find(id);
+            if (found == listeners_.end()) continue;
+            auto listener = found->second;
+            try { listener(event); } catch (...) {}
+        }
+    } catch (...) {}
 }
 RecoverySnapshot Document::recoverySnapshot(std::string utc) const {
     if (!project_ || readOnly_ || !dirty_ || !validUtcStamp(utc)) throw std::runtime_error("자동 복구 저장할 편집 가능한 미저장 문서/시각이 없습니다.");
@@ -366,7 +376,7 @@ void Document::recover(const RecoverySnapshot& snapshot) {
     validate(snapshot.project); if (!validUtcStamp(snapshot.capturedAt)) throw std::runtime_error("복구 시각이 잘못되었습니다.");
     auto p = snapshot.project; p.derivedFrom = p.documentId; p.documentId = store_.newId(); validate(p);
     RecoveryOrigin origin{snapshot.project.documentId, snapshot.sourcePath, snapshot.capturedAt, snapshot.project.revision, snapshot.lastSavedRevision};
-    project_ = std::move(p); path_.clear(); fingerprint_.clear(); lease_.reset(); savedState_.reset(); calculation_.reset();
+    project_ = std::move(p); path_.clear(); fingerprint_.clear(); lease_.reset(); savedState_.reset(); calculation_.reset(); ++calculationGeneration_;
     dirty_ = true; readOnly_ = false; requiresSaveAs_ = true; recoveryOrigin_ = std::move(origin);
     clearHistory("복구한 입력에서 새 편집 이력을 시작합니다. 복구 전 실행 취소 이력은 포함하지 않습니다."); ++sessionGeneration_; notify(Event::Replaced);
 }

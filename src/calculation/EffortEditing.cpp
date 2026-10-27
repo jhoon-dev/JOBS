@@ -5,13 +5,14 @@
 namespace jobs {
 namespace {
 void scaleAssignments(Project& p,std::size_t index,std::int64_t target,std::int64_t duration) {
+    calculationCheckpoint();
     auto t=p.tasks.at(index);t.taskType="fixed-duration";t.workDriven=false;t.workUnitMinutes.reset();t.durationMinutes=duration;
     auto trial=p;trial.tasks[index]=t;auto plan=calculatePlan(trial);std::int64_t local=0;TaskExecution model(p,t);
     if(plan.status!=CalculationStatus::Valid)throw std::runtime_error("배정률 역산에는 입력 기간을 적용한 유효한 전체 계획이 필요합니다. 선행관계·날짜 제약·기간 입력을 확인하세요.");
     for(const auto& row:plan.tasks)if(row.taskId==t.id)local=model.calendar().offset(row.start);
     const auto work=model.work(model.dates(local));
     if(target&&work==0)throw std::runtime_error("공수/기간으로 배정률을 조정하려면 양수 기간과 겹치는 자원 달력·배정이 필요합니다.");
-    for(auto& a:p.assignments)if(a.taskId==t.id){const auto units=work?std::llround(static_cast<long double>(a.units)*target/work):0;if(units>100000)throw std::runtime_error("필요 배정률이 100,000%를 초과합니다.");a.units=int(target?std::max(1LL,units):0);}
+    for(auto& a:p.assignments){calculationCheckpoint();if(a.taskId==t.id){const auto units=work?std::llround(static_cast<long double>(a.units)*target/work):0;if(units>100000)throw std::runtime_error("필요 배정률이 100,000%를 초과합니다.");a.units=int(target?std::max(1LL,units):0);}}
     std::erase_if(p.assignments,[&](const auto& a){return a.taskId==t.id&&!a.units;});
 }
 }

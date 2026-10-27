@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "BuildIdentity.h"
 #include "PerformanceFixture.h"
 #include "persistence/JsonProjectStore.h"
@@ -99,22 +100,22 @@ int main(int argc, char** argv) {
             jobs::MainWindow window(document);
             window.show();
             app.processEvents();
-            auto* table = window.findChild<QTableWidget*>("taskTable");
+            auto* table = taskTable(window);
             auto* undo = window.findChild<QAction*>("undoEdit");
             auto* redo = window.findChild<QAction*>("redoEdit");
             check(table && undo && redo && table->rowCount() == count, "UI controls missing");
             // Scroll the edited row into view. No autosave controller is enabled in this probe.
             table->setCurrentCell(0, 0);
-            table->scrollToItem(table->item(0, 0));
+            table->scrollTo(cell(table, 0, 0));
             app.processEvents();
             for (int i = 0; i < repeats; ++i) {
                 const auto name = QString("Visible edit %1").arg(i);
-                measure("ui_name_commit_events", [&] { table->item(0, 0)->setText(name); }, true);
+                measure("ui_name_commit_events", [&] { setCellText(table, 0, 0, name); }, true);
                 check(QString::fromStdString(document.project()->tasks[0].name) == name, "UI name edit lost");
                 measure("ui_undo_events", [&] { undo->trigger(); }, true);
                 measure("ui_redo_events", [&] { redo->trigger(); }, true);
                 undo->trigger(); app.processEvents();
-                measure("ui_duration_commit_events", [&] { table->item(0, 1)->setText(QString::number(2 + i)); }, true);
+                measure("ui_duration_commit_events", [&] { setCellText(table, 0, 1, QString::number(2 + i)); }, true);
                 check(document.project()->tasks[0].durationMinutes == (2 + i) * 60, "UI duration edit lost");
                 measure("ui_duration_undo_events", [&] { undo->trigger(); }, true);
                 measure("ui_duration_redo_events", [&] { redo->trigger(); }, true);

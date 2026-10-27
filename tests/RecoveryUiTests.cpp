@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "ui/AutoSaveController.h"
 #include "ui/RecoveryDialog.h"
@@ -68,10 +69,10 @@ int main(int argc, char* argv[]) {
         jobs::Document restored(store); jobs::MainWindow window(restored, &recovery); window.show(); QTimer startupPoll; startupPoll.setInterval(10); bool selected = false;
         QObject::connect(&startupPoll, &QTimer::timeout, [&] { auto* dialog = QApplication::activeModalWidget(); if (!dialog || dialog->objectName() != "recoveryDialog") return; auto* restore = dialog->findChild<QPushButton*>("restoreRecovery"); if (!restore->isEnabled()) return; dialog->grab().save("recovery-selection-smoke.png"); selected = true; startupPoll.stop(); restore->click(); }); startupPoll.start();
         check(wait([&] { return restored.recoveryOrigin().has_value(); }), "startup recovery selection failed"); check(selected && restored.dirty() && restored.requiresSaveAs() && restored.path().empty() && restored.project()->tasks[0].name == recoveredName && read(source) == originalBytes, "startup recovery modified original or lost snapshot");
-        auto* table = window.findChild<QTableWidget*>(); const auto priorName = restored.project()->tasks[0].name; table->item(0, 0)->setText("UI commit"); check(restored.project()->tasks[0].name == "UI commit", "table edit not committed");
-        table->editItem(table->item(0, 0)); QTest::qWait(20); auto* editor = table->findChild<QLineEdit*>(); check(editor, "cell editor missing"); editor->setText("local"); editor->insert("x"); QTest::keySequence(editor, QKeySequence::Undo); check(editor->text() == "local" && restored.project()->tasks[0].name == "UI commit", "text undo triggered document undo"); QTest::keyClick(editor, Qt::Key_Escape); table->setFocus(); window.activateWindow(); QTest::qWait(20);
+        auto* table = taskTable(window); const auto priorName = restored.project()->tasks[0].name; setCellText(table, 0, 0, "UI commit"); check(restored.project()->tasks[0].name == "UI commit", "table edit not committed");
+        table->edit(cell(table, 0, 0)); QTest::qWait(20); auto* editor = table->findChild<QLineEdit*>(); check(editor, "cell editor missing"); editor->setText("local"); editor->insert("x"); QTest::keySequence(editor, QKeySequence::Undo); check(editor->text() == "local" && restored.project()->tasks[0].name == "UI commit", "text undo triggered document undo"); QTest::keyClick(editor, Qt::Key_Escape); table->setFocus(); window.activateWindow(); QTest::qWait(20);
         QTest::keySequence(table, QKeySequence::Undo); check(restored.project()->tasks[0].name == priorName && window.findChild<QAction*>("redoEdit")->isEnabled(), "document undo shortcut failed"); QTest::keySequence(table, QKeySequence::Redo); check(restored.project()->tasks[0].name == "UI commit", "redo shortcut failed");
-        table->editItem(table->item(0, 1)); QTest::qWait(20); editor = table->findChild<QLineEdit*>(); check(editor, "duration editor missing"); editor->setText("16");
+        table->edit(cell(table, 0, 1)); QTest::qWait(20); editor = table->findChild<QLineEdit*>(); check(editor, "duration editor missing"); editor->setText("16");
         bool calculated = false; for (auto* action : window.findChildren<QAction*>()) if (action->shortcut() == QKeySequence(Qt::Key_F9)) { action->trigger(); calculated = true; break; }
         check(calculated && wait([&] { return restored.calculation() && restored.calculation()->status == jobs::CalculationStatus::Valid; }) && restored.project()->tasks[0].durationMinutes == 960, "F9 lost pending cell input");
         restored.captureBaseline("새 승인", "PM", "복구 후 승인", "2026-10-26T09:00:00Z"); check(!window.findChild<QAction*>("undoEdit")->isEnabled() && window.findChild<QAction*>("undoEdit")->toolTip().contains("정정 보고"), "immutable history boundary not explained");
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
         check(wait([&] { auto s = recovery.scan(); return s.candidates.empty() && s.activeSessions == 0; }), "saved recovery source not cleaned");
         restored.renameTask(0, "temporary edit"); trigger(window, "undoEdit"); check(!restored.dirty() && !restored.revisionSaved(), "undo clean inputs incorrectly claimed saved revision");
         jobs::ReportDialog report(restored, {}, {}); report.show(); check(wait([&] { return report.findChild<QPushButton*>("exportXlsx")->isEnabled(); }) && report.findChild<QLabel*>("reportMessage")->text().contains("미저장 메모리"), "report provenance claimed a new undo revision was already saved"); report.reject();
-        table->editItem(table->item(0, 0)); QTest::qWait(20); editor = table->findChild<QLineEdit*>(); check(editor, "pending close editor missing"); editor->setText("pending close");
+        table->edit(cell(table, 0, 0)); QTest::qWait(20); editor = table->findChild<QLineEdit*>(); check(editor, "pending close editor missing"); editor->setText("pending close");
         QTimer::singleShot(20, [] { auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget()); callbackCheck(box, "uncommitted edit close confirmation absent"); box->button(QMessageBox::Cancel)->click(); });
         const auto closed = window.close(); if (closed || !restored.dirty() || restored.project()->tasks[0].name != "pending close") std::cerr << "close=" << closed << " dirty=" << restored.dirty() << " name=" << restored.project()->tasks[0].name << '\n';
         check(!closed && restored.dirty() && restored.project()->tasks[0].name == "pending close", "close lost pending editor text or cancel state");

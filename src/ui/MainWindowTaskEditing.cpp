@@ -21,7 +21,6 @@
 #include <QSignalBlocker>
 #include <QMimeData>
 #include <QStatusBar>
-#include <QTableWidget>
 #include <QTimer>
 #include <QResizeEvent>
 #include <QVBoxLayout>
@@ -35,15 +34,15 @@ QString qs(const std::string& s){return QString::fromUtf8(s.data(),qsizetype(s.s
 void MainWindow::setupTaskEditing(QMenu* menu,QVBoxLayout* layout) {
     table_->setObjectName("taskTable");table_->setSelectionMode(QAbstractItemView::ExtendedSelection);table_->setSelectionBehavior(QAbstractItemView::SelectItems);
     menu->addSeparator();
-    auto action=[&](const QString& name,const char* id,const QKeySequence& key,auto callback){auto* a=menu->addAction(name);a->setObjectName(id);a->setShortcut(key);a->setShortcutContext(Qt::WidgetShortcut);table_->addAction(a);connect(a,&QAction::triggered,this,[this,callback]{commitPendingCell();(this->*callback)();});return a;};
+    auto action=[&](const QString& name,const char* id,const QKeySequence& key,auto callback){auto* a=menu->addAction(name);a->setObjectName(id);a->setShortcut(key);a->setShortcutContext(Qt::WidgetShortcut);table_->addAction(a);connect(a,&QAction::triggered,this,[this,callback]{runAfterEdit([this, callback] { (this->*callback)(); });});return a;};
     insertTasks_=action("작업 삽입…","insertTasks",QKeySequence(Qt::Key_Insert),&MainWindow::insertSelectedTasks);
     deleteTasks_=action("선택 작업 삭제…","deleteTasks",QKeySequence(Qt::Key_Delete),&MainWindow::deleteSelectedTasks);
     duplicateTasks_=action("선택 작업 복제","duplicateTasks",QKeySequence("Ctrl+D"),&MainWindow::duplicateSelectedTasks);
     copyTasks_=action("표 선택 복사","copyTaskCells",QKeySequence::Copy,&MainWindow::copySelectedCells);
     pasteTasks_=action("표 붙여넣기","pasteTaskCells",QKeySequence::Paste,&MainWindow::pasteCells);
     auto* editCell=menu->addAction("현재 셀 편집");editCell->setObjectName("editTaskCell");editCell->setShortcut(QKeySequence(Qt::Key_F2));editCell->setShortcutContext(Qt::WidgetShortcut);table_->addAction(editCell);
-    connect(editCell,&QAction::triggered,this,[this]{commitPendingCell();auto* item=table_->currentItem();if(item&&(item->flags()&Qt::ItemIsEditable))table_->editItem(item);});
-    auto* all=menu->addAction("표 전체 선택");all->setShortcut(QKeySequence::SelectAll);all->setShortcutContext(Qt::WidgetShortcut);table_->addAction(all);connect(all,&QAction::triggered,table_,&QTableWidget::selectAll);
+    connect(editCell,&QAction::triggered,this,[this]{commitPendingCell();const auto index=table_->currentIndex();if(index.isValid()&&(index.flags()&Qt::ItemIsEditable))table_->edit(index);});
+    auto* all=menu->addAction("표 전체 선택");all->setShortcut(QKeySequence::SelectAll);all->setShortcutContext(Qt::WidgetShortcut);table_->addAction(all);connect(all,&QAction::triggered,table_,&QTableView::selectAll);
     auto* strip=new QHBoxLayout;taskSearch_=new QLineEdit;taskSearch_->setObjectName("taskSearch");taskSearch_->setAccessibleName("작업 이름·ID 검색");taskSearch_->setPlaceholderText("작업 이름·ID 검색 ("+QKeySequence(QKeySequence::Find).toString(QKeySequence::NativeText)+")");taskSearch_->setClearButtonEnabled(true);taskSearch_->setMinimumWidth(260);taskSearch_->setMaximumWidth(280);taskSearch_->setToolTip("검색은 표·간트 보기만 바꿉니다. 일정은 전체 프로젝트를 계산하고 보고서는 선택 WBS 범위를 사용합니다.");strip->addWidget(taskSearch_);
     taskFilter_=new QComboBox;taskFilter_->setObjectName("taskFilter");taskFilter_->setAccessibleName("작업 필터");taskFilter_->addItems({"전체 작업","계획 임계","마일스톤","미배정"});strip->addWidget(taskFilter_);
     taskSort_=new QComboBox;taskSort_->setObjectName("taskSort");taskSort_->setAccessibleName("작업 정렬");taskSort_->addItems({"프로젝트 원본 순서","이름 ↑","이름 ↓","기간 ↑","기간 ↓","시작일 ↑","시작일 ↓"});strip->addWidget(taskSort_);
@@ -63,7 +62,7 @@ void MainWindow::syncTaskSelection() {
 
         selectedTaskIds_=selectedTaskIds();
         const auto row = table_->currentRow();
-        if (document_.project() && row >= 0 && std::size_t(row) < visibleRows_.size() && !table_->selectedItems().isEmpty())
+        if (document_.project() && row >= 0 && std::size_t(row) < visibleRows_.size() && table_->selectionModel()->hasSelection())
             selectedTask_ = document_.project()->tasks[visibleRows_[std::size_t(row)]].id;
         else selectedTask_.clear();
         if(!selectedTaskIds_.empty()&&std::find(selectedTaskIds_.begin(),selectedTaskIds_.end(),selectedTask_)==selectedTaskIds_.end())selectedTask_=selectedTaskIds_.front();
@@ -79,13 +78,13 @@ void MainWindow::syncTaskSelection() {
 }
 std::vector<std::string> MainWindow::selectedTaskIds() const {
     QSet<int> rows;for(const auto& index:table_->selectionModel()->selectedIndexes())rows.insert(index.row());auto ordered=rows.values();std::sort(ordered.begin(),ordered.end());std::vector<std::string> ids;
-    for(int row:ordered)if(auto* id=table_->item(row,8))ids.push_back(id->text().toUtf8().toStdString());
+    for(int row:ordered)ids.push_back(table_->model()->index(row,8).data().toString().toUtf8().toStdString());
     return ids;
 }
 void MainWindow::updateTaskActions() {
     if(!insertTasks_)return;
     const bool writable=document_.project()&&!document_.readOnly();const bool selection=!selectedTaskIds().empty();
-    if(auto* edit=findChild<QAction*>("editTaskCell"))edit->setEnabled(writable&&table_->currentItem()&&(table_->currentItem()->flags()&Qt::ItemIsEditable));
+    if(auto* edit=findChild<QAction*>("editTaskCell"))edit->setEnabled(writable&&table_->currentIndex().isValid()&&(table_->currentIndex().flags()&Qt::ItemIsEditable));
     insertTasks_->setEnabled(writable);deleteTasks_->setEnabled(writable&&selection);duplicateTasks_->setEnabled(writable&&selection);copyTasks_->setEnabled(selection);
     pasteTasks_->setEnabled(writable&&table_->currentRow()>=0&&table_->currentColumn()>=0&&table_->currentColumn()<3&&(QApplication::clipboard()->mimeData()&&QApplication::clipboard()->mimeData()->hasText()));
 }
@@ -134,7 +133,7 @@ void MainWindow::copySelectedCells() {
         if(left==0&&right==table_->columnCount()-1)right=2;
         if(bottom-top+1>10000||(bottom-top+1)*(right-left+1)>30000)throw std::runtime_error("복사는 최대 10,000행·30,000셀입니다.");
         QList<QStringList> rows;
-        for(int r=top;r<=bottom;++r){QStringList row;for(int c=left;c<=right;++c)if(!table_->isColumnHidden(c))row<<table_->item(r,c)->text();rows<<row;}const auto text=encodeTaskTsv(rows);if(text.toUtf8().size()>4*1024*1024)throw std::runtime_error("복사 텍스트는 최대 4 MiB입니다.");QApplication::clipboard()->setText(text);statusBar()->showMessage("선택 표를 복사했습니다.");
+        for(int r=top;r<=bottom;++r){QStringList row;for(int c=left;c<=right;++c)if(!table_->isColumnHidden(c))row<<table_->model()->index(r,c).data().toString();rows<<row;}const auto text=encodeTaskTsv(rows);if(text.toUtf8().size()>4*1024*1024)throw std::runtime_error("복사 텍스트는 최대 4 MiB입니다.");QApplication::clipboard()->setText(text);statusBar()->showMessage("선택 표를 복사했습니다.");
     }catch(const std::exception& e){report(e);}
 }
 void MainWindow::pasteCells() {
@@ -143,6 +142,8 @@ void MainWindow::pasteCells() {
         const auto& p=*document_.project();std::vector<TaskEdit> edits;
         for(qsizetype r=0;r<cells.size();++r){TaskEdit e;e.taskId=p.tasks[visibleRows_.at(std::size_t(row)+std::size_t(r))].id;
             for(qsizetype c=0;c<cells[r].size();++c){try{const auto& value=cells[r][c];if(column+c==0){if(value.trimmed().isEmpty())throw std::runtime_error("작업 이름은 빈칸일 수 없습니다.");e.name=value.trimmed().toUtf8().toStdString();}else if(column+c==1)e.duration.emplace(taskDurationInput(value));else e.edges=taskDependencyInput(value,p,e.taskId);}catch(const std::exception& error){throw std::runtime_error("붙여넣기 "+std::to_string(r+1)+"행 "+std::to_string(c+1)+"열: "+error.what());}}edits.push_back(std::move(e));}
+        bool inverse = false; for (const auto& edit : edits) if (edit.duration && hasInverseDuration(edit.taskId)) inverse = true;
+        if (inverse) { submitEdit(BatchTaskEdit{std::move(edits)}, "표 공수 역산"); return; }
         document_.editTasks(edits);refresh();statusBar()->showMessage(QString("%1행 붙여넣기 완료 · 한 번에 실행 취소 가능").arg(cells.size()));
     }catch(const std::exception& e){report(e);}
 }

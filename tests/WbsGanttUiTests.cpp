@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "persistence/JsonProjectStore.h"
@@ -57,7 +58,7 @@ int main(int argc, char* argv[]) {
         doc.assignWbs(0, w1); doc.assignWbs(1, child); doc.assignWbs(3, w1);
         doc.applyCalculation(jobs::calculate(*doc.project()));
         jobs::MainWindow window(doc); window.show(); QTest::qWait(80);
-        auto* table = window.findChild<QTableWidget*>(); auto* tree = window.findChild<QTreeWidget*>("wbsTree");
+        auto* table = taskTable(window); auto* tree = window.findChild<QTreeWidget*>("wbsTree");
         // GanttView has no custom metaobject; find by the base class and cast explicitly.
         auto* gantt = dynamic_cast<jobs::GanttView*>(window.findChild<QGraphicsView*>("ganttView"));
         check(gantt && table && tree, "missing WBS/table/Gantt pane");
@@ -69,10 +70,10 @@ int main(int argc, char* argv[]) {
         QTest::mouseClick(gantt->viewport(), Qt::LeftButton, Qt::NoModifier, gantt->mapFromScene(aBar->sceneBoundingRect().center()));
         check(table->currentRow() == 0, "Gantt click did not select same ID in table");
         selectWbs(tree, w2);
-        check(table->rowCount() == 1 && table->verticalHeaderItem(0)->text() == "2" && table->item(0, 2)->text() == "1", "filtered global row/FS identity mismatch");
+        check(table->rowCount() == 1 && table->model()->headerData(0, Qt::Vertical).toString() == "2" && cellText(table, 0, 2) == "1", "filtered global row/FS identity mismatch");
         check(count(gantt, "task") == 1 && count(gantt, "dependency") == 0 && bar(gantt, b)->toolTip().contains("WBS 밖 선행: 1"),
               "filtered Gantt hid external dependency evidence");
-        table->item(0, 1)->setText("24");
+        setCellText(table, 0, 1, "24");
         check(doc.project()->tasks[1].durationMinutes == 1440 && doc.project()->tasks[0].durationMinutes == 480 && count(gantt, "task") == 0,
               "filtered edit changed wrong task / kept stale Gantt");
         auto recalculate = [&] {
@@ -123,7 +124,7 @@ int main(int argc, char* argv[]) {
         selectWbs(tree, w1); selectWbs(tree, "");
         table->verticalScrollBar()->setValue(120);
         check(table->verticalScrollBar()->value() == gantt->verticalScrollBar()->value(), "table/Gantt row scroll desynchronized");
-        table->item(0, 1)->setText(""); table->verticalScrollBar()->setValue(120);
+        setCellText(table, 0, 1, ""); table->verticalScrollBar()->setValue(120);
         check(count(gantt, "task") == 0 && count(gantt, "milestone") == 0 && table->verticalScrollBar()->value() == gantt->verticalScrollBar()->value(),
               "stale Gantt retained bars or lost empty-row scroll alignment");
         QTimer::singleShot(50, [] {

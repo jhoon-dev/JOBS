@@ -1,6 +1,7 @@
 #pragma once
 #include "application/ProjectStore.h"
 #include "application/InputDelta.h"
+#include "application/EditCommand.h"
 #include <optional>
 #include "calculation/Scheduler.h"
 #include "calculation/Tracking.h"
@@ -10,18 +11,17 @@
 #include <variant>
 
 namespace jobs {
-struct TaskEdit {
-    std::string taskId;
-    std::optional<std::string> name;
-    std::optional<std::optional<std::int64_t>> duration;
-    std::optional<std::vector<Dependency>> edges;
-};
 struct TaskRemoval {
     std::size_t tasks=0, links=0, assignments=0, costs=0;
     std::vector<std::string> protectedTaskIds;
 };
 class Document {
 public:
+    class EditRequest;
+    class PreparedEdit;
+    EditRequest makeEditRequest(EditCommand command) const;
+    static std::shared_ptr<PreparedEdit> prepareEdit(EditRequest request, std::shared_ptr<CalculationControl> control);
+    EditState applyPreparedEdit(PreparedEdit& result);
     enum class Event { Edited, Saved, Replaced };
     explicit Document(ProjectStore& store) : store_(store) {}
     const std::optional<Project>& project() const { return project_; }
@@ -31,6 +31,7 @@ public:
     bool readOnly() const { return readOnly_; }
     bool requiresSaveAs() const { return requiresSaveAs_; }
     const std::optional<ScheduleResult>& calculation() const { return calculation_; }
+    std::uint64_t calculationGeneration() const { return calculationGeneration_; }
     bool canUndo() const { return !readOnly_ && historyCursor_ > 0; }
     bool canRedo() const { return !readOnly_ && historyCursor_ < history_.size(); }
     std::string undoLabel() const;
@@ -90,6 +91,7 @@ private:
     std::string path_, fingerprint_;
     std::unique_ptr<WriteLease> lease_;
     std::optional<ScheduleResult> calculation_;
+    std::uint64_t calculationGeneration_ = 0;
     struct TaskNameDelta {
         std::size_t row;
         std::string taskId, before, after;
@@ -115,5 +117,36 @@ private:
     void staleCalculation();
     bool dirty_ = false, readOnly_ = false;
     bool requiresSaveAs_ = false;
+};
+class Document::EditRequest {
+public:
+    EditRequest(EditRequest&&) = default;
+    EditRequest& operator=(EditRequest&&) = default;
+    EditRequest(const EditRequest&) = delete;
+private:
+    friend class Document;
+    EditRequest(Project snapshot, EditCommand command, std::uint64_t session, std::string factId)
+        : snapshot_(std::move(snapshot)), command_(std::move(command)), session_(session), factId_(std::move(factId)) {}
+    Project snapshot_;
+    EditCommand command_;
+    std::uint64_t session_;
+    std::string factId_;
+};
+class Document::PreparedEdit {
+public:
+    PreparedEdit() = default;
+    PreparedEdit(const PreparedEdit&) = delete;
+    PreparedEdit& operator=(const PreparedEdit&) = delete;
+    EditState state() const { return state_; }
+    const std::string& error() const { return error_; }
+private:
+    friend class Document;
+    EditState state_ = EditState::Failed;
+    std::string error_, documentId_, notice_;
+    std::uint64_t revision_ = 0, session_ = 0;
+    std::shared_ptr<CalculationControl> control_;
+    std::optional<Project> proposal_;
+    std::optional<HistoryStep> history_;
+    bool consumed_ = false;
 };
 }

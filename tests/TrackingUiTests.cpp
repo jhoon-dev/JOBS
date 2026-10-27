@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "persistence/JsonProjectStore.h"
@@ -45,7 +46,7 @@ int main(int argc, char* argv[]) {
         doc.setDuration(0, 960); doc.setDuration(1, 0); const auto aid = doc.project()->tasks[0].id;
         doc.setPredecessors(1, {aid}); doc.applyCalculation(jobs::calculate(*doc.project()));
         jobs::MainWindow window(doc); window.show(); QTest::qWait(60);
-        auto* table = window.findChild<QTableWidget*>(); auto* gantt = dynamic_cast<jobs::GanttView*>(window.findChild<QGraphicsView*>("ganttView"));
+        auto* table = taskTable(window); auto* gantt = dynamic_cast<jobs::GanttView*>(window.findChild<QGraphicsView*>("ganttView"));
         auto baseline = [&](const QString& name) {
             QTimer::singleShot(50, [name] {
                 auto* dialog = QApplication::activeModalWidget(); if (!dialog) return;
@@ -77,8 +78,8 @@ int main(int argc, char* argv[]) {
             check(doc.calculation() && doc.calculation()->status == jobs::CalculationStatus::Valid, "forecast UI failed");
         };
         recalculate();
-        check(doc.calculation()->isForecast && table->item(0, 3)->text() == "2026-10-26 09:00" && table->item(0, 4)->text() == "2026-10-28 18:00" &&
-              table->item(0, 5)->text() == "—" && count(gantt, "baseline") == 2, "forecast actual dates / unsupported float / baseline overlay mismatch");
+        check(doc.calculation()->isForecast && cellText(table, 0, 3) == "2026-10-26 09:00" && cellText(table, 0, 4) == "2026-10-28 18:00" &&
+              cellText(table, 0, 5) == "—" && count(gantt, "baseline") == 2, "forecast actual dates / unsupported float / baseline overlay mismatch");
         auto* choice = window.findChild<QComboBox*>("baselineChoice"); choice->setCurrentIndex(0); check(count(gantt, "baseline") == 0, "baseline overlay toggle failed");
         choice->setCurrentIndex(1); check(count(gantt, "baseline") == 2, "baseline selection overlay failed");
         QTimer comparePoll; comparePoll.setInterval(20); int stage = 0;
@@ -104,7 +105,8 @@ int main(int argc, char* argv[]) {
             callbackCheck(dialog->findChild<QTableWidget*>("progressHistory")->rowCount() == 1, "report history absent");
             dialog->findChild<QLineEdit*>("actualFinish")->setText("2026-10-29 18:00"); dialog->findChild<QSpinBox*>("remainingMinutes")->setValue(0);
             dialog->findChild<QLineEdit*>("progressReason")->setText("검증 후 정정"); auto* save = dialog->findChild<QDialogButtonBox*>()->button(QDialogButtonBox::Save); save->click();
-            callbackCheck(doc.project()->progress.size() == 1 && !dialog->findChild<QLabel*>("progressError")->text().isEmpty(), "invalid report mutated state / no field error");
+            for (int i = 0; i < 300 && !save->isEnabled(); ++i) QTest::qWait(10);
+            callbackCheck(save->isEnabled() && doc.project()->progress.size() == 1 && !dialog->findChild<QLabel*>("progressError")->text().isEmpty(), "invalid report mutated state / no field error");
             dialog->findChild<QLineEdit*>("actualFinish")->clear(); dialog->findChild<QSpinBox*>("remainingMinutes")->setValue(1200); save->click();
         });
         trigger(window, "선택 작업 실적");

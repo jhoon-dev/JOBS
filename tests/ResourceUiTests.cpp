@@ -1,3 +1,4 @@
+#include "TaskTableTest.h"
 #include "ui/MainWindow.h"
 #include "persistence/JsonProjectStore.h"
 #include <QAction>
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]) {
     QTimer watchdog; watchdog.setSingleShot(true); QObject::connect(&watchdog, &QTimer::timeout, [] { std::cerr << "resource UI timeout\n"; std::exit(2); }); watchdog.start(30000);
     try {
         QTemporaryDir dir; jobs::JsonProjectStore store; jobs::Document doc(store); doc.create("자원 평준화 검증", "2026-10-26", {"설계", "개발"}); doc.setDuration(0, 480); doc.setDuration(1, 480);
-        jobs::MainWindow window(doc); window.show(); QTest::qWait(60); auto* tasks = window.findChild<QTableWidget*>();
+        jobs::MainWindow window(doc); window.show(); QTest::qWait(60); auto* tasks = taskTable(window);
         QTimer::singleShot(30, [&] {
             auto* dialog = QApplication::activeModalWidget(); callbackCheck(dialog && dialog->objectName() == "resourceDialog", "resource dialog missing");
             dialog->findChild<QLineEdit*>("resourceName")->setText("설계·개발팀");
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]) {
             });
             trigger(window, "assignResources");
         }
-        callbackCheck(doc.project()->assignments.size() == 2 && tasks->item(0, 7)->text().contains("100%"), "assignment cell missing");
+        callbackCheck(doc.project()->assignments.size() == 2 && cellText(tasks, 0, 7).contains("100%"), "assignment cell missing");
         const auto original = static_cast<const jobs::PlanInput&>(*doc.project());
         QTimer poll; poll.setInterval(20); int stage = 0;
         QObject::connect(&poll, &QTimer::timeout, [&] {

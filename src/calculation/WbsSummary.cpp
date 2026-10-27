@@ -4,17 +4,18 @@
 #include <unordered_map>
 namespace jobs {
 WbsSummary summarizeWbs(const Project& p, const ScheduleResult* result, const std::string& id) {
+    EvaluationScope evaluation;
     WbsSummary summary;
     const bool valid = result && result->status == CalculationStatus::Valid && result->documentId == p.documentId &&
         result->inputRevision == p.revision && result->profile == p.calculationProfile;
     std::unordered_map<std::string, const TaskSchedule*> dates;
     if (valid) for (const auto& row : result->tasks) dates.emplace(row.taskId, &row);
     bool complete = valid;
-    ScheduleResult plan;
-    const auto* durationResult=result;
-    if(isEffort(p)&&valid&&result->isForecast){plan=calculatePlan(p);durationResult=&plan;}
     std::unordered_map<std::string,const TaskSchedule*> durationDates;
-    if(durationResult&&durationResult->status==CalculationStatus::Valid&&(durationResult==&plan||valid))for(const auto& r:durationResult->tasks)durationDates[r.taskId]=&r;
+    if (valid) {
+        const auto& durationRows = isEffort(p) && result->isForecast ? result->plannedTasks : result->tasks;
+        for (const auto& row : durationRows) durationDates[row.taskId] = &row;
+    }
     for (auto index : wbsTaskRows(p, id)) {
         const auto& task = p.tasks[index]; ++summary.taskCount;
         if(isEffort(p)&&usesWork(task)) {
