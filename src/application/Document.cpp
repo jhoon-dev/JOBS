@@ -34,8 +34,19 @@ void Document::open(const std::string& path, bool readOnly) {
 }
 void Document::renameTask(std::size_t row, std::string name) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
-    auto p = *project_; p.tasks.at(row).name = std::move(name);
-    edit(std::move(p), "작업 이름 변경");
+    auto& task = project_->tasks.at(row);
+    if (task.name == name) return;
+    validateTaskName(name);
+    if (project_->revision >= 9007199254740991ULL)
+        throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+    TaskNameDelta delta{row, task.id, task.name, name};
+    const auto weight = sizeof(HistoryStep) + delta.taskId.size() + delta.before.size() + delta.after.size();
+    pushHistory({std::move(delta), "작업 이름 변경", weight + std::string("작업 이름 변경").size()});
+    // The document is already valid; changing only the display name cannot affect
+    // references, calendars, booked facts or any other domain invariant.
+    task.name.swap(name);
+    ++project_->revision;
+    updateDirty(); staleCalculation(); notify(Event::Edited);
 }
 void Document::addTask(std::string name, std::string wbsId) {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
@@ -257,31 +268,9 @@ void Document::edit(Project p, std::string label) {
     const bool immutable = p.baselines != project_->baselines || p.progress != project_->progress || p.costEntries != project_->costEntries || p.scenarios != project_->scenarios;
     if (immutable) clearHistory("승인 기준선·제출 실적/원가·저장 시나리오는 이력으로 보존합니다. 실적/원가는 정정 보고를 사용하세요.");
     else {
-        HistoryStep step{{static_cast<const PlanInput&>(*project_), project_->statusAt}, {static_cast<const PlanInput&>(p), p.statusAt}, std::move(label), 0};
-        auto weight = [](const InputState& s) {
-            const auto& v = s.plan; std::size_t n = sizeof(InputState) + v.name.size() + v.startDate.size() + v.calendar.size() + v.calculationProfile.size() + v.currency.size() + v.costProfile.size();
-            if (s.statusAt) n += s.statusAt->size();
-            for (const auto& t : v.tasks) { n += sizeof(Task) + t.id.size() + t.name.size() + t.wbsId.size(); for (const auto& id : t.predecessors) n += sizeof(std::string) + id.size(); }
-            for (const auto& w : v.wbsNodes) n += sizeof(WbsNode) + w.id.size() + w.name.size() + w.parentId.size();
-            for (const auto& h : v.holidays) n += sizeof(std::string) + h.size();
-            for (const auto& r : v.resources) { n += sizeof(Resource) + r.id.size() + r.name.size() + r.type.size()+r.calendarId.size(); for (const auto& d : r.exceptions) n += sizeof(CapacityDay) + d.date.size(); for (const auto& rate : r.rates) n += sizeof(Resource::Rate) + rate.effectiveDate.size(); }
-            for (const auto& a : v.assignments) n += sizeof(Assignment) + a.taskId.size() + a.resourceId.size();
-            for (const auto& c : v.taskCosts) n += sizeof(TaskCost) + c.taskId.size() + c.accrual.size() + c.credit.size();
-            for (const auto& t : v.tasks) { n += t.calendarId.size(); for (const auto& d : t.dependencyRules) n += sizeof(Dependency) + d.predecessorId.size() + d.type.size(); }
-            for (const auto& t : v.tasks) n+=t.constraintType.size()+(t.constraintAt?t.constraintAt->size():0)+(t.deadlineAt?t.deadlineAt->size():0);
-            for(const auto& t:v.tasks){n+=t.taskType.size();for(const auto& b:t.breaks)n+=sizeof(TaskBreak)+b.start.size()+b.finish.size();}
-            for (const auto& c : v.calendars) { n += sizeof(TaskCalendar) + c.id.size() + c.name.size() + c.weekdays.size() * sizeof(int) + c.periods.size() * sizeof(WorkPeriod); for (const auto& d : c.holidays) n += sizeof(std::string) + d.size(); }
-            return n;
-        };
-        step.weight = weight(step.before) + weight(step.after) + step.label.size();
-        while (history_.size() > historyCursor_) { historyWeight_ -= history_.back().weight; history_.pop_back(); }
-        constexpr std::size_t maxWeight = 32 * 1024 * 1024;
-        if (step.weight > maxWeight) clearHistory("이번 변경은 실행 취소 이력의 추정 입력 32 MiB 한도를 초과했습니다.");
-        else {
-            historyWeight_ += step.weight; history_.push_back(std::move(step));
-            while (history_.size() > 100 || historyWeight_ > maxWeight) { historyWeight_ -= history_.front().weight; history_.erase(history_.begin()); historyNotice_ = "최근 100단계 / 추정 입력 32 MiB 범위의 실행 취소 이력입니다."; }
-            historyCursor_ = history_.size();
-        }
+        InputDelta delta(*project_, p);
+        const auto weight = sizeof(HistoryStep) - sizeof(InputDelta) + delta.bytes() + label.size();
+        pushHistory({std::move(delta), std::move(label), weight});
     }
     project_ = std::move(p); updateDirty(); staleCalculation(); notify(Event::Edited);
 }
@@ -323,12 +312,46 @@ void Document::updateDirty() {
     const auto& a = *project_; const auto& b = *savedState_;
     dirty_ = static_cast<const PlanInput&>(a) != static_cast<const PlanInput&>(b) || a.statusAt != b.statusAt || a.documentId != b.documentId || a.derivedFrom != b.derivedFrom || a.baselines != b.baselines || a.progress != b.progress || a.scenarios != b.scenarios || a.costEntries != b.costEntries;
 }
-void Document::applyHistory(const InputState& state) {
-    auto p = *project_; static_cast<PlanInput&>(p) = state.plan; p.statusAt = state.statusAt; ++p.revision; validate(p);
-    project_ = std::move(p); updateDirty(); staleCalculation();
+void Document::pushHistory(HistoryStep step) {
+    constexpr std::size_t maxWeight = 32 * 1024 * 1024;
+    if (step.weight > maxWeight) {
+        clearHistory("이번 변경은 실행 취소 이력의 추정 입력 32 MiB 한도를 초과했습니다.");
+        return;
+    }
+    history_.reserve(history_.size() + 1);
+    while (history_.size() > historyCursor_) {
+        historyWeight_ -= history_.back().weight;
+        history_.pop_back();
+    }
+    historyWeight_ += step.weight;
+    history_.push_back(std::move(step));
+    while (history_.size() > 100 || historyWeight_ > maxWeight) {
+        historyWeight_ -= history_.front().weight;
+        history_.erase(history_.begin());
+        historyNotice_ = "최근 100단계 / 추정 입력 32 MiB 범위의 실행 취소 이력입니다.";
+    }
+    historyCursor_ = history_.size();
 }
-void Document::undo() { if (!canUndo()) throw std::runtime_error("실행 취소할 편집이 없습니다."); applyHistory(history_[historyCursor_ - 1].before); --historyCursor_; notify(Event::Edited); }
-void Document::redo() { if (!canRedo()) throw std::runtime_error("다시 실행할 편집이 없습니다."); applyHistory(history_[historyCursor_].after); ++historyCursor_; notify(Event::Edited); }
+void Document::applyHistory(const HistoryStep& step, bool forward) {
+    if (const auto* delta = std::get_if<TaskNameDelta>(&step.change)) {
+        if (project_->revision >= 9007199254740991ULL)
+            throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+        auto& task = project_->tasks.at(delta->row);
+        if (task.id != delta->taskId) throw std::logic_error("실행 취소 작업 ID가 일치하지 않습니다.");
+        auto name = forward ? delta->after : delta->before;
+        task.name.swap(name);
+        ++project_->revision;
+    } else {
+        auto p = *project_;
+        std::get<InputDelta>(step.change).apply(p, forward);
+        ++p.revision;
+        validate(p);
+        project_ = std::move(p);
+    }
+    updateDirty(); staleCalculation();
+}
+void Document::undo() { if (!canUndo()) throw std::runtime_error("실행 취소할 편집이 없습니다."); applyHistory(history_[historyCursor_ - 1], false); --historyCursor_; notify(Event::Edited); }
+void Document::redo() { if (!canRedo()) throw std::runtime_error("다시 실행할 편집이 없습니다."); applyHistory(history_[historyCursor_], true); ++historyCursor_; notify(Event::Edited); }
 std::uint64_t Document::subscribe(std::function<void(Event)> listener) { auto token = ++listenerToken_; listeners_.emplace(token, std::move(listener)); return token; }
 void Document::unsubscribe(std::uint64_t token) { listeners_.erase(token); }
 void Document::notify(Event event) noexcept {

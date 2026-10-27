@@ -219,6 +219,8 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     note->setWordWrap(true); layout->addWidget(note); setCentralWidget(central);
     connect(table_, &QTableWidget::cellChanged, this, [this](int row, int column) {
         if (column > 2) return;
+        // Also refresh rejected/no-op input, e.g. whitespace around an unchanged name.
+        if (row >= 0 && std::size_t(row) < renderedTasks_.size()) renderedTasks_[std::size_t(row)].reset();
         try {
             const auto text = table_->item(row, column)->text().trimmed();
             const auto taskRow = visibleRows_.at(std::size_t(row));
@@ -245,6 +247,7 @@ void MainWindow::refresh(bool rebuildTree) {
     const int selectedColumn=std::max(0,table_->currentColumn());
     const auto& p = document_.project();
     if (p && (treeDocument_ != p->documentId || taskViewReset_)) {
+        tableRenderReady_ = false;
         taskViewReset_=false;selectedTaskIds_.clear();
         const QSignalBlocker searchBlock(taskSearch_),filterBlock(taskFilter_),sortBlock(taskSort_);taskSearch_->clear();taskFilter_->setCurrentIndex(0);taskSort_->setCurrentIndex(0);
         selectedWbs_.clear(); selectedTask_.clear(); treeDocument_ = p->documentId;
@@ -276,7 +279,7 @@ void MainWindow::refresh(bool rebuildTree) {
     rates_->setEnabled(p.has_value()); evm_->setEnabled(p.has_value()); reports_->setEnabled(p.has_value());
     taskCost_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty());
     costReport_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty() && p->statusAt.has_value());
-    if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
+    if (!p) { tableRenderReady_ = false; renderedRows_.clear(); renderedTasks_.clear(); summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
         gantt_->setPlan(nullptr, nullptr, {}); assignWbs_->setEnabled(false); statusBar()->showMessage("준비"); return; }
     summary_->setText(qs(p->name) + "  |  시작일 " + qs(p->startDate) + "  |  revision " + QString::number(p->revision)
         + "  |  휴일 " + QString::number(p->holidays.size()) + "개"
@@ -288,6 +291,13 @@ void MainWindow::refresh(bool rebuildTree) {
         + (document_.historyNotice().empty() ? QString{} : "\n편집 이력: " + qs(document_.historyNotice())));
     const auto& calculation = document_.calculation();
     const bool valid = calculation && calculation->status == CalculationStatus::Valid;
+    const auto status = calculation ? std::optional{calculation->status} : std::nullopt;
+    const bool refreshAllRows = !tableRenderReady_ || renderedRows_ != visibleRows_ ||
+        renderedReadOnly_ != document_.readOnly() || renderedStatus_ != status ||
+        (calculation && calculation->status != CalculationStatus::Stale) ||
+        renderedResources_ != p->resources || renderedAssignments_ != p->assignments ||
+        renderedCalendars_ != p->calendars;
+    renderedTasks_.resize(visibleRows_.size());
     std::unordered_map<std::string, const TaskSchedule*> schedules;
     if (valid) for (const auto& row : calculation->tasks) schedules.emplace(row.taskId, &row);
     std::unordered_map<std::string, int> numbers;
@@ -295,9 +305,21 @@ void MainWindow::refresh(bool rebuildTree) {
     std::unordered_map<std::string,QStringList> assignedLabels;std::unordered_map<std::string,std::string> resourceNames;
     for(const auto& r:p->resources)resourceNames[r.id]=r.name;
     for(const auto& a:p->assignments)assignedLabels[a.taskId]<<qs(resourceNames.at(a.resourceId))+" "+QString::number(a.units)+"%";
+    // Updating existing items one by one makes ResizeToContents repeatedly scan
+    // the whole table. Batch model notifications after the row structure exists.
+    // Row insert/remove notifications above must remain visible to the view.
+    QSignalBlocker modelBlocker(table_->model());
+    std::vector<int> changedRows;
+    bool headersChanged = false;
     for (int row = 0; row < int(visibleRows_.size()); ++row) {
         const auto taskIndex = visibleRows_[std::size_t(row)]; const auto& t = p->tasks[taskIndex];
-        table_->setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(taskIndex + 1)));
+        auto& rendered = renderedTasks_[std::size_t(row)];
+        if (!refreshAllRows && rendered && *rendered == t) continue;
+        changedRows.push_back(row);
+        auto* header = table_->verticalHeaderItem(row);
+        if (!header) { header = new QTableWidgetItem; table_->setVerticalHeaderItem(row, header); }
+        const auto number = QString::number(taskIndex + 1);
+        if (header->text() != number) { header->setText(number); headersChanged = true; }
         QStringList predecessors;
         for (const auto& d : dependencies(t)) predecessors << (numbers.contains(d.predecessorId) ? QString::number(numbers.at(d.predecessorId)) : "누락:" + qs(d.predecessorId)) + (d.type=="FS" && !d.lagMinutes?QString{}:qs(d.type)+(d.lagMinutes>=0?"+":"")+QString::number(d.lagMinutes)+"m");
         auto found = schedules.find(t.id); const auto* s = found == schedules.end() ? nullptr : found->second;
@@ -312,15 +334,33 @@ void MainWindow::refresh(bool rebuildTree) {
         const auto& assigned=assignedLabels[t.id];
         if (!assigned.isEmpty()) values[7] = assigned.join(", ");
         for (int column = 0; column < values.size(); ++column) {
-            auto* item = new QTableWidgetItem(values[column]);
-            if (column > 2 || document_.readOnly()) item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            auto* item = table_->item(row, column);
+            if (!item) { item = new QTableWidgetItem; table_->setItem(row, column, item); }
+            if (item->text() != values[column]) item->setText(values[column]);
+            auto flags = item->flags();
+            if (column > 2 || document_.readOnly()) flags &= ~Qt::ItemIsEditable;
+            else flags |= Qt::ItemIsEditable;
+            if (item->flags() != flags) item->setFlags(flags);
+            if (item->background().style() != Qt::NoBrush) item->setBackground(QBrush{});
+            if (item->foreground().style() != Qt::NoBrush) item->setForeground(QBrush{});
             item->setToolTip("작업 ID: " + qs(t.id));
             if(column==10)item->setToolTip(qs(constraintName(t.constraintType))+" · "+qs(t.constraintType)+(t.constraintAt?" "+qs(*t.constraintAt):QString{}));
             if(column==11&&t.deadlineAt&&s&&s->finish>*t.deadlineAt){item->setBackground(QColor("#fff1cc"));item->setForeground(QColor("#653b00"));item->setToolTip("마감 초과 · 마감일은 경고 기준이며 날짜를 강제로 이동하지 않습니다.");}
             if(column==0&&calculation&&calculation->status==CalculationStatus::Conflict)for(const auto& issue:calculation->diagnostics)if(std::find(issue.taskIds.begin(),issue.taskIds.end(),t.id)!=issue.taskIds.end()){item->setBackground(QColor("#ffddd7"));item->setForeground(QColor("#662015"));item->setToolTip("<qt>"+qs(issue.message).toHtmlEscaped()+"</qt>");break;}
-            table_->setItem(row, column, item);
         }
+        rendered = t;
     }
+    modelBlocker.unblock();
+    for (std::size_t i = 0; i < changedRows.size();) {
+        const int first = changedRows[i];
+        int last = first;
+        while (++i < changedRows.size() && changedRows[i] == last + 1) last = changedRows[i];
+        table_->model()->dataChanged(table_->model()->index(first, 0), table_->model()->index(last, 13));
+    }
+    if (headersChanged) table_->model()->headerDataChanged(Qt::Vertical, 0, table_->rowCount() - 1);
+    renderedRows_ = visibleRows_; renderedStatus_ = status; renderedReadOnly_ = document_.readOnly();
+    renderedResources_ = p->resources; renderedAssignments_ = p->assignments; renderedCalendars_ = p->calendars;
+    tableRenderReady_ = true;
     restoreTaskSelection(selectedColumn);
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
@@ -380,6 +420,15 @@ void MainWindow::calculateSchedule() {
     watcher->setFuture(QtConcurrent::run([snapshot,control] { return jobs::calculate(snapshot,control); }));
 }
 void MainWindow::rebuildWbsTree() {
+    if (document_.project()) {
+        const auto& p = *document_.project();
+        if (cachedTreeDocument_ == p.documentId && cachedTreeName_ == p.name && cachedTreeNodes_ == p.wbsNodes &&
+            wbsTree_->currentItem() && str(wbsTree_->currentItem()->data(0, Qt::UserRole).toString()) == selectedWbs_)
+            return;
+        cachedTreeDocument_ = p.documentId; cachedTreeName_ = p.name; cachedTreeNodes_ = p.wbsNodes;
+    } else {
+        cachedTreeDocument_.clear(); cachedTreeName_.clear(); cachedTreeNodes_.clear();
+    }
     const QSignalBlocker blocker(wbsTree_);
     QSet<QString> expanded;
     for (QTreeWidgetItemIterator it(wbsTree_); *it; ++it) if ((*it)->isExpanded()) expanded.insert((*it)->data(0, Qt::UserRole).toString());

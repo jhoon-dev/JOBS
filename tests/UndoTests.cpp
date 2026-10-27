@@ -48,6 +48,51 @@ int main(int argc, char* argv[]) {
         jobs::Document bounded(store); bounded.create("bounded", "2026-10-26", {"task"}); for (int i = 1; i <= 150; ++i) bounded.renameTask(0, "task" + std::to_string(i)); int undos = 0; while (bounded.canUndo()) { bounded.undo(); ++undos; } check(undos == 100 && bounded.project()->tasks[0].name == "task50", "history count limit failed");
         jobs::Document large(store); large.create("large", "2026-10-26", {std::string(17 * 1024 * 1024, 'a')}); large.setDuration(0, 480); check(!large.canUndo() && large.historyNotice().find("32 MiB") != std::string::npos, "history memory budget not applied");
         int events = 0; auto token = d.subscribe([&](auto) { ++events; }); d.renameTask(0, "event"); d.unsubscribe(token); d.renameTask(0, "after unsubscribe"); check(events == 1, "document listener lifetime failed");
+        jobs::Project big; big.documentId = store.newId(); big.name = "large undo"; big.startDate = "2026-10-26";
+        for (int i = 0; i < 10000; ++i) big.tasks.push_back({store.newId(), "Task " + std::to_string(i), 60, {}});
+        const auto bigPath = dir.filePath("large-history.jobs").toUtf8().toStdString();
+        store.save(bigPath, big, {});
+        jobs::Document retained(store); retained.open(bigPath);
+        for (int i = 0; i < 3; ++i) retained.captureBaseline("Approval " + std::to_string(i), "PM", "test", "2026-10-27T00:00:00Z");
+        retained.save();
+        const auto frozenLarge = retained.project()->baselines;
+        for (bool duration : {false, true}) {
+            retained.open(bigPath);
+            const auto originalPlan = static_cast<const jobs::PlanInput&>(*retained.project());
+            for (int i = 0; i < 100; ++i) {
+                if (duration) retained.setDuration(std::size_t(i), 120 + i);
+                else retained.renameTask(std::size_t(i), "Changed " + std::to_string(i));
+            }
+            check(retained.historyBytes() < 32 * 1024 * 1024, "sparse history exceeded budget");
+            const auto editedPlan = static_cast<const jobs::PlanInput&>(*retained.project());
+            int count = 0;
+            while (retained.canUndo()) { retained.undo(); ++count; }
+            check(count == 100 && !retained.dirty() && static_cast<const jobs::PlanInput&>(*retained.project()) == originalPlan,
+                  "100 sparse edits were not retained/restored for 10000 tasks and 3 baselines");
+            while (retained.canRedo()) retained.redo();
+            check(static_cast<const jobs::PlanInput&>(*retained.project()) == editedPlan && retained.project()->baselines == frozenLarge,
+                  "large sparse redo changed the plan or immutable baseline");
+        }
+        // A rename delta must compose with structural deltas and rejected/no-op branches.
+        retained.open(bigPath); retained.renameTask(0, "First");
+        retained.insertTasks({"Inserted"}, retained.project()->tasks[0].id);
+        retained.renameTask(1, "Second"); retained.undo(); retained.undo(); retained.undo();
+        check(static_cast<const jobs::PlanInput&>(*retained.project()) == static_cast<const jobs::PlanInput&>(big),
+              "name and structural deltas did not compose");
+        const auto stable = *retained.project(); const auto redoName = retained.redoLabel();
+        rejects([&] { retained.renameTask(0, " \t\r\n"); });
+        rejects([&] { retained.renameTask(10000, "out of bounds"); });
+        retained.renameTask(0, stable.tasks[0].name);
+        check(*retained.project() == stable && retained.redoLabel() == redoName, "invalid/no-op rename consumed redo");
+        retained.redo(); retained.redo(); retained.redo();
+        check(retained.project()->tasks[1].name == "Second", "structural/name redo targeted the wrong row");
+        big.revision = 9007199254740991ULL;
+        const auto maxPath = dir.filePath("maximum-revision.jobs").toUtf8().toStdString();
+        store.save(maxPath, big, {});
+        retained.open(maxPath);
+        rejects([&] { retained.renameTask(0, "would overflow revision"); });
+        check(*retained.project() == big && !retained.canUndo() && !retained.dirty(),
+              "fast rename bypassed the revision range/atomic failure contract");
         (void)baseline; std::cout << "PASS: atomic input history, monotonic revisions/STALE, saved-content dirty state, save/branch/no-op/error boundaries, stable WBS/resource/cost IDs, immutable facts, count/memory limits, readonly and observers\n";
     } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
 }

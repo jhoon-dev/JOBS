@@ -54,6 +54,9 @@ bool validDate(const std::string& s) {
 static bool blank(const std::string& s) {
     return s.empty() || std::all_of(s.begin(), s.end(), [](unsigned char c) { return c <= ' '; });
 }
+void validateTaskName(const std::string& name) {
+    if (blank(name)) throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
+}
 static std::int64_t civilMinute(const std::string& s) {
     const auto date = std::chrono::year{std::stoi(s.substr(0, 4))}/unsigned(std::stoi(s.substr(5, 2)))/unsigned(std::stoi(s.substr(8, 2)));
     return std::int64_t(std::chrono::sys_days{date}.time_since_epoch().count()) * 1440 + std::stoi(s.substr(11, 2)) * 60 + std::stoi(s.substr(14, 2));
@@ -118,7 +121,8 @@ void validatePlan(const PlanInput& p) {
     }
     for (const auto& t : p.tasks) {
         calculationCheckpoint();
-        if (blank(t.id) || blank(t.name) || !ids.insert(t.id).second || nodes.contains(t.id))
+        validateTaskName(t.name);
+        if (blank(t.id) || !ids.insert(t.id).second || nodes.contains(t.id))
             throw std::runtime_error("작업 ID 중복 또는 작업 이름 누락이 있습니다.");
         if (!t.wbsId.empty() && !nodes.contains(t.wbsId)) throw std::runtime_error("작업의 WBS가 존재하지 않습니다.");
         if (t.durationMinutes && (*t.durationMinutes < 0 || *t.durationMinutes > 5000000))

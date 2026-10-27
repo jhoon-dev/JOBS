@@ -34,6 +34,8 @@ jobs:
           python scripts/verify-project-xml.py build
       - name: Measure deterministic 1k and 10k schedules and UI
         run: python scripts/run-performance-probes.py --repeats 3
+      - name: Measure cell edits and retained undo at 1k and 10k tasks
+        run: python scripts/run-editing-performance-probes.py --repeats 7
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

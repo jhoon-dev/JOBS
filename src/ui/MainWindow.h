@@ -67,6 +67,15 @@ private:
     QAction* reports_;
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
+    std::vector<std::size_t> renderedRows_;
+    std::vector<std::optional<Task>> renderedTasks_;
+    std::vector<Resource> renderedResources_;
+    std::vector<Assignment> renderedAssignments_;
+    std::vector<TaskCalendar> renderedCalendars_;
+    std::optional<CalculationStatus> renderedStatus_;
+    bool tableRenderReady_ = false, renderedReadOnly_ = false;
+    std::string cachedTreeDocument_, cachedTreeName_;
+    std::vector<WbsNode> cachedTreeNodes_;
     bool calculating_ = false;
     QAction* cancelCalculation_ = nullptr;
     std::shared_ptr<CalculationControl> calculationControl_;

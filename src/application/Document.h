@@ -1,11 +1,13 @@
 #pragma once
 #include "application/ProjectStore.h"
+#include "application/InputDelta.h"
 #include <optional>
 #include "calculation/Scheduler.h"
 #include "calculation/Tracking.h"
 #include "application/Recovery.h"
 #include <functional>
 #include <map>
+#include <variant>
 
 namespace jobs {
 struct TaskEdit {
@@ -88,8 +90,15 @@ private:
     std::string path_, fingerprint_;
     std::unique_ptr<WriteLease> lease_;
     std::optional<ScheduleResult> calculation_;
-    struct InputState { PlanInput plan; std::optional<std::string> statusAt; };
-    struct HistoryStep { InputState before, after; std::string label; std::size_t weight = 0; };
+    struct TaskNameDelta {
+        std::size_t row;
+        std::string taskId, before, after;
+    };
+    struct HistoryStep {
+        std::variant<TaskNameDelta, InputDelta> change;
+        std::string label;
+        std::size_t weight = 0;
+    };
     std::vector<HistoryStep> history_;
     std::size_t historyCursor_ = 0, historyWeight_ = 0;
     std::optional<Project> savedState_;
@@ -100,7 +109,8 @@ private:
     void notify(Event) noexcept;
     void clearHistory(std::string notice = {});
     void updateDirty();
-    void applyHistory(const InputState&);
+    void applyHistory(const HistoryStep&, bool forward);
+    void pushHistory(HistoryStep);
     void edit(Project project, std::string label = "입력 변경");
     void staleCalculation();
     bool dirty_ = false, readOnly_ = false;

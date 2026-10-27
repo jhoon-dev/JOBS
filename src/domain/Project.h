@@ -157,6 +157,7 @@ bool validDate(const std::string& date);
 bool validStamp(const std::string& stamp);
 bool validUtcStamp(const std::string& stamp);
 void validatePlan(const PlanInput& plan);
+void validateTaskName(const std::string& name);
 void validate(const Project& project);
 // Report-date selection, with later appended corrections winning a tie.
 const ProgressEntry* progressAsOf(const Project& project, const std::string& taskId);
