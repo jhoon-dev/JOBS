@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QDialog>
+#include <QDir>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
         });
         trigger(window, "새로 만들기");
         check(doc.project() && doc.project()->tasks.size() == 3 && doc.dirty(), "new project dialog failed");
-        auto path = dir.filePath("ui.jobs");
+        auto path = dir.filePath("MyUiPlan.jobs");
         QTimer::singleShot(50, [&] {
             auto* dialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget());
             if (!dialog) return;
@@ -57,6 +58,10 @@ int main(int argc, char* argv[]) {
         });
         trigger(window, "저장(&");
         check(!doc.dirty() && !doc.path().empty(), "save dialog failed");
+        check(QDir(dir.path()).entryList({"*.jobs"}, QDir::Files) == QStringList{"MyUiPlan.jobs"},
+              "save dialog did not preserve the physical filename");
+        check(QFileInfo(QString::fromUtf8(doc.path())).fileName() == "MyUiPlan.jobs",
+              "save dialog did not preserve the displayed filename");
         if (doc.path() != store.normalizePath(path.toUtf8().toStdString())) {
             std::cerr << "expected path: " << path.toUtf8().toStdString() << "; selected path: " << doc.path() << '\n';
             throw std::runtime_error("file dialog selected unexpected save path");

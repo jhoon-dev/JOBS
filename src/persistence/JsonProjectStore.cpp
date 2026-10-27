@@ -12,6 +12,7 @@
 #include <QUuid>
 #include <cmath>
 #include <stdexcept>
+#include <filesystem>
 
 namespace jobs {
 namespace {
@@ -63,11 +64,17 @@ std::string JsonProjectStore::normalizePath(const std::string& path) const {
         if (parent.isEmpty()) fail("저장할 폴더가 없습니다.");
         canonical = QDir(parent).filePath(info.fileName());
     }
-#ifdef Q_OS_WIN
-    // Windows paths are normally case-insensitive; use one lock identity.
-    canonical = canonical.toLower();
-#endif
     return str(canonical);
+}
+bool JsonProjectStore::sameFile(const std::string& left, const std::string& right) const {
+    if (left.empty() || right.empty()) return false;
+    if (left == right) return true;
+    std::error_code error;
+    // Ask the OS about existing files, including case-sensitive NTFS directories.
+    const bool equivalent = std::filesystem::equivalent(
+        std::filesystem::path(std::u8string(left.begin(), left.end())),
+        std::filesystem::path(std::u8string(right.begin(), right.end())), error);
+    return !error && equivalent;
 }
 std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string& path) { return std::make_unique<Lock>(qs(path)); }
 StoredProject JsonProjectStore::load(const std::string& path) const {

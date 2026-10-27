@@ -17,7 +17,7 @@ void Document::create(std::string name, std::string date, const std::vector<std:
 }
 void Document::open(const std::string& path, bool readOnly) {
     auto normalized = store_.normalizePath(path);
-    if (normalized == path_ && (lease_ || readOnly)) {
+    if (store_.sameFile(normalized, path_) && (lease_ || readOnly)) {
         auto loaded = store_.load(normalized);
         project_ = std::move(loaded.project); fingerprint_ = std::move(loaded.fingerprint);
         requiresSaveAs_ = loaded.requiresSaveAs; calculation_.reset();
@@ -301,7 +301,7 @@ void Document::save() {
 void Document::saveAs(const std::string& path) {
     if (!project_) throw std::runtime_error("열린 프로젝트가 없습니다.");
     auto normalized = store_.normalizePath(path);
-    if (normalized == path_) {
+    if (store_.sameFile(normalized, path_)) {
         throw std::runtime_error("독립 사본은 현재 파일과 다른 경로에 저장하세요.");
     }
     auto lease = store_.lock(normalized);

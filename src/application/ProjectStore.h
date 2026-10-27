@@ -17,6 +17,10 @@ public:
     virtual ~ProjectStore() = default;
     virtual std::string newId() const = 0;
     virtual std::string normalizePath(const std::string& path) const = 0;
+    // Identity is separate from the case-preserving path used for I/O/display.
+    virtual bool sameFile(const std::string& left, const std::string& right) const {
+        return !left.empty() && left == right;
+    }
     virtual std::unique_ptr<WriteLease> lock(const std::string& path) = 0;
     virtual StoredProject load(const std::string& path) const = 0;
     // Empty expectedFingerprint means create-only. Never silently overwrite.

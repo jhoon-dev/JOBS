@@ -2,6 +2,8 @@
 #include "persistence/JsonProjectStore.h"
 #include <QCoreApplication>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -34,6 +36,50 @@ int main(int argc, char* argv[]) {
         auto a = dir.filePath(QString::fromUtf8("프로젝트 α.jobs"));
         auto b = dir.filePath("copy.jobs");
         jobs::JsonProjectStore store;
+        {
+            QDir caseDirectory(dir.filePath("MixedCaseFolder"));
+            check(QDir().mkpath(caseDirectory.path()), "case directory creation failed");
+            const auto filename = QString::fromUtf8("MyPlan_한글_Α.jobs");
+            const auto mixedPath = caseDirectory.filePath(filename);
+            const auto mixedUtf8 = mixedPath.toUtf8().toStdString();
+            jobs::Document mixed(store);
+            mixed.create("case preservation", "2026-10-26", {"task"});
+            mixed.saveAs(mixedUtf8);
+            check(caseDirectory.entryList({"*.jobs"}, QDir::Files) == QStringList{filename},
+                  "physical filename changed case");
+            check(QFileInfo(QString::fromUtf8(mixed.path())).fileName() == filename,
+                  "document filename changed case");
+            const auto originalId = mixed.project()->documentId;
+            const auto originalBytes = read(mixedPath);
+            const auto relative = QDir::current().relativeFilePath(mixedPath).toUtf8().toStdString();
+            mixed.open(relative);
+            check(mixed.project()->documentId == originalId, "relative same-file reopen failed");
+            rejects([&] { mixed.saveAs(relative); });
+            jobs::Document contender(store);
+            rejects([&] { contender.open(relative); });
+            contender.open(mixedUtf8, true);
+            check(*contender.project() == *mixed.project(), "mixed-case read-only open failed");
+            const auto alternate = caseDirectory.filePath(filename.toLower()).toUtf8().toStdString();
+            if (store.sameFile(mixedUtf8, alternate)) {
+                // Standard NTFS/macOS: a spelling alias must not obtain a second lease.
+                rejects([&] { jobs::Document other(store); other.open(alternate); });
+                rejects([&] { mixed.saveAs(alternate); });
+                mixed.open(alternate);
+            } else {
+                // Case-sensitive filesystems must keep distinct names distinct.
+                check(!QFileInfo::exists(QString::fromUtf8(alternate)), "unexpected case alias");
+                jobs::Document distinct(store);
+                distinct.create("distinct", "2026-10-26", {});
+                distinct.saveAs(alternate);
+                check(!store.sameFile(mixedUtf8, alternate), "distinct files conflated");
+            }
+            mixed.renameTask(0, "saved edit"); mixed.save();
+            check(store.load(mixedUtf8).project.tasks[0].name == "saved edit",
+                  "mixed-case save did not roundtrip");
+            check(read(mixedPath) != originalBytes, "same-file edit did not save");
+            check(caseDirectory.entryList({filename}, QDir::Files).contains(filename),
+                  "saving an existing file changed its name");
+        }
         jobs::Document doc(store);
         rejects([&] { doc.create("", "2026-10-26", {}); });
         rejects([&] { doc.create("test", "2026-02-30", {}); });
