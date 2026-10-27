@@ -1,4 +1,5 @@
 #include "TaskTableTest.h"
+#include "BuildIdentity.h"
 #include "PerformanceFixture.h"
 #include "ui/AsyncEditController.h"
 #include "ui/GanttView.h"
@@ -18,6 +19,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QSysInfo>
 #include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTest>
@@ -258,6 +260,8 @@ int main(int argc, char** argv) {
         temporary.unsubscribe(commitDestructionObserver);
         heartbeat.stop();
         QJsonObject metrics{{"status", "success"}, {"task_count", 10000}, {"platform", QApplication::platformName()},
+            {"fixture", "jobs-perf-layered-v1"}, {"source_revision", JOBS_PERF_REVISION}, {"built_product_source_sha256", JOBS_SOURCE_SHA256},
+            {"qt", qVersion()}, {"os", QSysInfo::prettyProductName()}, {"build_configuration", JOBS_PERF_CONFIG},
             {"enqueue_gui_ms", enqueueMs}, {"successful_edit_settled_ms", settledMs}, {"heartbeat_count_while_editing", heartbeats},
             {"largest_observed_timer_gap_ms", double(maxGapNs) / 1000000},
             {"scope", "Single observation; timer gaps sampled during first running-cancel and one successful inverse edit only; excludes deliberate blocked delivery and test file I/O; not an FPS/worst-latency guarantee"}};

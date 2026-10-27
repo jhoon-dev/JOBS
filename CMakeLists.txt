@@ -70,6 +70,9 @@ if(BUILD_TESTING)
             "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/BuildIdentity.h"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/scripts/WriteBuildIdentity.cmake"
     BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/BuildIdentity.h")
+  add_dependencies(jobs_async_editing_ui_tests jobs_build_identity)
+  target_include_directories(jobs_async_editing_ui_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+  target_compile_definitions(jobs_async_editing_ui_tests PRIVATE JOBS_PERF_CONFIG="$<CONFIG>")
   add_executable(jobs_performance_probe tests/PerformanceProbe.cpp)
   add_dependencies(jobs_performance_probe jobs_build_identity)
   target_include_directories(jobs_performance_probe PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
