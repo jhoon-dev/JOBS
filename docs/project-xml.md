@@ -17,7 +17,7 @@
 
 파일 메뉴의 XML 가져오기/내보내기는 건수·손실 진단·대상 새 폴더를 미리 보여 준다. 진단을 확인하고 승인한 뒤 같은 부모의 임시 폴더에서 모든 파일을 기록/재열기 검증하고 새 폴더로 rename한다. 기존 목적지는 거절한다. 오류/취소 때 현재 문서는 그대로다. 가져오기는 미저장 변경 처리 후 project.jobs를 새 세션으로 연다. 내보내기는 읽기 전용 문서에서도 가능하며 전체 프로젝트를 사용한다.
 
-conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/SaveVersion/BuildNumber, 문서 ID/revision, UID 매핑과 경로/설명별 진단을 담는다. `import`, `originalPreservation`, `jobsRecomputation`, `externalRoundTrip` 네 판정은 독립이다. source/original 바이트 보존은 exact이고 외부 재계산/왕복은 unverified다. .jobs schema 9는 그대로 유지한다. 동반 원본/진단 파일은 해당 교환 폴더에 보관되며 .jobs 파일만 별도 저장/이동하면 동반 이동하지 않는다.
+conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/SaveVersion/BuildNumber, 문서 ID/revision, UID 매핑과 경로/설명별 진단을 담는다. `import`, `originalPreservation`, `jobsRecomputation`, `externalRoundTrip` 네 판정은 독립이다. 수입 original.xml은 원본 바이트 exact이고 수출 source.jobs는 현재 입력/이력의 정확한 새 직렬화 스냅샷이다(기존 디스크 파일의 바이트 사본이라는 뜻이 아니다). 외부 재계산/왕복은 unverified다. .jobs schema 9는 그대로 유지한다. 동반 원본/진단 파일은 해당 교환 폴더에 보관되며 .jobs 파일만 별도 저장/이동하면 동반 이동하지 않는다.
 
 ## 완료 검사
 
