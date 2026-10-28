@@ -260,3 +260,14 @@ F08/F09의 기간 부분과 수용 범위는 [기준선·실적·비교 계약](
 | PARSER-SAFE-02 | coverage-guided 퍼징 | opt-in Clang/libFuzzer 타깃 3개에 JOBS 파서와 도메인/계산 의존 코드까지 coverage 및 ASan/UBSan을 적용한다. `.jobs`는 원본 envelope와 schema1~9의 payload를 구분 실행하여 checksum이 깊은 검증을 가리지 않게 한다. XER UTF-8/Windows-1252, 정상·손상/잘린 seed를 재생하며 입력 크기·시간·RSS/프로세스 시간을 제한한다. 일반 파서 거부 예외만 허용하고 crash/sanitizer/timeout/OOM은 실패로 기록한다. |
 | PARSER-SAFE-03 | 재현 가능한 smoke·회귀 CI | 일반 Windows/macOS 빌드에서도 seed 재생 검사를 실행한다. 별도 Linux/Clang CI는 전체 회귀에 ASan/UBSan을 적용하고 각 타깃의 seed 재생 및 고정 seed/실행 수의 유한 퍼징을 수행한다. 도구 버전·source revision·명령/상태·로그·발견 입력과 corpus를 artifact로 보존한다. 정상 코드의 계측 누락과 취소/예외 삼키기를 검사한다. |
 | PARSER-SAFE-04 | 제품 경계·판정 | 기본 Release 빌드·배포 옵션은 유지하며 미지원 컴파일러의 opt-in은 명시 실패한다. 기존 파일/교환·독립 reader와 Windows/macOS 회귀를 유지한다. Qt 사전 빌드 내부는 계측하지 않으며 유한 퍼징 통과를 취약점 부재·상용 제품 호환·Linux 제품 지원·지속 모니터링으로 주장하지 않는다. |
+
+## 2026-10-28 포맷·정적 분석·편집 진입 가드
+
+사용자 요청으로 구현 전에 MAINT-01~04와 [개발 품질 계약](../cpp-quality.md)을 확정한다.
+
+| ID | 요구사항 | 이번 완료조건 |
+|---|---|---|
+| MAINT-01 | 고정 포맷과 점진 적용 | clang-format 18.1.8과 저장소 스타일을 고정한다. Document.h/.cpp·TaskEditing.cpp·PreparedEdit.cpp부터 전체 파일에 적용하고, 이후 등록 파일과 새로 추가/수정한 src/tests C++ 파일을 검사한다. 기본 검사는 읽기 전용이며 명시적 fix만 파일을 변경한다. 포맷 변경과 의미 변경을 별도 커밋으로 남긴다. |
+| MAINT-02 | 실제 컴파일 기반 정적 분석 | Clang 18/Qt 6.8.3의 compile_commands로 전체 src C++ 번역 단위를 clang-tidy 분석한다. clang-analyzer와 한정된 오류 중심 check를 명시하고 선택 진단·컴파일 오류를 CI 실패로 처리한다. 의존 헤더를 이유로 검사 전체를 끄거나 경고를 무조건 허용하지 않는다. 실행 대상·버전·명령/반환·원시 진단을 보존하고, format/analysis 실패 경로도 검증한다. |
+| MAINT-03 | 편집 권한 가드 통합 | 문서 존재·읽기 전용 여부를 복사/쓰기 없는 private helper에 모아 일반 편집·구조 변경·준비 요청에서 공유한다. 기존 거부 메시지/우선순위, 상태일·간트·저장·복구·stale 경합의 별도 조건, 읽기 전용 문서의 독립 사본 저장·조회 허용을 유지한다. 거부 시 입력/revision/session/dirty/이력/계산/공유 snapshot/파일·ID 부작용이 없음을 경계별 검사한다. |
+| MAINT-04 | 재현·회귀와 제품 범위 | 로컬/CI의 format·tidy 명령과 적용 파일 목록을 문서화한다. Windows/macOS 전체 회귀·독립 reader·일정 hash 및 기존 sanitizer/fuzz 검사를 유지한다. 파일 schema/계산/편집 의미를 변경하지 않으며, 전체 레거시 파일 포맷 일괄 적용·모든 tidy check·enum/다국어 개편은 별도 후속 범위다. |
