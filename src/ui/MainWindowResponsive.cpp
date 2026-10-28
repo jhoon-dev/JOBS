@@ -70,6 +70,9 @@ bool MainWindow::refreshProjected() {
     const QSignalBlocker blocker(table_->selectionModel());const auto column=table_->currentColumn();
     const auto x=table_->horizontalScrollBar()->value(),y=table_->verticalScrollBar()->value();
     auto rows=view->rows;
+    // Selection is already owned as IDs and restored below. Avoid Qt expanding
+    // a large selection to persistent cell indexes during every layout change.
+    table_->clearSelection();
     if(!taskModel_->synchronizeProjected(*view))return false;
     visibleRows_=std::move(rows);table_->clearSelection();restoreTaskSelection(column);if(selectedTask_.empty())table_->setCurrentCell(-1,-1);syncTaskSelection();
     table_->horizontalScrollBar()->setValue(x);table_->verticalScrollBar()->setValue(y);

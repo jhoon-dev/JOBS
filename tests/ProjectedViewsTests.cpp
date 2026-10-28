@@ -86,7 +86,8 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
         QApplication::clipboard()->setText(lines.join('\n'));action(window,"pasteTaskCells");oracle(window,doc,spec);
         check(resets==0&&survivor.isValid()&&survivor.data()==survivorId,"paste reset/lost survivor ID");
         if(spec.sort==1&&spec.query.isEmpty())check(layouts>0,"name sorting did not use layout change");
-        if(!spec.query.isEmpty())check(!table->selectionModel()->hasSelection(),"filtered-out edits remained selected");
+        if(!spec.query.isEmpty()||mode==3)check(!table->selectionModel()->hasSelection(),"filtered-out edits remained selected");
+        else check(table->selectionModel()->selectedRows().size()==10,"visible edited selection was lost during publication");
         action(window,"undoEdit");oracle(window,doc,spec);check(!doc.dirty()&&doc.project()->baselines==original.baselines,"undo save point/archive mismatch");
         table->setCurrentCell(0,0);selectCellRange(table,0,0,2,0);action(window,"duplicateTasks");oracle(window,doc,spec);
         check(resets==0&&survivor.isValid()&&survivor.data()==survivorId,"duplicate reset/lost survivor");
