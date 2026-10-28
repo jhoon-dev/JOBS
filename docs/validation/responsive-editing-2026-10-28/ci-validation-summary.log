@@ -1,0 +1,8 @@
+build (windows-latest, win64_msvc2022_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-28T01:03:42.4263204Z 100% tests passed out of 39
+build (windows-latest, win64_msvc2022_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-28T01:03:42.4263949Z Total Test time (real) =  85.49 sec
+build (windows-latest, win64_msvc2022_64)	Exercise native model and cancellable editing	2026-10-28T01:08:55.0437242Z PASS: native model/view + cancellable edits; GUI enqueue observation 1.86 ms
+build (windows-latest, win64_msvc2022_64)	Exercise native incremental refresh and WBS fallbacks	2026-10-28T01:08:59.4632981Z PASS: native 10k/3-baseline incremental model, WBS, selection/scroll and full-refresh fallbacks
+build (macos-15, clang_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-28T00:59:34.5477960Z 100% tests passed out of 39
+build (macos-15, clang_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-28T00:59:34.5478920Z Total Test time (real) =  70.87 sec
+build (macos-15, clang_64)	Exercise native model and cancellable editing	2026-10-28T01:02:35.5392660Z PASS: native model/view + cancellable edits; GUI enqueue observation 2.16 ms
+build (macos-15, clang_64)	Exercise native incremental refresh and WBS fallbacks	2026-10-28T01:02:41.8471270Z PASS: native 10k/3-baseline incremental model, WBS, selection/scroll and full-refresh fallbacks

@@ -1,0 +1,11 @@
+PASS: reports-smoke.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+PASS: reports-resources.xlsx: 7 sheets, ZIP/OOXML/types/unknown/provenance
+PASS: reports-pdm.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+PASS: reports-constraints.xlsx: 15 sheets, ZIP/OOXML/types/unknown/provenance
+PASS: reports-effort.xlsx: 19 sheets, ZIP/OOXML/types/unknown/provenance
+PASS: reports-smoke.pdf: 9 pages, size/text/provenance/continuation
+PASS: reports-long-portrait.pdf: 3 pages, size/text/provenance/continuation
+PASS: reports-a3.pdf: 3 pages, size/text/provenance/continuation
+PASS: reports-pdm.pdf: 6 pages, size/text/provenance/continuation
+PASS: reports-constraints.pdf: 6 pages, size/text/provenance/continuation
+PASS: reports-effort.pdf: 11 pages, size/text/provenance/continuation

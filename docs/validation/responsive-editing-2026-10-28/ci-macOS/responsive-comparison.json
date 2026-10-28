@@ -1,0 +1,110 @@
+{
+  "status": "success",
+  "semantics": "Paired phase observations; same CI toolchain, no universal latency guarantee",
+  "cases": [
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "before_revision": "0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c",
+      "after_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a",
+      "phases": {
+        "request_gui": {
+          "before_median_ms": 0.122042,
+          "after_median_ms": 0.000541,
+          "before_observed_p95_ms": 0.192709,
+          "after_observed_p95_ms": 0.705459
+        },
+        "prepare_worker": {
+          "before_median_ms": 74.370333,
+          "after_median_ms": 79.092834,
+          "before_observed_p95_ms": 97.115417,
+          "after_observed_p95_ms": 81.751167
+        },
+        "apply_gui": {
+          "before_median_ms": 0.256,
+          "after_median_ms": 0.009167,
+          "before_observed_p95_ms": 0.413375,
+          "after_observed_p95_ms": 0.016333
+        }
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "before_revision": "0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c",
+      "after_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a",
+      "phases": {
+        "request_gui": {
+          "before_median_ms": 0.234292,
+          "after_median_ms": 0.001083,
+          "before_observed_p95_ms": 0.390167,
+          "after_observed_p95_ms": 0.009875
+        },
+        "prepare_worker": {
+          "before_median_ms": 83.309042,
+          "after_median_ms": 95.960333,
+          "before_observed_p95_ms": 87.580417,
+          "after_observed_p95_ms": 134.384791
+        },
+        "apply_gui": {
+          "before_median_ms": 0.453125,
+          "after_median_ms": 0.004333,
+          "before_observed_p95_ms": 0.454583,
+          "after_observed_p95_ms": 0.00925
+        }
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "before_revision": "0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c",
+      "after_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a",
+      "phases": {
+        "request_gui": {
+          "before_median_ms": 0.561083,
+          "after_median_ms": 0.000875,
+          "before_observed_p95_ms": 0.835417,
+          "after_observed_p95_ms": 0.012292
+        },
+        "prepare_worker": {
+          "before_median_ms": 672.914709,
+          "after_median_ms": 620.677167,
+          "before_observed_p95_ms": 716.153959,
+          "after_observed_p95_ms": 634.879042
+        },
+        "apply_gui": {
+          "before_median_ms": 0.742875,
+          "after_median_ms": 0.013292,
+          "before_observed_p95_ms": 1.119916,
+          "after_observed_p95_ms": 0.015583
+        }
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "before_revision": "0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c",
+      "after_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a",
+      "phases": {
+        "request_gui": {
+          "before_median_ms": 4.131042,
+          "after_median_ms": 0.001125,
+          "before_observed_p95_ms": 13.535291,
+          "after_observed_p95_ms": 0.023625
+        },
+        "prepare_worker": {
+          "before_median_ms": 614.054291,
+          "after_median_ms": 761.322875,
+          "before_observed_p95_ms": 656.120417,
+          "after_observed_p95_ms": 802.028166
+        },
+        "apply_gui": {
+          "before_median_ms": 4.702084,
+          "after_median_ms": 0.004042,
+          "before_observed_p95_ms": 5.602416,
+          "after_observed_p95_ms": 0.006542
+        }
+      }
+    }
+  ]
+}

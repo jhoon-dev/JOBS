@@ -1,0 +1,40 @@
+{
+    "apply_gui": {
+        "median_ms": 0.009167,
+        "observed_p95_ms": 0.016333,
+        "samples_ms": [
+            0.003458,
+            0.009167,
+            0.016333
+        ]
+    },
+    "baseline_count": 0,
+    "built_product_source_sha256": "a7dd141a2051bf65765cbfb75ed92dad01d52ecb577ac3e4e55c58487a4a1ce9",
+    "fixture": "jobs-responsive-phases-v1",
+    "os": "macOS Sequoia (15.7)",
+    "platform": "cocoa",
+    "prepare_worker": {
+        "median_ms": 79.092834,
+        "observed_p95_ms": 81.751167,
+        "samples_ms": [
+            81.751167,
+            60.2285,
+            79.092834
+        ]
+    },
+    "qt": "6.8.3",
+    "repeats": 3,
+    "request_gui": {
+        "median_ms": 0.000541,
+        "observed_p95_ms": 0.705459,
+        "samples_ms": [
+            0.705459,
+            0.000541,
+            0.000333
+        ]
+    },
+    "scope": "Sealed request creation, isolated worker preparation, Document GUI commit only; excludes UI refresh, explicit save/open, controlled result destruction and OS presentation",
+    "source_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a",
+    "status": "success",
+    "task_count": 1000
+}

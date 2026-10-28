@@ -1,0 +1,16 @@
+{
+    "build_configuration": "Release",
+    "built_product_source_sha256": "14a77f5385468b22dce3e4d6dd057af240a311386c2092a52566cbe16f53ee87",
+    "enqueue_gui_ms": 5.2797,
+    "fixture": "jobs-perf-layered-v1",
+    "heartbeat_count_while_editing": 2939,
+    "largest_observed_timer_gap_ms": 85.0209,
+    "os": "Windows 11 Version 26H2",
+    "platform": "windows",
+    "qt": "6.8.3",
+    "scope": "Single observation; timer gaps sampled during first running-cancel and one successful inverse edit only; excludes deliberate blocked delivery and test file I/O; not an FPS/worst-latency guarantee",
+    "source_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a+dirty",
+    "status": "success",
+    "successful_edit_settled_ms": 1308.234,
+    "task_count": 10000
+}

@@ -1,0 +1,40 @@
+{
+    "apply_gui": {
+        "median_ms": 0.0062,
+        "observed_p95_ms": 0.0082,
+        "samples_ms": [
+            0.0051,
+            0.0082,
+            0.0062
+        ]
+    },
+    "baseline_count": 0,
+    "built_product_source_sha256": "14a77f5385468b22dce3e4d6dd057af240a311386c2092a52566cbe16f53ee87",
+    "fixture": "jobs-responsive-phases-v1",
+    "os": "Windows 11 Version 26H2",
+    "platform": "windows",
+    "prepare_worker": {
+        "median_ms": 294.2528,
+        "observed_p95_ms": 309.302,
+        "samples_ms": [
+            294.2528,
+            285.5275,
+            309.302
+        ]
+    },
+    "qt": "6.8.3",
+    "repeats": 3,
+    "request_gui": {
+        "median_ms": 0.0017,
+        "observed_p95_ms": 0.1225,
+        "samples_ms": [
+            0.1225,
+            0.0011,
+            0.0017
+        ]
+    },
+    "scope": "Sealed request creation, isolated worker preparation, Document GUI commit only; excludes UI refresh, explicit save/open, controlled result destruction and OS presentation",
+    "source_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a+dirty",
+    "status": "success",
+    "task_count": 1000
+}

@@ -1,0 +1,2 @@
+PASS: independent TSV reader, XER tables/fields/references/values/encoding/hash/verdicts
+PASS: MPXJ 16.10.0 strict read, names/durations/relations/calendars/exceptions/resources/assignments

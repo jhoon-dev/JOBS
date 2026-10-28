@@ -62,3 +62,5 @@ python scripts/run-performance-probes.py --repeats 3
 각 사례는 별도 프로세스·기본 180초 한도로 실행하고 실패/시간 초과를 정상 표본에 합치지 않는다. CI는 현재 버전에서 100단계 보존을 강제하며 이전 참조에만 `--allow-short-history`를 사용한다. `jobs_build_identity`는 CMake 재설정 없이도 빌드할 때마다 소스/HEAD를 갱신한다.
 
 이 기록 다음 증분에서 `QAbstractTableModel` 전환과 공수 역산·실적/배정 계산의 비동기화·취소를 구현했다. [별도 계약과 검증](model-async-editing.md)을 따른다. 복합 편집/일반 기간 undo의 전체 문서 사본 제거와 아주 큰 기준선/원장은 여전히 후속 범위다. 모든 편집이 상수 시간이 되거나 모든 UI 정지가 사라졌다고 주장하지 않는다. 파일 schema 9와 계산 정책/엔진·기준선/불변 원장·복구 형식은 유지한다.
+
+후속 [대규모 편집 응답성 증분](responsive-editing.md)은 일반 기간의 변경/undo도 한 작업 delta로 처리하고, 정확한 증분 dirty와 공유 worker 요청·모델/WBS 변경 범위 갱신을 추가한다. 이 문서의 전후 수치는 당시 구현에 대한 역사적 기록이다.

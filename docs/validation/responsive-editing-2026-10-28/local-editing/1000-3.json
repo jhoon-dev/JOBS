@@ -1,0 +1,177 @@
+{
+    "baseline_count": 3,
+    "build_configuration": "Release",
+    "build_source_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a+dirty",
+    "built_product_source_sha256": "14a77f5385468b22dce3e4d6dd057af240a311386c2092a52566cbe16f53ee87",
+    "compiler": "13.1.0",
+    "estimated_history_bytes": 78170,
+    "fixture": "jobs-perf-editing-v1",
+    "logical_cpu_count": 16,
+    "measurements": {
+        "document_duration": {
+            "median_ms": 4e-04,
+            "observed_p95_ms": 0.1161,
+            "samples_ms": [
+                0.1161,
+                7e-04,
+                3e-04,
+                4e-04,
+                3e-04,
+                3e-04,
+                4e-04
+            ]
+        },
+        "document_duration_redo": {
+            "median_ms": 2e-04,
+            "observed_p95_ms": 5e-04,
+            "samples_ms": [
+                5e-04,
+                3e-04,
+                2e-04,
+                2e-04,
+                2e-04,
+                2e-04,
+                2e-04
+            ]
+        },
+        "document_duration_undo": {
+            "median_ms": 2e-04,
+            "observed_p95_ms": 8e-04,
+            "samples_ms": [
+                8e-04,
+                3e-04,
+                2e-04,
+                2e-04,
+                1e-04,
+                2e-04,
+                2e-04
+            ]
+        },
+        "document_name": {
+            "median_ms": 4e-04,
+            "observed_p95_ms": 0.2377,
+            "samples_ms": [
+                0.2377,
+                0.0012,
+                5e-04,
+                4e-04,
+                3e-04,
+                3e-04,
+                4e-04
+            ]
+        },
+        "document_redo": {
+            "median_ms": 2e-04,
+            "observed_p95_ms": 6e-04,
+            "samples_ms": [
+                6e-04,
+                3e-04,
+                2e-04,
+                2e-04,
+                2e-04,
+                1e-04,
+                1e-04
+            ]
+        },
+        "document_undo": {
+            "median_ms": 1e-04,
+            "observed_p95_ms": 0.0024,
+            "samples_ms": [
+                0.0024,
+                3e-04,
+                1e-04,
+                2e-04,
+                1e-04,
+                1e-04,
+                1e-04
+            ]
+        },
+        "ui_duration_commit_events": {
+            "median_ms": 23.7224,
+            "observed_p95_ms": 31.3416,
+            "samples_ms": [
+                22.4541,
+                29.6579,
+                12.5579,
+                21.3245,
+                31.3416,
+                27.7754,
+                23.7224
+            ]
+        },
+        "ui_duration_redo_events": {
+            "median_ms": 20.9981,
+            "observed_p95_ms": 37.6577,
+            "samples_ms": [
+                37.6577,
+                16.5719,
+                13.7795,
+                20.9981,
+                17.57,
+                21.5215,
+                28.8703
+            ]
+        },
+        "ui_duration_undo_events": {
+            "median_ms": 16.1356,
+            "observed_p95_ms": 26.3624,
+            "samples_ms": [
+                26.3624,
+                10.7569,
+                11.6149,
+                15.7504,
+                18.5988,
+                16.1356,
+                17.2324
+            ]
+        },
+        "ui_name_commit_events": {
+            "median_ms": 10.436,
+            "observed_p95_ms": 73.6843,
+            "samples_ms": [
+                73.6843,
+                17.6974,
+                9.1521,
+                9.9194,
+                10.436,
+                10.8561,
+                6.726
+            ]
+        },
+        "ui_redo_events": {
+            "median_ms": 12.9243,
+            "observed_p95_ms": 21.6179,
+            "samples_ms": [
+                21.6179,
+                18.6299,
+                13.4421,
+                10.5185,
+                7.7365,
+                6.543,
+                12.9243
+            ]
+        },
+        "ui_undo_events": {
+            "median_ms": 10.4123,
+            "observed_p95_ms": 18.5272,
+            "samples_ms": [
+                18.4019,
+                18.2148,
+                7.8477,
+                10.4123,
+                7.6397,
+                7.3921,
+                18.5272
+            ]
+        }
+    },
+    "os": "Windows 11 Version 26H2",
+    "platform": "windows",
+    "qt": "6.8.3",
+    "repeats": 7,
+    "retained_undo_after_100_edits": 100,
+    "runtime_source_revision": "369051c68576fbd6ede202bf65f6ff1ec510359a+dirty",
+    "scope": "Cell commit + synchronous refresh + processEvents; excludes OS presentation latency, autosave, effort inversions and resource/progress edits",
+    "status": "success",
+    "task_count": 1000
+}

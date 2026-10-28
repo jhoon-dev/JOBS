@@ -73,3 +73,5 @@ python scripts/run-performance-probes.py --repeats 3
 CI의 1만 공수 작업 네이티브 관측은 Windows 요청 반환 3.57ms / 성공 완료 566.71ms, macOS 4.90ms / 543.99ms였다. 두 OS에서 계산 중 heartbeat와 취소/재시도 검사를 통과했다. 각 JSON은 단일 시험 관측 범위와 타이머 간격의 한계를 명시한다. CI에서도 일정 네 사례의 전체 결과 해시가 각 OS에서 이전 검증과 동일함을 별도로 확인했다.
 
 [원시 CI 전후 표본과 관측](validation/model-async-2026-10-28/)의 `ci-Windows/`, `ci-macOS/`, `ci-results.json`에서 빌드 식별·표본·해시·완료 상태를 확인한다.
+
+후속 RESPONSIVE-01~04 증분에서 이 기록 당시 UI에 남았던 요청의 큰 입력 복사와 전체 dirty 비교를 worker로 이동하고, 일반 기간의 단일 작업 delta 및 연속 변경의 모델/WBS 증분 갱신을 추가했다. 이전 버전의 원시 관측과 한계는 이 문서에 보존하며 최신 계약·검증은 [대규모 편집 응답성](responsive-editing.md)을 따른다.
