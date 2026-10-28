@@ -1,0 +1,84 @@
+{
+  "status": "success",
+  "ci_run": 40622311402,
+  "ci_url": "https://github.com/jhoon-dev/JOBS/actions/runs/40622311402",
+  "implementation_revision": "7cddc7a2a3f3a9765ba61f9b7b2c08daad85c096",
+  "workflow_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+  "ctest_per_os": 40,
+  "ctest_seconds": {
+    "Windows": 81.16,
+    "macOS": 66.25
+  },
+  "paired_reference": "edbea737a4ebe081ceca2086b2a9b249e2c559fd",
+  "paired_reset_totals": {
+    "Windows": {
+      "before": 24,
+      "after": 0
+    },
+    "macOS": {
+      "before": 24,
+      "after": 0
+    }
+  },
+  "schedule_hashes": [
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    }
+  ],
+  "measurement_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+  "reference_dirty_scope": "Only tests/BulkPerformanceProbe.cpp overlaid with the same measurement tool; reference product source/CMake unchanged",
+  "setup_readiness_excluded_and_recorded": true
+}

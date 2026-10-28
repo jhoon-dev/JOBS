@@ -1,0 +1,106 @@
+{
+    "affected_tasks": 100,
+    "baseline_count": 0,
+    "batch_phases_ms": {
+        "apply_gui": 0.552792,
+        "prepare_worker": 1.325583,
+        "request_gui": 0.000583
+    },
+    "built_product_source_sha256": "8dd803a06213a8e7033ad4286dd37af728b8c7fb788c46e3d7c97a2008b81196",
+    "fixture": "jobs-bulk-ui-v1",
+    "operations": [
+        {
+            "heartbeat_ticks": 3,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 91,
+            "operation": "insert",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 152.422125,
+            "setup_ready_ms": 8.3e-05,
+            "trigger_return_ms": 121.297667
+        },
+        {
+            "heartbeat_ticks": 2,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 11,
+            "operation": "undo_insert",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 19.484916,
+            "setup_ready_ms": 0.000167,
+            "trigger_return_ms": 0.118041
+        },
+        {
+            "heartbeat_ticks": 2,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 10,
+            "operation": "duplicate",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 16.247,
+            "setup_ready_ms": 0.000167,
+            "trigger_return_ms": 0.103541
+        },
+        {
+            "heartbeat_ticks": 2,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 9,
+            "operation": "undo_duplicate",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 15.145458,
+            "setup_ready_ms": 0.000666,
+            "trigger_return_ms": 0.113416
+        },
+        {
+            "heartbeat_ticks": 2,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 9,
+            "operation": "paste",
+            "row_insert_signals": 0,
+            "row_remove_signals": 0,
+            "settled_ms": 18.994375,
+            "setup_ready_ms": 0.000167,
+            "trigger_return_ms": 0.097
+        },
+        {
+            "heartbeat_ticks": 1,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 9,
+            "operation": "undo_paste",
+            "row_insert_signals": 0,
+            "row_remove_signals": 0,
+            "settled_ms": 9.985583,
+            "setup_ready_ms": 0.00025,
+            "trigger_return_ms": 0.170833
+        },
+        {
+            "heartbeat_ticks": 3,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 63,
+            "operation": "delete",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 85.421417,
+            "setup_ready_ms": 4.2e-05,
+            "trigger_return_ms": 65.632334
+        },
+        {
+            "heartbeat_ticks": 2,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 11,
+            "operation": "undo_delete",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 18.237834,
+            "setup_ready_ms": 0.000375,
+            "trigger_return_ms": 0.108792
+        }
+    ],
+    "platform": "cocoa",
+    "scope": "One sample per operation; setup_ready_ms excluded from timing; trigger includes automated modal input/confirmation; settled includes worker and GUI refresh, excludes initial open/save/baselines and OS presentation",
+    "source_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+    "status": "success",
+    "task_count": 1000
+}

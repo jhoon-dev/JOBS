@@ -1,0 +1,398 @@
+{
+  "status": "success",
+  "semantics": "Paired observations, no universal latency guarantee or timing gate",
+  "cases": [
+    {
+      "task_count": 1000,
+      "baseline_count": 0,
+      "before_file": "1000-0.json",
+      "after_file": "1000-0.json",
+      "before_revision": "edbea737a4ebe081ceca2086b2a9b249e2c559fd+dirty",
+      "after_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+      "before_history_steps": 100,
+      "after_history_steps": 100,
+      "before_history_bytes": 66970,
+      "after_history_bytes": 17370,
+      "timings": {
+        "document_duration": {
+          "before_median_ms": 0.000208,
+          "after_median_ms": 0.000542,
+          "before_observed_p95_ms": 0.036583,
+          "after_observed_p95_ms": 0.739333,
+          "observed_median_change_percent": 160.5769230769231
+        },
+        "document_duration_redo": {
+          "before_median_ms": 0.000167,
+          "after_median_ms": 0.000334,
+          "before_observed_p95_ms": 0.00025,
+          "after_observed_p95_ms": 0.0005,
+          "observed_median_change_percent": 100.0
+        },
+        "document_duration_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000292,
+          "before_observed_p95_ms": 0.000292,
+          "after_observed_p95_ms": 0.001959,
+          "observed_median_change_percent": 133.6
+        },
+        "document_name": {
+          "before_median_ms": 0.000167,
+          "after_median_ms": 0.0005,
+          "before_observed_p95_ms": 0.02175,
+          "after_observed_p95_ms": 0.025916,
+          "observed_median_change_percent": 199.4011976047904
+        },
+        "document_redo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.00025,
+          "before_observed_p95_ms": 0.000167,
+          "after_observed_p95_ms": 0.000334,
+          "observed_median_change_percent": 100.0
+        },
+        "document_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.00025,
+          "before_observed_p95_ms": 0.001,
+          "after_observed_p95_ms": 0.001167,
+          "observed_median_change_percent": 100.0
+        },
+        "ui_duration_commit_events": {
+          "before_median_ms": 8.5715,
+          "after_median_ms": 14.709417,
+          "before_observed_p95_ms": 18.9585,
+          "after_observed_p95_ms": 17.901459,
+          "observed_median_change_percent": 71.60843492970892
+        },
+        "ui_duration_redo_events": {
+          "before_median_ms": 7.062541,
+          "after_median_ms": 14.26925,
+          "before_observed_p95_ms": 10.486875,
+          "after_observed_p95_ms": 16.061167,
+          "observed_median_change_percent": 102.04130496375168
+        },
+        "ui_duration_undo_events": {
+          "before_median_ms": 7.146208,
+          "after_median_ms": 12.541,
+          "before_observed_p95_ms": 14.556292,
+          "after_observed_p95_ms": 19.036791,
+          "observed_median_change_percent": 75.49167334619983
+        },
+        "ui_name_commit_events": {
+          "before_median_ms": 6.473834,
+          "after_median_ms": 7.243625,
+          "before_observed_p95_ms": 26.449292,
+          "after_observed_p95_ms": 55.108875,
+          "observed_median_change_percent": 11.890805355837042
+        },
+        "ui_redo_events": {
+          "before_median_ms": 6.849625,
+          "after_median_ms": 7.321084,
+          "before_observed_p95_ms": 11.378791,
+          "after_observed_p95_ms": 11.402709,
+          "observed_median_change_percent": 6.882989944704998
+        },
+        "ui_undo_events": {
+          "before_median_ms": 5.789917,
+          "after_median_ms": 8.71675,
+          "before_observed_p95_ms": 9.812334,
+          "after_observed_p95_ms": 25.839625,
+          "observed_median_change_percent": 50.55051739083651
+        }
+      }
+    },
+    {
+      "task_count": 1000,
+      "baseline_count": 3,
+      "before_file": "1000-3.json",
+      "after_file": "1000-3.json",
+      "before_revision": "edbea737a4ebe081ceca2086b2a9b249e2c559fd+dirty",
+      "after_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+      "before_history_steps": 100,
+      "after_history_steps": 100,
+      "before_history_bytes": 66970,
+      "after_history_bytes": 17370,
+      "timings": {
+        "document_duration": {
+          "before_median_ms": 0.000209,
+          "after_median_ms": 0.000542,
+          "before_observed_p95_ms": 0.008,
+          "after_observed_p95_ms": 0.009792,
+          "observed_median_change_percent": 159.3301435406698
+        },
+        "document_duration_redo": {
+          "before_median_ms": 0.000167,
+          "after_median_ms": 0.000375,
+          "before_observed_p95_ms": 0.000209,
+          "after_observed_p95_ms": 0.0005,
+          "observed_median_change_percent": 124.55089820359282
+        },
+        "document_duration_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000334,
+          "before_observed_p95_ms": 0.00025,
+          "after_observed_p95_ms": 0.000792,
+          "observed_median_change_percent": 167.19999999999996
+        },
+        "document_name": {
+          "before_median_ms": 0.000167,
+          "after_median_ms": 0.0005,
+          "before_observed_p95_ms": 0.003,
+          "after_observed_p95_ms": 0.025709,
+          "observed_median_change_percent": 199.4011976047904
+        },
+        "document_redo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000291,
+          "before_observed_p95_ms": 0.000208,
+          "after_observed_p95_ms": 0.000417,
+          "observed_median_change_percent": 132.80000000000004
+        },
+        "document_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000333,
+          "before_observed_p95_ms": 0.000959,
+          "after_observed_p95_ms": 0.002042,
+          "observed_median_change_percent": 166.4
+        },
+        "ui_duration_commit_events": {
+          "before_median_ms": 10.380792,
+          "after_median_ms": 15.801375,
+          "before_observed_p95_ms": 15.014666,
+          "after_observed_p95_ms": 23.90125,
+          "observed_median_change_percent": 52.2174319647287
+        },
+        "ui_duration_redo_events": {
+          "before_median_ms": 9.215458,
+          "after_median_ms": 14.689667,
+          "before_observed_p95_ms": 13.828792,
+          "after_observed_p95_ms": 19.131542,
+          "observed_median_change_percent": 59.402462688235346
+        },
+        "ui_duration_undo_events": {
+          "before_median_ms": 8.819834,
+          "after_median_ms": 12.395625,
+          "before_observed_p95_ms": 11.739417,
+          "after_observed_p95_ms": 16.433875,
+          "observed_median_change_percent": 40.54261111943831
+        },
+        "ui_name_commit_events": {
+          "before_median_ms": 6.4695,
+          "after_median_ms": 14.213583,
+          "before_observed_p95_ms": 20.805542,
+          "after_observed_p95_ms": 27.962,
+          "observed_median_change_percent": 119.70141432877348
+        },
+        "ui_redo_events": {
+          "before_median_ms": 7.378792,
+          "after_median_ms": 10.323,
+          "before_observed_p95_ms": 12.553875,
+          "after_observed_p95_ms": 16.093416,
+          "observed_median_change_percent": 39.90094855634907
+        },
+        "ui_undo_events": {
+          "before_median_ms": 7.192792,
+          "after_median_ms": 9.637541,
+          "before_observed_p95_ms": 12.43925,
+          "after_observed_p95_ms": 15.994209,
+          "observed_median_change_percent": 33.98887386149914
+        }
+      }
+    },
+    {
+      "task_count": 10000,
+      "baseline_count": 0,
+      "before_file": "10000-0.json",
+      "after_file": "10000-0.json",
+      "before_revision": "edbea737a4ebe081ceca2086b2a9b249e2c559fd+dirty",
+      "after_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+      "before_history_steps": 100,
+      "after_history_steps": 100,
+      "before_history_bytes": 66970,
+      "after_history_bytes": 17370,
+      "timings": {
+        "document_duration": {
+          "before_median_ms": 0.000208,
+          "after_median_ms": 0.000208,
+          "before_observed_p95_ms": 0.005375,
+          "after_observed_p95_ms": 0.006792,
+          "observed_median_change_percent": 0.0
+        },
+        "document_duration_redo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000167,
+          "before_observed_p95_ms": 0.00025,
+          "after_observed_p95_ms": 0.000291,
+          "observed_median_change_percent": 33.59999999999999
+        },
+        "document_duration_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000125,
+          "before_observed_p95_ms": 0.000333,
+          "after_observed_p95_ms": 0.000333,
+          "observed_median_change_percent": 0.0
+        },
+        "document_name": {
+          "before_median_ms": 0.000208,
+          "after_median_ms": 0.000208,
+          "before_observed_p95_ms": 0.007,
+          "after_observed_p95_ms": 0.027667,
+          "observed_median_change_percent": 0.0
+        },
+        "document_redo": {
+          "before_median_ms": 8.4e-05,
+          "after_median_ms": 8.4e-05,
+          "before_observed_p95_ms": 0.000333,
+          "after_observed_p95_ms": 0.00025,
+          "observed_median_change_percent": 0.0
+        },
+        "document_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000125,
+          "before_observed_p95_ms": 0.001041,
+          "after_observed_p95_ms": 0.001042,
+          "observed_median_change_percent": 0.0
+        },
+        "ui_duration_commit_events": {
+          "before_median_ms": 8.965792,
+          "after_median_ms": 10.829958,
+          "before_observed_p95_ms": 16.798,
+          "after_observed_p95_ms": 16.73425,
+          "observed_median_change_percent": 20.791983574903348
+        },
+        "ui_duration_redo_events": {
+          "before_median_ms": 7.1705,
+          "after_median_ms": 11.927209,
+          "before_observed_p95_ms": 9.916042,
+          "after_observed_p95_ms": 22.888583,
+          "observed_median_change_percent": 66.33720103200613
+        },
+        "ui_duration_undo_events": {
+          "before_median_ms": 7.163916,
+          "after_median_ms": 11.636542,
+          "before_observed_p95_ms": 9.455584,
+          "after_observed_p95_ms": 16.344584,
+          "observed_median_change_percent": 62.432697424146234
+        },
+        "ui_name_commit_events": {
+          "before_median_ms": 6.031708,
+          "after_median_ms": 8.33925,
+          "before_observed_p95_ms": 40.984375,
+          "after_observed_p95_ms": 45.543667,
+          "observed_median_change_percent": 38.256858587982045
+        },
+        "ui_redo_events": {
+          "before_median_ms": 6.057541,
+          "after_median_ms": 7.531959,
+          "before_observed_p95_ms": 9.043959,
+          "after_observed_p95_ms": 17.047083,
+          "observed_median_change_percent": 24.34020669443262
+        },
+        "ui_undo_events": {
+          "before_median_ms": 6.882125,
+          "after_median_ms": 12.39725,
+          "before_observed_p95_ms": 10.896042,
+          "after_observed_p95_ms": 22.695,
+          "observed_median_change_percent": 80.13694898014782
+        }
+      }
+    },
+    {
+      "task_count": 10000,
+      "baseline_count": 3,
+      "before_file": "10000-3.json",
+      "after_file": "10000-3.json",
+      "before_revision": "edbea737a4ebe081ceca2086b2a9b249e2c559fd+dirty",
+      "after_revision": "19c55995db0675d14c5016a212d83ed50039a0e2",
+      "before_history_steps": 100,
+      "after_history_steps": 100,
+      "before_history_bytes": 66970,
+      "after_history_bytes": 17370,
+      "timings": {
+        "document_duration": {
+          "before_median_ms": 0.000291,
+          "after_median_ms": 0.000209,
+          "before_observed_p95_ms": 0.01025,
+          "after_observed_p95_ms": 0.005,
+          "observed_median_change_percent": -28.1786941580756
+        },
+        "document_duration_redo": {
+          "before_median_ms": 0.000167,
+          "after_median_ms": 0.000167,
+          "before_observed_p95_ms": 0.000584,
+          "after_observed_p95_ms": 0.00025,
+          "observed_median_change_percent": 0.0
+        },
+        "document_duration_undo": {
+          "before_median_ms": 0.000166,
+          "after_median_ms": 0.000125,
+          "before_observed_p95_ms": 0.0005,
+          "after_observed_p95_ms": 0.000292,
+          "observed_median_change_percent": -24.69879518072289
+        },
+        "document_name": {
+          "before_median_ms": 0.00025,
+          "after_median_ms": 0.000208,
+          "before_observed_p95_ms": 0.007166,
+          "after_observed_p95_ms": 0.009958,
+          "observed_median_change_percent": -16.800000000000004
+        },
+        "document_redo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 8.4e-05,
+          "before_observed_p95_ms": 0.000333,
+          "after_observed_p95_ms": 0.000208,
+          "observed_median_change_percent": -32.800000000000004
+        },
+        "document_undo": {
+          "before_median_ms": 0.000125,
+          "after_median_ms": 0.000125,
+          "before_observed_p95_ms": 0.001084,
+          "after_observed_p95_ms": 0.000709,
+          "observed_median_change_percent": 0.0
+        },
+        "ui_duration_commit_events": {
+          "before_median_ms": 10.491125,
+          "after_median_ms": 19.234833,
+          "before_observed_p95_ms": 12.419209,
+          "after_observed_p95_ms": 21.611333,
+          "observed_median_change_percent": 83.3438549249961
+        },
+        "ui_duration_redo_events": {
+          "before_median_ms": 8.775584,
+          "after_median_ms": 13.376583,
+          "before_observed_p95_ms": 12.609458,
+          "after_observed_p95_ms": 22.883584,
+          "observed_median_change_percent": 52.42954770873369
+        },
+        "ui_duration_undo_events": {
+          "before_median_ms": 8.503666,
+          "after_median_ms": 11.209292,
+          "before_observed_p95_ms": 9.582167,
+          "after_observed_p95_ms": 18.548583,
+          "observed_median_change_percent": 31.817171558713596
+        },
+        "ui_name_commit_events": {
+          "before_median_ms": 6.724833,
+          "after_median_ms": 9.73325,
+          "before_observed_p95_ms": 39.231708,
+          "after_observed_p95_ms": 38.000458,
+          "observed_median_change_percent": 44.735936193508444
+        },
+        "ui_redo_events": {
+          "before_median_ms": 6.041917,
+          "after_median_ms": 10.739958,
+          "before_observed_p95_ms": 10.413208,
+          "after_observed_p95_ms": 15.05375,
+          "observed_median_change_percent": 77.75745678068733
+        },
+        "ui_undo_events": {
+          "before_median_ms": 6.06225,
+          "after_median_ms": 10.818042,
+          "before_observed_p95_ms": 18.505209,
+          "after_observed_p95_ms": 19.646625,
+          "observed_median_change_percent": 78.449288630459
+        }
+      }
+    }
+  ]
+}

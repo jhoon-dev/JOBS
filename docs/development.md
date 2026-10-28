@@ -174,3 +174,6 @@ Primavera XER 증분은 PRD XER-01~04를 먼저 정의하고 `persistence/Primav
 작업 표 모델/비동기 편집 증분은 PRD MODEL-01·ASYNC-EDIT-01~03·MODEL-PERF-01을 구현 전에 커밋했다. TaskTableModel/TaskTableView는 14열과 ID 기반 보기/선택을 유지하며, AsyncEditController와 Document의 봉인된 준비/반영 API가 공수·실적·배정 계산을 격리한다. 새 prepared_edit_contract/task_table_model_contract/async_editing_ui로 CTest 37개다. 1만 공수 작업에서 실행 중/완료 직전 취소, 최신 요청·문서 재열기·저장/F9 순서, 대화상자 초안/재시도와 창 파괴를 검사한다. 네이티브 검사는 `python scripts/capture-model-async-ui.py build`이며 PNG와 관측 JSON을 남긴다. [모델·비동기 편집 계약과 검증](model-async-editing.md)을 따른다.
 
 대규모 편집 응답성 증분은 PRD RESPONSIVE-01~04를 먼저 확정하고 내부 ProjectState의 owning read-only snapshot, worker의 정확한 dirty 준비와 일반 기간 단일 작업 delta, 연속 변경의 모델/WBS 증분 갱신을 추가했다. F9/공수 미리보기/기준선 준비/자동복구도 공유 입력을 캡처한다. responsive_document_contract/responsive_editing_ui를 포함해 CTest 39개를 구성하며, 상세 범위와 전후 원시 관측은 [대규모 편집 준비·dirty·화면 갱신](responsive-editing.md)을 따른다.
+
+
+구조·복합 편집 증분은 PRD BULK-01~04를 먼저 확정하고 작업 추가/삽입·삭제·복제·모든 TSV 붙여넣기와 해당 복합 undo/redo의 해석/검증/표시 준비를 worker로 연결했다. 현재 계획만 검증하는 내부 경계와 준비된 BulkView, 기본 보기의 행 추가/삭제 및 변경 범위 신호, 공유 delta·선택 범위·기준선 캐시를 사용한다. `bulk_editing_contract_ui`를 포함해 CTest 40개다. [구조·복합 편집 계약과 측정](bulk-editing.md)을 따른다.

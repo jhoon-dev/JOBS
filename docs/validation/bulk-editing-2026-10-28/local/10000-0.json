@@ -1,0 +1,106 @@
+{
+    "affected_tasks": 1000,
+    "baseline_count": 0,
+    "batch_phases_ms": {
+        "apply_gui": 1.2979,
+        "prepare_worker": 33.3577,
+        "request_gui": 0.0025
+    },
+    "built_product_source_sha256": "b14d009bdd2c35dd4db9e6bf571ed88f4703d43f953c36003c809b0ebe1d6c4d",
+    "fixture": "jobs-bulk-ui-v1",
+    "operations": [
+        {
+            "heartbeat_ticks": 6,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 101,
+            "operation": "insert",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 233.8556,
+            "setup_ready_ms": 3e-04,
+            "trigger_return_ms": 138.8283
+        },
+        {
+            "heartbeat_ticks": 7,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 48,
+            "operation": "undo_insert",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 112.2418,
+            "setup_ready_ms": 2e-04,
+            "trigger_return_ms": 1.4378
+        },
+        {
+            "heartbeat_ticks": 9,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 29,
+            "operation": "duplicate",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 99.7813,
+            "setup_ready_ms": 2e-04,
+            "trigger_return_ms": 1.4507
+        },
+        {
+            "heartbeat_ticks": 6,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 35,
+            "operation": "undo_duplicate",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 86.4514,
+            "setup_ready_ms": 2e-04,
+            "trigger_return_ms": 0.8783
+        },
+        {
+            "heartbeat_ticks": 3,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 57,
+            "operation": "paste",
+            "row_insert_signals": 0,
+            "row_remove_signals": 0,
+            "settled_ms": 99.7278,
+            "setup_ready_ms": 2e-04,
+            "trigger_return_ms": 2.0656
+        },
+        {
+            "heartbeat_ticks": 4,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 21,
+            "operation": "undo_paste",
+            "row_insert_signals": 0,
+            "row_remove_signals": 0,
+            "settled_ms": 77.7135,
+            "setup_ready_ms": 3e-04,
+            "trigger_return_ms": 1.726
+        },
+        {
+            "heartbeat_ticks": 7,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 98,
+            "operation": "delete",
+            "row_insert_signals": 0,
+            "row_remove_signals": 1,
+            "settled_ms": 263.9463,
+            "setup_ready_ms": 1e-04,
+            "trigger_return_ms": 180.2561
+        },
+        {
+            "heartbeat_ticks": 5,
+            "model_resets": 0,
+            "observed_max_heartbeat_gap_ms": 35,
+            "operation": "undo_delete",
+            "row_insert_signals": 1,
+            "row_remove_signals": 0,
+            "settled_ms": 90.8973,
+            "setup_ready_ms": 2e-04,
+            "trigger_return_ms": 1.4605
+        }
+    ],
+    "platform": "windows",
+    "scope": "One sample per operation; setup_ready_ms excluded from timing; trigger includes automated modal input/confirmation; settled includes worker and GUI refresh, excludes initial open/save/baselines and OS presentation",
+    "source_revision": "19c55995db0675d14c5016a212d83ed50039a0e2+dirty",
+    "status": "success",
+    "task_count": 10000
+}
