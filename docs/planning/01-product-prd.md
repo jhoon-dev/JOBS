@@ -271,3 +271,14 @@ F08/F09의 기간 부분과 수용 범위는 [기준선·실적·비교 계약](
 | MAINT-02 | 실제 컴파일 기반 정적 분석 | Clang 18/Qt 6.8.3의 compile_commands로 전체 src C++ 번역 단위를 clang-tidy 분석한다. clang-analyzer와 한정된 오류 중심 check를 명시하고 선택 진단·컴파일 오류를 CI 실패로 처리한다. 의존 헤더를 이유로 검사 전체를 끄거나 경고를 무조건 허용하지 않는다. 실행 대상·버전·명령/반환·원시 진단을 보존하고, format/analysis 실패 경로도 검증한다. |
 | MAINT-03 | 편집 권한 가드 통합 | 문서 존재·읽기 전용 여부를 복사/쓰기 없는 private helper에 모아 일반 편집·구조 변경·준비 요청에서 공유한다. 기존 거부 메시지/우선순위, 상태일·간트·저장·복구·stale 경합의 별도 조건, 읽기 전용 문서의 독립 사본 저장·조회 허용을 유지한다. 거부 시 입력/revision/session/dirty/이력/계산/공유 snapshot/파일·ID 부작용이 없음을 경계별 검사한다. |
 | MAINT-04 | 재현·회귀와 제품 범위 | 로컬/CI의 format·tidy 명령과 적용 파일 목록을 문서화한다. Windows/macOS 전체 회귀·독립 reader·일정 hash 및 기존 sanitizer/fuzz 검사를 유지한다. 파일 schema/계산/편집 의미를 변경하지 않으며, 전체 레거시 파일 포맷 일괄 적용·모든 tidy check·enum/다국어 개편은 별도 후속 범위다. |
+
+## 2026-10-28 선행관계·제약·작업 유형 enum 전환
+
+사용자 요청으로 구현 전에 ENUM-01~04와 [형식 전환·호환 계약](../plan-enums.md)을 확정한다.
+
+| ID | 요구사항 | 이번 완료조건 |
+|---|---|---|
+| ENUM-01 | 강한 도메인 타입 | DependencyType(FS/SS/FF/SF), ConstraintType(ASAP/ALAP/SNET/SNLT/FNET/FNLT/MSO/MFO), TaskType(고정 기간/공수/단위)를 enum class로 정의한다. 도메인 필드·편집 API/비동기 명령·계산·간트 모델은 typed 값을 사용한다. 관계 문자 인덱싱을 endpoint 의미 검사로 교체하고 잘못 캐스팅한 enum도 검증에서 거부한다. 자원 종류/계산 정책 등 다른 문자열 분류와 다국어는 이번 범위 밖이다. |
+| ENUM-02 | wire 표현 유지 | `.jobs` schema1~9와 복구/기준선/시나리오의 기존 canonical 문자열, 기본값·무결성·검증 정책을 유지한다. schema9를 올리지 않고 enum ordinal을 파일/보고서/교환 코드로 저장하지 않는다. 엄격한 문자열 변환은 Qt 없는 경계 helper에 모으고 미지원 값은 기본형으로 대체하지 않는다. 기존 UI 입력 대소문자 허용과 XML 숫자/XER PR_·CS_ 매핑은 각 경계에서 보존한다. |
+| ENUM-03 | 독립 호환 회귀 | enum 구현 전에 만든 native schema1~9·PDM/제약/공수 및 승인/실적/원가/시나리오 fixture의 원본 byte/SHA를 고정한다. 새 reader로 열고 typed 의미·기존 writer payload/토큰·저장/재열기·원본 보존을 검증한다. 기존 XML/XER fixture·보고서·복구·undo/redo와 지원되지 않는 token/enum 거부를 검사한다. |
+| ENUM-04 | 품질·계산 동등성 | 수정한 C++ 파일의 고정 formatter, 전체 src clang-tidy와 Windows/macOS 회귀·독립 reader·1천/1만 기본/공수 전체 일정 hash, ASan/UBSan·유한 parser fuzz를 유지한다. 타입 전환을 일정 정책 변경이나 외부 제품 전체 호환 판정으로 확대하지 않는다. |
