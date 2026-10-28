@@ -3,3 +3,5 @@ src/application/Document.h
 src/application/Document.cpp
 src/application/TaskEditing.cpp
 src/application/PreparedEdit.cpp
+src/ui/AsyncEditController.cpp
+src/ui/TaskTableModel.cpp
