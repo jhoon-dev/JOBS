@@ -107,7 +107,10 @@ Section "JOBS (필수)" MainSection
   WriteRegDWORD HKCU "${RegistryKey}" "NoModify" 1
   WriteRegDWORD HKCU "${RegistryKey}" "NoRepair" 1
   WriteRegDWORD HKCU "${RegistryKey}" "EstimatedSize" ${InstalledSizeKiB}
-  WriteRegDWORD HKCU "${RegistryKey}" "DesktopShortcut" 0
+  ReadRegDWORD $0 HKCU "${RegistryKey}" "DesktopShortcut"
+  ${If} $0 != 1
+    WriteRegDWORD HKCU "${RegistryKey}" "DesktopShortcut" 0
+  ${EndIf}
 SectionEnd
 
 Section /o "바탕화면 바로가기" DesktopSection

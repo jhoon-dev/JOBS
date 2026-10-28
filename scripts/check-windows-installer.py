@@ -1,5 +1,6 @@
 """Manual native acceptance helper; refuses to touch existing JOBS user data."""
 import argparse
+import ctypes
 import hashlib
 import json
 import os
@@ -34,6 +35,9 @@ def installer_command(executable, target):
 
 
 def main():
+    package_name_length = ctypes.c_uint32()
+    if ctypes.windll.kernel32.GetCurrentPackageFullName(ctypes.byref(package_name_length), None) != 15700:
+        raise RuntimeError('Use an unpackaged python.exe directly; Store aliases virtualize registry and AppData')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('install', 'launch', 'uninstall'))
     parser.add_argument('--installer', type=Path)
@@ -66,17 +70,32 @@ def main():
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, UNINSTALL, 0, ACCESS) as key:
             assert Path(winreg.QueryValueEx(key, 'InstallLocation')[0]) == target
             assert winreg.QueryValueEx(key, 'UninstallString')[0] == f'"{target}\\Uninstall.exe"'
+        desktop_buffer = ctypes.create_unicode_buffer(32768)
+        assert ctypes.windll.shell32.SHGetFolderPathW(None, 0x10, None, 0, desktop_buffer) == 0
+        desktop_shortcut = Path(desktop_buffer.value) / 'JOBS.lnk'
+        assert not desktop_shortcut.exists(), 'Existing desktop shortcut must be preserved; use a clean test account'
+        desktop_shortcut.write_bytes(b'installer smoke synthetic shortcut')
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, UNINSTALL, 0,
+                            winreg.KEY_WRITE | winreg.KEY_WOW64_64KEY) as key:
+            winreg.SetValueEx(key, 'DesktopShortcut', 0, winreg.REG_DWORD, 1)
+        # Reinstall without selecting the optional component: ownership must survive.
+        result = subprocess.run(installer_command(args.installer.resolve(), target), shell=False, timeout=120)
+        assert result.returncode == 0
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, UNINSTALL, 0, ACCESS) as key:
+            assert winreg.QueryValueEx(key, 'DesktopShortcut')[0] == 1
         state = {'case': str(case), 'target': str(target), 'local': str(local), 'roaming': str(roaming),
                  'installer': str(args.installer.resolve()), 'installer_sha256': digest(args.installer),
                  'settings_key_existed_empty': settings_existed, 'inventory_files_verified': len(manifest['files']),
-                 'source_revision': manifest['source_revision'], 'protected_nonempty_directory_rejected': True}
+                 'source_revision': manifest['source_revision'], 'protected_nonempty_directory_rejected': True,
+                 'desktop_shortcut': str(desktop_shortcut), 'reinstall_shortcut_ownership_preserved': True}
     else:
         state = json.loads(args.state.read_text(encoding='utf-8'))
         target, case = Path(state['target']), Path(state['case'])
         assert target.resolve().is_relative_to((ROOT / 'build').resolve()) and target.name == 'JOBS'
         if args.mode == 'launch':
             environment = os.environ.copy()
-            environment['PATH'] = os.pathsep.join((str(Path(environment['SystemRoot']) / 'System32'), environment['SystemRoot']))
+            system_root = os.environ['SystemRoot']
+            environment['PATH'] = os.pathsep.join((str(Path(system_root) / 'System32'), system_root))
             for name in list(environment):
                 if name.startswith(('QT_', 'QML_')) or name in ('QML2_IMPORT_PATH',):
                     environment.pop(name)
@@ -111,6 +130,8 @@ def main():
             assert not target.exists(), 'Installation directory was not fully removed'
             assert not Path(state['local']).exists() and not Path(state['roaming']).exists()
             assert not exists(SETTINGS) and not exists(UNINSTALL)
+            assert not Path(state['desktop_shortcut']).exists()
+            assert not (Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/JOBS').exists()
             assert digest(project) == project_hash
             assert (sibling / 'keep.txt').read_text() == 'other application data'
             # Remove only the synthetic sibling; restore the pre-test empty settings key.
