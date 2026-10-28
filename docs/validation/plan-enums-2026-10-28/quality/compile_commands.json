@@ -1,0 +1,656 @@
+[
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_domain.dir/src/domain/Project.cpp.o -c /home/runner/work/JOBS/JOBS/src/domain/Project.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/domain/Project.cpp",
+  "output": "CMakeFiles/jobs_domain.dir/src/domain/Project.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_domain.dir/src/domain/Wbs.cpp.o -c /home/runner/work/JOBS/JOBS/src/domain/Wbs.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/domain/Wbs.cpp",
+  "output": "CMakeFiles/jobs_domain.dir/src/domain/Wbs.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_domain.dir/src/domain/CalculationControl.cpp.o -c /home/runner/work/JOBS/JOBS/src/domain/CalculationControl.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/domain/CalculationControl.cpp",
+  "output": "CMakeFiles/jobs_domain.dir/src/domain/CalculationControl.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Scheduler.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Scheduler.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Scheduler.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Scheduler.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/WbsSummary.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/WbsSummary.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/WbsSummary.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/WbsSummary.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/WorkCalendar.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/WorkCalendar.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/WorkCalendar.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/WorkCalendar.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Forecast.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Forecast.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Forecast.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Forecast.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Tracking.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Tracking.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Tracking.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Tracking.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Resources.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Resources.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Resources.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Resources.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Costs.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Costs.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Costs.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Costs.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Reports.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Reports.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Reports.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Reports.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Pdm.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Pdm.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Pdm.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Pdm.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/PdmResources.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/PdmResources.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/PdmResources.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/PdmResources.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Constraints.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Constraints.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Constraints.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Constraints.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/Effort.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/Effort.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/Effort.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/Effort.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/EffortScheduler.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/EffortScheduler.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/EffortScheduler.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/EffortScheduler.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_calculation.dir/src/calculation/EffortEditing.cpp.o -c /home/runner/work/JOBS/JOBS/src/calculation/EffortEditing.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/calculation/EffortEditing.cpp",
+  "output": "CMakeFiles/jobs_calculation.dir/src/calculation/EffortEditing.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_application.dir/src/application/Document.cpp.o -c /home/runner/work/JOBS/JOBS/src/application/Document.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/application/Document.cpp",
+  "output": "CMakeFiles/jobs_application.dir/src/application/Document.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_application.dir/src/application/TaskEditing.cpp.o -c /home/runner/work/JOBS/JOBS/src/application/TaskEditing.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/application/TaskEditing.cpp",
+  "output": "CMakeFiles/jobs_application.dir/src/application/TaskEditing.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_application.dir/src/application/InputDelta.cpp.o -c /home/runner/work/JOBS/JOBS/src/application/InputDelta.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/application/InputDelta.cpp",
+  "output": "CMakeFiles/jobs_application.dir/src/application/InputDelta.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_application.dir/src/application/PreparedEdit.cpp.o -c /home/runner/work/JOBS/JOBS/src/application/PreparedEdit.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/application/PreparedEdit.cpp",
+  "output": "CMakeFiles/jobs_application.dir/src/application/PreparedEdit.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_application.dir/src/application/ProjectState.cpp.o -c /home/runner/work/JOBS/JOBS/src/application/ProjectState.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/application/ProjectState.cpp",
+  "output": "CMakeFiles/jobs_application.dir/src/application/ProjectState.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/JsonProjectStore.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/JsonProjectStore.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/JsonProjectStore.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/JsonProjectStore.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/ProjectJson.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/ProjectJson.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/ProjectJson.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/ProjectJson.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/JsonRecoveryStore.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/JsonRecoveryStore.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/JsonRecoveryStore.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/JsonRecoveryStore.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/ProjectFile.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/ProjectFile.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/ProjectFile.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/ProjectFile.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/ProjectXml.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/ProjectXml.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/ProjectXml.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/ProjectXml.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/ExchangePackage.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/ExchangePackage.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/ExchangePackage.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/ExchangePackage.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_persistence.dir/src/persistence/PrimaveraXer.cpp.o -c /home/runner/work/JOBS/JOBS/src/persistence/PrimaveraXer.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/persistence/PrimaveraXer.cpp",
+  "output": "CMakeFiles/jobs_persistence.dir/src/persistence/PrimaveraXer.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_reporting.dir/src/reporting/ReportFormat.cpp.o -c /home/runner/work/JOBS/JOBS/src/reporting/ReportFormat.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/reporting/ReportFormat.cpp",
+  "output": "CMakeFiles/jobs_reporting.dir/src/reporting/ReportFormat.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_reporting.dir/src/reporting/XlsxExport.cpp.o -c /home/runner/work/JOBS/JOBS/src/reporting/XlsxExport.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/reporting/XlsxExport.cpp",
+  "output": "CMakeFiles/jobs_reporting.dir/src/reporting/XlsxExport.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_reporting.dir/src/reporting/PdfExport.cpp.o -c /home/runner/work/JOBS/JOBS/src/reporting/PdfExport.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/reporting/PdfExport.cpp",
+  "output": "CMakeFiles/jobs_reporting.dir/src/reporting/PdfExport.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindow.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindow.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowTracking.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowTracking.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowTracking.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowTracking.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowResources.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowResources.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowResources.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowResources.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowCosts.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowCosts.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowCosts.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowCosts.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowRecovery.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowRecovery.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowRecovery.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowRecovery.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/AutoSaveController.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/AutoSaveController.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/AutoSaveController.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/AutoSaveController.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/RecoveryDialog.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/RecoveryDialog.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/RecoveryDialog.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/RecoveryDialog.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/CostAnalysisDialog.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/CostAnalysisDialog.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/ResourceComparisonDialog.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/ResourceComparisonDialog.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/ResourceComparisonDialog.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/ResourceComparisonDialog.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/ComparisonDialog.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/ComparisonDialog.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/GanttView.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/GanttView.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/GanttView.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/GanttView.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/ReportDialog.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/ReportDialog.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowCalendars.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowCalendars.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowCalendars.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowCalendars.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/GanttEditing.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/GanttEditing.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/GanttEditing.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/GanttEditing.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowConstraints.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowConstraints.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowConstraints.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowConstraints.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowEffort.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowEffort.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowEffort.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowEffort.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowTaskEditing.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowTaskEditing.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowTaskEditing.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowTaskEditing.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/TaskInput.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/TaskInput.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/TaskInput.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/TaskInput.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowXml.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowXml.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowXml.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowXml.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/TaskViewProjection.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/TaskViewProjection.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/TaskViewProjection.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/TaskViewProjection.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowXer.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowXer.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowXer.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowXer.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/TaskTableModel.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/TaskTableModel.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/TaskTableView.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/TaskTableView.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/TaskTableView.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/TaskTableView.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/AsyncEditController.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/AsyncEditController.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowAsync.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowAsync.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui.dir/src/ui/MainWindowResponsive.cpp.o -c /home/runner/work/JOBS/JOBS/src/ui/MainWindowResponsive.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/ui/MainWindowResponsive.cpp",
+  "output": "CMakeFiles/jobs_ui.dir/src/ui/MainWindowResponsive.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/JOBS.dir/src/main.cpp.o -c /home/runner/work/JOBS/JOBS/src/main.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/src/main.cpp",
+  "output": "CMakeFiles/JOBS.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/tests/fuzz -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_parser_harness.dir/tests/fuzz/ParserHarness.cpp.o -c /home/runner/work/JOBS/JOBS/tests/fuzz/ParserHarness.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/fuzz/ParserHarness.cpp",
+  "output": "CMakeFiles/jobs_parser_harness.dir/tests/fuzz/ParserHarness.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_document_guard_tests.dir/tests/DocumentGuardTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/DocumentGuardTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/DocumentGuardTests.cpp",
+  "output": "CMakeFiles/jobs_document_guard_tests.dir/tests/DocumentGuardTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_FIXTURES=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures\\\" -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/tests/fuzz -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_parser_seed_tests.dir/tests/fuzz/ParserSeeds.cpp.o -c /home/runner/work/JOBS/JOBS/tests/fuzz/ParserSeeds.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/fuzz/ParserSeeds.cpp",
+  "output": "CMakeFiles/jobs_parser_seed_tests.dir/tests/fuzz/ParserSeeds.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_responsive_document_tests.dir/tests/ResponsiveDocumentTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ResponsiveDocumentTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ResponsiveDocumentTests.cpp",
+  "output": "CMakeFiles/jobs_responsive_document_tests.dir/tests/ResponsiveDocumentTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_responsive_ui_tests.dir/tests/ResponsiveUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ResponsiveUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ResponsiveUiTests.cpp",
+  "output": "CMakeFiles/jobs_responsive_ui_tests.dir/tests/ResponsiveUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_prepared_edit_tests.dir/tests/PreparedEditTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PreparedEditTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PreparedEditTests.cpp",
+  "output": "CMakeFiles/jobs_prepared_edit_tests.dir/tests/PreparedEditTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_task_table_model_tests.dir/tests/TaskTableModelTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TaskTableModelTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TaskTableModelTests.cpp",
+  "output": "CMakeFiles/jobs_task_table_model_tests.dir/tests/TaskTableModelTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_PERF_CONFIG=\\\"Release\\\" -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_async_editing_ui_tests.dir/tests/AsyncEditingUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/AsyncEditingUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/AsyncEditingUiTests.cpp",
+  "output": "CMakeFiles/jobs_async_editing_ui_tests.dir/tests/AsyncEditingUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_XER_FIXTURE=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures/primavera-plan.xer\\\" -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_primavera_xer_tests.dir/tests/PrimaveraXerTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PrimaveraXerTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PrimaveraXerTests.cpp",
+  "output": "CMakeFiles/jobs_primavera_xer_tests.dir/tests/PrimaveraXerTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_XER_FIXTURE=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures/primavera-plan.xer\\\" -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_primavera_xer_ui_tests.dir/tests/PrimaveraXerUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PrimaveraXerUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PrimaveraXerUiTests.cpp",
+  "output": "CMakeFiles/jobs_primavera_xer_ui_tests.dir/tests/PrimaveraXerUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_XML_FIXTURE=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures/project-xml-plan.xml\\\" -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_project_xml_tests.dir/tests/ProjectXmlTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ProjectXmlTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ProjectXmlTests.cpp",
+  "output": "CMakeFiles/jobs_project_xml_tests.dir/tests/ProjectXmlTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_XML_FIXTURE=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures/project-xml-plan.xml\\\" -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_project_xml_ui_tests.dir/tests/ProjectXmlUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ProjectXmlUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ProjectXmlUiTests.cpp",
+  "output": "CMakeFiles/jobs_project_xml_ui_tests.dir/tests/ProjectXmlUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_PERF_CONFIG=\\\"Release\\\" -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_performance_probe.dir/tests/PerformanceProbe.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PerformanceProbe.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PerformanceProbe.cpp",
+  "output": "CMakeFiles/jobs_performance_probe.dir/tests/PerformanceProbe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_bulk_editing_tests.dir/tests/BulkEditingTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/BulkEditingTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/BulkEditingTests.cpp",
+  "output": "CMakeFiles/jobs_bulk_editing_tests.dir/tests/BulkEditingTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_projected_views_tests.dir/tests/ProjectedViewsTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ProjectedViewsTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ProjectedViewsTests.cpp",
+  "output": "CMakeFiles/jobs_projected_views_tests.dir/tests/ProjectedViewsTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_projected_view_probe.dir/tests/ProjectedViewPerformanceProbe.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ProjectedViewPerformanceProbe.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ProjectedViewPerformanceProbe.cpp",
+  "output": "CMakeFiles/jobs_projected_view_probe.dir/tests/ProjectedViewPerformanceProbe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_bulk_performance_probe.dir/tests/BulkPerformanceProbe.cpp.o -c /home/runner/work/JOBS/JOBS/tests/BulkPerformanceProbe.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/BulkPerformanceProbe.cpp",
+  "output": "CMakeFiles/jobs_bulk_performance_probe.dir/tests/BulkPerformanceProbe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_responsive_performance_probe.dir/tests/ResponsivePerformanceProbe.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ResponsivePerformanceProbe.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ResponsivePerformanceProbe.cpp",
+  "output": "CMakeFiles/jobs_responsive_performance_probe.dir/tests/ResponsivePerformanceProbe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_PERF_CONFIG=\\\"Release\\\" -DJOBS_SOURCE_DIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/build-quality -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_editing_performance_probe.dir/tests/EditingPerformanceProbe.cpp.o -c /home/runner/work/JOBS/JOBS/tests/EditingPerformanceProbe.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/EditingPerformanceProbe.cpp",
+  "output": "CMakeFiles/jobs_editing_performance_probe.dir/tests/EditingPerformanceProbe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_task_editing_tests.dir/tests/TaskEditingTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TaskEditingTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TaskEditingTests.cpp",
+  "output": "CMakeFiles/jobs_task_editing_tests.dir/tests/TaskEditingTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_task_editing_ui_tests.dir/tests/TaskEditingUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TaskEditingUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TaskEditingUiTests.cpp",
+  "output": "CMakeFiles/jobs_task_editing_ui_tests.dir/tests/TaskEditingUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_control_tests.dir/tests/CalculationControlTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/CalculationControlTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/CalculationControlTests.cpp",
+  "output": "CMakeFiles/jobs_control_tests.dir/tests/CalculationControlTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_integration_tests.dir/tests/IntegratedProjectTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/IntegratedProjectTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/IntegratedProjectTests.cpp",
+  "output": "CMakeFiles/jobs_integration_tests.dir/tests/IntegratedProjectTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_performance_ui_tests.dir/tests/PerformanceUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PerformanceUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PerformanceUiTests.cpp",
+  "output": "CMakeFiles/jobs_performance_ui_tests.dir/tests/PerformanceUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_effort_tests.dir/tests/EffortTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/EffortTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/EffortTests.cpp",
+  "output": "CMakeFiles/jobs_effort_tests.dir/tests/EffortTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_effort_ui_tests.dir/tests/EffortUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/EffortUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/EffortUiTests.cpp",
+  "output": "CMakeFiles/jobs_effort_ui_tests.dir/tests/EffortUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_constraint_tests.dir/tests/ConstraintTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ConstraintTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ConstraintTests.cpp",
+  "output": "CMakeFiles/jobs_constraint_tests.dir/tests/ConstraintTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_constraint_ui_tests.dir/tests/ConstraintUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ConstraintUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ConstraintUiTests.cpp",
+  "output": "CMakeFiles/jobs_constraint_ui_tests.dir/tests/ConstraintUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_pdm_tests.dir/tests/PdmTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PdmTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PdmTests.cpp",
+  "output": "CMakeFiles/jobs_pdm_tests.dir/tests/PdmTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_pdm_ui_tests.dir/tests/PdmUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PdmUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PdmUiTests.cpp",
+  "output": "CMakeFiles/jobs_pdm_ui_tests.dir/tests/PdmUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_undo_tests.dir/tests/UndoTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/UndoTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/UndoTests.cpp",
+  "output": "CMakeFiles/jobs_undo_tests.dir/tests/UndoTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DJOBS_ENUM_FIXTURES=\\\"/home/runner/work/JOBS/JOBS/tests/fixtures/enum-compat\\\" -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_plan_enum_tests.dir/tests/PlanEnumTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/PlanEnumTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/PlanEnumTests.cpp",
+  "output": "CMakeFiles/jobs_plan_enum_tests.dir/tests/PlanEnumTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_input_delta_tests.dir/tests/InputDeltaTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/InputDeltaTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/InputDeltaTests.cpp",
+  "output": "CMakeFiles/jobs_input_delta_tests.dir/tests/InputDeltaTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_editing_performance_ui_tests.dir/tests/EditingPerformanceUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/EditingPerformanceUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/EditingPerformanceUiTests.cpp",
+  "output": "CMakeFiles/jobs_editing_performance_ui_tests.dir/tests/EditingPerformanceUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_recovery_tests.dir/tests/RecoveryTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/RecoveryTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/RecoveryTests.cpp",
+  "output": "CMakeFiles/jobs_recovery_tests.dir/tests/RecoveryTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_recovery_ui_tests.dir/tests/RecoveryUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/RecoveryUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/RecoveryUiTests.cpp",
+  "output": "CMakeFiles/jobs_recovery_ui_tests.dir/tests/RecoveryUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_report_tests.dir/tests/ReportTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ReportTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ReportTests.cpp",
+  "output": "CMakeFiles/jobs_report_tests.dir/tests/ReportTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_report_ui_tests.dir/tests/ReportUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ReportUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ReportUiTests.cpp",
+  "output": "CMakeFiles/jobs_report_ui_tests.dir/tests/ReportUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_cost_tests.dir/tests/CostTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/CostTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/CostTests.cpp",
+  "output": "CMakeFiles/jobs_cost_tests.dir/tests/CostTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_cost_ui_tests.dir/tests/CostUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/CostUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/CostUiTests.cpp",
+  "output": "CMakeFiles/jobs_cost_ui_tests.dir/tests/CostUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_resource_tests.dir/tests/ResourceTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ResourceTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ResourceTests.cpp",
+  "output": "CMakeFiles/jobs_resource_tests.dir/tests/ResourceTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_resource_ui_tests.dir/tests/ResourceUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/ResourceUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/ResourceUiTests.cpp",
+  "output": "CMakeFiles/jobs_resource_ui_tests.dir/tests/ResourceUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_tracking_tests.dir/tests/TrackingTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TrackingTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TrackingTests.cpp",
+  "output": "CMakeFiles/jobs_tracking_tests.dir/tests/TrackingTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_tracking_file_tests.dir/tests/TrackingFileTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TrackingFileTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TrackingFileTests.cpp",
+  "output": "CMakeFiles/jobs_tracking_file_tests.dir/tests/TrackingFileTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_wbs_tests.dir/tests/WbsTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/WbsTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/WbsTests.cpp",
+  "output": "CMakeFiles/jobs_wbs_tests.dir/tests/WbsTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18  -I/home/runner/work/JOBS/JOBS/src -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/jobs_schedule_tests.dir/tests/SchedulerTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/SchedulerTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/SchedulerTests.cpp",
+  "output": "CMakeFiles/jobs_schedule_tests.dir/tests/SchedulerTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_NO_DEBUG -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_file_tests.dir/tests/FileLifecycleTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/FileLifecycleTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/FileLifecycleTests.cpp",
+  "output": "CMakeFiles/jobs_file_tests.dir/tests/FileLifecycleTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_ui_tests.dir/tests/UiLifecycleTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/UiLifecycleTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/UiLifecycleTests.cpp",
+  "output": "CMakeFiles/jobs_ui_tests.dir/tests/UiLifecycleTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_wbs_gantt_ui_tests.dir/tests/WbsGanttUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/WbsGanttUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/WbsGanttUiTests.cpp",
+  "output": "CMakeFiles/jobs_wbs_gantt_ui_tests.dir/tests/WbsGanttUiTests.cpp.o"
+},
+{
+  "directory": "/home/runner/work/JOBS/JOBS/build-quality",
+  "command": "/usr/bin/clang++-18 -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_TESTCASE_BUILDDIR=\\\"/home/runner/work/JOBS/JOBS/build-quality\\\" -DQT_TESTCASE_SOURCEDIR=\\\"/home/runner/work/JOBS/JOBS\\\" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -I/home/runner/work/JOBS/JOBS/src -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtGui -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtConcurrent -I/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtTest -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -fPIC -o CMakeFiles/jobs_tracking_ui_tests.dir/tests/TrackingUiTests.cpp.o -c /home/runner/work/JOBS/JOBS/tests/TrackingUiTests.cpp",
+  "file": "/home/runner/work/JOBS/JOBS/tests/TrackingUiTests.cpp",
+  "output": "CMakeFiles/jobs_tracking_ui_tests.dir/tests/TrackingUiTests.cpp.o"
+}
+]

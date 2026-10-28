@@ -1,0 +1,85 @@
+{
+  "status": "success",
+  "source_revision": "d35712898d432154098d21994d99ce5440fcf657",
+  "prd_revision": "06d4580",
+  "format_only_revision": "2cab025",
+  "desktop_run_id": 40651569003,
+  "quality_run_id": 40651569072,
+  "sanitized_run_id": 40651568910,
+  "ctest_per_platform": 44,
+  "ctest_seconds": {
+    "local-MinGW": 138.66,
+    "Windows": 79.37,
+    "macOS": 55.65,
+    "Linux-ASan-UBSan": 192.32
+  },
+  "enum_contract_checks": 402,
+  "pre_enum_files": 13,
+  "fixture_product_revision": "f3316f100cee78f9db866e5f7c689f2b0ffa77a7",
+  "writer_schema": 9,
+  "static_translation_units": 59,
+  "static_all_returncodes_zero": true,
+  "fuzz_executions": 15000,
+  "schedule_hashes": [
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_enum": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_enum": true
+    }
+  ],
+  "local_hash_checks": 4,
+  "local_schedule_repeats": 1,
+  "local_schedule_purpose": "deterministic hash comparison only; no performance improvement claim",
+  "superseded_run_note": "de1cb5c builds exposed one remaining invalid-string constraint test; 614b372 migrated it and added mixed-case UI coverage; d357128 removed two test-only copy warnings. Final three runs above all test d357128."
+}

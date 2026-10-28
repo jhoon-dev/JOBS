@@ -1,0 +1,113 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 20261028
+INFO: Loaded 1 modules   (42366 inline 8-bit counters): 42366 [0x556a7741a250, 0x556a774247ce), 
+INFO: Loaded 1 PC tables (42366 PCs): 42366 [0x556a774247d0,0x556a774c9fb0), 
+INFO:       45 files found in /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs
+INFO: seed corpus: files: 45 min: 4b max: 3257b total: 28662b rss: 51Mb
+#46	INITED cov: 1005 ft: 2617 corp: 21/16Kb exec/s: 0 rss: 69Mb
+#47	NEW    cov: 1005 ft: 2618 corp: 22/17Kb lim: 3257 exec/s: 0 rss: 71Mb L: 518/3257 MS: 1 InsertByte-
+#73	NEW    cov: 1008 ft: 2628 corp: 23/17Kb lim: 3257 exec/s: 0 rss: 72Mb L: 482/3257 MS: 1 InsertByte-
+#74	NEW    cov: 1008 ft: 2638 corp: 24/18Kb lim: 3257 exec/s: 0 rss: 72Mb L: 470/3257 MS: 1 ChangeBit-
+#120	NEW    cov: 1009 ft: 2641 corp: 25/18Kb lim: 3257 exec/s: 0 rss: 77Mb L: 425/3257 MS: 1 ShuffleBytes-
+#127	NEW    cov: 1010 ft: 2647 corp: 26/19Kb lim: 3257 exec/s: 0 rss: 77Mb L: 608/3257 MS: 2 ChangeASCIIInt-CMP- DE: "scenarios"-
+#143	NEW    cov: 1010 ft: 2648 corp: 27/19Kb lim: 3257 exec/s: 0 rss: 77Mb L: 488/3257 MS: 1 InsertRepeatedBytes-
+#144	NEW    cov: 1012 ft: 2650 corp: 28/20Kb lim: 3257 exec/s: 0 rss: 77Mb L: 608/3257 MS: 1 ChangeBinInt-
+#170	NEW    cov: 1013 ft: 2651 corp: 29/20Kb lim: 3257 exec/s: 0 rss: 78Mb L: 306/3257 MS: 1 CMP- DE: "\036\000\000\000\000\000\000\000"-
+#171	NEW    cov: 1015 ft: 2653 corp: 30/20Kb lim: 3257 exec/s: 0 rss: 78Mb L: 298/3257 MS: 1 ChangeBit-
+#198	NEW    cov: 1015 ft: 2654 corp: 31/21Kb lim: 3257 exec/s: 0 rss: 79Mb L: 609/3257 MS: 2 ChangeASCIIInt-InsertByte-
+#214	NEW    cov: 1015 ft: 2655 corp: 32/22Kb lim: 3257 exec/s: 0 rss: 79Mb L: 699/3257 MS: 1 InsertRepeatedBytes-
+#274	REDUCE cov: 1015 ft: 2655 corp: 32/22Kb lim: 3257 exec/s: 0 rss: 81Mb L: 3/3257 MS: 5 ChangeBinInt-ShuffleBytes-CopyPart-ShuffleBytes-EraseBytes-
+#286	REDUCE cov: 1015 ft: 2655 corp: 32/21Kb lim: 3257 exec/s: 0 rss: 81Mb L: 273/3257 MS: 2 ChangeASCIIInt-EraseBytes-
+#333	NEW    cov: 1015 ft: 2656 corp: 33/22Kb lim: 3257 exec/s: 0 rss: 82Mb L: 378/3257 MS: 2 ChangeBit-EraseBytes-
+#359	NEW    cov: 1016 ft: 2657 corp: 34/22Kb lim: 3257 exec/s: 0 rss: 83Mb L: 618/3257 MS: 1 CMP- DE: "dependency"-
+#370	NEW    cov: 1017 ft: 2666 corp: 35/23Kb lim: 3257 exec/s: 0 rss: 83Mb L: 609/3257 MS: 1 PersAutoDict- DE: "scenarios"-
+#396	NEW    cov: 1021 ft: 3188 corp: 36/26Kb lim: 3257 exec/s: 0 rss: 84Mb L: 3257/3257 MS: 1 ChangeASCIIInt-
+#417	NEW    cov: 1021 ft: 3190 corp: 37/27Kb lim: 3257 exec/s: 0 rss: 84Mb L: 608/3257 MS: 1 ChangeASCIIInt-
+#433	NEW    cov: 1022 ft: 3191 corp: 38/27Kb lim: 3257 exec/s: 0 rss: 84Mb L: 678/3257 MS: 1 InsertRepeatedBytes-
+#501	REDUCE cov: 1022 ft: 3191 corp: 38/27Kb lim: 3257 exec/s: 0 rss: 86Mb L: 442/3257 MS: 3 ChangeBinInt-ChangeByte-EraseBytes-
+#552	NEW    cov: 1023 ft: 3192 corp: 39/28Kb lim: 3257 exec/s: 0 rss: 87Mb L: 760/3257 MS: 1 InsertByte-
+#554	NEW    cov: 1025 ft: 3206 corp: 40/29Kb lim: 3257 exec/s: 0 rss: 87Mb L: 610/3257 MS: 2 InsertRepeatedBytes-InsertByte-
+#585	REDUCE cov: 1025 ft: 3206 corp: 40/28Kb lim: 3257 exec/s: 0 rss: 88Mb L: 361/3257 MS: 1 EraseBytes-
+#586	NEW    cov: 1026 ft: 3208 corp: 41/29Kb lim: 3257 exec/s: 0 rss: 88Mb L: 467/3257 MS: 1 EraseBytes-
+#627	NEW    cov: 1026 ft: 3222 corp: 42/31Kb lim: 3257 exec/s: 0 rss: 89Mb L: 2743/3257 MS: 1 ChangeBit-
+#668	NEW    cov: 1029 ft: 3279 corp: 43/35Kb lim: 3257 exec/s: 0 rss: 90Mb L: 3257/3257 MS: 1 ChangeBit-
+#674	NEW    cov: 1029 ft: 3281 corp: 44/35Kb lim: 3257 exec/s: 0 rss: 90Mb L: 554/3257 MS: 1 ChangeBinInt-
+#740	NEW    cov: 1030 ft: 3291 corp: 45/37Kb lim: 3257 exec/s: 0 rss: 92Mb L: 2350/3257 MS: 1 InsertRepeatedBytes-
+#781	NEW    cov: 1030 ft: 3292 corp: 46/38Kb lim: 3257 exec/s: 0 rss: 93Mb L: 554/3257 MS: 1 ChangeBit-
+#797	NEW    cov: 1030 ft: 3293 corp: 47/38Kb lim: 3257 exec/s: 0 rss: 93Mb L: 415/3257 MS: 1 CrossOver-
+#818	NEW    cov: 1030 ft: 3325 corp: 48/42Kb lim: 3257 exec/s: 0 rss: 94Mb L: 3257/3257 MS: 1 ChangeBinInt-
+#1161	NEW    cov: 1030 ft: 3326 corp: 49/42Kb lim: 3257 exec/s: 0 rss: 103Mb L: 235/3257 MS: 3 CrossOver-ChangeBinInt-EraseBytes-
+#1182	NEW    cov: 1030 ft: 3327 corp: 50/42Kb lim: 3257 exec/s: 0 rss: 104Mb L: 609/3257 MS: 1 InsertByte-
+#1228	NEW    cov: 1030 ft: 3329 corp: 51/43Kb lim: 3257 exec/s: 0 rss: 105Mb L: 555/3257 MS: 1 InsertRepeatedBytes-
+#1399	NEW    cov: 1030 ft: 3353 corp: 52/45Kb lim: 3257 exec/s: 0 rss: 110Mb L: 2339/3257 MS: 1 ChangeASCIIInt-
+	NEW_FUNC[1/1]: 0x556a77106b20 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>::~basic_string() /usr/bin/../lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/basic_string.h:809
+#1435	NEW    cov: 1035 ft: 3440 corp: 53/48Kb lim: 3257 exec/s: 0 rss: 111Mb L: 3257/3257 MS: 1 ShuffleBytes-
+#1517	NEW    cov: 1036 ft: 3458 corp: 54/51Kb lim: 3257 exec/s: 0 rss: 113Mb L: 2350/3257 MS: 2 ChangeByte-CMP- DE: "resource"-
+#1539	NEW    cov: 1036 ft: 3542 corp: 55/54Kb lim: 3257 exec/s: 0 rss: 114Mb L: 3257/3257 MS: 2 ChangeASCIIInt-ChangeByte-
+#1675	NEW    cov: 1036 ft: 3554 corp: 56/57Kb lim: 3257 exec/s: 0 rss: 118Mb L: 2743/3257 MS: 1 ChangeASCIIInt-
+#1776	REDUCE cov: 1036 ft: 3554 corp: 56/57Kb lim: 3257 exec/s: 0 rss: 121Mb L: 2/3257 MS: 1 EraseBytes-
+#1777	NEW    cov: 1036 ft: 3557 corp: 57/58Kb lim: 3257 exec/s: 0 rss: 121Mb L: 1457/3257 MS: 1 EraseBytes-
+#1788	REDUCE cov: 1036 ft: 3557 corp: 57/58Kb lim: 3257 exec/s: 0 rss: 121Mb L: 1/3257 MS: 1 EraseBytes-
+#1889	NEW    cov: 1036 ft: 3559 corp: 58/61Kb lim: 3257 exec/s: 0 rss: 125Mb L: 3257/3257 MS: 1 ChangeBinInt-
+#1932	REDUCE cov: 1036 ft: 3559 corp: 58/61Kb lim: 3257 exec/s: 0 rss: 126Mb L: 332/3257 MS: 3 ShuffleBytes-CMP-EraseBytes- DE: "\001\007"-
+#1943	NEW    cov: 1036 ft: 3561 corp: 59/63Kb lim: 3257 exec/s: 0 rss: 127Mb L: 2458/3257 MS: 1 EraseBytes-
+#2064	NEW    cov: 1038 ft: 3563 corp: 60/64Kb lim: 3257 exec/s: 0 rss: 131Mb L: 610/3257 MS: 1 ChangeByte-
+#2070	NEW    cov: 1038 ft: 3567 corp: 61/67Kb lim: 3257 exec/s: 0 rss: 131Mb L: 3257/3257 MS: 1 ChangeBit-
+#2106	NEW    cov: 1040 ft: 3570 corp: 62/67Kb lim: 3257 exec/s: 0 rss: 133Mb L: 271/3257 MS: 1 ChangeASCIIInt-
+	NEW_FUNC[1/1]: 0x556a77324b50 in std::unordered_set<int, std::hash<int>, std::equal_to<int>, std::allocator<int>>::~unordered_set() /usr/bin/../lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/unordered_set.h:104
+#2222	NEW    cov: 1045 ft: 3579 corp: 63/70Kb lim: 3257 exec/s: 0 rss: 138Mb L: 2339/3257 MS: 1 ChangeASCIIInt-
+#2373	NEW    cov: 1045 ft: 3582 corp: 64/72Kb lim: 3257 exec/s: 0 rss: 144Mb L: 2751/3257 MS: 1 CMP- DE: "\000\000\000\000\000\000\000\000"-
+#2449	NEW    cov: 1046 ft: 3583 corp: 65/73Kb lim: 3257 exec/s: 0 rss: 146Mb L: 271/3257 MS: 1 ChangeBinInt-
+#2527	NEW    cov: 1048 ft: 3595 corp: 66/75Kb lim: 3257 exec/s: 0 rss: 149Mb L: 2350/3257 MS: 3 ChangeASCIIInt-ChangeASCIIInt-CopyPart-
+#2548	NEW    cov: 1048 ft: 3600 corp: 67/77Kb lim: 3257 exec/s: 0 rss: 150Mb L: 2339/3257 MS: 1 ChangeByte-
+#2794	NEW    cov: 1048 ft: 3638 corp: 68/80Kb lim: 3257 exec/s: 0 rss: 158Mb L: 3257/3257 MS: 1 ShuffleBytes-
+#2800	NEW    cov: 1049 ft: 3642 corp: 69/84Kb lim: 3257 exec/s: 0 rss: 158Mb L: 3257/3257 MS: 1 PersAutoDict- DE: "scenarios"-
+#2811	NEW    cov: 1058 ft: 3686 corp: 70/87Kb lim: 3257 exec/s: 0 rss: 159Mb L: 3257/3257 MS: 1 ChangeBinInt-
+#2812	NEW    cov: 1059 ft: 3688 corp: 71/87Kb lim: 3257 exec/s: 0 rss: 159Mb L: 554/3257 MS: 1 ChangeBit-
+#3144	NEW    cov: 1059 ft: 3708 corp: 72/91Kb lim: 3257 exec/s: 0 rss: 174Mb L: 3257/3257 MS: 2 CopyPart-ChangeBit-
+#3231	NEW    cov: 1059 ft: 3710 corp: 73/91Kb lim: 3257 exec/s: 0 rss: 177Mb L: 608/3257 MS: 2 ChangeASCIIInt-ChangeASCIIInt-
+#3382	NEW    cov: 1059 ft: 3713 corp: 74/94Kb lim: 3257 exec/s: 3382 rss: 184Mb L: 2743/3257 MS: 1 ChangeByte-
+#3478	NEW    cov: 1059 ft: 3717 corp: 75/97Kb lim: 3257 exec/s: 3478 rss: 188Mb L: 2743/3257 MS: 1 ShuffleBytes-
+#3529	NEW    cov: 1059 ft: 3721 corp: 76/99Kb lim: 3257 exec/s: 3529 rss: 191Mb L: 2753/3257 MS: 1 InsertRepeatedBytes-
+#3555	NEW    cov: 1060 ft: 3724 corp: 77/101Kb lim: 3257 exec/s: 3555 rss: 192Mb L: 2009/3257 MS: 1 EraseBytes-
+#3616	NEW    cov: 1060 ft: 3733 corp: 78/103Kb lim: 3257 exec/s: 3616 rss: 194Mb L: 2339/3257 MS: 1 ChangeASCIIInt-
+#3757	NEW    cov: 1062 ft: 3735 corp: 79/104Kb lim: 3257 exec/s: 3757 rss: 198Mb L: 759/3257 MS: 1 ChangeBit-
+#3863	NEW    cov: 1065 ft: 3742 corp: 80/107Kb lim: 3257 exec/s: 3863 rss: 202Mb L: 2743/3257 MS: 1 ShuffleBytes-
+#3899	NEW    cov: 1065 ft: 3746 corp: 81/109Kb lim: 3257 exec/s: 3899 rss: 204Mb L: 2339/3257 MS: 1 ChangeBinInt-
+#3955	NEW    cov: 1066 ft: 3747 corp: 82/110Kb lim: 3257 exec/s: 3955 rss: 206Mb L: 419/3257 MS: 1 CMP- DE: "\000\000\000\000"-
+#3966	NEW    cov: 1067 ft: 3749 corp: 83/110Kb lim: 3257 exec/s: 3966 rss: 206Mb L: 608/3257 MS: 1 CMP- DE: "schemaV"-
+#3972	NEW    cov: 1067 ft: 3751 corp: 84/110Kb lim: 3257 exec/s: 3972 rss: 207Mb L: 350/3257 MS: 1 EraseBytes-
+#4058	NEW    cov: 1067 ft: 3832 corp: 85/114Kb lim: 3257 exec/s: 4058 rss: 211Mb L: 3257/3257 MS: 1 ChangeBit-
+#4154	NEW    cov: 1067 ft: 3834 corp: 86/116Kb lim: 3257 exec/s: 4154 rss: 214Mb L: 2743/3257 MS: 1 ChangeASCIIInt-
+#4275	NEW    cov: 1069 ft: 3836 corp: 87/119Kb lim: 3257 exec/s: 4275 rss: 218Mb L: 2743/3257 MS: 1 CMP- DE: "units"-
+#4341	NEW    cov: 1069 ft: 3841 corp: 88/121Kb lim: 3257 exec/s: 4341 rss: 221Mb L: 2344/3257 MS: 1 PersAutoDict- DE: "units"-
+#4412	NEW    cov: 1069 ft: 3842 corp: 89/124Kb lim: 3257 exec/s: 4412 rss: 224Mb L: 2339/3257 MS: 1 ChangeBit-
+#4453	NEW    cov: 1070 ft: 3843 corp: 90/124Kb lim: 3257 exec/s: 4453 rss: 227Mb L: 415/3257 MS: 1 ChangeByte-
+#4479	REDUCE cov: 1070 ft: 3843 corp: 90/124Kb lim: 3257 exec/s: 4479 rss: 228Mb L: 250/3257 MS: 1 EraseBytes-
+#4560	NEW    cov: 1070 ft: 3845 corp: 91/127Kb lim: 3257 exec/s: 4560 rss: 231Mb L: 2743/3257 MS: 1 ChangeBit-
+#4561	NEW    cov: 1071 ft: 3852 corp: 92/129Kb lim: 3257 exec/s: 4561 rss: 231Mb L: 2744/3257 MS: 1 InsertByte-
+#4567	NEW    cov: 1073 ft: 3854 corp: 93/132Kb lim: 3257 exec/s: 4567 rss: 232Mb L: 2745/3257 MS: 1 PersAutoDict- DE: "\001\007"-
+#4619	NEW    cov: 1074 ft: 3855 corp: 94/134Kb lim: 3257 exec/s: 4619 rss: 234Mb L: 2354/3257 MS: 2 PersAutoDict-ChangeASCIIInt- DE: "\000\000\000\000"-
+#4655	NEW    cov: 1074 ft: 3856 corp: 95/136Kb lim: 3257 exec/s: 4655 rss: 236Mb L: 2087/3257 MS: 1 InsertRepeatedBytes-
+#4726	NEW    cov: 1074 ft: 3857 corp: 96/139Kb lim: 3257 exec/s: 4726 rss: 239Mb L: 3257/3257 MS: 1 ChangeBit-
+#4862	NEW    cov: 1076 ft: 3859 corp: 97/142Kb lim: 3257 exec/s: 4862 rss: 243Mb L: 2844/3257 MS: 1 InsertRepeatedBytes-
+#4923	NEW    cov: 1077 ft: 3860 corp: 98/145Kb lim: 3257 exec/s: 4923 rss: 246Mb L: 3257/3257 MS: 1 CMP- DE: "startDate"-
+#5000	DONE   cov: 1077 ft: 3860 corp: 98/145Kb lim: 3257 exec/s: 5000 rss: 250Mb
+###### Recommended dictionary. ######
+"scenarios" # Uses: 90
+"\036\000\000\000\000\000\000\000" # Uses: 98
+"dependency" # Uses: 94
+"resource" # Uses: 51
+"\001\007" # Uses: 51
+"\000\000\000\000\000\000\000\000" # Uses: 31
+"\000\000\000\000" # Uses: 7
+"schemaV" # Uses: 9
+"units" # Uses: 7
+"startDate" # Uses: 2
+###### End of recommended dictionary. ######
+Done 5000 runs in 1 second(s)
+stat::number_of_executed_units: 5000
+stat::average_exec_per_sec:     5000
+stat::new_units_added:          85
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              250

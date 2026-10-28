@@ -35,4 +35,23 @@ ctest --test-dir build --output-on-failure
 python scripts/check-cpp-quality.py format --base a4b1fa1 --tool .deps/cpp-quality/Scripts/clang-format.exe
 ```
 
-수정 파일의 기존 포맷은 2cab025 커밋으로 먼저 분리했다. 타입 전환 후의 의미 변경과 리뷰에서 구분할 수 있다. 최종 실행 결과는 아래 검증 기록에 추가한다.
+수정 파일의 기존 포맷은 2cab025 커밋으로 먼저 분리했다. 타입 전환 후의 의미 변경과 리뷰에서 구분할 수 있다. 최종 실행 결과는 아래에 기록했다.
+
+## 2026-10-28 검증 결과
+
+검증한 코드 revision은 `d35712898d432154098d21994d99ce5440fcf657`이다. [원시 로그·도구 설정·결과 요약](validation/plan-enums-2026-10-28/verification.json)을 저장했다.
+
+| 검사 | 결과 |
+|---|---|
+| 로컬 MinGW Release | 44/44, 138.66초; 최종 증분 빌드 경고/오류 없음 |
+| Windows MSVC / macOS Clang | 각각 44/44, 79.37초 / 55.65초; 독립 reader·성능 비교·네이티브 UI 단계 완료 |
+| Linux Clang ASan/UBSan | 44/44, 192.32초; 실제 parser 의존 라이브러리 계측 확인 |
+| 새 enum 계약 | 402개 검사, 이전 파일 13개 SHA 및 schema1~9·전체 이력·사본 저장/재열기·undo/복구 통과 |
+| 포맷/정적 분석 | clang-format 18.1.8 검사 통과; 제품 src 59개 번역 단위의 clang-tidy 반환 모두 0 |
+| 외부 reader | openpyxl/pypdf/XML/독립 TSV/MPXJ로 기존 출력 값·관계·달력·자원·출처 검증 통과 |
+| 일정 동등성 | Windows/macOS × 기본/공수 × 1천/1만 작업의 전체 일정 hash 8개가 이전 f3316f1 증거와 일치; 로컬 4개도 일치 |
+| 유한 퍼징 | JOBS/XML/XER 각 5,000회, 총 15,000회 완료; 모든 seed 재생/퍼징 명령 반환 0 |
+
+[Desktop CI](https://github.com/jhoon-dev/JOBS/actions/runs/40651569003), [포맷·분석 CI](https://github.com/jhoon-dev/JOBS/actions/runs/40651569072), [ASan/UBSan·퍼징 CI](https://github.com/jhoon-dev/JOBS/actions/runs/40651568910)가 모두 같은 revision에서 성공했다. 최초 전체 테스트 빌드에서 남아 있던 invalid-string 테스트 한 곳을 발견해 enum 무효값 검사로 옮겼고, 혼합 대소문자 UI 입력 회귀와 테스트 복사 경고 수정을 마친 뒤 최종 세 workflow를 재실행했다.
+
+이 결과는 기존 native 파일 표현과 이번 타입 전환의 계산 동등성에 대한 증거다. XML/XER의 기존 지원 범위·손실 보고를 유지하며, 새 외부 제품 기능 호환이나 일정 정책을 추가하지 않았다. 로컬 일정 probe는 hash 검증 목적으로 1회 실행했으므로 성능 향상을 주장하지 않는다.

@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": "614b372dba6c318f15cfdd563a703d3bf1f48187",
+  "files": [
+    "src/application/Document.cpp",
+    "src/application/Document.h",
+    "src/application/PreparedEdit.cpp",
+    "src/application/TaskEditing.cpp",
+    "src/ui/AsyncEditController.cpp",
+    "src/ui/TaskTableModel.cpp",
+    "tests/PlanEnumTests.cpp"
+  ],
+  "format_changes": [],
+  "fix": false
+}

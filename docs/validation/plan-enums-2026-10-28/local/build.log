@@ -1,0 +1,15 @@
+[1/15] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\dow\Development\ToolMoa\JOBS\build && C:\Users\dow\AppData\Roaming\Python\Python314\site-packages\cmake\data\bin\cmake.exe -DSOURCE_DIR=C:/Users/dow/Development/ToolMoa/JOBS -DOUTPUT=C:/Users/dow/Development/ToolMoa/JOBS/build/BuildIdentity.h -P C:/Users/dow/Development/ToolMoa/JOBS/scripts/WriteBuildIdentity.cmake"
+[2/15] Building CXX object CMakeFiles/jobs_plan_enum_tests.dir/tests/PlanEnumTests.cpp.obj
+[3/15] Building CXX object CMakeFiles/jobs_performance_probe.dir/tests/PerformanceProbe.cpp.obj
+[4/15] Building CXX object CMakeFiles/jobs_async_editing_ui_tests.dir/tests/AsyncEditingUiTests.cpp.obj
+[5/15] Building CXX object CMakeFiles/jobs_projected_view_probe.dir/tests/ProjectedViewPerformanceProbe.cpp.obj
+[6/15] Building CXX object CMakeFiles/jobs_responsive_performance_probe.dir/tests/ResponsivePerformanceProbe.cpp.obj
+[7/15] Building CXX object CMakeFiles/jobs_bulk_performance_probe.dir/tests/BulkPerformanceProbe.cpp.obj
+[8/15] Linking CXX executable jobs_async_editing_ui_tests.exe
+[9/15] Linking CXX executable jobs_performance_probe.exe
+[10/15] Linking CXX executable jobs_projected_view_probe.exe
+[11/15] Building CXX object CMakeFiles/jobs_editing_performance_probe.dir/tests/EditingPerformanceProbe.cpp.obj
+[12/15] Linking CXX executable jobs_responsive_performance_probe.exe
+[13/15] Linking CXX executable jobs_bulk_performance_probe.exe
+[14/15] Linking CXX executable jobs_plan_enum_tests.exe
+[15/15] Linking CXX executable jobs_editing_performance_probe.exe

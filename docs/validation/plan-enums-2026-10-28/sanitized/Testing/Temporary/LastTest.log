@@ -1,0 +1,932 @@
+Start testing: Oct 28 07:50 UTC
+----------------------------------------------------------
+1/44 Testing: document_edit_guards
+1/44 Test: document_edit_guards
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_document_guard_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"document_edit_guards" start time: Oct 28 07:50 UTC
+Output:
+----------------------------------------------------------
+PASS: 70 closed/read-only guard cases, special messages, no input/history/snapshot/IO/ID effects, stale preparation, writable undo/redo and independent copy
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"document_edit_guards" end time: Oct 28 07:50 UTC
+"document_edit_guards" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/44 Testing: parser_seed_replay
+2/44 Test: parser_seed_replay
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_parser_seed_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"parser_seed_replay" start time: Oct 28 07:50 UTC
+Output:
+----------------------------------------------------------
+PASS: 56 parser seeds, schema 1..9, checksum/body separation, byte limit and store parity
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"parser_seed_replay" end time: Oct 28 07:50 UTC
+"parser_seed_replay" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/44 Testing: responsive_document_contract
+3/44 Test: responsive_document_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_responsive_document_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"responsive_document_contract" start time: Oct 28 07:50 UTC
+Output:
+----------------------------------------------------------
+PASS: shared snapshot isolation, exact bounded dirty comparisons, duration validation/undo, structural fallback, save races, eviction and deferred recovery
+<end of output>
+Test time =  55.21 sec
+----------------------------------------------------------
+Test Passed.
+"responsive_document_contract" end time: Oct 28 07:51 UTC
+"responsive_document_contract" time elapsed: 00:00:55
+----------------------------------------------------------
+
+4/44 Testing: responsive_editing_ui
+4/44 Test: responsive_editing_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_responsive_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"responsive_editing_ui" start time: Oct 28 07:51 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+PASS: 10k/3 baseline bounded model updates, selection/scroll, WBS delta, search, stale and missed-revision fallbacks
+<end of output>
+Test time =  10.61 sec
+----------------------------------------------------------
+Test Passed.
+"responsive_editing_ui" end time: Oct 28 07:51 UTC
+"responsive_editing_ui" time elapsed: 00:00:10
+----------------------------------------------------------
+
+5/44 Testing: prepared_edit_contract
+5/44 Test: prepared_edit_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_prepared_edit_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"prepared_edit_contract" start time: Oct 28 07:51 UTC
+Output:
+----------------------------------------------------------
+PASS: sealed worker preparation, one commit/undo, cancellation/late cancel/failure/no-op, source session, work preservation, immutable progress and running cancellation
+<end of output>
+Test time =   3.56 sec
+----------------------------------------------------------
+Test Passed.
+"prepared_edit_contract" end time: Oct 28 07:51 UTC
+"prepared_edit_contract" time elapsed: 00:00:03
+----------------------------------------------------------
+
+6/44 Testing: task_table_model_contract
+6/44 Test: task_table_model_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_task_table_model_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"task_table_model_contract" start time: Oct 28 07:51 UTC
+Output:
+----------------------------------------------------------
+PASS: Qt model tester, dimensions/roles/flags, sparse notifications/persistent index, dates/diagnostics, view mapping and session/read-only safety
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"task_table_model_contract" end time: Oct 28 07:51 UTC
+"task_table_model_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/44 Testing: async_editing_ui
+7/44 Test: async_editing_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_async_editing_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"async_editing_ui" start time: Oct 28 07:51 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+stage: responsive running cancellation
+stage: stale session, concurrent and latest-only edits
+stage: deferred save/F9, Gantt and batch inversion
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+stage: progress/assignment running cancellation, draft retry, immutable facts and dialog close
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: 10k model/view heartbeat, running/late cancellation, stale/session/latest-only requests, deferred save/F9, Gantt/batch, preview draft and lifetime safety
+<end of output>
+Test time =  57.66 sec
+----------------------------------------------------------
+Test Passed.
+"async_editing_ui" end time: Oct 28 07:52 UTC
+"async_editing_ui" time elapsed: 00:00:57
+----------------------------------------------------------
+
+8/44 Testing: primavera_xer_contract
+8/44 Test: primavera_xer_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_primavera_xer_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"primavera_xer_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+Primavera XER planning contract, independent dates, roundtrip, encodings, preservation and rejections passed
+<end of output>
+Test time =   0.91 sec
+----------------------------------------------------------
+Test Passed.
+"primavera_xer_contract" end time: Oct 28 07:52 UTC
+"primavera_xer_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/44 Testing: primavera_xer_ui
+9/44 Test: primavera_xer_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_primavera_xer_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"primavera_xer_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+Primavera XER UI preview/cancel/import/export/stale/readonly tests passed
+<end of output>
+Test time =   1.39 sec
+----------------------------------------------------------
+Test Passed.
+"primavera_xer_ui" end time: Oct 28 07:52 UTC
+"primavera_xer_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+10/44 Testing: project_xml_contract
+10/44 Test: project_xml_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_project_xml_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"project_xml_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+Project XML contract, source preservation, roundtrip and rejection tests passed
+<end of output>
+Test time =   1.62 sec
+----------------------------------------------------------
+Test Passed.
+"project_xml_contract" end time: Oct 28 07:52 UTC
+"project_xml_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+11/44 Testing: project_xml_ui
+11/44 Test: project_xml_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_project_xml_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"project_xml_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+Project XML UI preview/cancel/import/export/stale/readonly tests passed
+<end of output>
+Test time =   0.94 sec
+----------------------------------------------------------
+Test Passed.
+"project_xml_ui" end time: Oct 28 07:52 UTC
+"project_xml_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/44 Testing: bulk_editing_contract_ui
+12/44 Test: bulk_editing_contract_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_bulk_editing_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"bulk_editing_contract_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: bulk atomicity, validation oracle, cancellation/stale/save, shared undo, model tester/persistent IDs, compact selection, disjoint/sorted fallback
+<end of output>
+Test time =   3.97 sec
+----------------------------------------------------------
+Test Passed.
+"bulk_editing_contract_ui" end time: Oct 28 07:52 UTC
+"bulk_editing_contract_ui" time elapsed: 00:00:03
+----------------------------------------------------------
+
+13/44 Testing: projected_views_ui
+13/44 Test: projected_views_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_projected_views_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"projected_views_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+QAbstractItemView::commitData called with an editor that does not belong to this view
+This plugin does not support propagateSizeHints()
+PASS: projected search/sort/WBS/filter oracle, membership/layout/persistent IDs, range budget, view race and stale critical/Gantt
+<end of output>
+Test time =   7.78 sec
+----------------------------------------------------------
+Test Passed.
+"projected_views_ui" end time: Oct 28 07:52 UTC
+"projected_views_ui" time elapsed: 00:00:07
+----------------------------------------------------------
+
+14/44 Testing: task_editing_contract
+14/44 Test: task_editing_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_task_editing_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"task_editing_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: insert/delete/duplicate references and IDs, protected ledgers, atomic batch/fixed-work rules, undo/redo, failure/readonly, file and recovery
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"task_editing_contract" end time: Oct 28 07:52 UTC
+"task_editing_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/44 Testing: task_editing_ui
+15/44 Test: task_editing_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_task_editing_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"task_editing_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: TSV/limits, sorted atomic clipboard/undo, stable IDs/Gantt, search/filter/selection, insert/duplicate/delete keyboard, readonly
+<end of output>
+Test time =   1.35 sec
+----------------------------------------------------------
+Test Passed.
+"task_editing_ui" end time: Oct 28 07:52 UTC
+"task_editing_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+16/44 Testing: calculation_cancellation
+16/44 Test: calculation_cancellation
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_control_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"calculation_cancellation" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: pre-cancel, mid-calendar/backward cancel, no partial result, immutable input, restart and calendar cache isolation
+<end of output>
+Test time =   9.69 sec
+----------------------------------------------------------
+Test Passed.
+"calculation_cancellation" end time: Oct 28 07:52 UTC
+"calculation_cancellation" time elapsed: 00:00:09
+----------------------------------------------------------
+
+17/44 Testing: integrated_project_workflow
+17/44 Test: integrated_project_workflow
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_integration_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"integrated_project_workflow" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: create/WBS/calendar/effort/split/resource/cost, plan/baseline/actual/forecast/EVM/level/report, cancel/save/reopen/recovery
+<end of output>
+Test time =   1.95 sec
+----------------------------------------------------------
+Test Passed.
+"integrated_project_workflow" end time: Oct 28 07:52 UTC
+"integrated_project_workflow" time elapsed: 00:00:01
+----------------------------------------------------------
+
+18/44 Testing: performance_cancellation_ui
+18/44 Test: performance_cancellation_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_performance_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"performance_cancellation_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+PASS: viewport object bound, last row, offscreen stable selection, zoom, UI cancel/restart and late session rejection
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"performance_cancellation_ui" end time: Oct 28 07:52 UTC
+"performance_cancellation_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/44 Testing: effort_work_calendar_split
+19/44 Test: effort_work_calendar_split
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_effort_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"effort_work_calendar_split" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: work/type edit matrix, heterogeneous calendars, splits, exact final minute, PDM/constraints/ALAP, resource leveling, frozen costs/PV, explicit remaining, undo/schema9/recovery
+<end of output>
+Test time =   2.14 sec
+----------------------------------------------------------
+Test Passed.
+"effort_work_calendar_split" end time: Oct 28 07:52 UTC
+"effort_work_calendar_split" time elapsed: 00:00:02
+----------------------------------------------------------
+
+20/44 Testing: effort_ui
+20/44 Test: effort_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_effort_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"effort_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: effort/type/split UI, validation with no partial edit, automatic FS propagation, split Gantt paths, single-step undo/redo, resource calendar edit and read-only inspection
+<end of output>
+Test time =   0.82 sec
+----------------------------------------------------------
+Test Passed.
+"effort_ui" end time: Oct 28 07:52 UTC
+"effort_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/44 Testing: constraint_contract
+21/44 Test: constraint_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_constraint_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"constraint_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: 8 constraints/ALAP chains, fixed-calendar and causal conflicts, soft deadlines, actual preservation, leveling, atomic guarded drag/undo, schema8 and old engine recovery/report
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"constraint_contract" end time: Oct 28 07:52 UTC
+"constraint_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/44 Testing: constraint_gantt_ui
+22/44 Test: constraint_gantt_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_constraint_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"constraint_gantt_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: timing UI, causal deadline navigation, real mouse move/resize/undo/Esc/stale guards, successor propagation, week zoom, forecast/readonly drag exclusion
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"constraint_gantt_ui" end time: Oct 28 07:52 UTC
+"constraint_gantt_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/44 Testing: pdm_calendar_contract
+23/44 Test: pdm_calendar_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_pdm_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"pdm_calendar_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: PDM endpoints/leads/lags, minute-grid floats, independent calendars, validation/cycles, legacy/new baselines, schema7/recovery/undo, resources/leveling/cost/forecast/report
+<end of output>
+Test time =   0.56 sec
+----------------------------------------------------------
+Test Passed.
+"pdm_calendar_contract" end time: Oct 28 07:52 UTC
+"pdm_calendar_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/44 Testing: pdm_calendar_ui
+24/44 Test: pdm_calendar_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_pdm_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"pdm_calendar_ui" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: calendar registration/assignment/readonly, typed PDM units and invalid input, undo/redo, F9 dates, Gantt endpoint metadata
+<end of output>
+Test time =   0.37 sec
+----------------------------------------------------------
+Test Passed.
+"pdm_calendar_ui" end time: Oct 28 07:52 UTC
+"pdm_calendar_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/44 Testing: undo_contract
+25/44 Test: undo_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_undo_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"undo_contract" start time: Oct 28 07:52 UTC
+Output:
+----------------------------------------------------------
+PASS: atomic input history, monotonic revisions/STALE, saved-content dirty state, save/branch/no-op/error boundaries, stable WBS/resource/cost IDs, immutable facts, count/memory limits, readonly and observers
+<end of output>
+Test time =  18.21 sec
+----------------------------------------------------------
+Test Passed.
+"undo_contract" end time: Oct 28 07:53 UTC
+"undo_contract" time elapsed: 00:00:18
+----------------------------------------------------------
+
+26/44 Testing: plan_enum_compatibility
+26/44 Test: plan_enum_compatibility
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_plan_enum_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"plan_enum_compatibility" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: 402 checks; 13 pre-enum SHA fixtures, schemas1-9, strict tokens, typed validation, full history, SaveAs, undo and recovery
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"plan_enum_compatibility" end time: Oct 28 07:53 UTC
+"plan_enum_compatibility" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/44 Testing: input_delta_contract
+27/44 Test: input_delta_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_input_delta_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"input_delta_contract" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: sparse, inserted/deleted/empty vectors, all scalar/input fields and inverse order
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"input_delta_contract" end time: Oct 28 07:53 UTC
+"input_delta_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/44 Testing: editing_performance_ui
+28/44 Test: editing_performance_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_editing_performance_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"editing_performance_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+stage: initial
+stage: incremental
+stage: undo/redo
+stage: sort
+stage: search
+stage: filtered undo
+PASS: incremental rows/items/tree, stale dates, normalization, undo/redo, selection, scrolling, sorting/filtering and save
+<end of output>
+Test time =   1.00 sec
+----------------------------------------------------------
+Test Passed.
+"editing_performance_ui" end time: Oct 28 07:53 UTC
+"editing_performance_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+29/44 Testing: recovery_crash_file
+29/44 Test: recovery_crash_file
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_recovery_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"recovery_crash_file" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: actual process kill and pre-commit kill, stale/live locks, three generations, never-saved and Unicode recovery, immutable facts, detached copy, corruption/future/partial/race, missing/changed original, failed publish, exclusive discard and path confinement
+<end of output>
+Test time =   1.27 sec
+----------------------------------------------------------
+Test Passed.
+"recovery_crash_file" end time: Oct 28 07:53 UTC
+"recovery_crash_file" time elapsed: 00:00:01
+----------------------------------------------------------
+
+30/44 Testing: recovery_ui
+30/44 Test: recovery_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_recovery_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"recovery_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: background save retirement race, continuous deadline/pause/readonly/failure, startup selection, detached save, editor/document undo shortcuts, immutable notice, close cancel/discard, later and explicit discard
+<end of output>
+Test time =   1.37 sec
+----------------------------------------------------------
+Test Passed.
+"recovery_ui" end time: Oct 28 07:53 UTC
+"recovery_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+31/44 Testing: reports_export
+31/44 Test: reports_export
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_report_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"reports_export" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: snapshot/WBS/shared resources/empty scope/filters/unknown/stale inputs/F10/no-baseline AC/typed OOXML/injection/atomic create-only/PDF pagination; 9 PDF pages
+<end of output>
+Test time =   0.85 sec
+----------------------------------------------------------
+Test Passed.
+"reports_export" end time: Oct 28 07:53 UTC
+"reports_export" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/44 Testing: reports_ui
+32/44 Test: reports_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_report_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"reports_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: dashboard, report models, WBS/global demand, EAC/filter controls, XLSX/PDF dialogs, cancel/no mutation, stale snapshot during chooser/worker, readonly, invalid source text
+<end of output>
+Test time =   1.36 sec
+----------------------------------------------------------
+Test Passed.
+"reports_ui" end time: Oct 28 07:53 UTC
+"reports_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+33/44 Testing: cost_contract_file
+33/44 Test: cost_contract_file
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_cost_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"cost_contract_file" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: F10, EAC assumptions/zero denominator, asof/corrections, frozen budgets/rates/AC, effective dates/holidays, exact money rounding, WBS/cohort ratio, explicit physical/0-100 credit, overflow, persistence/provenance/schema5 migration
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"cost_contract_file" end time: Oct 28 07:53 UTC
+"cost_contract_file" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/44 Testing: cost_ui
+34/44 Test: cost_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_cost_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"cost_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: currency/rate precision, capacity edits preserve rates, task budgets, cumulative actual/physical reporting/corrections, F10 EVM/EAC, WBS/timephased/curve, no baseline/future AC/stale results, persistence and readonly
+<end of output>
+Test time =   0.66 sec
+----------------------------------------------------------
+Test Passed.
+"cost_ui" end time: Oct 28 07:53 UTC
+"cost_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/44 Testing: resource_contract_file
+35/44 Test: resource_contract_file
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_resource_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"resource_contract_file" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: F05 peak/work, short overlap, fractional/unknown/zero/date capacity, deterministic priority/FS/horizon, retained actuals, independent minute oracle, transactional commands, immutable snapshots, persistence/provenance, v4 migration
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"resource_contract_file" end time: Oct 28 07:53 UTC
+"resource_contract_file" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/44 Testing: resource_ui
+36/44 Test: resource_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_resource_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"resource_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: resource registration/exception validation, stable IDs, task assignments, peak/daily load, options invalidate results, saved A/B scenarios, unresolved horizon, source preservation and persistence, readonly
+<end of output>
+Test time =   0.85 sec
+----------------------------------------------------------
+Test Passed.
+"resource_ui" end time: Oct 28 07:53 UTC
+"resource_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/44 Testing: tracking_contract
+37/44 Test: tracking_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_tracking_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"tracking_contract" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: F09 +8h, immutable/versioned baseline, plan-vs-forecast variance, calendar snapshot, as-of corrections, validation/atomicity, completed actuals, F08 retained logic, unknowns/read-only
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_contract" end time: Oct 28 07:53 UTC
+"tracking_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/44 Testing: tracking_file
+38/44 Test: tracking_file
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_tracking_file_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"tracking_file" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: tracking roundtrip, retained history/provenance/clone, calendar immutability, baseline recomputation integrity, malformed ledger rejection, schema-3 copy migration
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_file" end time: Oct 28 07:53 UTC
+"tracking_file" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/44 Testing: wbs_contract
+39/44 Test: wbs_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_wbs_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"wbs_contract" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: F11 rollups, stable IDs/graph/dates, nested filter/move, unknowns, stale dates, cycles/dangling refs, atomic rejection, read-only, deep tree
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"wbs_contract" end time: Oct 28 07:53 UTC
+"wbs_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/44 Testing: schedule_contract
+40/44 Test: schedule_contract
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_schedule_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"schedule_contract" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: F01 CPM/float, multiple critical paths, calendar/holidays/lunch, milestones, missing duration, cycle path, dangling/self refs, horizon, provenance, determinism
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"schedule_contract" end time: Oct 28 07:53 UTC
+"schedule_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/44 Testing: file_lifecycle
+41/44 Test: file_lifecycle
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_file_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"file_lifecycle" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, stale revision/identity, schema-1 copy migration
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"file_lifecycle" end time: Oct 28 07:53 UTC
+"file_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/44 Testing: ui_lifecycle
+42/44 Test: ui_lifecycle
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"ui_lifecycle" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: new/save dialogs, task/duration/FS/holiday edits, async calculation, stale/incomplete/cycle handling, cancel/save on close
+<end of output>
+Test time =   0.64 sec
+----------------------------------------------------------
+Test Passed.
+"ui_lifecycle" end time: Oct 28 07:53 UTC
+"ui_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/44 Testing: wbs_gantt_ui
+43/44 Test: wbs_gantt_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_wbs_gantt_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"wbs_gantt_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: WBS tree/filter/global rows, filtered edits, task and subtree moves, add/rename/delete, Gantt IDs/links/milestones/selection/zoom/stale hiding
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"wbs_gantt_ui" end time: Oct 28 07:53 UTC
+"wbs_gantt_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/44 Testing: tracking_ui
+44/44 Test: tracking_ui
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_tracking_ui_tests" "-platform" "offscreen"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"tracking_ui" start time: Oct 28 07:53 UTC
+Output:
+----------------------------------------------------------
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS: baseline/status/progress dialogs, F09 comparison +8h, missing report coverage, baseline overlay/selection, invalid report error, immutable correction/versioning, UI save/reopen
+<end of output>
+Test time =   0.82 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_ui" end time: Oct 28 07:53 UTC
+"tracking_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 28 07:53 UTC

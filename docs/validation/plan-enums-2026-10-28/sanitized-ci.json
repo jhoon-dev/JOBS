@@ -1,0 +1,131 @@
+{
+  "conclusion": "success",
+  "headSha": "d35712898d432154098d21994d99ce5440fcf657",
+  "jobs": [
+    {
+      "completedAt": "2026-10-28T07:53:33Z",
+      "conclusion": "success",
+      "databaseId": 122692613739,
+      "name": "sanitized",
+      "startedAt": "2026-10-28T07:40:12Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T07:40:15Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T07:40:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:16Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-28T07:40:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:27Z",
+          "conclusion": "success",
+          "name": "Install runtime and Clang dependencies",
+          "number": 3,
+          "startedAt": "2026-10-28T07:40:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:47Z",
+          "conclusion": "success",
+          "name": "Run jurplel/install-qt-action@v4",
+          "number": 4,
+          "startedAt": "2026-10-28T07:40:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:48Z",
+          "conclusion": "success",
+          "name": "Record toolchain",
+          "number": 5,
+          "startedAt": "2026-10-28T07:40:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:50Z",
+          "conclusion": "success",
+          "name": "Configure instrumented JOBS and parser targets",
+          "number": 6,
+          "startedAt": "2026-10-28T07:40:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:40:50Z",
+          "conclusion": "success",
+          "name": "Verify instrumentation of real parser dependencies",
+          "number": 7,
+          "startedAt": "2026-10-28T07:40:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:50:12Z",
+          "conclusion": "success",
+          "name": "Build with bounded parallelism",
+          "number": 8,
+          "startedAt": "2026-10-28T07:40:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:25Z",
+          "conclusion": "success",
+          "name": "Run all regression contracts under ASan and UBSan",
+          "number": 9,
+          "startedAt": "2026-10-28T07:50:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:30Z",
+          "conclusion": "success",
+          "name": "Replay seeds and fuzz each real parser",
+          "number": 10,
+          "startedAt": "2026-10-28T07:53:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:31Z",
+          "conclusion": "success",
+          "name": "Preserve runtime and parser evidence",
+          "number": 11,
+          "startedAt": "2026-10-28T07:53:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:31Z",
+          "conclusion": "success",
+          "name": "Post Run jurplel/install-qt-action@v4",
+          "number": 21,
+          "startedAt": "2026-10-28T07:53:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:32Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 22,
+          "startedAt": "2026-10-28T07:53:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T07:53:32Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 23,
+          "startedAt": "2026-10-28T07:53:32Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40651568910/job/122692613739"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40651568910"
+}

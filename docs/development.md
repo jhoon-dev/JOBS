@@ -184,3 +184,5 @@ Primavera XER 증분은 PRD XER-01~04를 먼저 정의하고 `persistence/Primav
 외부 파일 검증 증분은 PRD PARSER-SAFE-01~04를 먼저 확정하고 실제 native 메모리 decoder와 XML/XER import에 공유 harness를 추가했다. `parser_seed_replay`를 포함해 CTest 42개이며, 기본 빌드에서는 56개 정상/손상 seed를 재생한다. 별도 Linux/Clang CI는 선택적 ASan/UBSan 전체 회귀와 libFuzzer 세 타깃의 유한 실행을 수행한다. [명령·경계·검증 결과](parser-safety.md)를 따른다.
 
 유지보수 증분은 PRD MAINT-01~04를 먼저 확정하고 편집 핵심의 점진 포맷, 전체 제품 src의 clang-tidy, private 편집 권한 가드를 도입했다. `document_edit_guards`를 포함해 CTest 43개다. 기본 빌드에는 formatter/analyzer가 필요하지 않으며 [도구 명령·가드 계약·검증](cpp-quality.md)을 따른다.
+
+타입 증분은 PRD ENUM-01~04를 먼저 확정하고 DependencyType/ConstraintType/TaskType을 도메인·편집 API·계산·UI에 적용했다. writer schema9와 파일 문자열/기본값은 유지한다. `plan_enum_compatibility`를 더해 CTest 44개로 확장했으며 이전 writer 파일 13개, 중첩 이력, 엄격한 token/enum 검증과 사본 저장·복구를 검사한다. [변환표·기존 파일 호환·검증](plan-enums.md)을 따른다.

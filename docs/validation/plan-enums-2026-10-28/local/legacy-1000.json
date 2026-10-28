@@ -1,0 +1,56 @@
+{
+    "build_configuration": "Release",
+    "built_product_source_sha256": "9fc75034918fcb1764f381b7872b74053797044d64443e0b1e372abc2b3f3a30",
+    "calculation": {
+        "median_ms": 10.5247,
+        "observed_p95_ms": 10.5247,
+        "samples_ms": [
+            10.5247
+        ]
+    },
+    "calendar_count": 0,
+    "compiler": "13.1.0",
+    "cpu_architecture": "x86_64",
+    "dependency_count": 900,
+    "fixture": "jobs-perf-layered-v1",
+    "logical_cpu_count": 16,
+    "maximum_gantt_items": 110,
+    "os": "Windows 11 Version 26H2",
+    "peak_memory_semantics": "OS process high water mark; not an incremental allocation measurement",
+    "peak_process_resident_bytes": 65114112,
+    "profile": "native-fs0-workminutes-v1",
+    "project_finish": "2026-10-27 11:00",
+    "qt": "6.8.3",
+    "repeats": 1,
+    "resource_count": 0,
+    "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+    "scroll": {
+        "median_ms": 33.0317,
+        "observed_p95_ms": 94.011,
+        "samples_ms": [
+            94.011,
+            42.4481,
+            27.2301,
+            36.2652,
+            44.6889,
+            31.1501,
+            26.0951,
+            28.5811,
+            23.0637,
+            33.4051,
+            32.6583,
+            50.7004
+        ]
+    },
+    "source_revision": "d35712898d432154098d21994d99ce5440fcf657",
+    "split_task_count": 0,
+    "status": "success",
+    "task_count": 1000,
+    "ui_preparation": {
+        "median_ms": 663.0317,
+        "observed_p95_ms": 663.0317,
+        "samples_ms": [
+            663.0317
+        ]
+    }
+}
