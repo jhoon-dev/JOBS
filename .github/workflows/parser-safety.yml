@@ -1,5 +1,5 @@
 name: Parser fuzzing and runtime checks
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 jobs:
   sanitized:
     runs-on: ubuntu-24.04
@@ -15,11 +15,11 @@ jobs:
       - name: Install runtime and Clang dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang llvm libgl1-mesa-dev libxkbcommon-dev libegl1
+          sudo apt-get install -y clang llvm libclang-rt-dev libgl1-mesa-dev libxkbcommon-dev libegl1
       - uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
-          arch: gcc_64
+          arch: linux_gcc_64
           cache: true
       - name: Record toolchain
         run: |
