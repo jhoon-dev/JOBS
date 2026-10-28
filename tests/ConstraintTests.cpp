@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
                   jobs::deadlineSlack(due, due.tasks[1], warning.tasks[1].finish) == -240,
               "deadline changed schedule or lost slack");
         auto invalid = sample();
-        invalid.tasks[1].constraintType = "bad";
+        invalid.tasks[1].constraintType = static_cast<jobs::ConstraintType>(-1);
         rejects([&] { jobs::validate(invalid); });
         invalid = sample();
         invalid.tasks[1].constraintAt = "2026-10-27 09:00";

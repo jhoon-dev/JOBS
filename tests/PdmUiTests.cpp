@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         action(window, "assignTaskCalendar");
         check(!doc.project()->tasks[1].calendarId.empty() && cellText(table, 1, 9) == "오후 현장팀",
               "task calendar assignment lost");
-        setCellText(table, 1, 2, "1SS+1.5h");
+        setCellText(table, 1, 2, "1sS+1.5h");
         check(doc.project()->tasks[1].dependencyRules[0].lagMinutes == 90 && cellText(table, 1, 2) == "1SS+90m",
               "typed relation parse/format wrong");
         auto before = *doc.project();
