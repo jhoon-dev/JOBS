@@ -576,6 +576,9 @@ void WorkspaceDialog::taskChoices() {
 void WorkspaceDialog::startAnalysis() {
     if (busy_)
         return;
+    // Synchronize pending view notifications before freezing this operation's source.
+    // Otherwise the next timer tick can cancel a fresh operation for an older edit.
+    refresh();
     const auto generation = workspace_.generation();
     const auto config = workspace_.configuration();
     const auto snapshots = workspace_.snapshots();

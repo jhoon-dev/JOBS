@@ -121,6 +121,8 @@ int main(int argc, char **argv) {
                   "stale worker result applied");
             a->undo();
             analyze->click();
+            for (auto *timer : dialog.findChildren<QTimer *>())
+                QMetaObject::invokeMethod(timer, "timeout", Qt::DirectConnection);
             wait([&] { return analyze->isEnabled(); });
             check(load->model()->rowCount() == 1 && load->model()->index(0, 3).data().toInt() == 200,
                   "aggregate UI did not show concurrent demand");
