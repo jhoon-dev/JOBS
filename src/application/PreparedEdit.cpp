@@ -127,8 +127,7 @@ std::shared_ptr<BulkView> prepareView(const Project &before, const Project &afte
 }
 } // namespace
 Document::EditRequest Document::makeEditRequest(EditCommand command, ViewPreparation viewPreparation) const {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     const bool reserve =
         std::holds_alternative<ProgressEdit>(command) || std::holds_alternative<InsertTasksEdit>(command) ||
         std::holds_alternative<DuplicateTasksEdit>(command) || std::holds_alternative<DeferredTaskEdit>(command);
@@ -252,8 +251,8 @@ EditState Document::applyPreparedEdit(PreparedEdit &result) {
         return EditState::Stale;
     if (result.control_ && result.control_->cancelRequested.load())
         return EditState::Cancelled;
-    if (!project_ || readOnly_ || project_->documentId != result.documentId_ ||
-        project_->revision != result.revision_ || sessionGeneration_ != result.session_)
+    if (!isEditable() || project_->documentId != result.documentId_ || project_->revision != result.revision_ ||
+        sessionGeneration_ != result.session_)
         return EditState::Stale;
     if (result.state_ != EditState::Ready && result.state_ != EditState::NoChange)
         return result.state_;

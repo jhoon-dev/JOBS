@@ -167,6 +167,8 @@ public:
     void saveAs(const std::string &path);
 
 private:
+    bool isEditable() const;
+    void requireEditable() const;
     ProjectStore &store_;
     ProjectState project_;
     std::string path_, fingerprint_;

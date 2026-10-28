@@ -5,6 +5,13 @@
 #include <algorithm>
 
 namespace jobs {
+bool Document::isEditable() const {
+    return project_ && !readOnly_;
+}
+void Document::requireEditable() const {
+    if (!isEditable())
+        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+}
 void Document::create(std::string name, std::string date, const std::vector<std::string> &tasks) {
     Project p;
     p.documentId = store_.newId();
@@ -72,8 +79,7 @@ void Document::open(const std::string &path, bool readOnly) {
     notify(Event::Replaced);
 }
 void Document::renameTask(std::size_t row, std::string name) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     const auto &original = project_->tasks.at(row);
     if (original.name == name)
         return;
@@ -97,15 +103,13 @@ void Document::renameTask(std::size_t row, std::string name) {
     notify(Event::Edited);
 }
 void Document::addTask(std::string name, std::string wbsId) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.tasks.push_back({store_.newId(), std::move(name), std::nullopt, {}, std::move(wbsId)});
     edit(std::move(p), "작업 추가");
 }
 std::string Document::addWbs(std::string name, std::string parentId) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto id = store_.newId();
     p.wbsNodes.push_back({id, std::move(name), std::move(parentId)});
@@ -113,8 +117,7 @@ std::string Document::addWbs(std::string name, std::string parentId) {
     return id;
 }
 void Document::renameWbs(const std::string &id, std::string name) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto &n) { return n.id == id; });
     if (it == p.wbsNodes.end())
@@ -123,8 +126,7 @@ void Document::renameWbs(const std::string &id, std::string name) {
     edit(std::move(p), "WBS 이름 변경");
 }
 void Document::moveWbs(const std::string &id, std::string parentId) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto &n) { return n.id == id; });
     if (it == p.wbsNodes.end())
@@ -133,8 +135,7 @@ void Document::moveWbs(const std::string &id, std::string parentId) {
     edit(std::move(p), "WBS 이동");
 }
 void Document::removeWbs(const std::string &id) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     for (const auto &n : p.wbsNodes)
         if (n.parentId == id)
@@ -148,15 +149,13 @@ void Document::removeWbs(const std::string &id) {
     edit(std::move(p), "빈 WBS 삭제");
 }
 void Document::assignWbs(std::size_t row, std::string id) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.tasks.at(row).wbsId = std::move(id);
     edit(std::move(p), "작업 WBS 변경");
 }
 void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (project_->tasks.at(row).taskType == "fixed-work") {
         auto p = *project_;
         changeDuration(p, row, minutes);
@@ -191,8 +190,7 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
 }
 void Document::setTaskEffort(std::size_t row, std::string type, bool workInput, std::optional<std::int64_t> duration,
                              std::optional<std::int64_t> work, std::vector<TaskBreak> breaks) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.calculationProfile = effortProfile;
     auto &t = p.tasks.at(row);
@@ -211,16 +209,14 @@ void Document::setTaskEffort(std::size_t row, std::string type, bool workInput, 
     edit(std::move(p), "작업 유형·공수·분할 변경");
 }
 void Document::setPredecessors(std::size_t row, std::vector<std::string> ids) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     std::vector<Dependency> edges;
     for (auto &id : ids)
         edges.push_back({std::move(id), "FS", 0});
     setDependencies(row, std::move(edges));
 }
 void Document::setDependencies(std::size_t row, std::vector<Dependency> edges) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto &t = p.tasks.at(row);
     t.predecessors.clear();
@@ -235,8 +231,7 @@ void Document::setDependencies(std::size_t row, std::vector<Dependency> edges) {
     edit(std::move(p), "선행관계·지연 변경");
 }
 std::string Document::putCalendar(TaskCalendar c) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     if (c.id.empty())
         c.id = store_.newId();
@@ -251,8 +246,7 @@ std::string Document::putCalendar(TaskCalendar c) {
     return c.id;
 }
 void Document::removeCalendar(const std::string &id) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     for (const auto &t : p.tasks)
         if (t.calendarId == id)
@@ -265,8 +259,7 @@ void Document::removeCalendar(const std::string &id) {
     edit(std::move(p), "작업 달력 삭제");
 }
 void Document::setTaskCalendar(std::size_t row, std::string id) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.tasks.at(row).calendarId = std::move(id);
     if (!p.tasks.at(row).calendarId.empty() && !isPdm(p))
@@ -275,8 +268,7 @@ void Document::setTaskCalendar(std::size_t row, std::string id) {
 }
 void Document::setTaskTiming(std::size_t row, std::string type, std::optional<std::string> at,
                              std::optional<std::string> deadline) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto &t = p.tasks.at(row);
     if (t.constraintType == type && t.constraintAt == at && t.deadlineAt == deadline)
@@ -290,7 +282,7 @@ void Document::setTaskTiming(std::size_t row, std::string type, std::optional<st
 }
 void Document::editGantt(const std::string &id, std::uint64_t revision, const std::string &taskId, bool resize,
                          const std::string &target) {
-    if (!project_ || readOnly_ || project_->documentId != id || project_->revision != revision || !calculation_ ||
+    if (!isEditable() || project_->documentId != id || project_->revision != revision || !calculation_ ||
         calculation_->status != CalculationStatus::Valid || calculation_->inputRevision != revision ||
         project_->statusAt)
         throw std::runtime_error(
@@ -336,22 +328,19 @@ void Document::editGantt(const std::string &id, std::uint64_t revision, const st
     edit(std::move(p), resize ? "간트 기간 변경" : "간트 날짜 이동");
 }
 void Document::setHolidays(std::vector<std::string> dates) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.holidays = std::move(dates);
     edit(std::move(p), "휴일 변경");
 }
 void Document::setStatusAt(std::optional<std::string> stamp) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     p.statusAt = std::move(stamp);
     edit(std::move(p), "상태일 변경");
 }
 std::string Document::appendBaseline(Baseline b) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (b.sourceDocumentId != project_->documentId || b.inputRevision != project_->revision ||
         b.input != static_cast<const PlanInput &>(*project_))
         throw std::runtime_error("기준선 준비 중 문서가 변경되었습니다. 최신 계획으로 다시 저장하세요.");
@@ -365,13 +354,12 @@ std::string Document::appendBaseline(Baseline b) {
     return id;
 }
 std::string Document::captureBaseline(std::string name, std::string author, std::string reason, std::string utc) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     return appendBaseline(
         prepareBaseline(*project_, std::move(name), std::move(author), std::move(reason), std::move(utc)));
 }
 void Document::recordProgress(ProgressEntry entry) {
-    if (!project_ || readOnly_ || !project_->statusAt)
+    if (!isEditable() || !project_->statusAt)
         throw std::runtime_error("실적 보고 전에 상태일을 설정하세요.");
     auto p = *project_;
     entry.id = store_.newId();
@@ -410,8 +398,7 @@ void Document::staleCalculation() {
     }
 }
 void Document::setCurrency(std::string currency) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (currency == project_->currency)
         return;
     auto monetary = [](const PlanInput &p) {
@@ -431,8 +418,7 @@ void Document::setCurrency(std::string currency) {
     edit(std::move(p), "프로젝트 통화 변경");
 }
 void Document::setTaskCost(TaskCost cost) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     auto it =
         std::find_if(p.taskCosts.begin(), p.taskCosts.end(), [&](const auto &c) { return c.taskId == cost.taskId; });
@@ -443,7 +429,7 @@ void Document::setTaskCost(TaskCost cost) {
     edit(std::move(p), "작업 예산 변경");
 }
 void Document::recordCost(CostEntry entry) {
-    if (!project_ || readOnly_ || !project_->statusAt)
+    if (!isEditable() || !project_->statusAt)
         throw std::runtime_error("원가 보고 전에 편집 가능한 프로젝트와 상태일이 필요합니다.");
     auto p = *project_;
     entry.id = store_.newId();
@@ -461,8 +447,7 @@ void Document::recordCost(CostEntry entry) {
     edit(std::move(p));
 }
 std::string Document::putResource(Resource r) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     if (!r.calendarId.empty())
         p.calculationProfile = effortProfile;
@@ -481,8 +466,7 @@ std::string Document::putResource(Resource r) {
     return id;
 }
 void Document::removeResource(const std::string &id) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     for (const auto &a : p.assignments)
         if (a.resourceId == id)
@@ -492,8 +476,7 @@ void Document::removeResource(const std::string &id) {
     edit(std::move(p), "자원 삭제");
 }
 void Document::setAssignments(const std::string &id, std::vector<Assignment> assignments) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     if (std::none_of(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == id; }))
         throw std::runtime_error("작업이 존재하지 않습니다.");
@@ -533,8 +516,7 @@ void Document::setAssignments(const std::string &id, std::vector<Assignment> ass
 }
 std::string Document::saveScenario(std::string name, std::string priority, int horizon, std::string utc,
                                    const std::string &sourceId, std::uint64_t sourceRevision) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (sourceId != project_->documentId || sourceRevision != project_->revision)
         throw std::runtime_error("비교 중 문서가 변경되었습니다. 최신 입력으로 다시 계산하세요.");
     auto p = *project_;
@@ -591,7 +573,7 @@ void Document::applyCalculation(ScheduleResult result) {
     ++calculationGeneration_;
 }
 void Document::save() {
-    if (!project_ || path_.empty() || readOnly_ || requiresSaveAs_)
+    if (!isEditable() || path_.empty() || requiresSaveAs_)
         throw std::runtime_error("다른 이름으로 저장하세요. 이전 형식의 원본은 보존합니다.");
     auto fingerprint = store_.save(path_, *project_, fingerprint_);
     fingerprint_ = std::move(fingerprint);
@@ -778,7 +760,7 @@ RecoverySnapshot Document::recoverySnapshot(std::string utc) const {
     return recoverySnapshotRequest(std::move(utc))();
 }
 std::function<RecoverySnapshot()> Document::recoverySnapshotRequest(std::string utc) const {
-    if (!project_ || readOnly_ || !dirty_ || !validUtcStamp(utc))
+    if (!isEditable() || !dirty_ || !validUtcStamp(utc))
         throw std::runtime_error("자동 복구 저장할 편집 가능한 미저장 문서/시각이 없습니다.");
     return
         [input = snapshot(), path = path_, fingerprint = fingerprint_, captured = std::move(utc), readOnly = readOnly_,

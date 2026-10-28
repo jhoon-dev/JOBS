@@ -54,8 +54,7 @@ void validateGraph(const Project &p) {
 } // namespace
 std::vector<std::string> Document::insertTasks(const std::vector<std::string> &names, const std::string &beforeId,
                                                const std::string &wbsId) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (names.empty() || names.size() > 10000)
         throw std::runtime_error("한 번에 1~10,000개 작업 이름을 입력하세요.");
     auto p = *project_;
@@ -110,8 +109,7 @@ TaskRemoval Document::previewRemoveTasks(const Project &project, const std::vect
     return out;
 }
 void Document::removeTasks(const std::vector<std::string> &ids) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     const auto summary = previewRemoveTasks(ids);
     if (!summary.protectedTaskIds.empty())
         throw std::runtime_error("실적/원가 보고 이력이 있는 작업은 삭제할 수 없습니다. 승인·실제 원장을 보존합니다.");
@@ -127,8 +125,7 @@ void Document::removeTasks(const std::vector<std::string> &ids) {
     editPlan(std::move(p), "선택 작업 일괄 삭제");
 }
 std::vector<std::string> Document::duplicateTasks(const std::vector<std::string> &ids) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     auto p = *project_;
     const auto targets = selected(p, ids);
     std::unordered_map<std::string, std::string> copies;
@@ -172,8 +169,7 @@ std::vector<std::string> Document::duplicateTasks(const std::vector<std::string>
     return created;
 }
 void Document::editTasks(const std::vector<TaskEdit> &changes) {
-    if (!project_ || readOnly_)
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+    requireEditable();
     if (changes.empty() || changes.size() > 10000)
         throw std::runtime_error("한 번에 1~10,000개 작업을 편집하세요.");
     auto p = *project_;
