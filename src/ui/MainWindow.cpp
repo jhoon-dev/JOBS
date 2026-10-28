@@ -222,6 +222,8 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
 MainWindow::~MainWindow() { if(editController_) { delete editController_; editController_ = nullptr; } if(calculationControl_)calculationControl_->cancel();document_.unsubscribe(historyListener_); if (autosave_) autosave_->statusChanged = {}; }
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
 void MainWindow::refresh(bool rebuildTree) {
+    updateHistoryActions();
+    if (refreshIncremental()) return;
     EvaluationScope evaluation;
     const bool updates=table_->updatesEnabled();table_->setUpdatesEnabled(false);
     struct RestoreUpdates { QWidget* widget;bool enabled;~RestoreUpdates(){widget->setUpdatesEnabled(enabled);} } restoreUpdates{table_,updates};
@@ -264,16 +266,8 @@ void MainWindow::refresh(bool rebuildTree) {
     costReport_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty() && p->statusAt.has_value());
     if (!p) { summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요."); diagnostics_->clear(); wbsSummary_->clear();
         gantt_->setPlan(nullptr, nullptr, {}); assignWbs_->setEnabled(false); statusBar()->showMessage("준비"); return; }
-    summary_->setText(qs(p->name) + "  |  시작일 " + qs(p->startDate) + "  |  revision " + QString::number(p->revision)
-        + "  |  휴일 " + QString::number(p->holidays.size()) + "개"
-        + "  |  상태일 " + (p->statusAt ? qs(*p->statusAt) : "미설정 · 현재 계획 모드")
-        + "  |  기준선 " + QString::number(p->baselines.size()) + "개 · 실적 이력 " + QString::number(p->progress.size()) + "건"
-        + "\n" + (document_.path().empty() ? "아직 저장하지 않은 프로젝트" : qs(document_.path()))
-        + (document_.recoveryOrigin() ? " · 복구 사본: 새 파일에 저장 필요" : document_.requiresSaveAs() ? " · 이전 형식: 저장 시 새 파일 필요" : "")
-        + (document_.recoveryOrigin() ? "\n복구 시각 UTC " + qs(document_.recoveryOrigin()->capturedAt) + " · 원본 r" + QString::number(document_.recoveryOrigin()->revision) + " · " + (document_.recoveryOrigin()->path.empty() ? "처음 저장 전" : qs(document_.recoveryOrigin()->path)) : "")
-        + (document_.historyNotice().empty() ? QString{} : "\n편집 이력: " + qs(document_.historyNotice())));
+    refreshDocumentSummary();
     const auto& calculation = document_.calculation();
-    const bool valid = calculation && calculation->status == CalculationStatus::Valid;
     std::unordered_map<std::string, int> numbers;
     for (std::size_t row = 0; row < p->tasks.size(); ++row) numbers[p->tasks[row].id] = int(row + 1);
     restoreTaskSelection(selectedColumn);
@@ -287,10 +281,7 @@ void MainWindow::refresh(bool rebuildTree) {
     for (const auto& b : p->baselines) if (b.id == selectedBaseline_) baseline = &b;
     gantt_->setBaseline(baseline);
     const auto rollup = summarizeWbs(*p, calculation ? &*calculation : nullptr, selectedWbs_);
-    wbsSummary_->setText("선택 범위: " + wbsTree_->currentItem()->text(0) + " · 작업 " + QString::number(rollup.taskCount)
-        + "개 · 알려진 작업 기간 합계 " + QString::number(double(rollup.knownDurationMinutes) / 60, 'g', 10) + "h"
-        + " · 기간 미정 " + QString::number(rollup.missingDurations) + "개 (합계는 WBS 경과기간과 다름)"
-        + (rollup.start ? "\n계산 구간: " + qs(*rollup.start) + " → " + qs(*rollup.finish) : "\n계산 구간: 최신 유효한 결과 없음"));
+    renderedRollup_ = rollup; refreshWbsSummary();
     QString state = "미계산 · F9로 계산";
     if (calculation) {
         switch (calculation->status) {
@@ -316,15 +307,16 @@ void MainWindow::refresh(bool rebuildTree) {
         }
     }
     diagnostics_->setPlainText(calculating_ ? "계산 중 · 편집할 수 있습니다. 변경 시 계산 결과는 오래됨으로 처리됩니다." : state);
-    statusBar()->showMessage(QString(document_.readOnly() ? "읽기 전용 · " : document_.dirty() ? "미저장 변경 있음 · " : "명시 저장본과 같은 입력 · ")
-        + (valid ? (calculation->isForecast ? "실적·잔여 예측 · 자원 미검증" : "선행관계·작업 달력 일정 · 자원 미검증") : "유효한 최신 일정 없음"));
+    rendered_ = true; renderedView_ = viewKey(); renderedSession_ = document_.sessionGeneration();
+    renderedRevision_ = p->revision; renderedCalculation_ = document_.calculationGeneration();
+    refreshStatus();
 }
 void MainWindow::calculateSchedule() {
     commitPendingCell();
     if (editController_ && editController_->busy()) { runAfterEdit([this] { calculateSchedule(); }); return; }
     if (!document_.project()) return;
     if(calculating_){queuedCalculation_=document_.sessionGeneration();return;}
-    const auto snapshot = *document_.project(); calculating_ = true;calculationControl_=std::make_shared<CalculationControl>();const auto control=calculationControl_;calculationSession_=document_.sessionGeneration();calculationProgressLabel_->setText("일정 계산 준비 중…");calculationProgressTimer_->start();refresh();
+    const auto snapshot = document_.snapshot(); calculating_ = true;calculationControl_=std::make_shared<CalculationControl>();const auto control=calculationControl_;calculationSession_=document_.sessionGeneration();calculationProgressLabel_->setText("일정 계산 준비 중…");calculationProgressTimer_->start();refresh();
     auto* watcher = new QFutureWatcher<ScheduleResult>(this);
     connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this, [this, watcher, control, session = document_.sessionGeneration()] {
         calculating_ = false;calculationProgressTimer_->stop();calculationProgressLabel_->clear();calculationControl_.reset();
@@ -333,7 +325,7 @@ void MainWindow::calculateSchedule() {
         const auto queued=queuedCalculation_;queuedCalculation_.reset();
         if(queued&&*queued==document_.sessionGeneration())calculateSchedule();
     });
-    watcher->setFuture(QtConcurrent::run([snapshot,control] { return jobs::calculate(snapshot,control); }));
+    watcher->setFuture(QtConcurrent::run([snapshot,control] { return jobs::calculate(*snapshot,control); }));
 }
 void MainWindow::rebuildWbsTree() {
     if (document_.project()) {

@@ -59,7 +59,7 @@ void MainWindow::saveBaseline() {
         dialog.accept();
     });
     if (dialog.exec() != QDialog::Accepted) return;
-    const auto snapshot = *document_.project(); const auto n = str(name->text().trimmed()), a = str(author->text().trimmed()), r = str(reason->text().trimmed()), utc = utcNow();
+    const auto snapshot = document_.snapshot(); const auto n = str(name->text().trimmed()), a = str(author->text().trimmed()), r = str(reason->text().trimmed()), utc = utcNow();
     baselinePreparing_ = true; refreshTracking();
     auto* watcher = new QFutureWatcher<BaselinePreparation>(this);
     connect(watcher, &QFutureWatcher<BaselinePreparation>::finished, this, [this, watcher] {
@@ -72,7 +72,7 @@ void MainWindow::saveBaseline() {
         watcher->deleteLater(); refresh();
     });
     watcher->setFuture(QtConcurrent::run([snapshot, n, a, r, utc] {
-        try { return BaselinePreparation{prepareBaseline(snapshot, n, a, r, utc), {}}; }
+        try { return BaselinePreparation{prepareBaseline(*snapshot, n, a, r, utc), {}}; }
         catch (const std::exception& e) { return BaselinePreparation{std::nullopt, e.what()}; }
     }));
 }

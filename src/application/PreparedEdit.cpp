@@ -32,20 +32,26 @@ std::size_t taskRow(const Project& p, const std::string& id) {
 Document::EditRequest Document::makeEditRequest(EditCommand command) const {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     auto factId = std::holds_alternative<ProgressEdit>(command) ? store_.newId() : std::string{};
-    return EditRequest(*project_, std::move(command), sessionGeneration_, std::move(factId));
+    return EditRequest(project_, savedState_, dirtyState_, std::move(command), sessionGeneration_, std::move(factId));
 }
 std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest request, std::shared_ptr<CalculationControl> control) {
     auto result = std::make_shared<PreparedEdit>();
-    result->documentId_ = request.snapshot_.documentId;
-    result->revision_ = request.snapshot_.revision;
+    result->documentId_ = request.snapshot_->documentId;
+    result->revision_ = request.snapshot_->revision;
+    result->savedIdentity_ = request.saved_.identity();
+    // Keep the identity owner alive: allocator address reuse must never make a
+    // later save look like the captured save point.
+    result->retired_ = request.saved_;
     result->session_ = request.session_;
     result->control_ = control;
     try {
         EvaluationScope evaluation(std::move(control));
-        calculationProgress(CalculationStage::Validation, 0, request.snapshot_.tasks.size());
+        calculationProgress(CalculationStage::Validation, 0, request.snapshot_->tasks.size());
         PreparationStore store(std::move(request.factId_));
         Document trial(store);
-        trial.project_ = std::move(request.snapshot_);
+        // The deep source copy happens on this worker, never in request capture.
+        trial.project_ = Project(*request.snapshot_);
+        trial.savedState_ = request.saved_; trial.dirtyState_ = request.dirty_;
         // Gantt editing also requires the exact source plan. It is prepared here,
         // rather than reusing live UI cache pointers in a worker.
         if (std::holds_alternative<GanttTaskEdit>(request.command_)) trial.applyCalculation(calculate(*trial.project_));
@@ -74,6 +80,9 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
             result->notice_ = std::move(trial.historyNotice_);
             if (!trial.history_.empty()) result->history_.emplace(std::move(trial.history_.back()));
             result->proposal_ = std::move(trial.project_);
+            result->dirty_ = trial.dirtyState_;
+            result->sourceDirty_ = compareSavedInput(*result->proposal_, request.snapshot_);
+            result->taskChange_ = trial.taskChange_;
             result->state_ = EditState::Ready;
         }
     } catch (const CalculationCancelled&) {
@@ -91,13 +100,30 @@ EditState Document::applyPreparedEdit(PreparedEdit& result) {
         sessionGeneration_ != result.session_) return EditState::Stale;
     if (result.state_ != EditState::Ready && result.state_ != EditState::NoChange) return result.state_;
     if (result.state_ == EditState::NoChange) { result.consumed_ = true; return EditState::NoChange; }
+    DirtyState dirty;
+    if (savedState_.identity() == result.savedIdentity_) dirty = result.dirty_;
+    else if (savedState_ && savedState_->documentId == result.documentId_ && savedState_->revision == result.revision_)
+        dirty = result.sourceDirty_; // A normal save saved the exact request source.
+    else return EditState::Stale;
     // Validation and delta construction completed in the isolated worker. Nothing
     // can change the live document between this final check and GUI-thread commit.
     if (result.history_) pushHistory(std::move(*result.history_));
     else clearHistory(std::move(result.notice_));
+    auto previous = std::move(project_);
     project_ = std::move(result.proposal_);
+    result.proposal_ = std::move(previous);
     result.consumed_ = true;
-    updateDirty(); staleCalculation(); notify(Event::Edited);
+    dirtyState_ = dirty; dirty_ = dirty.dirty(); dirtyComparisons_ = 0;
+    taskChange_ = result.taskChange_;
+    staleCalculation(); notify(Event::Edited);
     return EditState::Applied;
+}
+std::vector<std::shared_ptr<const Project>> Document::PreparedEdit::takeRetiredProjects() {
+    consumed_ = true;
+    std::vector<std::shared_ptr<const Project>> snapshots;
+    if (retired_) snapshots.push_back(retired_.snapshot());
+    if (proposal_) snapshots.push_back(proposal_.snapshot());
+    retired_.reset(); proposal_.reset();
+    return snapshots;
 }
 }

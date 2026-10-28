@@ -60,8 +60,17 @@ void AsyncEditController::start(Pending pending) {
         EditState state = EditState::Failed;
         QString message;
         QPointer<AsyncEditController> guard(this);
+        struct Retire {
+            std::shared_ptr<Document::PreparedEdit> result;
+            ~Retire() {
+                if (!result) return;
+                auto roots = result->takeRetiredProjects();
+                if (!roots.empty()) (void)QtConcurrent::run([roots = std::move(roots)] {});
+            }
+        } retire;
         try {
             auto prepared = watcher->result();
+            retire.result = prepared;
             if (control->cancelRequested.load()) state = cancelState_;
             else {
                 applying_ = true;

@@ -37,19 +37,23 @@ jobs:
         run: python scripts/run-performance-probes.py --repeats 3
       - name: Measure cell edits and retained undo at 1k and 10k tasks
         run: python scripts/run-editing-performance-probes.py --repeats 7
+      - name: Measure request worker and GUI commit phases
+        run: python scripts/run-responsive-performance-probes.py --repeats 3
       - name: Check out pre-optimization editing reference
         uses: actions/checkout@v4
         with:
-          ref: d9270cdf8c8fa5f9b7ee778be22a8f8b311a8150
+          ref: 0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
           cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe --parallel 3
+          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe --parallel 3
       - name: Measure reference and compare paired editing observations
         run: |
           python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history
           python scripts/compare-editing-performance.py build/performance/editing-reference build/performance/editing build/performance/editing-comparison.json
+          python scripts/run-responsive-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/responsive-reference --repeats 3
+          python scripts/compare-responsive-performance.py build/performance/responsive-reference build/performance/responsive build/performance/responsive-comparison.json
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -62,6 +66,8 @@ jobs:
         run: python scripts/capture-task-editing-ui.py build
       - name: Exercise native model and cancellable editing
         run: python scripts/capture-model-async-ui.py build
+      - name: Exercise native incremental refresh and WBS fallbacks
+        run: python scripts/check-responsive-native-ui.py build
       - name: Preserve model and async editing evidence
         if: always()
         uses: actions/upload-artifact@v4

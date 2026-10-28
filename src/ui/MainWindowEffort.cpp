@@ -41,7 +41,7 @@ EffortPreview previewEffort(const Project& snapshot, const Task& task, const std
 }
 void MainWindow::editTaskEffort() {
     if (!document_.project() || selectedTask_.empty()) return;
-    const auto snapshot = std::make_shared<const Project>(*document_.project());
+    const auto snapshot = document_.snapshot();
     const auto found = std::find_if(snapshot->tasks.begin(), snapshot->tasks.end(), [&](const auto& task) { return task.id == selectedTask_; });
     if (found == snapshot->tasks.end()) return;
     const Task task = *found;

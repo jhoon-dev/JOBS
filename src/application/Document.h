@@ -2,6 +2,7 @@
 #include "application/ProjectStore.h"
 #include "application/InputDelta.h"
 #include "application/EditCommand.h"
+#include "application/ProjectState.h"
 #include <optional>
 #include "calculation/Scheduler.h"
 #include "calculation/Tracking.h"
@@ -24,7 +25,13 @@ public:
     EditState applyPreparedEdit(PreparedEdit& result);
     enum class Event { Edited, Saved, Replaced };
     explicit Document(ProjectStore& store) : store_(store) {}
-    const std::optional<Project>& project() const { return project_; }
+    const std::optional<Project>& project() const { return project_.value(); }
+    // Owning, read-only snapshot; borrowed project() references last until mutation.
+    std::shared_ptr<const Project> snapshot() const { return project_.snapshot(); }
+    bool snapshotShared() const { return project_.shared(); }
+    struct TaskChange { std::uint64_t before = 0, after = 0; std::size_t row = 0; bool nameOnly = false; };
+    const std::optional<TaskChange>& taskChange() const { return taskChange_; }
+    std::size_t lastDirtyTaskComparisons() const { return dirtyComparisons_; }
     const std::string& path() const { return path_; }
     bool dirty() const { return dirty_; }
     bool revisionSaved() const { return !dirty_ && project_ && savedState_ && project_->revision == savedState_->revision; }
@@ -44,6 +51,7 @@ public:
     std::uint64_t subscribe(std::function<void(Event)> listener);
     void unsubscribe(std::uint64_t token);
     RecoverySnapshot recoverySnapshot(std::string capturedAt) const;
+    std::function<RecoverySnapshot()> recoverySnapshotRequest(std::string capturedAt) const;
     void recover(const RecoverySnapshot&);
     const std::optional<RecoveryOrigin>& recoveryOrigin() const { return recoveryOrigin_; }
     void create(std::string name, std::string startDate, const std::vector<std::string>& tasks);
@@ -87,7 +95,7 @@ public:
     void saveAs(const std::string& path);
 private:
     ProjectStore& store_;
-    std::optional<Project> project_;
+    ProjectState project_;
     std::string path_, fingerprint_;
     std::unique_ptr<WriteLease> lease_;
     std::optional<ScheduleResult> calculation_;
@@ -97,13 +105,17 @@ private:
         std::string taskId, before, after;
     };
     struct HistoryStep {
-        std::variant<TaskNameDelta, InputDelta> change;
+        struct TaskValue { std::size_t row; std::shared_ptr<const std::pair<Task, Task>> values; };
+        std::variant<TaskNameDelta, TaskValue, InputDelta> change;
         std::string label;
         std::size_t weight = 0;
     };
     std::vector<HistoryStep> history_;
     std::size_t historyCursor_ = 0, historyWeight_ = 0;
-    std::optional<Project> savedState_;
+    ProjectState savedState_;
+    DirtyState dirtyState_;
+    std::size_t dirtyComparisons_ = 0;
+    std::optional<TaskChange> taskChange_;
     std::optional<RecoveryOrigin> recoveryOrigin_;
     std::string historyNotice_;
     std::uint64_t sessionGeneration_ = 0, listenerToken_ = 0;
@@ -111,6 +123,7 @@ private:
     void notify(Event) noexcept;
     void clearHistory(std::string notice = {});
     void updateDirty();
+    void updateTaskDirty(std::size_t, const Task& before);
     void applyHistory(const HistoryStep&, bool forward);
     void pushHistory(HistoryStep);
     void edit(Project project, std::string label = "입력 변경");
@@ -125,9 +138,10 @@ public:
     EditRequest(const EditRequest&) = delete;
 private:
     friend class Document;
-    EditRequest(Project snapshot, EditCommand command, std::uint64_t session, std::string factId)
-        : snapshot_(std::move(snapshot)), command_(std::move(command)), session_(session), factId_(std::move(factId)) {}
-    Project snapshot_;
+    EditRequest(ProjectState snapshot, ProjectState saved, DirtyState dirty, EditCommand command, std::uint64_t session, std::string factId)
+        : snapshot_(std::move(snapshot)), saved_(std::move(saved)), dirty_(dirty), command_(std::move(command)), session_(session), factId_(std::move(factId)) {}
+    ProjectState snapshot_, saved_;
+    DirtyState dirty_;
     EditCommand command_;
     std::uint64_t session_;
     std::string factId_;
@@ -139,13 +153,17 @@ public:
     PreparedEdit& operator=(const PreparedEdit&) = delete;
     EditState state() const { return state_; }
     const std::string& error() const { return error_; }
+    std::vector<std::shared_ptr<const Project>> takeRetiredProjects();
 private:
     friend class Document;
     EditState state_ = EditState::Failed;
     std::string error_, documentId_, notice_;
     std::uint64_t revision_ = 0, session_ = 0;
     std::shared_ptr<CalculationControl> control_;
-    std::optional<Project> proposal_;
+    ProjectState proposal_, retired_;
+    DirtyState dirty_, sourceDirty_;
+    const void* savedIdentity_ = nullptr;
+    std::optional<TaskChange> taskChange_;
     std::optional<HistoryStep> history_;
     bool consumed_ = false;
 };

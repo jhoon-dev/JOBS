@@ -2,6 +2,7 @@
 #include "application/Document.h"
 #include "ui/TaskTableView.h"
 #include <QMainWindow>
+#include <tuple>
 class QLabel;
 class QPlainTextEdit;
 class QAction;
@@ -105,6 +106,16 @@ private:
     void importXer();
     void exportXer();
     void refresh(bool rebuildTree = true);
+    using ViewKey = std::tuple<std::string, std::string, QString, int, int, bool, bool, bool, std::string>;
+    ViewKey viewKey() const;
+    ViewKey renderedView_;
+    bool rendered_ = false;
+    std::uint64_t renderedSession_ = 0, renderedRevision_ = 0, renderedCalculation_ = 0;
+    WbsSummary renderedRollup_;
+    bool refreshIncremental();
+    void refreshDocumentSummary();
+    void refreshWbsSummary();
+    void refreshStatus();
     void calculateSchedule();
     void editHolidays();
     QAction *insertTasks_=nullptr,*deleteTasks_=nullptr,*duplicateTasks_=nullptr,*copyTasks_=nullptr,*pasteTasks_=nullptr;

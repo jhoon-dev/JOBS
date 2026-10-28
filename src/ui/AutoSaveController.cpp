@@ -51,8 +51,8 @@ void AutoSaveController::checkpointNow() {
     idle_.stop(); deadline_.stop();
     try {
         if (!session_) session_ = store_.newSession();
-        auto snapshot = document_.recoverySnapshot(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd'T'HH:mm:ss'Z'").toStdString());
-        const auto revision = snapshot.project.revision, serial = serial_; auto session = session_;
+        auto request = document_.recoverySnapshotRequest(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd'T'HH:mm:ss'Z'").toStdString());
+        const auto revision = document_.project()->revision, serial = serial_; auto session = session_;
         busy_ = true; setStatus("자동복구 저장 중 · revision " + QString::number(revision));
         auto* watcher = new QFutureWatcher<Result>(this);
         connect(watcher, &QFutureWatcher<Result>::finished, this, [this, watcher, session, serial, revision] {
@@ -67,7 +67,14 @@ void AutoSaveController::checkpointNow() {
             if (!result.error.isEmpty() && session_ == session) deadline_.start(intervalMs_);
             else if (serial_ != storedSerial_) schedule();
         });
-        watcher->setFuture(QtConcurrent::run([session, snapshot = std::move(snapshot)] { Result out; try { out.sequence = session->checkpoint(snapshot); } catch (const std::exception& e) { out.error = QString::fromUtf8(e.what()); } return out; }));
+        watcher->setFuture(QtConcurrent::run([session, request = std::move(request)]() mutable {
+            Result out;
+            try {
+                auto snapshot = request(); request = {}; // Release the read-only source before disk I/O.
+                out.sequence = session->checkpoint(snapshot);
+            } catch (const std::exception& e) { out.error = QString::fromUtf8(e.what()); }
+            return out;
+        }));
     } catch (const std::exception& e) { setStatus("자동복구 저장 실패 · " + QString::fromUtf8(e.what())); deadline_.start(intervalMs_); }
 }
 void AutoSaveController::finishDocument() { finished_ = true; idle_.stop(); deadline_.stop(); retire(std::move(session_)); recoveredSession_.reset(); }

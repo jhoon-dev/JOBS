@@ -102,6 +102,21 @@ bool TaskTableModel::setData(const QModelIndex& index, const QVariant& value, in
     if (row < rowCount()) emit dataChanged(this->index(row, column), this->index(row, column));
     return accepted;
 }
+bool TaskTableModel::synchronizeTask() {
+    const auto& hint = document_.taskChange();
+    const auto& project = document_.project();
+    if (!initialized_ || !project || !hint || hint->before != revision_ || hint->after != project->revision ||
+        session_ != document_.sessionGeneration() || documentId_ != project->documentId ||
+        calculationGeneration_ != document_.calculationGeneration() || readOnly_ != document_.readOnly()) return false;
+    plan_.tasks.at(hint->row) = project->tasks.at(hint->row);
+    lastTaskVisits_ = 1; revision_ = project->revision;
+    if (!hint->nameOnly) renderCache_ = std::make_shared<EvaluationCache>();
+    if (const auto found = positions_.find(hint->row); found != positions_.end()) {
+        const int last = hint->nameOnly ? 0 : 13;
+        emit dataChanged(index(found->second, 0), index(found->second, last));
+    }
+    return true;
+}
 void TaskTableModel::synchronize(const std::vector<std::size_t>& rows) {
     const auto& project = document_.project();
     const bool newSession = !initialized_ || session_ != document_.sessionGeneration();
@@ -111,12 +126,13 @@ void TaskTableModel::synchronize(const std::vector<std::size_t>& rows) {
     const bool reset = newSession || structure || rows_ != rows;
     if (reset) beginResetModel();
     if (!project) {
-        plan_ = {}; rows_.clear(); result_.reset(); schedules_.clear(); numbers_.clear(); assignments_.clear(); issues_.clear();
+        plan_ = {}; rows_.clear(); positions_.clear(); result_.reset(); schedules_.clear(); numbers_.clear(); assignments_.clear(); issues_.clear();
         documentId_.clear(); session_ = document_.sessionGeneration(); revision_ = 0; initialized_ = true;
         if (reset) endResetModel();
         return;
     }
     const auto& p = *project;
+    lastTaskVisits_ = p.tasks.size();
     const bool metadata = !initialized_ || plan_.startDate != p.startDate || plan_.calendar != p.calendar || plan_.holidays != p.holidays ||
         plan_.calculationProfile != p.calculationProfile || plan_.resources != p.resources || plan_.assignments != p.assignments || plan_.calendars != p.calendars;
     const bool calculation = calculationGeneration_ != document_.calculationGeneration();
@@ -160,6 +176,10 @@ void TaskTableModel::synchronize(const std::vector<std::size_t>& rows) {
     }
     if (metadata || !changed.empty() || reset) renderCache_ = std::make_shared<EvaluationCache>();
     rows_ = rows; documentId_ = p.documentId; session_ = document_.sessionGeneration(); revision_ = p.revision;
+    if (reset) {
+        positions_.clear();
+        for (int row = 0; row < int(rows_.size()); ++row) positions_.emplace(rows_[std::size_t(row)], row);
+    }
     readOnly_ = document_.readOnly(); calculationGeneration_ = document_.calculationGeneration(); initialized_ = true;
     if (reset) { endResetModel(); return; }
     for (int i = 0; i < rowCount();) {

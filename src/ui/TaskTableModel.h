@@ -15,11 +15,17 @@ public:
     Qt::ItemFlags flags(const QModelIndex&) const override;
     bool setData(const QModelIndex&, const QVariant&, int role = Qt::EditRole) override;
     void synchronize(const std::vector<std::size_t>& rows);
+    bool synchronizeTask();
+    const Task& cachedTask(std::size_t row) const { return plan_.tasks.at(row); }
+    bool containsSourceRow(std::size_t row) const { return positions_.contains(row); }
+    std::size_t lastTaskVisits() const { return lastTaskVisits_; }
     std::function<bool(std::string, int, QString)> editRequested;
 private:
     Document& document_;
     PlanInput plan_;
     std::vector<std::size_t> rows_;
+    std::unordered_map<std::size_t, int> positions_;
+    std::size_t lastTaskVisits_ = 0;
     std::optional<ScheduleResult> result_;
     std::string documentId_;
     std::uint64_t session_ = 0, revision_ = 0, calculationGeneration_ = 0;
