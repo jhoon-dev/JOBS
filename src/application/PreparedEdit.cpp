@@ -82,6 +82,7 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
             result->proposal_ = std::move(trial.project_);
             result->dirty_ = trial.dirtyState_;
             result->sourceDirty_ = compareSavedInput(*result->proposal_, request.snapshot_);
+            calculationCheckpoint();
             result->taskChange_ = trial.taskChange_;
             result->state_ = EditState::Ready;
         }

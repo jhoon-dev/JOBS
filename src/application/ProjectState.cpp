@@ -1,5 +1,4 @@
 #include "application/ProjectState.h"
-#include "domain/CalculationControl.h"
 
 namespace jobs {
 DirtyState compareSavedInput(const Project& a, const ProjectState& saved) {
@@ -8,7 +7,8 @@ DirtyState compareSavedInput(const Project& a, const ProjectState& saved) {
     DirtyState result;
     result.aligned = a.tasks.size() == b.tasks.size();
     if (result.aligned) for (std::size_t i = 0; i < a.tasks.size(); ++i) {
-        calculationCheckpoint();
+        // Also used after synchronous commit: dirty bookkeeping must not unwind
+        // a live edit. Worker callers check cancellation around this pure comparison.
         if (a.tasks[i].id != b.tasks[i].id) result.aligned = false;
         if (a.tasks[i] != b.tasks[i]) ++result.differentTasks;
     }

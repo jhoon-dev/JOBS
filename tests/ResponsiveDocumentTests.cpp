@@ -22,6 +22,12 @@ int main(int argc, char** argv) {
         jobs::Document doc(store); doc.open(path);
         for (int i = 0; i < 3; ++i) doc.captureBaseline("B" + std::to_string(i), "PM", "large baseline", "2026-10-28T00:00:00Z");
         doc.save(); auto saved = *doc.project();
+        {
+            jobs::ProjectState savedState; savedState = saved;
+            auto control = std::make_shared<jobs::CalculationControl>(); control->cancel();
+            jobs::EvaluationScope scope(control);
+            check(!jobs::compareSavedInput(saved, savedState).dirty(), "post-commit bookkeeping cooperatively unwound a live edit");
+        }
         const auto snapshot = doc.snapshot(); check(snapshot.get() == doc.snapshot().get(), "snapshot capture copied input");
         auto oldRequest = doc.makeEditRequest(jobs::DurationEdit{"T9999", 120});
         doc.renameTask(9999, "Late edit");
