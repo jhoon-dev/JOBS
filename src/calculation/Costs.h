@@ -14,8 +14,15 @@ struct CostTaskRow {
     std::optional<int> physicalBasisPoints;
     std::vector<std::string> issues;
 };
-struct CostGroup { std::string id, name; Money plan, actual; Evm evm; };
-struct CostDay { std::string date; Money plan, budget, pv, ev, ac, currentActual; };
+struct CostGroup {
+    std::string id, name;
+    Money plan, actual;
+    Evm evm;
+};
+struct CostDay {
+    std::string date;
+    Money plan, budget, pv, ev, ac, currentActual;
+};
 struct CostAnalysis {
     std::string documentId, baselineId, currency, formula;
     std::uint64_t revision = 0;
@@ -29,6 +36,7 @@ struct CostAnalysis {
     std::size_t actualCoverage = 0, evCoverage = 0, baselineTasks = 0;
 };
 // All inputs and ledger amounts are integer minor units; no rate-based revaluation of AC.
-CostAnalysis analyzeCosts(const Project&, const std::string& baselineId, const std::string& formula = "budget-remaining-v1",
-                          const std::optional<std::vector<std::string>>& taskScope = std::nullopt);
-}
+CostAnalysis analyzeCosts(const Project &, const std::string &baselineId,
+                          const std::string &formula = "budget-remaining-v1",
+                          const std::optional<std::vector<std::string>> &taskScope = std::nullopt);
+} // namespace jobs
