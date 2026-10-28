@@ -69,7 +69,7 @@ def main():
     with (workspace / 'windeployqt.log').open('w', encoding='utf-8') as log:
         run([qt / 'bin/windeployqt.exe', '--release', '--compiler-runtime', '--no-translations',
              '--dir', stage, stage / 'JOBS.exe'], env=environment, stdout=log, stderr=subprocess.STDOUT)
-    required = ['JOBS.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'Qt6Concurrent.dll',
+    required = ['JOBS.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll',
                 'platforms/qwindows.dll', 'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll']
     for name in required:
         if not (stage / name).is_file():
@@ -92,20 +92,12 @@ def main():
                 'application_sha256': sha256(stage / 'JOBS.exe'), 'files': inventory,
                 'inventory_excludes': ['package-manifest.json', 'Uninstall.exe (generated at install time)']}
     (stage / 'package-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-    files = sorted(p.relative_to(stage) for p in stage.rglob('*') if p.is_file())
-    directories = sorted((p.relative_to(stage) for p in stage.rglob('*') if p.is_dir()),
-                         key=lambda p: len(p.parts), reverse=True)
-    def quoted(relative):
-        return str(relative).replace('$', '$$').replace('"', '$\\"')
-    removal = workspace / 'remove-files.nsh'
-    removal.write_text('\n'.join([f'Delete "$INSTDIR\\{quoted(p)}"' for p in files] +
-                                 [f'RMDir "$INSTDIR\\{quoted(p)}"' for p in directories]) + '\n', encoding='utf-8-sig')
     source = workspace / 'installer.nsi'
     source.write_text((ROOT / 'packaging/windows-installer.nsi').read_text(encoding='utf-8'), encoding='utf-8-sig')
     installer = output / f'JOBS-{version}-Setup-win64-{revision[:8]}.exe'
     with (workspace / 'nsis.log').open('w', encoding='utf-8') as log:
         run([nsis / 'makensis.exe', '/V3', f'/DAppVersion={version}', f'/DStageDir={stage}',
-             f'/DInstallerPath={installer}', f'/DRemovalScript={removal}',
+             f'/DInstallerPath={installer}',
              f'/DInstalledSizeKiB={sum(p.stat().st_size for p in stage.rglob("*") if p.is_file()) // 1024}', source],
             stdout=log, stderr=subprocess.STDOUT)
     summary = {'installer': str(installer), 'bytes': installer.stat().st_size, 'sha256': sha256(installer),

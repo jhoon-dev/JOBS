@@ -3,6 +3,7 @@ Unicode true
 !include "LogicLib.nsh"
 !include "x64.nsh"
 !include "WinVer.nsh"
+!include "FileFunc.nsh"
 
 Name "JOBS ${AppVersion} Preview"
 OutFile "${InstallerPath}"
@@ -25,6 +26,7 @@ VIAddVersionKey "LegalCopyright" "ToolMoa"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
+!define MUI_UNCONFIRMPAGE_TEXT_TOP "JOBS 설치 폴더의 모든 파일과 설정·캐시·자동 복구 데이터를 삭제합니다. 설치 폴더 밖에 따로 저장한 프로젝트 파일은 유지합니다. 제거 전에 JOBS 창을 닫아 주세요."
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "Korean"
@@ -46,6 +48,20 @@ FunctionEnd
 
 ; A silent /D= path is subject to the same check as the directory page.
 Function VerifyInstallDirectory
+  GetFullPathName $INSTDIR "$INSTDIR"
+  ${GetFileName} "$INSTDIR" $2
+  StrCmp $2 "JOBS" valid_name
+    MessageBox MB_ICONSTOP "설치 전용 JOBS 폴더를 선택해 주세요. 예: D:\Apps\JOBS" /SD IDOK
+    SetErrorLevel 3
+    Quit
+  valid_name:
+  ReadRegStr $2 HKCU "${RegistryKey}" "InstallLocation"
+  StrCmp $2 "" check_contents
+  StrCmp $2 "$INSTDIR" check_contents
+    MessageBox MB_ICONSTOP "기존 JOBS를 먼저 제거한 뒤 다른 위치에 설치해 주세요." /SD IDOK
+    SetErrorLevel 3
+    Quit
+  check_contents:
   ReadINIStr $0 "$INSTDIR\install-info.ini" "JOBS" "ProductId"
   StrCmp $0 "ToolMoa.JOBS" verified
   FindFirst $0 $1 "$INSTDIR\*"
@@ -100,12 +116,38 @@ Function un.onInit
   SetErrorLevel 3
   Abort
   verified:
+  GetFullPathName $INSTDIR "$INSTDIR"
+  ReadRegStr $0 HKCU "${RegistryKey}" "InstallLocation"
+  StrCmp $0 "$INSTDIR" registered invalid_directory
+  registered:
+  ${GetFileName} "$INSTDIR" $0
+  StrCmp $0 "JOBS" directory_ok invalid_directory
+  invalid_directory:
+    MessageBox MB_ICONSTOP "등록된 JOBS 설치 폴더와 일치하지 않아 제거를 중단합니다." /SD IDOK
+    SetErrorLevel 3
+    Abort
+  directory_ok:
+  ClearErrors
+  FileOpen $0 "$INSTDIR\JOBS.exe" a
+  IfErrors app_running app_closed
+  app_running:
+    MessageBox MB_ICONSTOP "실행 중인 JOBS 창을 닫고 다시 제거해 주세요." /SD IDOK
+    SetErrorLevel 4
+    Abort
+  app_closed:
+    FileClose $0
 FunctionEnd
 
 Section "Uninstall"
-  ; Generated explicit file names; never recursively delete the install directory.
-  !include "${RemovalScript}"
-  Delete "$INSTDIR\Uninstall.exe"
+  ; Fixed application-specific data roots; unrelated ToolMoa applications are kept.
+  GetFullPathName $0 "$LOCALAPPDATA\ToolMoa\JOBS"
+  RMDir /r "$0"
+  GetFullPathName $0 "$APPDATA\ToolMoa\JOBS"
+  RMDir /r "$0"
+  RMDir "$LOCALAPPDATA\ToolMoa"
+  RMDir "$APPDATA\ToolMoa"
+  DeleteRegKey HKCU "Software\ToolMoa\JOBS"
+  DeleteRegKey /ifempty HKCU "Software\ToolMoa"
   ReadRegStr $0 HKCU "${RegistryKey}" "InstallLocation"
   StrCmp $0 "$INSTDIR" own_registration keep_registration
   own_registration:
@@ -118,5 +160,6 @@ Section "Uninstall"
     Delete "$SMPROGRAMS\JOBS\JOBS 제거.lnk"
     RMDir "$SMPROGRAMS\JOBS"
   keep_registration:
-  RMDir "$INSTDIR"
+  ; The canonical directory, marker and per-user registration were checked above.
+  RMDir /r "$INSTDIR"
 SectionEnd
