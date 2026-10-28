@@ -16,6 +16,7 @@ public:
     bool setData(const QModelIndex&, const QVariant&, int role = Qt::EditRole) override;
     void synchronize(const std::vector<std::size_t>& rows);
     bool synchronizeTask();
+    bool synchronizeBulk(BulkView&);
     const Task& cachedTask(std::size_t row) const { return plan_.tasks.at(row); }
     bool containsSourceRow(std::size_t row) const { return positions_.contains(row); }
     std::size_t lastTaskVisits() const { return lastTaskVisits_; }

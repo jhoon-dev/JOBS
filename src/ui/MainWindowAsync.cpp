@@ -50,6 +50,10 @@ std::shared_ptr<CalculationControl> MainWindow::submitEdit(EditCommand command, 
         const auto session = document_.sessionGeneration();
         const auto revision = document_.project() ? document_.project()->revision : 0;
         auto after = std::move(afterEdit_); afterEdit_ = {};
+        if (state == EditState::Applied) if (auto view=document_.bulkView()) {
+            if (!view->createdIds.empty()) {selectedTaskIds_=view->createdIds;selectedTask_=selectedTaskIds_.front();}
+            else if(view->clearSelection){selectedTaskIds_.clear();selectedTask_.clear();}
+        }
         refresh();
         if (!message.isEmpty()) statusBar()->showMessage(message, 10000);
         QPointer<MainWindow> guard(this);
@@ -125,6 +129,7 @@ void MainWindow::undoEdit(bool redo) {
     try {
         commitPendingCell();
         if (editController_->busy()) { afterEdit_ = {}; editController_->cancel(); return; }
+        if (document_.historyNeedsWorker(redo)) {submitEdit(HistoryEdit{redo},redo?"다시 실행":"실행 취소");return;}
         if (redo && document_.canRedo()) document_.redo();
         if (!redo && document_.canUndo()) document_.undo();
         refresh();

@@ -37,6 +37,6 @@ Task pendingTask(const Project&,const Task&);
 std::vector<WorkSpan> executionSpans(const PlanInput&,const Task&,const TaskSchedule&);
 ScheduleResult calculateEffort(const Project&,bool forecast=false,const std::string& levelingPriority={},int horizonDays=260);
 LevelingResult levelEffort(const Project&,const std::string&,int);
-void changeDuration(Project&,std::size_t,std::optional<std::int64_t>);
+void changeDuration(Project&,std::size_t,std::optional<std::int64_t>,bool planOnly=false);
 void changeWork(Project&,std::size_t,std::int64_t);
 }

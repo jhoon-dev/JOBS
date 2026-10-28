@@ -19,6 +19,7 @@
 #include <QTest>
 #include <QTimer>
 #include <iostream>
+#include <future>
 namespace {
 void check(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
 }
@@ -70,8 +71,17 @@ int main(int argc, char** argv) {
         QTimer confirm; confirm.setInterval(5); QObject::connect(&confirm,&QTimer::timeout,[&] { auto* box=qobject_cast<QMessageBox*>(QApplication::activeModalWidget()); if(box && box->objectName()=="deleteTasksConfirmation" && box->button(QMessageBox::Yes)->isEnabled()) { confirm.stop(); box->done(QMessageBox::Yes); } }); confirm.start();
         measure("delete", "deleteTasks"); check(int(doc.project()->tasks.size()) == n-count, "delete failed");
         measure("undo_delete", "undoEdit"); check(int(doc.project()->tasks.size()) == n && !doc.dirty(), "undo/save point failed");
+        std::vector<jobs::TaskEdit> changes;
+        for(int i=0;i<count;++i){jobs::TaskEdit edit;edit.taskId="T"+std::to_string(i);edit.name="Phase "+std::to_string(i);changes.push_back(std::move(edit));}
+        QElapsedTimer phase;phase.start();auto request=doc.makeEditRequest(jobs::BatchTaskEdit{std::move(changes)});
+        const double requestMs=phase.nsecsElapsed()/1e6;
+        auto [prepared,workerMs]=std::async(std::launch::async,[request=std::move(request)]()mutable{
+            QElapsedTimer clock;clock.start();auto result=jobs::Document::prepareEdit(std::move(request),std::make_shared<jobs::CalculationControl>());
+            return std::pair{result,clock.nsecsElapsed()/1e6};}).get();
+        check(prepared->state()==jobs::EditState::Ready,"phase preparation failed");phase.restart();
+        check(doc.applyPreparedEdit(*prepared)==jobs::EditState::Applied,"phase apply failed");const double applyMs=phase.nsecsElapsed()/1e6;
         QJsonObject output{{"fixture","jobs-bulk-ui-v1"},{"status","success"},{"task_count",n},{"baseline_count",baselines},{"affected_tasks",count},
-            {"operations",operations},{"source_revision",JOBS_PERF_REVISION},{"built_product_source_sha256",JOBS_SOURCE_SHA256},{"platform",QApplication::platformName()},
+            {"batch_phases_ms",QJsonObject{{"request_gui",requestMs},{"prepare_worker",workerMs},{"apply_gui",applyMs}}},{"operations",operations},{"source_revision",JOBS_PERF_REVISION},{"built_product_source_sha256",JOBS_SOURCE_SHA256},{"platform",QApplication::platformName()},
             {"scope","One sample per operation; trigger includes automated modal input/confirmation; settled includes worker and GUI refresh, excludes initial open/save/baselines and OS presentation"}};
         QFile file(args.value(args.indexOf("--output")+1)); check(file.open(QIODevice::WriteOnly),"output unavailable"); file.write(QJsonDocument(output).toJson());
         std::cout << "PASS: bulk UI " << n << '/' << baselines << '\n';

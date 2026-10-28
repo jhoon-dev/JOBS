@@ -113,6 +113,10 @@ private:
     std::uint64_t renderedSession_ = 0, renderedRevision_ = 0, renderedCalculation_ = 0;
     WbsSummary renderedRollup_;
     bool refreshIncremental();
+    bool refreshBulk();
+    void refreshBaseline();
+    std::uint64_t renderedBaselineSession_ = ~std::uint64_t{0};
+    std::string renderedBaselineId_;
     void refreshDocumentSummary();
     void refreshWbsSummary();
     void refreshStatus();

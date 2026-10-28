@@ -213,6 +213,7 @@ void Document::recordProgress(ProgressEntry entry) {
     p.progress.push_back(std::move(entry)); edit(std::move(p));
 }
 void Document::staleCalculation() {
+    bulkView_.reset();
     if (calculation_ && calculation_->status != CalculationStatus::Stale) { calculation_->status = CalculationStatus::Stale; ++calculationGeneration_; }
 }
 void Document::setCurrency(std::string currency) {
@@ -293,8 +294,8 @@ void Document::edit(Project p, std::string label) {
     if (immutable) clearHistory("승인 기준선·제출 실적/원가·저장 시나리오는 이력으로 보존합니다. 실적/원가는 정정 보고를 사용하세요.");
     else {
         InputDelta delta(*project_, p);
-        const auto weight = sizeof(HistoryStep) - sizeof(InputDelta) + delta.bytes() + label.size();
-        pushHistory({std::move(delta), std::move(label), weight});
+        const auto weight = sizeof(HistoryStep) + delta.bytes() + label.size();
+        pushHistory({std::make_shared<const InputDelta>(std::move(delta)), std::move(label), weight});
     }
     project_ = std::move(p); taskChange_.reset(); updateDirty(); staleCalculation(); notify(Event::Edited);
 }
@@ -329,7 +330,7 @@ void Document::saveAs(const std::string& path) {
     if (calculation_ && calculation_->documentId != project_->documentId) staleCalculation();
     savedState_ = Project(*project_); dirtyState_ = {0, false, true}; dirtyComparisons_ = 0; recoveryOrigin_.reset(); if (independent) clearHistory(); ++sessionGeneration_; notify(Event::Saved);
 }
-void Document::clearHistory(std::string notice) { history_.clear(); historyCursor_ = historyWeight_ = 0; historyNotice_ = std::move(notice); }
+void Document::clearHistory(std::string notice) { bulkView_.reset(); history_.clear(); historyCursor_ = historyWeight_ = 0; historyNotice_ = std::move(notice); }
 std::string Document::undoLabel() const { return canUndo() ? history_[historyCursor_ - 1].label : std::string{}; }
 std::string Document::redoLabel() const { return canRedo() ? history_[historyCursor_].label : std::string{}; }
 void Document::updateDirty() {
@@ -388,13 +389,16 @@ void Document::applyHistory(const HistoryStep& step, bool forward) {
         taskChange_ = TaskChange{p.revision - 1, p.revision, value->row, false};
     } else {
         auto p = *project_;
-        std::get<InputDelta>(step.change).apply(p, forward);
+        std::get<std::shared_ptr<const InputDelta>>(step.change)->apply(p, forward);
         ++p.revision;
-        validate(p);
+        if (step.planOnly) validatePlan(p); else validate(p);
         project_ = std::move(p);
         taskChange_.reset(); updateDirty();
     }
     staleCalculation();
+}
+bool Document::historyNeedsWorker(bool redo) const {
+    return redo ? canRedo() && history_[historyCursor_].planOnly : canUndo() && history_[historyCursor_ - 1].planOnly;
 }
 void Document::undo() { if (!canUndo()) throw std::runtime_error("실행 취소할 편집이 없습니다."); applyHistory(history_[historyCursor_ - 1], false); --historyCursor_; notify(Event::Edited); }
 void Document::redo() { if (!canRedo()) throw std::runtime_error("다시 실행할 편집이 없습니다."); applyHistory(history_[historyCursor_], true); ++historyCursor_; notify(Event::Edited); }

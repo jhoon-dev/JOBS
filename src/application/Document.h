@@ -10,11 +10,26 @@
 #include <functional>
 #include <map>
 #include <variant>
+#include <unordered_map>
 
 namespace jobs {
 struct TaskRemoval {
     std::size_t tasks=0, links=0, assignments=0, costs=0;
     std::vector<std::string> protectedTaskIds;
+};
+struct BulkView {
+    PlanInput input;
+    std::unordered_map<std::string, int> numbers;
+    std::unordered_map<std::string, std::string> assignmentLabels;
+    std::vector<std::pair<int, int>> changedRanges;
+    std::vector<std::size_t> rows;
+    std::unordered_map<std::size_t, int> positions;
+    WbsSummary summary;
+    std::vector<std::string> createdIds;
+    bool clearSelection = false, sameOrder = false;
+    std::size_t prefix = 0, suffix = 0, oldSize = 0;
+    std::uint64_t before = 0, after = 0, session = 0;
+    std::string documentId;
 };
 class Document {
 public:
@@ -45,6 +60,8 @@ public:
     std::string redoLabel() const;
     const std::string& historyNotice() const { return historyNotice_; }
     std::size_t historyBytes() const { return historyWeight_; }
+    bool historyNeedsWorker(bool redo) const;
+    std::shared_ptr<BulkView> bulkView() const { return bulkView_; }
     void undo();
     void redo();
     std::uint64_t sessionGeneration() const { return sessionGeneration_; }
@@ -60,6 +77,7 @@ public:
     void addTask(std::string name, std::string wbsId = {});
     std::vector<std::string> insertTasks(const std::vector<std::string>& names, const std::string& beforeId={}, const std::string& wbsId={});
     TaskRemoval previewRemoveTasks(const std::vector<std::string>& ids) const;
+    static TaskRemoval previewRemoveTasks(const Project&, const std::vector<std::string>& ids);
     void removeTasks(const std::vector<std::string>& ids);
     std::vector<std::string> duplicateTasks(const std::vector<std::string>& ids);
     void editTasks(const std::vector<TaskEdit>& changes);
@@ -106,9 +124,10 @@ private:
     };
     struct HistoryStep {
         struct TaskValue { std::size_t row; std::shared_ptr<const std::pair<Task, Task>> values; };
-        std::variant<TaskNameDelta, TaskValue, InputDelta> change;
+        std::variant<TaskNameDelta, TaskValue, std::shared_ptr<const InputDelta>> change;
         std::string label;
         std::size_t weight = 0;
+        bool planOnly = false;
     };
     std::vector<HistoryStep> history_;
     std::size_t historyCursor_ = 0, historyWeight_ = 0;
@@ -128,6 +147,8 @@ private:
     void pushHistory(HistoryStep);
     void edit(Project project, std::string label = "입력 변경");
     void staleCalculation();
+    void editPlan(Project, std::string label, bool validated = false);
+    std::shared_ptr<BulkView> bulkView_;
     bool dirty_ = false, readOnly_ = false;
     bool requiresSaveAs_ = false;
 };
@@ -145,6 +166,7 @@ private:
     EditCommand command_;
     std::uint64_t session_;
     std::string factId_;
+    std::optional<HistoryStep> replay_;
 };
 class Document::PreparedEdit {
 public:
@@ -166,5 +188,7 @@ private:
     std::optional<TaskChange> taskChange_;
     std::optional<HistoryStep> history_;
     bool consumed_ = false;
+    std::optional<bool> replayForward_;
+    std::shared_ptr<BulkView> view_;
 };
 }

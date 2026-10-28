@@ -5,6 +5,7 @@
 #include <QPointer>
 #include <algorithm>
 #include <unordered_set>
+#include <QtConcurrent/QtConcurrentRun>
 
 namespace jobs {
 namespace {
@@ -114,6 +115,40 @@ bool TaskTableModel::synchronizeTask() {
     if (const auto found = positions_.find(hint->row); found != positions_.end()) {
         const int last = hint->nameOnly ? 0 : 13;
         emit dataChanged(index(found->second, 0), index(found->second, last));
+    }
+    return true;
+}
+bool TaskTableModel::synchronizeBulk(BulkView& view) {
+    const auto& project = document_.project();
+    if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+        view.session != session_ || session_ != document_.sessionGeneration() || view.documentId != documentId_ ||
+        readOnly_ != document_.readOnly() || view.input.tasks.size() != project->tasks.size() || rows_.size() != plan_.tasks.size()) return false;
+    for (std::size_t i=0; i<rows_.size(); ++i) if(rows_[i]!=i) return false;
+    if (document_.calculation() && document_.calculation()->status == CalculationStatus::Valid) return false;
+    const auto oldSize = view.oldSize, newSize = view.input.tasks.size();
+    const bool insert = newSize>oldSize && view.prefix+view.suffix==oldSize;
+    const bool remove = newSize<oldSize && view.prefix+view.suffix==newSize;
+    const bool reset = !view.sameOrder && !insert && !remove;
+    const bool dates = calculationGeneration_ != document_.calculationGeneration();
+    if(reset)beginResetModel();
+    else if(insert)beginInsertRows({},int(view.prefix),int(view.prefix+newSize-oldSize-1));
+    else if(remove)beginRemoveRows({},int(view.prefix),int(view.prefix+oldSize-newSize-1));
+    std::swap(plan_,view.input); rows_.swap(view.rows); positions_.swap(view.positions); numbers_.swap(view.numbers);
+    auto previousAssignments=std::move(assignments_);
+    for(const auto& [id,label]:view.assignmentLabels) assignments_.emplace(id,qs(label));
+    schedules_.clear();issues_.clear();result_.reset();renderCache_=std::make_shared<EvaluationCache>();
+    revision_=project->revision; calculationGeneration_=document_.calculationGeneration(); lastTaskVisits_=0;
+    if(reset)endResetModel(); else if(insert)endInsertRows(); else if(remove)endRemoveRows();
+    // Old model storage is independent from QObject state and dies off the GUI thread.
+    (void)QtConcurrent::run([input=std::move(view.input),numbers=std::move(view.numbers),rows=std::move(view.rows),
+        positions=std::move(view.positions),assignments=std::move(previousAssignments)]{});
+    if(!reset && rowCount()) {
+        if(dates)emit dataChanged(index(0,0),index(rowCount()-1,13));
+        else for(const auto& [first,last]:view.changedRanges)if(first<rowCount())emit dataChanged(index(first,0),index(std::min(last,rowCount()-1),13));
+        if(insert||remove) {
+            emit dataChanged(index(0,2),index(rowCount()-1,2));
+            emit headerDataChanged(Qt::Vertical,0,rowCount()-1);
+        }
     }
     return true;
 }

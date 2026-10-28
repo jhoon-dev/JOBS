@@ -223,7 +223,7 @@ MainWindow::~MainWindow() { if(editController_) { delete editController_; editCo
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
 void MainWindow::refresh(bool rebuildTree) {
     updateHistoryActions();
-    if (refreshIncremental()) return;
+    if (refreshIncremental() || refreshBulk()) return;
     EvaluationScope evaluation;
     const bool updates=table_->updatesEnabled();table_->setUpdatesEnabled(false);
     struct RestoreUpdates { QWidget* widget;bool enabled;~RestoreUpdates(){widget->setUpdatesEnabled(enabled);} } restoreUpdates{table_,updates};
@@ -277,9 +277,7 @@ void MainWindow::refresh(bool rebuildTree) {
     refreshTracking();
     assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_,!document_.readOnly()&&!calculating_); gantt_->setSelectedTask(selectedTask_);
-    const Baseline* baseline = nullptr;
-    for (const auto& b : p->baselines) if (b.id == selectedBaseline_) baseline = &b;
-    gantt_->setBaseline(baseline);
+    refreshBaseline();
     const auto rollup = summarizeWbs(*p, calculation ? &*calculation : nullptr, selectedWbs_);
     renderedRollup_ = rollup; refreshWbsSummary();
     QString state = "미계산 · F9로 계산";

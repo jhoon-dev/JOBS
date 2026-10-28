@@ -5,6 +5,9 @@
 #include <QLineEdit>
 #include <QStatusBar>
 #include <QTreeWidget>
+#include <QPlainTextEdit>
+#include <QSignalBlocker>
+#include "ui/GanttView.h"
 
 namespace jobs {
 namespace { QString qs(const std::string& value) { return QString::fromUtf8(value); } }
@@ -38,6 +41,30 @@ bool MainWindow::refreshIncremental() {
     }
     renderedRevision_ = project->revision;
     refreshDocumentSummary(); refreshStatus();
+    return true;
+}
+void MainWindow::refreshBaseline() {
+    if(renderedBaselineSession_==document_.sessionGeneration() && renderedBaselineId_==selectedBaseline_)return;
+    const Baseline* baseline=nullptr;
+    if(document_.project())for(const auto& b:document_.project()->baselines)if(b.id==selectedBaseline_)baseline=&b;
+    gantt_->setBaseline(baseline);renderedBaselineSession_=document_.sessionGeneration();renderedBaselineId_=selectedBaseline_;
+}
+bool MainWindow::refreshBulk() {
+    const auto view=document_.bulkView();const auto& p=document_.project();
+    if(!rendered_||!p||!view||renderedSession_!=view->session||renderedRevision_!=view->before||renderedView_!=viewKey()||
+        !selectedWbs_.empty()||!taskSearch_->text().trimmed().isEmpty()||taskFilter_->currentIndex()||taskSort_->currentIndex())return false;
+    const QSignalBlocker selectionBlocker(table_->selectionModel());
+    const auto column=table_->currentColumn();
+    // The worker prepared an identity row map; keep a compact GUI copy for selection/navigation.
+    auto rows=view->rows;
+    if(!taskModel_->synchronizeBulk(*view))return false;
+    visibleRows_=std::move(rows);table_->clearSelection();restoreTaskSelection(column);syncTaskSelection();
+    renderedRollup_=view->summary;refreshWbsSummary();refreshDocumentSummary();refreshStatus();refreshTracking();
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %1 · 선행 번호=프로젝트 원본 행").arg(visibleRows_.size()));
+    const auto& calculation=document_.calculation();
+    gantt_->setPlan(&*p,calculation?&*calculation:nullptr,visibleRows_,false);gantt_->setSelectedTask(selectedTask_);refreshBaseline();
+    if(calculation&&calculation->status==CalculationStatus::Stale)diagnostics_->setPlainText("오래된 계산 · F9로 다시 계산");
+    renderedRevision_=p->revision;renderedCalculation_=document_.calculationGeneration();setWindowModified(document_.dirty());
     return true;
 }
 void MainWindow::refreshDocumentSummary() {

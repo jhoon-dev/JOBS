@@ -27,6 +27,8 @@
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
+#include <QFutureWatcher>
+#include <QtConcurrent/QtConcurrentRun>
 namespace jobs {
 namespace {
 QString qs(const std::string& s){return QString::fromUtf8(s.data(),qsizetype(s.size()));}
@@ -77,13 +79,16 @@ void MainWindow::syncTaskSelection() {
         progressEdit_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && document_.project()->statusAt.has_value());
 }
 std::vector<std::string> MainWindow::selectedTaskIds() const {
-    QSet<int> rows;for(const auto& index:table_->selectionModel()->selectedIndexes())rows.insert(index.row());auto ordered=rows.values();std::sort(ordered.begin(),ordered.end());std::vector<std::string> ids;
+    QSet<int> rows;
+    for (const auto& range : table_->selectionModel()->selection())
+        for (int row = range.top(); row <= range.bottom(); ++row) rows.insert(row);
+    auto ordered=rows.values(); std::sort(ordered.begin(),ordered.end()); std::vector<std::string> ids;
     for(int row:ordered)ids.push_back(table_->model()->index(row,8).data().toString().toUtf8().toStdString());
     return ids;
 }
 void MainWindow::updateTaskActions() {
     if(!insertTasks_)return;
-    const bool writable=document_.project()&&!document_.readOnly();const bool selection=!selectedTaskIds().empty();
+    const bool writable=document_.project()&&!document_.readOnly();const bool selection=table_->selectionModel()->hasSelection();
     if(auto* edit=findChild<QAction*>("editTaskCell"))edit->setEnabled(writable&&table_->currentIndex().isValid()&&(table_->currentIndex().flags()&Qt::ItemIsEditable));
     insertTasks_->setEnabled(writable);deleteTasks_->setEnabled(writable&&selection);duplicateTasks_->setEnabled(writable&&selection);copyTasks_->setEnabled(selection);
     pasteTasks_->setEnabled(writable&&table_->currentRow()>=0&&table_->currentColumn()>=0&&table_->currentColumn()<3&&(QApplication::clipboard()->mimeData()&&QApplication::clipboard()->mimeData()->hasText()));
@@ -91,7 +96,10 @@ void MainWindow::updateTaskActions() {
 void MainWindow::restoreTaskSelection(int column) {
     if(selectedTaskIds_.empty()&&!selectedTask_.empty())selectedTaskIds_.push_back(selectedTask_);
     const std::unordered_set<std::string> requested(selectedTaskIds_.begin(),selectedTaskIds_.end());std::vector<std::string> kept;int active=-1,first=-1;
-    for(int row=0;row<int(visibleRows_.size());++row){const auto& id=document_.project()->tasks[visibleRows_[std::size_t(row)]].id;if(!requested.contains(id))continue;kept.push_back(id);if(first<0)first=row;if(id==selectedTask_)active=row;table_->selectionModel()->select(table_->model()->index(row,0),QItemSelectionModel::Select|QItemSelectionModel::Rows);}
+    QItemSelection selection; int run = -1;
+    for(int row=0;row<int(visibleRows_.size());++row){const auto& id=document_.project()->tasks[visibleRows_[std::size_t(row)]].id;if(!requested.contains(id)){if(run>=0){selection.select(table_->model()->index(run,0),table_->model()->index(row-1,13));run=-1;}continue;}if(run<0)run=row;kept.push_back(id);if(first<0)first=row;if(id==selectedTask_)active=row;}
+    if(run>=0)selection.select(table_->model()->index(run,0),table_->model()->index(int(visibleRows_.size())-1,13));
+    table_->selectionModel()->select(selection,QItemSelectionModel::ClearAndSelect);
     selectedTaskIds_=std::move(kept);if(active<0)active=first;
     if(active>=0){selectedTask_=document_.project()->tasks[visibleRows_[std::size_t(active)]].id;table_->setCurrentCell(active,std::clamp(column,0,13),QItemSelectionModel::NoUpdate);}else selectedTask_.clear();updateTaskActions();
 }
@@ -114,19 +122,46 @@ void MainWindow::insertSelectedTasks() {
     if(!document_.project()||document_.readOnly())return;
     const auto session=document_.sessionGeneration(),revision=document_.project()->revision;const auto before=selectedTask_,wbs=selectedWbs_;
     QDialog dialog(this);dialog.setObjectName("insertTasksDialog");dialog.setWindowTitle("작업 삽입");dialog.resize(480,320);auto* layout=new QVBoxLayout(&dialog);layout->addWidget(new QLabel(before.empty()?"프로젝트 끝에 추가합니다. 작업 이름을 한 줄에 하나씩 입력하세요.":"현재 작업의 프로젝트 원본 순서 앞에 삽입합니다. 한 줄에 한 작업입니다."));auto* names=new QPlainTextEdit;names->setObjectName("insertTaskNames");names->setPlainText("새 작업");layout->addWidget(names);auto* buttons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);layout->addWidget(buttons);connect(buttons,&QDialogButtonBox::accepted,&dialog,&QDialog::accept);connect(buttons,&QDialogButtonBox::rejected,&dialog,&QDialog::reject);if(dialog.exec()!=QDialog::Accepted)return;
-    try{if(document_.sessionGeneration()!=session||!document_.project()||document_.project()->revision!=revision)throw std::runtime_error("입력 중 프로젝트가 변경되었습니다. 다시 삽입하세요.");if(names->toPlainText().toUtf8().size()>4*1024*1024)throw std::runtime_error("작업 이름 목록은 최대 4 MiB입니다.");std::vector<std::string> values;for(const auto& line:names->toPlainText().split('\n'))if(!line.trimmed().isEmpty())values.push_back(line.trimmed().toUtf8().toStdString());selectedTaskIds_=document_.insertTasks(values,before,wbs);selectedTask_=selectedTaskIds_.front();refresh();}catch(const std::exception& e){report(e);}
+    try{if(document_.sessionGeneration()!=session||!document_.project()||document_.project()->revision!=revision)throw std::runtime_error("입력 중 프로젝트가 변경되었습니다. 다시 삽입하세요.");const auto text=names->toPlainText();
+        submitEdit(DeferredTaskEdit{[text,before,wbs](const Project&) -> BulkTaskCommand {
+            if(text.size()>4*1024*1024||text.toUtf8().size()>4*1024*1024)throw std::runtime_error("작업 이름 목록은 최대 4 MiB입니다.");
+            std::vector<std::string> values;
+            for(const auto& line:text.split('\n')){calculationCheckpoint();if(!line.trimmed().isEmpty())values.push_back(line.trimmed().toUtf8().toStdString());}
+            return InsertTasksEdit{std::move(values),before,wbs};
+        }},"작업 삽입");}catch(const std::exception& e){report(e);}
 }
 void MainWindow::deleteSelectedTasks() {
     if(!document_.project()||document_.readOnly())return;
-    try{const auto ids=selectedTaskIds();const auto info=document_.previewRemoveTasks(ids);if(!info.protectedTaskIds.empty())throw std::runtime_error("선택에 실적/원가 보고 이력이 있는 작업이 포함돼 삭제할 수 없습니다. 보고 이력을 보존합니다.");
-        const auto revision=document_.project()->revision,session=document_.sessionGeneration();QMessageBox confirm(QMessageBox::Warning,"선택 작업 삭제",QString("작업 %1개, 선행관계 %2개, 자원 배정 %3개, 작업 예산 %4개를 삭제합니다.\n승인 기준선과 저장 시나리오는 보존됩니다. 실행 취소할 수 있습니다.").arg(info.tasks).arg(info.links).arg(info.assignments).arg(info.costs),QMessageBox::Yes|QMessageBox::No,this);confirm.setObjectName("deleteTasksConfirmation");confirm.setDefaultButton(QMessageBox::No);if(confirm.exec()!=QMessageBox::Yes)return;
+    try {
+        const auto ids=selectedTaskIds(); const auto source=document_.snapshot();
+        const auto revision=source->revision,session=document_.sessionGeneration();
+        auto control=std::make_shared<CalculationControl>();
+        QMessageBox confirm(QMessageBox::Warning,"선택 작업 삭제","삭제 영향을 확인하고 있습니다…",QMessageBox::Yes|QMessageBox::No,this);
+        confirm.setObjectName("deleteTasksConfirmation");confirm.setDefaultButton(QMessageBox::No);confirm.button(QMessageBox::Yes)->setEnabled(false);
+        QFutureWatcher<std::pair<TaskRemoval,QString>> watcher;
+        bool ready=false;
+        connect(&watcher,&QFutureWatcherBase::finished,&confirm,[&]{
+            auto [info,error]=watcher.result();
+            if(!error.isEmpty()){confirm.setText(error);return;}
+            if(!info.protectedTaskIds.empty()){confirm.setText("선택에 실적/원가 보고 이력이 있는 작업이 포함돼 삭제할 수 없습니다. 보고 이력을 보존합니다.");return;}
+            confirm.setText(QString("작업 %1개, 선행관계 %2개, 자원 배정 %3개, 작업 예산 %4개를 삭제합니다.\n승인 기준선과 저장 시나리오는 보존됩니다. 실행 취소할 수 있습니다.").arg(info.tasks).arg(info.links).arg(info.assignments).arg(info.costs));
+            ready=true;confirm.button(QMessageBox::Yes)->setEnabled(true);
+        });
+        watcher.setFuture(QtConcurrent::run([source,ids,control]{
+            try{EvaluationScope scope(control);return std::pair{Document::previewRemoveTasks(*source,ids),QString{}};}
+            catch(const CalculationCancelled&){return std::pair{TaskRemoval{},QString("삭제 확인을 취소했습니다.")};}
+            catch(const std::exception& e){return std::pair{TaskRemoval{},QString::fromUtf8(e.what())};}
+        }));
+        const auto answer=confirm.exec();control->cancel();
+        if(answer!=QMessageBox::Yes||!ready)return;
         if(document_.sessionGeneration()!=session||!document_.project()||document_.project()->revision!=revision)throw std::runtime_error("확인 중 프로젝트가 변경되었습니다. 삭제 대상을 다시 확인하세요.");
-        document_.removeTasks(ids);selectedTaskIds_.clear();selectedTask_.clear();refresh();
+        submitEdit(RemoveTasksEdit{ids},"작업 삭제");
     }catch(const std::exception& e){report(e);}
 }
 void MainWindow::duplicateSelectedTasks() {
-    try{selectedTaskIds_=document_.duplicateTasks(selectedTaskIds());selectedTask_=selectedTaskIds_.front();refresh();}catch(const std::exception& e){report(e);}
+    try{submitEdit(DuplicateTasksEdit{selectedTaskIds()},"작업 복제");}catch(const std::exception& e){report(e);}
 }
+
 void MainWindow::copySelectedCells() {
     try{const auto indices=table_->selectionModel()->selectedIndexes();if(indices.isEmpty())return;int top=indices.front().row(),bottom=top,left=indices.front().column(),right=left;for(const auto& i:indices){top=std::min(top,i.row());bottom=std::max(bottom,i.row());left=std::min(left,i.column());right=std::max(right,i.column());}
         if(indices.size()!=qsizetype(bottom-top+1)*(right-left+1))throw std::runtime_error("복사할 셀은 구멍 없는 연속 직사각형으로 선택하세요.");
@@ -138,13 +173,15 @@ void MainWindow::copySelectedCells() {
 }
 void MainWindow::pasteCells() {
     if(!document_.project()||document_.readOnly())return;
-    try{const auto cells=decodeTaskTsv(QApplication::clipboard()->text());const int row=table_->currentRow(),column=table_->currentColumn();if(cells.isEmpty()||row<0||column<0||column>=3||column+cells.front().size()>3)throw std::runtime_error("이름·기간·선행 입력 3열 범위에 붙여넣으세요.");if(std::size_t(row)+std::size_t(cells.size())>visibleRows_.size())throw std::runtime_error("보이는 작업 행이 부족합니다. 작업 삽입으로 행을 먼저 만드세요.");
-        const auto& p=*document_.project();std::vector<TaskEdit> edits;
-        for(qsizetype r=0;r<cells.size();++r){TaskEdit e;e.taskId=p.tasks[visibleRows_.at(std::size_t(row)+std::size_t(r))].id;
+    try{
+        const auto text=QApplication::clipboard()->text();const int row=table_->currentRow(),column=table_->currentColumn();
+        submitEdit(DeferredTaskEdit{[text,row,column,rows=visibleRows_](const Project& p) -> BulkTaskCommand {
+        const auto cells=decodeTaskTsv(text);if(cells.isEmpty()||row<0||column<0||column>=3||column+cells.front().size()>3)throw std::runtime_error("이름·기간·선행 입력 3열 범위에 붙여넣으세요.");if(std::size_t(row)+std::size_t(cells.size())>rows.size())throw std::runtime_error("보이는 작업 행이 부족합니다. 작업 삽입으로 행을 먼저 만드세요.");
+        std::vector<TaskEdit> edits;
+        for(qsizetype r=0;r<cells.size();++r){calculationCheckpoint();TaskEdit e;e.taskId=p.tasks[rows.at(std::size_t(row)+std::size_t(r))].id;
             for(qsizetype c=0;c<cells[r].size();++c){try{const auto& value=cells[r][c];if(column+c==0){if(value.trimmed().isEmpty())throw std::runtime_error("작업 이름은 빈칸일 수 없습니다.");e.name=value.trimmed().toUtf8().toStdString();}else if(column+c==1)e.duration.emplace(taskDurationInput(value));else e.edges=taskDependencyInput(value,p,e.taskId);}catch(const std::exception& error){throw std::runtime_error("붙여넣기 "+std::to_string(r+1)+"행 "+std::to_string(c+1)+"열: "+error.what());}}edits.push_back(std::move(e));}
-        bool inverse = false; for (const auto& edit : edits) if (edit.duration && hasInverseDuration(edit.taskId)) inverse = true;
-        if (inverse) { submitEdit(BatchTaskEdit{std::move(edits)}, "표 공수 역산"); return; }
-        document_.editTasks(edits);refresh();statusBar()->showMessage(QString("%1행 붙여넣기 완료 · 한 번에 실행 취소 가능").arg(cells.size()));
+        return BatchTaskEdit{std::move(edits)};
+        }},"표 붙여넣기");
     }catch(const std::exception& e){report(e);}
 }
 }

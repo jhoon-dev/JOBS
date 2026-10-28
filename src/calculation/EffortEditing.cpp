@@ -4,10 +4,10 @@
 #include <stdexcept>
 namespace jobs {
 namespace {
-void scaleAssignments(Project& p,std::size_t index,std::int64_t target,std::int64_t duration) {
+void scaleAssignments(Project& p,std::size_t index,std::int64_t target,std::int64_t duration,bool planOnly=false) {
     calculationCheckpoint();
     auto t=p.tasks.at(index);t.taskType="fixed-duration";t.workDriven=false;t.workUnitMinutes.reset();t.durationMinutes=duration;
-    auto trial=p;trial.tasks[index]=t;auto plan=calculatePlan(trial);std::int64_t local=0;TaskExecution model(p,t);
+    Project trial; if(planOnly){static_cast<PlanInput&>(trial)=p;trial.documentId=p.documentId;trial.revision=p.revision;}else trial=p;trial.tasks[index]=t;auto plan=calculatePlan(trial);std::int64_t local=0;TaskExecution model(p,t);
     if(plan.status!=CalculationStatus::Valid)throw std::runtime_error("배정률 역산에는 입력 기간을 적용한 유효한 전체 계획이 필요합니다. 선행관계·날짜 제약·기간 입력을 확인하세요.");
     for(const auto& row:plan.tasks)if(row.taskId==t.id)local=model.calendar().offset(row.start);
     const auto work=model.work(model.dates(local));
@@ -16,11 +16,11 @@ void scaleAssignments(Project& p,std::size_t index,std::int64_t target,std::int6
     std::erase_if(p.assignments,[&](const auto& a){return a.taskId==t.id&&!a.units;});
 }
 }
-void changeDuration(Project& p,std::size_t index,std::optional<std::int64_t> duration) {
+void changeDuration(Project& p,std::size_t index,std::optional<std::int64_t> duration,bool planOnly) {
     auto& t=p.tasks.at(index);
     if(isEffort(p)&&t.taskType=="fixed-work") {
         if(!duration||(*duration==0&&t.workUnitMinutes.value_or(0)>0))throw std::runtime_error("고정 공수의 기간 편집에는 양수 기간이 필요합니다.");
-        scaleAssignments(p,index,t.workUnitMinutes.value(),*duration);
+        scaleAssignments(p,index,t.workUnitMinutes.value(),*duration,planOnly);
     } else if(t.taskType=="fixed-units"){t.workDriven=false;t.workUnitMinutes.reset();}
     t.durationMinutes=duration;
 }

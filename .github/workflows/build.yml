@@ -42,18 +42,31 @@ jobs:
       - name: Check out pre-optimization editing reference
         uses: actions/checkout@v4
         with:
-          ref: 0645867d0fcef29debfd6d9c32f5b4cdfdd3eb8c
+          ref: edbea73
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
           cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe --parallel 3
+          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe jobs_bulk_performance_probe --parallel 3
       - name: Measure reference and compare paired editing observations
         run: |
           python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history
           python scripts/compare-editing-performance.py build/performance/editing-reference build/performance/editing build/performance/editing-comparison.json
           python scripts/run-responsive-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/responsive-reference --repeats 3
           python scripts/compare-responsive-performance.py build/performance/responsive-reference build/performance/responsive build/performance/responsive-comparison.json
+      - name: Measure paired bulk UI operations
+        run: |
+          python scripts/run-bulk-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/bulk-reference
+          python scripts/run-bulk-performance-probes.py --reference build/performance/bulk-reference
+      - name: Exercise native structural editing and row notifications
+        run: python scripts/check-bulk-native-ui.py build
+      - name: Preserve native structural editing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-editing-${{ runner.os }}
+          path: build/bulk-editing-native.png
+          if-no-files-found: warn
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

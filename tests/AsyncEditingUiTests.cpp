@@ -165,6 +165,7 @@ int main(int argc, char** argv) {
         check(wait([&] { return !controller->busy(); }) && document.project()->tasks[0].durationMinutes == 120,
               "fixed-work paste did not apply the prepared duration");
         action(window, "undoEdit")->trigger();
+        check(wait([&]{return !controller->busy();}), "paste undo timeout");
         check(static_cast<const jobs::PlanInput&>(*document.project()) == static_cast<const jobs::PlanInput&>(before), "asynchronous paste was not one undo");
         std::cout << "stage: deferred save/F9, Gantt and batch inversion" << std::endl;
         table->selectRow(0); before = *document.project();
