@@ -1,0 +1,1083 @@
+{
+    "format": "JOBS",
+    "payload": {
+        "assignments": [
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                "units": 100
+            },
+            {
+                "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                "taskId": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                "units": 100
+            }
+        ],
+        "baselines": [
+            {
+                "approvedBy": "PM",
+                "createdAt": "2026-10-26T09:00:00Z",
+                "engineVersion": "jobs-effort-1.0",
+                "id": "f51b666f-76f1-4903-894b-0af4ba5c416a",
+                "input": {
+                    "assignments": [
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                            "units": 100
+                        }
+                    ],
+                    "calculationProfile": "native-effort-split-v1",
+                    "calendar": "standard-mon-fri-8h-v1",
+                    "calendars": [
+                    ],
+                    "costProfile": "cost-day-minor-half-up-v1",
+                    "currency": "KRW",
+                    "holidays": [
+                    ],
+                    "name": "Enum compatibility history",
+                    "resources": [
+                        {
+                            "calendarId": "",
+                            "exceptions": [
+                            ],
+                            "id": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "maxUnits": 100,
+                            "name": "Crew",
+                            "rates": [
+                                {
+                                    "effectiveDate": "2026-01-01",
+                                    "hourlyMinor": 6000
+                                }
+                            ],
+                            "type": "labor"
+                        }
+                    ],
+                    "startDate": "2026-10-26",
+                    "taskCosts": [
+                        {
+                            "accrual": "uniform",
+                            "credit": "physical",
+                            "fixedMinor": 100,
+                            "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "breaks": [
+                                {
+                                    "finish": "2026-10-27 13:00",
+                                    "start": "2026-10-26 13:00"
+                                }
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ASAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": null,
+                            "id": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                            "name": "Work",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-work",
+                            "wbsId": "",
+                            "workDriven": true,
+                            "workUnitMinutes": 48000
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ALAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 60,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "SS"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                            "name": "Units",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-units",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-27 09:00",
+                            "constraintType": "SNET",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": -30,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "FF"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                            "name": "Start lower",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-29 18:00",
+                            "constraintType": "SNLT",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 60,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "SF"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                            "name": "Start upper",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-27 09:00",
+                            "constraintType": "FNET",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 30,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "FS"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                            "name": "Finish lower",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-30 18:00",
+                            "constraintType": "FNLT",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                            "name": "Finish upper",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-28 09:00",
+                            "constraintType": "MSO",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                            "name": "Start fixed",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-28 18:00",
+                            "constraintType": "MFO",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                            "name": "Finish fixed",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ASAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                            "name": "Duration",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        }
+                    ],
+                    "wbsNodes": [
+                    ]
+                },
+                "inputRevision": 34,
+                "name": "Approved",
+                "projectFinish": "2026-10-28 18:00",
+                "reason": "Before enum conversion",
+                "schedule": [
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 2520,
+                        "earlyStartMinutes": 540,
+                        "finish": "2026-10-27 18:00",
+                        "freeFloatMinutes": 0,
+                        "lateFinishMinutes": 3870,
+                        "lateStartMinutes": 2430,
+                        "remainingStart": null,
+                        "start": "2026-10-26 09:00",
+                        "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                        "totalFloatMinutes": 390
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": true,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 3960,
+                        "earlyStartMinutes": 3900,
+                        "finish": "2026-10-28 18:00",
+                        "freeFloatMinutes": 0,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-28 17:00",
+                        "taskId": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                        "totalFloatMinutes": 0
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                            "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                        ],
+                        "earlyFinishMinutes": 2490,
+                        "earlyStartMinutes": 2430,
+                        "finish": "2026-10-27 17:30",
+                        "freeFloatMinutes": 510,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-27 16:30",
+                        "taskId": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                        "totalFloatMinutes": 510
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                            "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                        ],
+                        "earlyFinishMinutes": 600,
+                        "earlyStartMinutes": 540,
+                        "finish": "2026-10-26 10:00",
+                        "freeFloatMinutes": 1380,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-26 09:00",
+                        "taskId": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                        "totalFloatMinutes": 1380
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                            "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                        ],
+                        "earlyFinishMinutes": 3510,
+                        "earlyStartMinutes": 3450,
+                        "finish": "2026-10-28 10:30",
+                        "freeFloatMinutes": 390,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-28 09:30",
+                        "taskId": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                        "totalFloatMinutes": 390
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 600,
+                        "earlyStartMinutes": 540,
+                        "finish": "2026-10-26 10:00",
+                        "freeFloatMinutes": 1380,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-26 09:00",
+                        "taskId": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                        "totalFloatMinutes": 1380
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": true,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 3480,
+                        "earlyStartMinutes": 3420,
+                        "finish": "2026-10-28 10:00",
+                        "freeFloatMinutes": 0,
+                        "lateFinishMinutes": 3480,
+                        "lateStartMinutes": 3420,
+                        "remainingStart": null,
+                        "start": "2026-10-28 09:00",
+                        "taskId": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                        "totalFloatMinutes": 0
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": true,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 3960,
+                        "earlyStartMinutes": 3900,
+                        "finish": "2026-10-28 18:00",
+                        "freeFloatMinutes": 0,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-28 17:00",
+                        "taskId": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                        "totalFloatMinutes": 0
+                    },
+                    {
+                        "completedActual": false,
+                        "critical": false,
+                        "drivingPredecessors": [
+                        ],
+                        "earlyFinishMinutes": 600,
+                        "earlyStartMinutes": 540,
+                        "finish": "2026-10-26 10:00",
+                        "freeFloatMinutes": 1380,
+                        "lateFinishMinutes": 3960,
+                        "lateStartMinutes": 3900,
+                        "remainingStart": null,
+                        "start": "2026-10-26 09:00",
+                        "taskId": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                        "totalFloatMinutes": 1380
+                    }
+                ],
+                "sourceDocumentId": "7b471fc8-d18e-45dd-aaf2-c4aa4afb5ba0",
+                "version": 1
+            }
+        ],
+        "calculationProfile": "native-effort-split-v1",
+        "calendar": "standard-mon-fri-8h-v1",
+        "calendars": [
+        ],
+        "costEntries": [
+            {
+                "actualMinor": 18000,
+                "currency": "KRW",
+                "id": "29c8e08f-56ec-42d8-9f89-af2de840c6fd",
+                "physicalBasisPoints": 3750,
+                "previousEntryId": "",
+                "reason": "Before enum conversion",
+                "recordedAt": "2026-10-26T09:00:00Z",
+                "recordedRevision": 39,
+                "reporter": "PM",
+                "sourceDocumentId": "7b471fc8-d18e-45dd-aaf2-c4aa4afb5ba0",
+                "statusAt": "2026-10-26 18:00",
+                "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a"
+            }
+        ],
+        "costProfile": "cost-day-minor-half-up-v1",
+        "currency": "KRW",
+        "derivedFrom": "",
+        "documentId": "7b471fc8-d18e-45dd-aaf2-c4aa4afb5ba0",
+        "holidays": [
+        ],
+        "name": "Enum compatibility history",
+        "progress": [
+            {
+                "actualDurationMinutes": 180,
+                "actualFinish": null,
+                "actualStart": "2026-10-26 09:00",
+                "id": "7563d5de-9b4c-4986-ab4e-4a2f73d12458",
+                "planDurationMinutes": 480,
+                "previousEntryId": "",
+                "reason": "Before enum conversion",
+                "recordedAt": "2026-10-26T09:00:00Z",
+                "recordedRevision": 38,
+                "remainingMinutes": 300,
+                "remainingWorkUnitMinutes": 30000,
+                "reporter": "PM",
+                "sourceDocumentId": "7b471fc8-d18e-45dd-aaf2-c4aa4afb5ba0",
+                "statusAt": "2026-10-26 18:00",
+                "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a"
+            }
+        ],
+        "resources": [
+            {
+                "calendarId": "",
+                "exceptions": [
+                ],
+                "id": "56263600-0368-458f-b757-0a2f28fe5019",
+                "maxUnits": 100,
+                "name": "Crew",
+                "rates": [
+                    {
+                        "effectiveDate": "2026-01-01",
+                        "hourlyMinor": 6000
+                    }
+                ],
+                "type": "labor"
+            }
+        ],
+        "revision": 39,
+        "scenarios": [
+            {
+                "createdAt": "2026-10-26T09:00:00Z",
+                "horizonWorkDays": 20,
+                "id": "4e262662-1497-446c-b218-f348e755b2cf",
+                "input": {
+                    "assignments": [
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                            "units": 100
+                        },
+                        {
+                            "resourceId": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "taskId": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                            "units": 100
+                        }
+                    ],
+                    "calculationProfile": "native-effort-split-v1",
+                    "calendar": "standard-mon-fri-8h-v1",
+                    "calendars": [
+                    ],
+                    "costProfile": "cost-day-minor-half-up-v1",
+                    "currency": "KRW",
+                    "holidays": [
+                    ],
+                    "name": "Enum compatibility history",
+                    "resources": [
+                        {
+                            "calendarId": "",
+                            "exceptions": [
+                            ],
+                            "id": "56263600-0368-458f-b757-0a2f28fe5019",
+                            "maxUnits": 100,
+                            "name": "Crew",
+                            "rates": [
+                                {
+                                    "effectiveDate": "2026-01-01",
+                                    "hourlyMinor": 6000
+                                }
+                            ],
+                            "type": "labor"
+                        }
+                    ],
+                    "startDate": "2026-10-26",
+                    "taskCosts": [
+                        {
+                            "accrual": "uniform",
+                            "credit": "physical",
+                            "fixedMinor": 100,
+                            "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "breaks": [
+                                {
+                                    "finish": "2026-10-27 13:00",
+                                    "start": "2026-10-26 13:00"
+                                }
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ASAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": null,
+                            "id": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                            "name": "Work",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-work",
+                            "wbsId": "",
+                            "workDriven": true,
+                            "workUnitMinutes": 48000
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ALAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 60,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "SS"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                            "name": "Units",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-units",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-27 09:00",
+                            "constraintType": "SNET",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": -30,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "FF"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                            "name": "Start lower",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-29 18:00",
+                            "constraintType": "SNLT",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 60,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "SF"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                            "name": "Start upper",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-27 09:00",
+                            "constraintType": "FNET",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                                {
+                                    "lagMinutes": 30,
+                                    "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                                    "type": "FS"
+                                }
+                            ],
+                            "durationMinutes": 60,
+                            "id": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                            "name": "Finish lower",
+                            "predecessors": [
+                                "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-30 18:00",
+                            "constraintType": "FNLT",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                            "name": "Finish upper",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-28 09:00",
+                            "constraintType": "MSO",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                            "name": "Start fixed",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": "2026-10-28 18:00",
+                            "constraintType": "MFO",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                            "name": "Finish fixed",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        },
+                        {
+                            "breaks": [
+                            ],
+                            "calendarId": "",
+                            "constraintAt": null,
+                            "constraintType": "ASAP",
+                            "deadlineAt": null,
+                            "dependencyRules": [
+                            ],
+                            "durationMinutes": 60,
+                            "id": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                            "name": "Duration",
+                            "predecessors": [
+                            ],
+                            "taskType": "fixed-duration",
+                            "wbsId": "",
+                            "workDriven": false,
+                            "workUnitMinutes": null
+                        }
+                    ],
+                    "wbsNodes": [
+                    ]
+                },
+                "inputRevision": 35,
+                "name": "Frozen alternative",
+                "policy": "serial-effort-split-v1",
+                "priority": "shortest-first",
+                "progress": [
+                ],
+                "sourceDocumentId": "7b471fc8-d18e-45dd-aaf2-c4aa4afb5ba0",
+                "statusAt": null
+            }
+        ],
+        "startDate": "2026-10-26",
+        "statusAt": "2026-10-26 18:00",
+        "taskCosts": [
+            {
+                "accrual": "uniform",
+                "credit": "physical",
+                "fixedMinor": 100,
+                "taskId": "e193847b-2a3e-40b8-9786-60f2e100db5a"
+            }
+        ],
+        "tasks": [
+            {
+                "breaks": [
+                    {
+                        "finish": "2026-10-27 13:00",
+                        "start": "2026-10-26 13:00"
+                    }
+                ],
+                "calendarId": "",
+                "constraintAt": null,
+                "constraintType": "ASAP",
+                "deadlineAt": null,
+                "dependencyRules": [
+                ],
+                "durationMinutes": null,
+                "id": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                "name": "Work",
+                "predecessors": [
+                ],
+                "taskType": "fixed-work",
+                "wbsId": "",
+                "workDriven": true,
+                "workUnitMinutes": 48000
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": null,
+                "constraintType": "ALAP",
+                "deadlineAt": null,
+                "dependencyRules": [
+                    {
+                        "lagMinutes": 60,
+                        "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                        "type": "SS"
+                    }
+                ],
+                "durationMinutes": 60,
+                "id": "475b6e91-be59-42f3-8f49-72692b16ad7b",
+                "name": "Units",
+                "predecessors": [
+                    "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                ],
+                "taskType": "fixed-units",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-27 09:00",
+                "constraintType": "SNET",
+                "deadlineAt": null,
+                "dependencyRules": [
+                    {
+                        "lagMinutes": -30,
+                        "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                        "type": "FF"
+                    }
+                ],
+                "durationMinutes": 60,
+                "id": "82fd5aac-5d16-481c-bc9a-388dd90c791e",
+                "name": "Start lower",
+                "predecessors": [
+                    "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-29 18:00",
+                "constraintType": "SNLT",
+                "deadlineAt": null,
+                "dependencyRules": [
+                    {
+                        "lagMinutes": 60,
+                        "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                        "type": "SF"
+                    }
+                ],
+                "durationMinutes": 60,
+                "id": "2aa7f2b1-b71c-4f08-8255-8cb11f22aa72",
+                "name": "Start upper",
+                "predecessors": [
+                    "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-27 09:00",
+                "constraintType": "FNET",
+                "deadlineAt": null,
+                "dependencyRules": [
+                    {
+                        "lagMinutes": 30,
+                        "predecessorId": "e193847b-2a3e-40b8-9786-60f2e100db5a",
+                        "type": "FS"
+                    }
+                ],
+                "durationMinutes": 60,
+                "id": "e9e416eb-3756-4534-bf88-344166aa3bf5",
+                "name": "Finish lower",
+                "predecessors": [
+                    "e193847b-2a3e-40b8-9786-60f2e100db5a"
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-30 18:00",
+                "constraintType": "FNLT",
+                "deadlineAt": null,
+                "dependencyRules": [
+                ],
+                "durationMinutes": 60,
+                "id": "5dc97714-c26e-418d-8878-d74c51f7f377",
+                "name": "Finish upper",
+                "predecessors": [
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-28 09:00",
+                "constraintType": "MSO",
+                "deadlineAt": null,
+                "dependencyRules": [
+                ],
+                "durationMinutes": 60,
+                "id": "d17a960e-d51d-4a0a-8bed-d59c6aa9eff1",
+                "name": "Start fixed",
+                "predecessors": [
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": "2026-10-28 18:00",
+                "constraintType": "MFO",
+                "deadlineAt": null,
+                "dependencyRules": [
+                ],
+                "durationMinutes": 60,
+                "id": "db5a551d-9cfd-47a3-ac55-c327e244356b",
+                "name": "Finish fixed",
+                "predecessors": [
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            },
+            {
+                "breaks": [
+                ],
+                "calendarId": "",
+                "constraintAt": null,
+                "constraintType": "ASAP",
+                "deadlineAt": null,
+                "dependencyRules": [
+                ],
+                "durationMinutes": 60,
+                "id": "7f4682c0-8132-4c49-abed-0eb69ac43bba",
+                "name": "Duration",
+                "predecessors": [
+                ],
+                "taskType": "fixed-duration",
+                "wbsId": "",
+                "workDriven": false,
+                "workUnitMinutes": null
+            }
+        ],
+        "wbsNodes": [
+        ]
+    },
+    "schemaVersion": 9,
+    "sha256": "aa6d5b13b935ff072202cec27d730b80665e29660db4692e6eda7f25bf0bfc7d"
+}

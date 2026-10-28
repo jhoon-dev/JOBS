@@ -10,3 +10,5 @@
 # Generated validation evidence retains tool-emitted spacing and blank EOF lines.
 docs/validation/**/*.log text eol=lf -whitespace
 docs/validation/**/CMakeCache.txt text eol=lf -whitespace
+# Compatibility golden bytes must be identical on every checkout platform.
+tests/fixtures/enum-compat/*.jobs -text

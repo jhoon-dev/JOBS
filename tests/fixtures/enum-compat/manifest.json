@@ -1,0 +1,59 @@
+{
+  "wire_model": "pre-enum string fields",
+  "product_revision": "f3316f100cee78f9db866e5f7c689f2b0ffa77a7",
+  "provenance": "schema/profile seeds from parser-safety CI 40644969279; history.jobs generated before model edits using the pre-enum MinGW libraries; historical generator source included",
+  "files": [
+    {
+      "file": "history.jobs",
+      "sha256": "2bc40379033023b9f930c7083bab997090f3a79f4a4bdf34ebb6263c9b968cb3"
+    },
+    {
+      "file": "native-effort-split-v1.jobs",
+      "sha256": "af4e93b650dd4ea792585104ec1a20c89aa69a450c02c2c0898ce4dfaac821d2"
+    },
+    {
+      "file": "native-pdm-constraints-v1.jobs",
+      "sha256": "b1fedb0db44f8097eb88e6a74e533a8710ac4849ebba9cf38c319dd7d4850897"
+    },
+    {
+      "file": "native-pdm-taskcal-v1.jobs",
+      "sha256": "b2bf5ea25fbbfff2fefd4a9e195c73a75d4e8862920ec2ca78b104cd8cde9eb2"
+    },
+    {
+      "file": "schema-1.jobs",
+      "sha256": "77c2abe5f368ce22ad851d0199ff3fce4783fe867bd7c3e0b8d794269f13db29"
+    },
+    {
+      "file": "schema-2.jobs",
+      "sha256": "5f90a757770f6f37820a9646054aa7864df823b43331f7c4182030aa5e7c13b1"
+    },
+    {
+      "file": "schema-3.jobs",
+      "sha256": "7a143e807f13c96955a1016ebd0efb25b0d369e9ee0379a2ef1f85e449852f68"
+    },
+    {
+      "file": "schema-4.jobs",
+      "sha256": "dc10d667c5e19fdece4333b3125ea80a0c563c358ef40423e0d112c2a1c5357e"
+    },
+    {
+      "file": "schema-5.jobs",
+      "sha256": "2d52a2800ee73721f2beba2c691a874ba33105a0eab198aea83b35188b061379"
+    },
+    {
+      "file": "schema-6.jobs",
+      "sha256": "dbec32449f9f8ae821db523e78832f83836901b380007a6756e18d5a42644715"
+    },
+    {
+      "file": "schema-7.jobs",
+      "sha256": "25d066bf3af19ba6312e72f084641b12e8913e66d3be9e43ceddf718c69bab69"
+    },
+    {
+      "file": "schema-8.jobs",
+      "sha256": "5b694664c8a31519ffdd994edac1a2c6acdaaf7df49dd0d8be293da6c636e40c"
+    },
+    {
+      "file": "schema-9.jobs",
+      "sha256": "bc3e41452329635cf1bb35529162452e3cfaa525539d37cac5a44bbb3831dc4b"
+    }
+  ]
+}

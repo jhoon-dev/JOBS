@@ -1,0 +1,23 @@
+#include "application/Document.h"
+#include "persistence/JsonProjectStore.h"
+#include <QCoreApplication>
+#include <iostream>
+int main(int argc,char** argv){QCoreApplication app(argc,argv);try{
+ jobs::JsonProjectStore store;jobs::Document d(store);
+ d.create("Enum compatibility history","2026-10-26",{"Work","Units","Start lower","Start upper","Finish lower","Finish upper","Start fixed","Finish fixed","Duration"});
+ for(std::size_t i=0;i<9;++i)d.setDuration(i,60);
+ jobs::Resource r;r.name="Crew";r.rates={{"2026-01-01",6000}};auto rid=d.putResource(r);
+ const auto tasks=d.project()->tasks;for(const auto& t:tasks)d.setAssignments(t.id,{{t.id,rid,100}});
+ auto id=d.project()->tasks[0].id;
+ d.setTaskEffort(0,"fixed-work",true,{},48000,{{"2026-10-26 13:00","2026-10-27 13:00"}});
+ d.setTaskEffort(1,"fixed-units",false,60,{},{});
+ d.setDependencies(1,{{id,"SS",60}});d.setDependencies(2,{{id,"FF",-30}});d.setDependencies(3,{{id,"SF",60}});d.setDependencies(4,{{id,"FS",30}});
+ d.setTaskTiming(1,"ALAP",{},{});d.setTaskTiming(2,"SNET","2026-10-27 09:00",{});d.setTaskTiming(3,"SNLT","2026-10-29 18:00",{});
+ d.setTaskTiming(4,"FNET","2026-10-27 09:00",{});d.setTaskTiming(5,"FNLT","2026-10-30 18:00",{});
+ d.setTaskTiming(6,"MSO","2026-10-28 09:00",{});d.setTaskTiming(7,"MFO","2026-10-28 18:00",{});
+ d.setTaskCost({id,100,"uniform","physical"});d.captureBaseline("Approved","PM","Before enum conversion","2026-10-26T09:00:00Z");
+ d.saveScenario("Frozen alternative","shortest-first",20,"2026-10-26T09:00:00Z",d.project()->documentId,d.project()->revision);
+ d.setStatusAt("2026-10-26 18:00");jobs::ProgressEntry p;p.taskId=id;p.actualStart="2026-10-26 09:00";p.actualDurationMinutes=180;p.remainingMinutes=300;p.remainingWorkUnitMinutes=30000;p.reporter="PM";p.reason="Before enum conversion";p.recordedAt="2026-10-26T09:00:00Z";d.recordProgress(p);
+ jobs::CostEntry c;c.taskId=id;c.actualMinor=18000;c.physicalBasisPoints=3750;c.reporter="PM";c.reason="Before enum conversion";c.recordedAt="2026-10-26T09:00:00Z";d.recordCost(c);
+ d.saveAs(argv[1]);std::cout<<"PASS: pre-enum native schema9 history fixture\n";
+}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
