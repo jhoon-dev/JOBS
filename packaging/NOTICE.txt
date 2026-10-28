@@ -1,0 +1,26 @@
+JOBS 0.1.0 Preview - Windows x64
+
+JOBS uses unmodified Qt 6.8.3 shared libraries (Qt Company and contributors),
+distributed here under the LGPL v3 option. The DLLs can be replaced with compatible
+modified builds. This package does not restrict reverse engineering for debugging
+modifications to these libraries. Qt copyright notices, license texts and the
+upstream SPDX inventory are in licenses/qtbase. Qt's inventory can also describe
+components not used by this application.
+
+Qt source, build instructions and license information:
+https://download.qt.io/archive/qt/6.8/6.8.3/submodules/
+https://github.com/qt/qtbase/tree/v6.8.3
+https://doc.qt.io/qt-6.8/windows-deployment.html
+
+The MinGW GCC and winpthreads runtime libraries are dynamically linked. Their
+copyright, exception and license texts are in licenses/runtime. Source releases:
+https://gcc.gnu.org/releases.html
+https://github.com/niXman/mingw-builds-binaries/releases/tag/13.1.0-rt_v11-rev1
+https://www.mingw-w64.org/
+
+The installer uses NSIS 3.11. Its copyright and license notice is in licenses/nsis.
+https://nsis.sourceforge.io/Download
+
+Third-party licenses apply to their respective components. This notice does not
+assign a license to the JOBS application itself. This is an unsigned preview build.
+Application provenance and SHA-256 file inventory are in package-manifest.json.

@@ -1,5 +1,6 @@
 /build*/
 /.deps/
+/dist/
 /.qt/
 /.vs/
 /.idea/

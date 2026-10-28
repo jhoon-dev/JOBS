@@ -1,0 +1,9 @@
+{
+  "nsis_version": "3.11",
+  "official_url": "https://sourceforge.net/projects/nsis/files/NSIS%203/3.11/nsis-3.11.zip/download",
+  "download_mirror": "https://distfiles.macports.org/nsis/nsis-3.11.zip",
+  "archive_sha256": "c7d27f780ddb6cffb4730138cd1591e841f4b7edb155856901cdf5f214394fa1",
+  "published_checksum_source": "https://github.com/macports/macports-ports/blob/8e3f8f10e138c80b7476b074f32ac6a81373623a/devel/nsis/Portfile",
+  "makensis_sha256": "f497e92deb9f179f7b8f7553fcb3bd04f511bb2949e5e4a2aee80a10f7b20431",
+  "qt_version": "6.8.3"
+}

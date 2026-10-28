@@ -12,3 +12,6 @@ docs/validation/**/*.log text eol=lf -whitespace
 docs/validation/**/CMakeCache.txt text eol=lf -whitespace
 # Compatibility golden bytes must be identical on every checkout platform.
 tests/fixtures/enum-compat/*.jobs -text
+*.nsi text eol=lf
+# Preserve upstream license bytes and their recorded hashes.
+packaging/licenses/** -text -whitespace
