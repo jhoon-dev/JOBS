@@ -30,12 +30,20 @@ struct BulkView {
     std::size_t prefix = 0, suffix = 0, oldSize = 0;
     std::uint64_t before = 0, after = 0, session = 0;
     std::string documentId;
+    bool projected = false, contextValid = true, reordered = false;
+    std::string viewToken;
+    std::uint64_t sourceCalculationGeneration = 0;
+    std::size_t scopeTaskCount = 0;
+    std::vector<std::size_t> previousRows, survivorRows, survivorOldOrderRows;
+    std::vector<std::pair<int,int>> removals, insertions;
+    std::unordered_map<std::string,int> survivorPositions;
 };
 class Document {
 public:
     class EditRequest;
     class PreparedEdit;
-    EditRequest makeEditRequest(EditCommand command) const;
+    using ViewPreparation = std::function<void(BulkView&, const Project&, const Project&)>;
+    EditRequest makeEditRequest(EditCommand command, ViewPreparation viewPreparation = {}) const;
     static std::shared_ptr<PreparedEdit> prepareEdit(EditRequest request, std::shared_ptr<CalculationControl> control);
     EditState applyPreparedEdit(PreparedEdit& result);
     enum class Event { Edited, Saved, Replaced };
@@ -167,6 +175,7 @@ private:
     std::uint64_t session_;
     std::string factId_;
     std::optional<HistoryStep> replay_;
+    ViewPreparation viewPreparation_;
 };
 class Document::PreparedEdit {
 public:

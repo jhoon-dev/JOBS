@@ -20,7 +20,7 @@ AsyncEditController::~AsyncEditController() {
 }
 std::shared_ptr<CalculationControl> AsyncEditController::submit(EditCommand command, QString label, Completion completion) {
     auto control = std::make_shared<CalculationControl>();
-    Pending next{document_.makeEditRequest(std::move(command)), std::move(label), std::move(completion), control};
+    Pending next{document_.makeEditRequest(std::move(command), captureView ? captureView() : Document::ViewPreparation{}), std::move(label), std::move(completion), control};
     QPointer<AsyncEditController> guard(this);
     if (busy_) {
         invalidate(EditState::Cancelled);
@@ -73,11 +73,16 @@ void AsyncEditController::start(Pending pending) {
             retire.result = prepared;
             if (control->cancelRequested.load()) state = cancelState_;
             else {
+                if(beforeApply)beforeApply();
+                if(!guard)return;
+                if(control->cancelRequested.load())state=cancelState_;
+                else {
                 applying_ = true;
                 try { state = document_.applyPreparedEdit(*prepared); }
                 catch (...) { if (guard) applying_ = false; throw; }
                 if (!guard) return;
                 applying_ = false;
+                }
             }
             if (state == EditState::Failed) message = QString::fromUtf8(prepared->error());
         } catch (const CalculationCancelled&) { state = EditState::Cancelled; }

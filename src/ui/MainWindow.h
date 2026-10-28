@@ -114,6 +114,9 @@ private:
     WbsSummary renderedRollup_;
     bool refreshIncremental();
     bool refreshBulk();
+    bool refreshProjected();
+    Document::ViewPreparation captureTaskView() const;
+    std::string taskViewToken() const;
     void refreshBaseline();
     std::uint64_t renderedBaselineSession_ = ~std::uint64_t{0};
     std::string renderedBaselineId_;

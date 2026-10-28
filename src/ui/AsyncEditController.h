@@ -15,6 +15,8 @@ public:
     std::shared_ptr<CalculationControl> control() const { return control_; }
     const QString& label() const { return label_; }
     std::function<void()> stateChanged;
+    std::function<void()> beforeApply;
+    std::function<Document::ViewPreparation()> captureView;
 private:
     struct Pending { Document::EditRequest request; QString label; Completion completion; std::shared_ptr<CalculationControl> control; };
     Document& document_;

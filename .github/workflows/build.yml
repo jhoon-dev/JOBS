@@ -42,13 +42,14 @@ jobs:
       - name: Check out pre-optimization editing reference
         uses: actions/checkout@v4
         with:
-          ref: edbea737a4ebe081ceca2086b2a9b249e2c559fd
+          ref: ae8d9edaa360388012fdb98cd79b633192919971
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
           cmake -E copy tests/BulkPerformanceProbe.cpp build/editing-reference-source/tests/BulkPerformanceProbe.cpp
+          cmake -E copy tests/ProjectedViewPerformanceProbe.cpp build/editing-reference-source/tests/ProjectedViewPerformanceProbe.cpp
           cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe jobs_bulk_performance_probe --parallel 3
+          cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe jobs_bulk_performance_probe jobs_projected_view_probe --parallel 3
       - name: Measure reference and compare paired editing observations
         run: |
           python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history
@@ -59,6 +60,19 @@ jobs:
         run: |
           python scripts/run-bulk-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/bulk-reference
           python scripts/run-bulk-performance-probes.py --reference build/performance/bulk-reference
+      - name: Measure paired filtered sorted and WBS view operations
+        run: |
+          python scripts/run-projected-view-probes.py --build-dir build/editing-reference-build --output-dir build/performance/projected-views-reference
+          python scripts/run-projected-view-probes.py --reference build/performance/projected-views-reference
+      - name: Exercise native projected views and publication races
+        run: python scripts/check-projected-views-native.py build
+      - name: Preserve projected view evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: projected-views-${{ runner.os }}
+          path: build/projected-views-native.png
+          if-no-files-found: warn
       - name: Exercise native structural editing and row notifications
         run: python scripts/check-bulk-native-ui.py build
       - name: Preserve native structural editing evidence

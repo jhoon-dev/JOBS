@@ -2,6 +2,7 @@
 #include "PerformanceFixture.h"
 #include "TaskTableTest.h"
 #include "ui/MainWindow.h"
+#include "ui/TaskTableModel.h"
 #include "ui/AsyncEditController.h"
 #include "persistence/JsonProjectStore.h"
 #include <QApplication>
@@ -79,7 +80,7 @@ int main(int argc, char** argv) {
             while (controller->busy() && clock.elapsed() < 120000) QTest::qWait(2);
             check(!controller->busy(), "operation timeout"); app.processEvents(); maxGap = std::max(maxGap, heartbeat.elapsed());
             operations.append(QJsonObject{{"operation", name}, {"setup_ready_ms", readyMs}, {"trigger_return_ms", trigger}, {"settled_ms", clock.nsecsElapsed() / 1e6},
-                {"heartbeat_ticks", ticks}, {"observed_max_heartbeat_gap_ms", maxGap}, {"model_resets", resets-r}, {"layout_signals", layouts-l}, {"row_insert_signals", inserted-i}, {"row_remove_signals", removed-d}});
+                {"heartbeat_ticks", ticks}, {"observed_max_heartbeat_gap_ms", maxGap}, {"model_resets", resets-r}, {"gui_model_task_visits",qint64(dynamic_cast<jobs::TaskTableModel*>(table->model())->lastTaskVisits())}, {"layout_signals", layouts-l}, {"row_insert_signals", inserted-i}, {"row_remove_signals", removed-d}});
         };
         table->setCurrentCell(0,0);
         QStringList names; for (int i = 0; i < count; ++i) names << "Inserted " + QString::number(i);

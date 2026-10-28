@@ -1,6 +1,7 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "ui/TaskInput.h"
+#include "ui/TaskViewProjection.h"
 #include "calculation/WorkCalendar.h"
 #include <QAction>
 #include <QApplication>
@@ -30,9 +31,6 @@
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
 namespace jobs {
-namespace {
-QString qs(const std::string& s){return QString::fromUtf8(s.data(),qsizetype(s.size()));}
-}
 void MainWindow::setupTaskEditing(QMenu* menu,QVBoxLayout* layout) {
     table_->setObjectName("taskTable");table_->setSelectionMode(QAbstractItemView::ExtendedSelection);table_->setSelectionBehavior(QAbstractItemView::SelectItems);
     menu->addSeparator();
@@ -104,19 +102,16 @@ void MainWindow::restoreTaskSelection(int column) {
     if(active>=0){selectedTask_=document_.project()->tasks[visibleRows_[std::size_t(active)]].id;table_->setCurrentCell(active,std::clamp(column,0,13),QItemSelectionModel::NoUpdate);}else selectedTask_.clear();updateTaskActions();
 }
 void MainWindow::applyTaskView() {
-    if(!document_.project()){taskViewStatus_->clear();return;}const auto& p=*document_.project();const auto total=visibleRows_.size();const auto query=taskSearch_->text().trimmed();const auto filter=taskFilter_->currentIndex(),sort=taskSort_->currentIndex();
-    const auto& result=document_.calculation();const bool valid=result&&result->status==CalculationStatus::Valid;const bool plan=valid&&!result->isForecast;
-    std::unordered_map<std::string,const TaskSchedule*> dates;std::unordered_set<std::string> assigned;
-    if(filter||sort>=3){if(valid)for(const auto& r:result->tasks)dates[r.taskId]=&r;if(filter==3)for(const auto& a:p.assignments)assigned.insert(a.taskId);}
-    std::erase_if(visibleRows_,[&](std::size_t i){const auto& t=p.tasks[i];if(!query.isEmpty()&&!qs(t.name).contains(query,Qt::CaseInsensitive)&&!qs(t.id).contains(query,Qt::CaseInsensitive))return true;
-        if(filter==1)return !plan||!dates.contains(t.id)||!dates.at(t.id)->critical;
-        if(filter==2)return !(usesWork(t)?t.workUnitMinutes==0:t.durationMinutes==0)&&!(dates.contains(t.id)&&dates.at(t.id)->start==dates.at(t.id)->finish);
-        return filter==3&&assigned.contains(t.id);});
-    if(sort){struct Key{QString name;std::optional<std::int64_t> duration;std::optional<std::string> start;};std::vector<Key> keys(p.tasks.size());
-        for(auto i:visibleRows_){const auto& t=p.tasks[i];auto& k=keys[i];k.name=qs(t.name);k.duration=t.durationMinutes;if(dates.contains(t.id)){const auto& r=*dates.at(t.id);k.start=r.start;if(usesWork(t)&&plan){WorkCalendar cal(p,t);k.duration=cal.offset(r.finish)-cal.offset(r.start);}}}
-        std::stable_sort(visibleRows_.begin(),visibleRows_.end(),[&](std::size_t a,std::size_t b){const auto& x=keys[a];const auto& y=keys[b];if(sort<=2){const auto comparison=QString::compare(x.name,y.name,Qt::CaseInsensitive);return sort==1?comparison<0:comparison>0;}if(sort<=4){if(bool(x.duration)!=bool(y.duration))return bool(x.duration);if(!x.duration)return false;return sort==3?*x.duration<*y.duration:*x.duration>*y.duration;}if(bool(x.start)!=bool(y.start))return bool(x.start);if(!x.start)return false;return sort==5?*x.start<*y.start:*x.start>*y.start;});}
-    table_->horizontalHeader()->setSortIndicatorShown(sort!=0);if(sort)table_->horizontalHeader()->setSortIndicator(sort<=2?0:sort<=4?1:3,sort%2?Qt::AscendingOrder:Qt::DescendingOrder);
-    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %2 · 선행 번호=프로젝트 원본 행").arg(visibleRows_.size()).arg(total)+(filter==1&&!plan?" · 최신 계획 계산 필요":QString{}));
+    if(!document_.project()){visibleRows_.clear();taskViewStatus_->clear();return;}
+    const auto& result=document_.calculation();
+    const auto view=projectTaskView(*document_.project(),result?&*result:nullptr,
+        {selectedWbs_,taskSearch_->text(),taskFilter_->currentIndex(),taskSort_->currentIndex()});
+    visibleRows_=view.rows;
+    const int sort=taskSort_->currentIndex(),filter=taskFilter_->currentIndex();
+    table_->horizontalHeader()->setSortIndicatorShown(sort!=0);
+    if(sort)table_->horizontalHeader()->setSortIndicator(sort<=2?0:sort<=4?1:3,sort%2?Qt::AscendingOrder:Qt::DescendingOrder);
+    const bool plan=result&&result->status==CalculationStatus::Valid&&!result->isForecast;
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %2 · 선행 번호=프로젝트 원본 행").arg(visibleRows_.size()).arg(view.scopeCount)+(filter==1&&!plan?" · 최신 계획 계산 필요":QString{}));
 }
 void MainWindow::insertSelectedTasks() {
     if(!document_.project()||document_.readOnly())return;

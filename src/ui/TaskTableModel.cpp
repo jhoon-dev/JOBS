@@ -152,6 +152,62 @@ bool TaskTableModel::synchronizeBulk(BulkView& view) {
     }
     return true;
 }
+bool TaskTableModel::synchronizeProjected(BulkView& view) {
+    const auto& p=document_.project();
+    if(!initialized_||!p||!view.projected||!view.contextValid||view.before!=revision_||view.after!=p->revision||
+        view.session!=session_||session_!=document_.sessionGeneration()||view.documentId!=documentId_||
+        readOnly_!=document_.readOnly()||view.previousRows!=rows_||view.sourceCalculationGeneration!=calculationGeneration_||
+        view.input.tasks.size()!=p->tasks.size()||(document_.calculation()&&document_.calculation()->status==CalculationStatus::Valid))return false;
+    const bool reset=view.removals.size()+view.insertions.size()>128;
+    const bool dates=calculationGeneration_!=document_.calculationGeneration();
+    decltype(assignments_) previousAssignments;
+    decltype(schedules_) previousSchedules;decltype(issues_) previousIssues;
+    std::shared_ptr<EvaluationCache> previousCache;
+    // Keep old row data valid during remove/layout-about notifications.
+    auto adopt=[&]{
+        previousAssignments=std::move(assignments_);previousSchedules=std::move(schedules_);
+        previousIssues=std::move(issues_);previousCache=std::move(renderCache_);
+        std::swap(plan_,view.input);numbers_.swap(view.numbers);positions_.swap(view.positions);
+        assignments_.clear();for(const auto& [id,label]:view.assignmentLabels)assignments_.emplace(id,qs(label));
+        schedules_.clear();issues_.clear();result_.reset();renderCache_=std::make_shared<EvaluationCache>();
+        revision_=p->revision;calculationGeneration_=document_.calculationGeneration();lastTaskVisits_=0;
+    };
+    if(reset){
+        beginResetModel();adopt();rows_.swap(view.rows);endResetModel();
+    }else{
+        for(auto it=view.removals.rbegin();it!=view.removals.rend();++it){
+            beginRemoveRows({},it->first,it->second);
+            rows_.erase(rows_.begin()+it->first,rows_.begin()+it->second+1);endRemoveRows();
+        }
+        adopt();rows_=std::move(view.survivorOldOrderRows);
+        if(view.reordered){
+            // Publish edited values before changing layout: persistent items must
+            // keep the same data throughout the layout notification pair.
+            if(rowCount())emit dataChanged(index(0,0),index(rowCount()-1,13));
+            emit layoutAboutToBeChanged();
+            const auto from=persistentIndexList();QModelIndexList to;to.reserve(from.size());
+            for(const auto& index:from){
+                const auto& id=plan_.tasks[rows_.at(std::size_t(index.row()))].id;
+                to.push_back(this->index(view.survivorPositions.at(id),index.column()));
+            }
+            rows_=std::move(view.survivorRows);changePersistentIndexList(from,to);
+            emit layoutChanged();
+        }
+        for(const auto& [first,last]:view.insertions){
+            beginInsertRows({},first,last);
+            rows_.insert(rows_.begin()+first,view.rows.begin()+first,view.rows.begin()+last+1);endInsertRows();
+        }
+        if(rowCount()){
+            if(dates)emit dataChanged(index(0,0),index(rowCount()-1,13));
+            else for(const auto& [first,last]:view.changedRanges)emit dataChanged(index(first,0),index(last,13));
+            if(!view.sameOrder)emit dataChanged(index(0,2),index(rowCount()-1,2));
+            if(!view.sameOrder||view.reordered||!view.removals.empty()||!view.insertions.empty())emit headerDataChanged(Qt::Vertical,0,rowCount()-1);
+        }
+    }
+    (void)QtConcurrent::run([input=std::move(view.input),numbers=std::move(view.numbers),positions=std::move(view.positions),
+        assignments=std::move(previousAssignments),schedules=std::move(previousSchedules),issues=std::move(previousIssues),cache=std::move(previousCache)]{});
+    return true;
+}
 void TaskTableModel::synchronize(const std::vector<std::size_t>& rows) {
     const auto& project = document_.project();
     const bool newSession = !initialized_ || session_ != document_.sessionGeneration();

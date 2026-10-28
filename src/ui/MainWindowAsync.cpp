@@ -15,6 +15,8 @@
 namespace jobs {
 void MainWindow::setupAsyncEditing(QToolBar* tools) {
     editController_ = new AsyncEditController(document_, this);
+    editController_->beforeApply = [this]{commitPendingCell();};
+    editController_->captureView = [this]{return captureTaskView();};
     cancelEdit_ = new QAction("편집 계산 취소", this); cancelEdit_->setObjectName("cancelEdit");
     cancelEdit_->setEnabled(false); tools->addAction(cancelEdit_);
     editProgress_ = new QLabel; editProgress_->setObjectName("editProgress"); tools->addWidget(editProgress_);

@@ -81,7 +81,7 @@ std::shared_ptr<BulkView> prepareView(const Project& before, const Project& afte
     return view;
 }
 }
-Document::EditRequest Document::makeEditRequest(EditCommand command) const {
+Document::EditRequest Document::makeEditRequest(EditCommand command, ViewPreparation viewPreparation) const {
     if (!project_ || readOnly_) throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
     const bool reserve = std::holds_alternative<ProgressEdit>(command) || std::holds_alternative<InsertTasksEdit>(command) ||
         std::holds_alternative<DuplicateTasksEdit>(command) || std::holds_alternative<DeferredTaskEdit>(command);
@@ -90,6 +90,7 @@ Document::EditRequest Document::makeEditRequest(EditCommand command) const {
         if (!historyNeedsWorker(replay->redo)) throw std::runtime_error("준비할 복합 이력이 없습니다.");
         request.replay_ = history_[replay->redo ? historyCursor_ : historyCursor_-1];
     }
+    request.viewPreparation_ = std::move(viewPreparation);
     return request;
 }
 std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest request, std::shared_ptr<CalculationControl> control) {
@@ -161,6 +162,7 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
             result->taskChange_ = trial.taskChange_;
             if (bulk) {
                 result->view_ = prepareView(*request.snapshot_, *result->proposal_, result->session_);
+                if(request.viewPreparation_) request.viewPreparation_(*result->view_, *request.snapshot_, *result->proposal_);
                 result->view_->createdIds = std::move(created); result->view_->clearSelection = clearSelection;
             }
             calculationCheckpoint();
@@ -192,6 +194,8 @@ EditState Document::applyPreparedEdit(PreparedEdit& result) {
         if (*result.replayForward_) ++historyCursor_; else --historyCursor_;
     } else if (result.history_) pushHistory(std::move(*result.history_));
     else clearHistory(std::move(result.notice_));
+    if(result.view_ && result.view_->projected)
+        result.view_->contextValid = result.view_->sourceCalculationGeneration == calculationGeneration_;
     auto previous = std::move(project_);
     project_ = std::move(result.proposal_);
     result.proposal_ = std::move(previous);

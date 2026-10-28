@@ -8,6 +8,10 @@
 #include <QPlainTextEdit>
 #include <QSignalBlocker>
 #include "ui/GanttView.h"
+#include "ui/TaskViewProjection.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QScrollBar>
 
 namespace jobs {
 namespace { QString qs(const std::string& value) { return QString::fromUtf8(value); } }
@@ -48,6 +52,34 @@ void MainWindow::refreshBaseline() {
     const Baseline* baseline=nullptr;
     if(document_.project())for(const auto& b:document_.project()->baselines)if(b.id==selectedBaseline_)baseline=&b;
     gantt_->setBaseline(baseline);renderedBaselineSession_=document_.sessionGeneration();renderedBaselineId_=selectedBaseline_;
+}
+std::string MainWindow::taskViewToken() const {
+    return QJsonDocument(QJsonArray{qs(selectedWbs_),taskSearch_->text(),taskFilter_->currentIndex(),taskSort_->currentIndex()}).toJson(QJsonDocument::Compact).toStdString();
+}
+Document::ViewPreparation MainWindow::captureTaskView() const {
+    if(selectedWbs_.empty()&&taskSearch_->text().trimmed().isEmpty()&&!taskFilter_->currentIndex()&&!taskSort_->currentIndex())return {};
+    return [spec=TaskViewSpec{selectedWbs_,taskSearch_->text(),taskFilter_->currentIndex(),taskSort_->currentIndex()},
+        rows=visibleRows_,token=taskViewToken(),generation=document_.calculationGeneration()](BulkView& view,const Project& before,const Project& after){
+        prepareTaskView(view,before,after,spec,rows,token,generation);
+    };
+}
+bool MainWindow::refreshProjected() {
+    const auto view=document_.bulkView();const auto& p=document_.project();
+    if(!rendered_||!p||!view||!view->projected||!view->contextValid||view->viewToken!=taskViewToken()||
+        renderedSession_!=view->session||renderedRevision_!=view->before||renderedCalculation_!=view->sourceCalculationGeneration||renderedView_!=viewKey())return false;
+    const QSignalBlocker blocker(table_->selectionModel());const auto column=table_->currentColumn();
+    const auto x=table_->horizontalScrollBar()->value(),y=table_->verticalScrollBar()->value();
+    auto rows=view->rows;
+    if(!taskModel_->synchronizeProjected(*view))return false;
+    visibleRows_=std::move(rows);table_->clearSelection();restoreTaskSelection(column);if(selectedTask_.empty())table_->setCurrentCell(-1,-1);syncTaskSelection();
+    table_->horizontalScrollBar()->setValue(x);table_->verticalScrollBar()->setValue(y);
+    renderedRollup_=view->summary;refreshWbsSummary();refreshDocumentSummary();refreshTracking();refreshStatus();
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %2 · 선행 번호=프로젝트 원본 행").arg(visibleRows_.size()).arg(view->scopeTaskCount)+(taskFilter_->currentIndex()==1?" · 최신 계획 계산 필요":QString{}));
+    const auto& result=document_.calculation();
+    gantt_->setPlan(&*p,result?&*result:nullptr,visibleRows_,false);gantt_->setSelectedTask(selectedTask_);refreshBaseline();
+    if(result&&result->status==CalculationStatus::Stale)diagnostics_->setPlainText("오래된 계산 · F9로 다시 계산");
+    renderedRevision_=p->revision;renderedCalculation_=document_.calculationGeneration();setWindowModified(document_.dirty());
+    return true;
 }
 bool MainWindow::refreshBulk() {
     const auto view=document_.bulkView();const auto& p=document_.project();

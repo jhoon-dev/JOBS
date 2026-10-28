@@ -231,7 +231,7 @@ MainWindow::~MainWindow() { if(editController_) { delete editController_; editCo
 void MainWindow::report(const std::exception& e) { QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what())); }
 void MainWindow::refresh(bool rebuildTree) {
     updateHistoryActions();
-    if (refreshIncremental() || refreshBulk()) return;
+    if (refreshIncremental() || refreshProjected() || refreshBulk()) return;
     EvaluationScope evaluation;
     const bool updates=table_->updatesEnabled();table_->setUpdatesEnabled(false);
     struct RestoreUpdates { QWidget* widget;bool enabled;~RestoreUpdates(){widget->setUpdatesEnabled(enabled);} } restoreUpdates{table_,updates};
@@ -262,7 +262,6 @@ void MainWindow::refresh(bool rebuildTree) {
     addWbs_->setEnabled(p.has_value() && !document_.readOnly());
     const bool nodeEditable = p.has_value() && !document_.readOnly() && !selectedWbs_.empty();
     renameWbs_->setEnabled(nodeEditable); moveWbs_->setEnabled(nodeEditable); removeWbs_->setEnabled(nodeEditable);
-    visibleRows_ = p ? wbsTaskRows(*p, selectedWbs_) : std::vector<std::size_t>{};
     applyTaskView();
     taskModel_->synchronize(visibleRows_); table_->clearSelection(); table_->setCurrentCell(-1, -1);
     refreshTracking();
