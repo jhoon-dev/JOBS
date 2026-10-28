@@ -99,7 +99,6 @@
       "matches_pre_change": true
     }
   ],
-  "source_sha256": "8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846",
   "desktop_run_id": 40698951285,
   "quality_run_id": 40698951313,
   "sanitized_run_id": 40698951237,
@@ -130,5 +129,12 @@
   "sanitized_ctest_seconds": 180.45,
   "macos_ctest_seconds": 64.73,
   "ctest_per_platform": 48,
-  "windows_ctest_seconds": 85.67
+  "windows_ctest_seconds": 85.67,
+  "platform_source_byte_hashes": {
+    "local-MinGW": "8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846",
+    "Windows": "f7ce7ad22e89aaf52335065ed994206d2507029e4520ee8117ce86c5742bca67",
+    "macOS": "26f60f797ee9c89322421b24865f3576be8043ae9d8c82bc20f4e346f9c421b0"
+  },
+  "local_source_byte_sha256": "8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846",
+  "source_hash_semantics": "Build-time byte hashes describe each platform checkout and are recorded separately. The common product source identity is source_revision."
 }

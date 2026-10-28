@@ -1,6 +1,6 @@
 # 구조화 진단·다중 프로젝트 작업공간 검증
 
-제품 소스 `a2039fed0140c02bc8051d7cb3c67a3655056815`, 제품 소스 SHA-256 `8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846`의 기록이다. PRD `b872750` 및 메모리 디코더 퍼징 수용 `68bfe59`를 먼저 커밋하고 개발했다. 기존 파일의 서식 변경은 `d86c90d`·`4b5cf7b`로 분리했다. 기능 구현 후 주기 갱신과 새 계산 간 취소 경합, 공유 부하 안내 분류를 회귀 테스트와 함께 수정했다.
+제품 소스 `a2039fed0140c02bc8051d7cb3c67a3655056815`, 로컬 checkout byte SHA-256 `8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846`의 기록이다. PRD `b872750` 및 메모리 디코더 퍼징 수용 `68bfe59`를 먼저 커밋하고 개발했다. 기존 파일의 서식 변경은 `d86c90d`·`4b5cf7b`로 분리했다. 기능 구현 후 주기 갱신과 새 계산 간 취소 경합, 공유 부하 안내 분류를 회귀 테스트와 함께 수정했다.
 
 | 검증 | 결과 | 증거 |
 |---|---|---|
@@ -14,6 +14,8 @@
 | 기존 파일 | 이전 writer SHA 고정 파일 13개, schema1~9, 402개 계약 검사 | [호환성 출력](local/enum-compatibility.log) |
 | 외부 reader | XLSX 5개/PDF 6개, XML, XER 독립 TSV 및 MPXJ 16.10.0 통과 | [로컬 로그](local/readers.log), 플랫폼 CI 로그 |
 | Windows 설치본 | 파일 76개 SHA, 재설치·개발 PATH 없는 실행·전체 제거 통과 | [설치·제거 기록](local/installer-smoke.json), [payload](local/package-manifest.json) |
+
+probe의 실제 checkout byte hash는 플랫폼별로 기록한다. 플랫폼 간 공통 제품 소스 식별자는 위 Git revision이다.
 
 [기계 판독 요약](verification.json)은 source revision·설치 hash·CI run·일정 hash를 연결한다. 취소/입력 수정은 부분 결과를 적용하지 않으며, 새 계산 시작 직후 주기 갱신을 강제로 발생시키는 회귀를 포함한다. 공유 자원은 수동 기대값과 24개 분 단위 독립 oracle, 다른 프로젝트의 동일 로컬 ID·시작일·달력·분할·잔여 공수를 확인했다.
 
