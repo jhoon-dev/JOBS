@@ -1,0 +1,45 @@
+{
+    "format": "JOBS",
+    "payload": {
+        "assignments": [
+        ],
+        "baselines": [
+        ],
+        "calculationProfile": "native-fs0-workminutes-v1",
+        "calendar": "standard-mon-fri-8h-v1",
+        "costEntries": [
+        ],
+        "costProfile": "cost-day-minor-half-up-v1",
+        "currency": "KRW",
+        "derivedFrom": "",
+        "documentId": "95a1ddeb-f76a-436c-91c8-00500311aa9e",
+        "holidays": [
+        ],
+        "name": "설치 확인 프로젝트",
+        "progress": [
+        ],
+        "resources": [
+        ],
+        "revision": 1,
+        "scenarios": [
+        ],
+        "startDate": "2026-10-28",
+        "statusAt": null,
+        "taskCosts": [
+        ],
+        "tasks": [
+            {
+                "durationMinutes": null,
+                "id": "5fdfe14a-7085-4971-85c0-d8df727e1239",
+                "name": "설치 확인 프로젝트",
+                "predecessors": [
+                ],
+                "wbsId": ""
+            }
+        ],
+        "wbsNodes": [
+        ]
+    },
+    "schemaVersion": 9,
+    "sha256": "35a75c715f371dcfc1500fb61a9dc64e93b7cec94e5b86031acd12521fb2e2c6"
+}

@@ -60,7 +60,7 @@ ctest --test-dir build --output-on-failure
 open build/JOBS.app
 ```
 
-개발 실행에는 Qt DLL/라이브러리 경로가 필요하다. 설치 패키지·서명·배포·라이선스 검토는 별도다.
+개발 실행에는 Qt DLL/라이브러리 경로가 필요하다. Windows x64 preview 설치 파일은 [설치·완전 제거·패키징 계약](windows-installer.md)을 따른다. 설치 파일은 Qt/컴파일러 런타임을 포함하며 개발 환경이 필요 없다. 서명·공개 배포와 macOS 설치 패키지는 후속 범위다.
 GitHub Actions는 Windows/macOS 빌드와 계산·파일·화면 테스트를 수행한다.
 macOS는 `macos-15`와 Xcode 16.4를 고정한다. 최신 SDK에서 Qt 6.8.3의 AGL 링크 실패를 확인했다.
 

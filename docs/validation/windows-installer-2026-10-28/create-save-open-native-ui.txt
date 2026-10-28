@@ -1,0 +1,115 @@
+Window: "설치 확인 프로젝트 — JOBS", App: JOBS.exe.
+	0 창 (settable, string) 설치 확인 프로젝트 — JOBS Secondary Actions: Raise ID: QApplication.QMainWindow
+		1 제목 표시줄 (settable, string) Value: 설치 확인 프로젝트 — JOBS
+			2 메뉴 모음 시스템 ID: MenuBar
+				3 메뉴 항목 시스템
+			4 단추 최소화
+			5 단추 최대화
+			6 단추 닫기
+		7 메뉴 모음 (settable, string) ID: QApplication.QMainWindow.QMenuBar
+			8 메뉴 항목 (settable, string) 파일(F) ID: QApplication.QMainWindow.QMenuBar.QAction
+			9 메뉴 항목 (settable, string) 편집(E) ID: QApplication.QMainWindow.QMenuBar.QAction
+			10 메뉴 항목 (settable, string) 프로젝트(P) ID: QApplication.QMainWindow.QMenuBar.QAction
+			11 메뉴 항목 (settable, string) WBS(W) ID: QApplication.QMainWindow.QMenuBar.QAction
+			12 메뉴 항목 (settable, string) 추적(T) ID: QApplication.QMainWindow.QMenuBar.QAction
+			13 메뉴 항목 (settable, string) 자원(R) ID: QApplication.QMainWindow.QMenuBar.QAction
+			14 메뉴 항목 (settable, string) 원가(C) ID: QApplication.QMainWindow.QMenuBar.QAction
+			15 메뉴 항목 (settable, string) 보고서(B) ID: QApplication.QMainWindow.QMenuBar.QAction
+			16 메뉴 항목 (settable, string) 자동 저장·복구(A) ID: QApplication.QMainWindow.QMenuBar.QAction
+		17 도구 모음 (settable, string) ID: QApplication.QMainWindow.QToolBar
+			18 단추 (settable, string) 새로 만들기(N) ID: QApplication.QMainWindow.QToolBar.QToolButton
+			19 단추 (settable, string) 열기(O)… ID: QApplication.QMainWindow.QToolBar.QToolButton
+			20 단추 (settable, string) 저장(S) ID: QApplication.QMainWindow.QToolBar.QToolButton
+			21 단추 (settable, string) 다른 이름으로 저장(A)… ID: QApplication.QMainWindow.QToolBar.QToolButton
+			22 단추 (settable, string) 작업 추가 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			23 단추 (settable, string) 일정 계산(C) ID: QApplication.QMainWindow.QToolBar.QToolButton
+			24 단추 (disabled, settable, string) 일정 계산 취소 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			25 텍스트 ID: QApplication.QMainWindow.QToolBar.scheduleProgress
+			26 단추 (settable, string) 휴일 편집(H)… ID: QApplication.QMainWindow.QToolBar.QToolButton
+			27 단추 (disabled, settable, string) 선택 작업 달력 배정… ID: QApplication.QMainWindow.QToolBar.QToolButton
+			28 단추 (disabled, settable, string) 선택 작업 공수·유형·분할… ID: QApplication.QMainWindow.QToolBar.QToolButton
+			29 단추 (disabled, settable, string) 편집 계산 취소 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			30 텍스트 ID: QApplication.QMainWindow.QToolBar.editProgress
+		31 도구 모음 (settable, string) ID: QApplication.QMainWindow.QToolBar
+			32 단추 (settable, string) WBS 추가 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			33 단추 (disabled, settable, string) WBS 이름 변경 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			34 단추 (disabled, settable, string) WBS 이동 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			35 단추 (disabled, settable, string) 빈 WBS 삭제 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			36 단추 (disabled, settable, string) 선택 작업의 WBS 변경 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			37 그룹 (settable, string) ID: QApplication.QMainWindow.QToolBar.QToolBarSeparator
+			38 텍스트 간트 배율 ID: QApplication.QMainWindow.QToolBar.QLabel
+			39 콤보 상자 (settable, string) 간트 배율 Value: 일 ID: QApplication.QMainWindow.QToolBar.ganttZoom
+			40 그룹 (settable, string) ID: QApplication.QMainWindow.QToolBar.QToolBarSeparator
+			41 단추 (settable, string) 기준선 저장 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			42 단추 (settable, string) 상태일 설정 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			43 단추 (disabled, settable, string) 선택 작업 실적 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			44 단추 (settable, string) 계획 대비 비교 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			45 콤보 상자 (settable, string) 간트 비교 기준선 Value: 간트: 기준선 없음 ID: QApplication.QMainWindow.QToolBar.baselineChoice
+		46 도구 모음 (settable, string) ID: QApplication.QMainWindow.QToolBar
+			47 단추 (settable, string) 자원 등록·가용량 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			48 단추 (disabled, settable, string) 선택 작업 자원 배정 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			49 단추 (settable, string) 기간별 부하·평준화 비교 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			50 그룹 (settable, string) ID: QApplication.QMainWindow.QToolBar.QToolBarSeparator
+			51 단추 (settable, string) 통화·자원 단가 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			52 단추 (disabled, settable, string) 선택 작업 예산 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			53 단추 (disabled, settable, string) 원가·물리 진척 보고 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			54 단추 (settable, string) 원가·EVM 분석 ID: QApplication.QMainWindow.QToolBar.QToolButton
+			55 그룹 (settable, string) ID: QApplication.QMainWindow.QToolBar.QToolBarSeparator
+			56 단추 (settable, string) 프로젝트 대시보드·보고서… ID: QApplication.QMainWindow.QToolBar.QToolButton
+		57 그룹 (settable, string) ID: QApplication.QMainWindow.QWidget
+			58 텍스트 JOBS 프로젝트 일정 · 로컬 프로젝트 파일 ID: QApplication.QMainWindow.QWidget.QLabel
+			59 텍스트 설치 확인 프로젝트 | 시작일 2026-10-28 | revision 1 | 휴일 0개 | 상태일 미설정 · 현재 계획 모드 | 기준선 0개 · 실적 이력 0건 C:/Users/dow/Development/ToolMoa/JOBS/build/installer-smoke-98901d95/설치 확인 프로젝트.jobs ID: QApplication.QMainWindow.QWidget.QLabel
+			60 텍스트 선택 범위: 설치 확인 프로젝트 · 전체 작업 · 작업 1개 · 알려진 작업 기간 합계 0h · 기간 미정 1개 (합계는 WBS 경과기간과 다름) 계산 구간: 최신 유효한 결과 없음 ID: QApplication.QMainWindow.QWidget.wbsSummary
+			61 사용자 지정 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter
+				62 그룹 (settable, string) 간트 일정 · 표와 같은 작업 선택 ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView
+					63 그룹 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView.QWidget
+					64 그룹 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView.qt_scrollarea_hcontainer
+						65 스크롤 막대 (settable, float) Value: 0 ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView.qt_scrollarea_hcontainer.QScrollBar
+					66 그룹 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView.qt_scrollarea_vcontainer
+						67 스크롤 막대 (settable, float) Value: 0 ID: QApplication.QMainWindow.QWidget.QSplitter.ganttView.qt_scrollarea_vcontainer.QScrollBar
+				68 TABLE (settable, string) 프로젝트 작업 목록 Description: 프로젝트 작업 목록 Value: 프로젝트 작업 목록 ID: 프로젝트 작업 목록
+					418 창 (selectable, settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					419 머리글 (selectable, settable, string) 작업명 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					420 머리글 (selectable, settable, string) 기간(h / m) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					421 머리글 (selectable, settable, string) 선행(행·종류±지연) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					422 머리글 (selectable, settable, string) 시작 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					423 머리글 (selectable, settable, string) 완료 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					424 머리글 (selectable, settable, string) 총여유(h) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					425 머리글 (selectable, settable, string) 임계/상태 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					426 머리글 (selectable, settable, string) 자원 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					427 머리글 (selectable, settable, string) 안정 ID ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					428 머리글 (selectable, settable, string) 작업 달력 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					429 머리글 (selectable, settable, string) 제약 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					430 머리글 (selectable, settable, string) 마감일 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					431 머리글 (selectable, settable, string) 작업 유형 · 입력 공수(h) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					432 머리글 (selectable, settable, string) 분할 중단 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					433 머리글 (selectable, settable, string) 1 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					434 항목 (selectable, settable, string) 설치 확인 프로젝트 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					435 항목 (selectable, settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					436 항목 (selectable, settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					437 항목 (selectable, settable, string) 미계산 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					438 항목 (selectable, settable, string) 미계산 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					439 항목 (selectable, settable, string) — ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					440 항목 (selectable, settable, string) — ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					441 항목 (selectable, settable, string) 미설정 ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+					442 항목 (selectable, settable, string) 프로젝트 기본 (월–금 09–12 / 13–18) ID: QApplication.QMainWindow.QWidget.QSplitter.taskTable
+				84 트리 (settable, string) WBS 탐색 Description: WBS 탐색 Value: WBS 탐색 ID: WBS 탐색
+					142 머리글 (selectable, settable, string) WBS · 프로젝트 구조 ID: QApplication.QMainWindow.QWidget.QSplitter.wbsTree
+					143 콘솔 트리 (selectable, settable, string) 설치 확인 프로젝트 · 전체 작업 ID: QApplication.QMainWindow.QWidget.QSplitter.wbsTree
+				86 위치 조정 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.qt_splithandle_
+				87 위치 조정 (settable, string) ID: QApplication.QMainWindow.QWidget.QSplitter.qt_splithandle_
+			88 편집 계산 상태 및 진단 Value: 미계산 · F9로 계산 ID: QApplication.QMainWindow.QWidget.calculationDiagnostics
+				89 그룹 (settable, string) ID: QApplication.QMainWindow.QWidget.calculationDiagnostics.qt_scrollarea_viewport
+			90 텍스트 기본 월–금 09–12 / 13–18 · 프로젝트 메뉴에서 작업 달력 등록/배정 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, 0=마일스톤 선행: 프로젝트 행 번호 1, 2SS+2h, 3FF-30m, 4SF+1d · d=480 근무분 · 지연/선행=후행 달력 기준 · F9=전체 계산 간트: 빨강+[임계]=계획 임계, 파랑=계획/예측, 초록+[실제]=실제 완료, ◆=마일스톤, 회색=기준선, 배경 음영=프로젝트 기본 휴무 드래그=날짜 이동 · 오른쪽 끝/Shift=기간 · 이동량 15분 · Esc 취소 · 계획만 편집 · 적용 후 자동 재계산 프로젝트 메뉴: 제약·마감일 설정/충돌 진단 · 실제 날짜는 고정 · 예측 여유·임계 미산정 ID: QApplication.QMainWindow.QWidget.taskInputHelp
+			91 편집 (settable, string) 작업 이름·ID 검색 ID: QApplication.QMainWindow.QWidget.taskSearch
+			92 콤보 상자 (settable, string) 작업 필터 Value: 전체 작업 ID: QApplication.QMainWindow.QWidget.taskFilter
+			93 콤보 상자 (settable, string) 작업 정렬 Value: 프로젝트 원본 순서 ID: QApplication.QMainWindow.QWidget.taskSort
+			94 단추 (settable, string) 보기 초기화 ID: QApplication.QMainWindow.QWidget.resetTaskView
+			95 텍스트 표시 1 / WBS 범위 1 · 선행 번호=프로젝트 원본 행 ID: QApplication.QMainWindow.QWidget.taskViewStatus
+		96 상태 표시줄 명시 저장본과 같은 입력 · 유효한 최신 일정 없음 ID: QApplication.QMainWindow.QStatusBar
+			97 위치 조정 (settable, string) ID: QApplication.QMainWindow.QStatusBar.QSizeGrip
+			98 텍스트 명시 저장본과 같은 입력 · 복구본 정리 ID: QApplication.QMainWindow.QStatusBar.autosaveStatus
+
+Document text: ```
+미계산 · F9로 계산
+```

@@ -15,3 +15,4 @@ tests/fixtures/enum-compat/*.jobs -text
 *.nsi text eol=lf
 # Preserve upstream license bytes and their recorded hashes.
 packaging/licenses/** -text -whitespace
+docs/validation/windows-installer-2026-10-28/*.jobs -text

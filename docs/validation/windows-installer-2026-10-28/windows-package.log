@@ -1,0 +1,13 @@
+Warning: Translations will not be available due to the following error.
+Cannot open C:/Users/dow/Development/ToolMoa/JOBS/.deps/Qt/6.8.3/mingw_64/translations/catalogs.json
+ninja: no work to do.
+{
+  "installer": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\dist\\JOBS-0.1.0-Setup-win64-2ff28ff8.exe",
+  "bytes": 12830792,
+  "sha256": "6bd51edefd03d881d8c0f2974bb933d015f67adf3500b6602891452258190668",
+  "source_revision": "2ff28ff8775afd14aec45a8f9757f08373a839a5",
+  "version": "0.1.0",
+  "stage": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\2ff28ff8-41cdbd29\\payload",
+  "logs": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\2ff28ff8-41cdbd29",
+  "signed": false
+}

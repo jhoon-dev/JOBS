@@ -1,0 +1,14 @@
+{
+  "case": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\installer-smoke-ce691ab7",
+  "target": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\installer-smoke-ce691ab7\\설치 확인\\JOBS",
+  "local": "C:\\Users\\dow\\AppData\\Local\\ToolMoa\\JOBS",
+  "roaming": "C:\\Users\\dow\\AppData\\Roaming\\ToolMoa\\JOBS",
+  "installer": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\dist\\JOBS-0.1.0-Setup-win64-2ff28ff8.exe",
+  "installer_sha256": "6bd51edefd03d881d8c0f2974bb933d015f67adf3500b6602891452258190668",
+  "settings_key_existed_empty": true,
+  "inventory_files_verified": 76,
+  "source_revision": "2ff28ff8775afd14aec45a8f9757f08373a839a5",
+  "protected_nonempty_directory_rejected": true,
+  "desktop_shortcut": "C:\\Users\\dow\\Desktop\\JOBS.lnk",
+  "reinstall_shortcut_ownership_preserved": true
+}
