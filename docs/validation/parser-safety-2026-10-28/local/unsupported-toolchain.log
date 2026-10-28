@@ -1,0 +1,14 @@
+-- The CXX compiler identification is GNU 13.1.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Users/dow/Development/ToolMoa/JOBS/.deps/Qt/Tools/mingw1310_64/bin/g++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at cmake/RuntimeChecks.cmake:5 (message):
+  JOBS runtime checking requires Clang on Linux/macOS; normal Release builds
+  need neither option
+Call Stack (most recent call first):
+  CMakeLists.txt:6 (include)
+
+-- Configuring incomplete, errors occurred!
+

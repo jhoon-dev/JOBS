@@ -1,0 +1,9 @@
+{
+  "source_revision": "ea97d443f98e2eb9c0480ca8efe52ae5861f3467",
+  "compiler": "MinGW 13.1, Qt 6.8.3, Release",
+  "ctest": "42/42, 119.90 seconds",
+  "parser_seeds": 56,
+  "independent_readers": "5 XLSX, 6 PDF, Project XML, XER TSV and MPXJ",
+  "sanitizer_runtime": "not available on this MinGW toolchain; separate Linux CI required",
+  "unsupported_opt_in": "explicit configure failure verified"
+}

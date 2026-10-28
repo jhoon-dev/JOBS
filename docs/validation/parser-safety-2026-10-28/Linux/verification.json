@@ -1,0 +1,36 @@
+{
+  "status": "success",
+  "run_id": 40637696271,
+  "source_revision": "ec9de2e983d7f71e7896fbddd958bfff8af62b78",
+  "ctest": "42/42, 195.14 seconds",
+  "parsers": [
+    {
+      "parser": "jobs",
+      "executed_units": 5000,
+      "features_reported": 3947,
+      "new_units_added": 79,
+      "peak_rss_mb": 266,
+      "coverage_counters_reported": 1078
+    },
+    {
+      "parser": "xml",
+      "executed_units": 5000,
+      "features_reported": 2915,
+      "new_units_added": 151,
+      "peak_rss_mb": 415,
+      "coverage_counters_reported": 1805
+    },
+    {
+      "parser": "xer",
+      "executed_units": 5000,
+      "features_reported": 4634,
+      "new_units_added": 243,
+      "peak_rss_mb": 423,
+      "coverage_counters_reported": 2215
+    }
+  ],
+  "crash_artifacts": 0,
+  "corpus_files": 319,
+  "corpus_zip_sha256": "96a478fe1cec6f4cdc580581ec9b25d160b5d1bfac06218b31b60ba8a981a3c5",
+  "scope": "single finite smoke; cov/ft are libFuzzer counters, not percentage of format or branch coverage"
+}

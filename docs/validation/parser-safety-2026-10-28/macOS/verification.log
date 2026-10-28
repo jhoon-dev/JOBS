@@ -1,0 +1,108 @@
+2026-10-28T05:25:45.7403410Z  1/42 Test  #1: parser_seed_replay ...............   Passed    0.09 sec
+2026-10-28T05:26:04.9552700Z  2/42 Test  #2: responsive_document_contract .....   Passed   19.21 sec
+2026-10-28T05:26:11.8647880Z  3/42 Test  #3: responsive_editing_ui ............   Passed    6.91 sec
+2026-10-28T05:26:13.3835210Z  4/42 Test  #4: prepared_edit_contract ...........   Passed    1.51 sec
+2026-10-28T05:26:13.4743100Z  5/42 Test  #5: task_table_model_contract ........   Passed    0.10 sec
+2026-10-28T05:26:30.4791490Z  6/42 Test  #6: async_editing_ui .................   Passed   17.01 sec
+2026-10-28T05:26:30.6256380Z  7/42 Test  #7: primavera_xer_contract ...........   Passed    0.15 sec
+2026-10-28T05:26:31.8646340Z  8/42 Test  #8: primavera_xer_ui .................   Passed    1.24 sec
+2026-10-28T05:26:32.2045970Z  9/42 Test  #9: project_xml_contract .............   Passed    0.34 sec
+2026-10-28T05:26:33.3759790Z 10/42 Test #10: project_xml_ui ...................   Passed    1.17 sec
+2026-10-28T05:26:35.0980850Z 11/42 Test #11: bulk_editing_contract_ui .........   Passed    1.72 sec
+2026-10-28T05:26:39.8736690Z 12/42 Test #12: projected_views_ui ...............   Passed    4.78 sec
+2026-10-28T05:26:39.9525040Z 13/42 Test #13: task_editing_contract ............   Passed    0.08 sec
+2026-10-28T05:26:42.2643660Z 14/42 Test #14: task_editing_ui ..................   Passed    2.31 sec
+2026-10-28T05:26:44.7091440Z 15/42 Test #15: calculation_cancellation .........   Passed    2.44 sec
+2026-10-28T05:26:44.9686150Z 16/42 Test #16: integrated_project_workflow ......   Passed    0.26 sec
+2026-10-28T05:26:45.8527360Z 17/42 Test #17: performance_cancellation_ui ......   Passed    0.88 sec
+2026-10-28T05:26:46.2262120Z 18/42 Test #18: effort_work_calendar_split .......   Passed    0.37 sec
+2026-10-28T05:26:47.0350920Z 19/42 Test #19: effort_ui ........................   Passed    0.81 sec
+2026-10-28T05:26:47.0686720Z 20/42 Test #20: constraint_contract ..............   Passed    0.03 sec
+2026-10-28T05:26:47.8358450Z 21/42 Test #21: constraint_gantt_ui ..............   Passed    0.77 sec
+2026-10-28T05:26:47.9152010Z 22/42 Test #22: pdm_calendar_contract ............   Passed    0.08 sec
+2026-10-28T05:26:48.4246330Z 23/42 Test #23: pdm_calendar_ui ..................   Passed    0.51 sec
+2026-10-28T05:26:54.9570180Z 24/42 Test #24: undo_contract ....................   Passed    6.53 sec
+2026-10-28T05:26:54.9812470Z 25/42 Test #25: input_delta_contract .............   Passed    0.02 sec
+2026-10-28T05:26:55.9392750Z 26/42 Test #26: editing_performance_ui ...........   Passed    0.96 sec
+2026-10-28T05:26:56.1194710Z 27/42 Test #27: recovery_crash_file ..............   Passed    0.18 sec
+2026-10-28T05:26:59.1649420Z 28/42 Test #28: recovery_ui ......................   Passed    3.04 sec
+2026-10-28T05:27:00.3080090Z 29/42 Test #29: reports_export ...................   Passed    1.14 sec
+2026-10-28T05:27:01.5750540Z 30/42 Test #30: reports_ui .......................   Passed    1.27 sec
+2026-10-28T05:27:01.6692420Z 31/42 Test #31: cost_contract_file ...............   Passed    0.09 sec
+2026-10-28T05:27:02.5032250Z 32/42 Test #32: cost_ui ..........................   Passed    0.84 sec
+2026-10-28T05:27:02.5504880Z 33/42 Test #33: resource_contract_file ...........   Passed    0.05 sec
+2026-10-28T05:27:03.6822550Z 34/42 Test #34: resource_ui ......................   Passed    1.13 sec
+2026-10-28T05:27:03.6889880Z 35/42 Test #35: tracking_contract ................   Passed    0.01 sec
+2026-10-28T05:27:03.7155840Z 36/42 Test #36: tracking_file ....................   Passed    0.03 sec
+2026-10-28T05:27:03.7203500Z 37/42 Test #37: wbs_contract .....................   Passed    0.00 sec
+2026-10-28T05:27:03.7243630Z 38/42 Test #38: schedule_contract ................   Passed    0.00 sec
+2026-10-28T05:27:03.7638330Z 39/42 Test #39: file_lifecycle ...................   Passed    0.04 sec
+2026-10-28T05:27:04.5672140Z 40/42 Test #40: ui_lifecycle .....................   Passed    0.80 sec
+2026-10-28T05:27:05.3558910Z 41/42 Test #41: wbs_gantt_ui .....................   Passed    0.79 sec
+2026-10-28T05:27:06.3766090Z 42/42 Test #42: tracking_ui ......................   Passed    1.02 sec
+2026-10-28T05:27:06.3774080Z 100% tests passed out of 42
+2026-10-28T05:27:06.3775140Z Total Test time (real) =  80.72 sec
+2026-10-28T05:27:11.7224650Z PASS: reports-smoke.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T05:27:11.7225210Z PASS: reports-resources.xlsx: 7 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T05:27:11.7225640Z PASS: reports-pdm.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T05:27:11.7226080Z PASS: reports-constraints.xlsx: 15 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T05:27:11.7226510Z PASS: reports-effort.xlsx: 19 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T05:27:11.7226970Z PASS: reports-smoke.pdf: 8 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7227450Z PASS: reports-long-portrait.pdf: 3 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7227880Z PASS: reports-a3.pdf: 3 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7228290Z PASS: reports-pdm.pdf: 5 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7228680Z PASS: reports-constraints.pdf: 6 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7229100Z PASS: reports-effort.pdf: 10 pages, size/text/provenance/continuation
+2026-10-28T05:27:11.7753080Z Independent Project XML reader: namespace, identities, four links, calendars, resource units and source verdicts passed
+2026-10-28T05:30:11.8329460Z PASS: bulk UI 1000/0
+2026-10-28T05:30:13.0821690Z PASS: bulk UI 1000/3
+2026-10-28T05:30:16.1542010Z PASS: bulk UI 10000/0
+2026-10-28T05:30:21.1863820Z PASS: bulk UI 10000/3
+2026-10-28T05:30:22.2320920Z PASS: bulk UI 1000/0
+2026-10-28T05:30:23.5783240Z PASS: bulk UI 1000/3
+2026-10-28T05:30:26.0569470Z PASS: bulk UI 10000/0
+2026-10-28T05:30:30.5990820Z PASS: bulk UI 10000/3
+2026-10-28T05:30:31.9016090Z PASS: search 1000/0
+2026-10-28T05:30:33.1182550Z PASS: search 1000/3
+2026-10-28T05:30:35.6864170Z PASS: search 10000/0
+2026-10-28T05:30:40.7714630Z PASS: search 10000/3
+2026-10-28T05:30:41.6751290Z PASS: sort 1000/0
+2026-10-28T05:30:42.9087490Z PASS: sort 1000/3
+2026-10-28T05:30:45.3950440Z PASS: sort 10000/0
+2026-10-28T05:30:50.1661190Z PASS: sort 10000/3
+2026-10-28T05:30:51.1957920Z PASS: wbs 1000/0
+2026-10-28T05:30:52.4370880Z PASS: wbs 1000/3
+2026-10-28T05:30:54.9339120Z PASS: wbs 10000/0
+2026-10-28T05:30:59.6367480Z PASS: wbs 10000/3
+2026-10-28T05:31:00.8688910Z PASS: combined 1000/0
+2026-10-28T05:31:02.5993880Z PASS: combined 1000/3
+2026-10-28T05:31:05.6618520Z PASS: combined 10000/0
+2026-10-28T05:31:10.7210950Z PASS: combined 10000/3
+2026-10-28T05:31:12.1364940Z PASS: search 1000/0
+2026-10-28T05:31:13.4987150Z PASS: search 1000/3
+2026-10-28T05:31:16.5439300Z PASS: search 10000/0
+2026-10-28T05:31:21.2251420Z PASS: search 10000/3
+2026-10-28T05:31:22.2773970Z PASS: sort 1000/0
+2026-10-28T05:31:23.2967110Z PASS: sort 1000/3
+2026-10-28T05:31:25.4359070Z PASS: sort 10000/0
+2026-10-28T05:31:29.7025550Z PASS: sort 10000/3
+2026-10-28T05:31:30.5868630Z PASS: wbs 1000/0
+2026-10-28T05:31:31.6252100Z PASS: wbs 1000/3
+2026-10-28T05:31:33.7176990Z PASS: wbs 10000/0
+2026-10-28T05:31:37.6859960Z PASS: wbs 10000/3
+2026-10-28T05:31:38.7603150Z PASS: combined 1000/0
+2026-10-28T05:31:39.9965400Z PASS: combined 1000/3
+2026-10-28T05:31:42.3066730Z PASS: combined 10000/0
+2026-10-28T05:31:47.0097280Z PASS: combined 10000/3
+2026-10-28T05:31:55.0195930Z PASS: projected search/sort/WBS/filter oracle, membership/layout/persistent IDs, range budget, view race and stale critical/Gantt
+2026-10-28T05:32:00.0718560Z PASS: bulk atomicity, validation oracle, cancellation/stale/save, shared undo, model tester/persistent IDs, compact selection, disjoint/sorted fallback
+2026-10-28T05:32:05.9242810Z PASS: independent TSV reader, XER tables/fields/references/values/encoding/hash/verdicts
+2026-10-28T05:32:05.9243900Z PASS: MPXJ 16.10.0 strict read, names/durations/relations/calendars/exceptions/resources/assignments
+2026-10-28T05:32:06.8369150Z PASS: native sorted task editing screen captured
+2026-10-28T05:32:06.9969120Z PASS: task-editing-native-smoke.png (131622 bytes)
+2026-10-28T05:32:22.9166260Z PASS: 10k model/view heartbeat, running/late cancellation, stale/session/latest-only requests, deferred save/F9, Gantt/batch, preview draft and lifetime safety
+2026-10-28T05:32:23.0151420Z PASS: native model/view + cancellable edits; GUI enqueue observation 1.88 ms
+2026-10-28T05:32:29.0165790Z PASS: 10k/3 baseline bounded model updates, selection/scroll, WBS delta, search, stale and missed-revision fallbacks
+2026-10-28T05:32:29.0225660Z PASS: native 10k/3-baseline incremental model, WBS, selection/scroll and full-refresh fallbacks
+2026-10-28T05:32:34.8441790Z PASS: project-xml-preview-native.png (58097 bytes)
+2026-10-28T05:32:38.6595690Z PASS: primavera-xer-preview-native.png (67455 bytes)

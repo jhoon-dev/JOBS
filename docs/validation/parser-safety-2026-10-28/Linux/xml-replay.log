@@ -1,0 +1,22 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 516682265
+INFO: Loaded 1 modules   (42366 inline 8-bit counters): 42366 [0x55d124271d60, 0x55d12427c2de), 
+INFO: Loaded 1 PC tables (42366 PCs): 42366 [0x55d12427c2e0,0x55d124321ac0), 
+/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xml: Running 4 inputs 1 time(s) each.
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/binary
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/binary in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/empty
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/empty in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml in 10 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml.truncated in 1 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***
+stat::number_of_executed_units: 5
+stat::average_exec_per_sec:     0
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              55

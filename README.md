@@ -64,3 +64,5 @@ PM Canvas는 별도 개인용 프로토타입이다. 그 코드·아키텍처·�
 [구조·대량 편집 응답성](docs/bulk-editing.md): 작업 추가·삽입·삭제·복제·표 붙여넣기와 해당 undo/redo를 비동기로 준비하고 도구 모음에서 취소할 수 있다. 기본 보기의 연속 구조 변경은 행 단위로 반영한다.
 
 [필터·정렬·WBS 대량 편집](docs/projected-task-views.md)에서도 표시 자료를 비동기로 준비하고 생존 작업 ID를 유지하며 갱신한다. 많이 흩어진 변경은 준비된 자료로 한 번 reset하고, 준비 중 보기/입력이 바뀌면 안전한 경합 처리를 사용한다.
+
+[외부 파일 파서 검증](docs/parser-safety.md): `.jobs`·Project XML·Primavera XER seed 재생과 선택적 Clang/libFuzzer·ASan/UBSan 검사를 제공한다. 기본 앱 실행에는 퍼징 도구가 필요 없다.

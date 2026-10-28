@@ -1,0 +1,169 @@
+{
+  "source_revision": "ec9de2e983d7f71e7896fbddd958bfff8af62b78",
+  "scope": "finite parser smoke, not a security or compatibility guarantee",
+  "seed": 20261028,
+  "runs_requested_per_target": 5000,
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "CXX": "clang++"
+  },
+  "commands": [
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_parser_seed_tests",
+        "--write-corpus",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus"
+      ],
+      "timeout_seconds": 120,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/binary",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/checksum.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/empty",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/unknown.jobs",
+        "-runs=1",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/jobs/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 120,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_jobs",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs",
+        "-runs=5000",
+        "-seed=20261028",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/jobs/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xml",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/binary",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/empty",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml/plan.xml.truncated",
+        "-runs=1",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/xml/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 120,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xml",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xml",
+        "-runs=5000",
+        "-seed=20261028",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/xml/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xer",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/binary",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/empty",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer.truncated",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer.truncated",
+        "-runs=1",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/xer/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 120,
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xer",
+        "/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer",
+        "-runs=5000",
+        "-seed=20261028",
+        "-max_len=65536",
+        "-timeout=10",
+        "-rss_limit_mb=2048",
+        "-malloc_limit_mb=1024",
+        "-artifact_prefix=/home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/artifacts/xer/",
+        "-print_final_stats=1"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    }
+  ],
+  "status": "success"
+}
