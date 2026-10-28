@@ -12,7 +12,7 @@ struct CostTaskRow {
     Evm evm;
     bool baselineMember = false;
     std::optional<int> physicalBasisPoints;
-    std::vector<std::string> issues;
+    std::vector<Diagnostic> issues;
 };
 struct CostGroup {
     std::string id, name;

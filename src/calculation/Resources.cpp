@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Resources.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/PdmResources.h"
@@ -9,6 +10,60 @@
 #include <stdexcept>
 
 namespace jobs {
+std::vector<ResourceOccupancy> resourceOccupancies(const Project &project, const ScheduleResult &result,
+                                                   std::size_t limit, const std::set<std::string> *includedResources) {
+    if (result.status != CalculationStatus::Valid || result.documentId != project.documentId ||
+        result.inputRevision != project.revision || result.profile != project.calculationProfile ||
+        (result.isForecast && result.statusAt != project.statusAt))
+        throw AppError(ErrorCode::WORKSPACE_SOURCE_CHANGED);
+    std::unordered_map<std::string, const TaskSchedule *> rows;
+    for (const auto &row : result.tasks)
+        rows.emplace(row.taskId, &row);
+    if (rows.size() != project.tasks.size())
+        throw AppError(ErrorCode::WORKSPACE_SOURCE_CHANGED);
+    std::unordered_map<std::string, std::vector<const Assignment *>> assigned;
+    for (const auto &assignment : project.assignments)
+        if (!includedResources || includedResources->contains(assignment.resourceId))
+            assigned[assignment.taskId].push_back(&assignment);
+    ExecutionInputs inputs(project);
+    WorkCalendar clock(project);
+    std::vector<ResourceOccupancy> out;
+    const auto append = [&](const std::string &resource, const std::string &task, const std::string &start,
+                            const std::string &finish, int units) {
+        calculationCheckpoint();
+        if (includedResources && !includedResources->contains(resource))
+            return;
+        if (start >= finish)
+            return;
+        if (out.size() >= limit)
+            throw AppError(ErrorCode::WORKSPACE_LIMIT);
+        out.push_back({resource, task, start, finish, units});
+    };
+    for (const auto &task : project.tasks) {
+        calculationCheckpoint();
+        if (!assigned.contains(task.id))
+            continue;
+        const auto found = rows.find(task.id);
+        if (found == rows.end())
+            throw AppError(ErrorCode::WORKSPACE_SOURCE_CHANGED);
+        const auto &row = *found->second;
+        if (result.isForecast && row.completedActual)
+            continue;
+        if (isEffort(project)) {
+            const auto remaining = result.isForecast ? pendingTask(project, task) : task;
+            for (const auto &span : TaskExecution(project, remaining, &inputs).spans(row))
+                append(span.resourceId, task.id, clock.boundary(span.start, false), clock.boundary(span.finish, true),
+                       span.units);
+        } else {
+            const auto start = result.isForecast ? row.remainingStart.value_or(row.start) : row.start;
+            WorkCalendar calendar(project, task);
+            for (const auto &[begin, end] : calendar.segments(start, row.finish))
+                for (const auto *assignment : assigned.at(task.id))
+                    append(assignment->resourceId, task.id, begin, end, assignment->units);
+        }
+    }
+    return out;
+}
 namespace {
 using Minute = std::int64_t;
 using Events = std::map<Minute, Minute>;
@@ -62,8 +117,7 @@ ResourceLoad resourceLoad(const Project &p, const ScheduleResult &result) {
     load.totalTasks = p.tasks.size();
     if (result.documentId != p.documentId || result.inputRevision != p.revision || result.statusAt != p.statusAt ||
         result.profile != p.calculationProfile || result.status != CalculationStatus::Valid) {
-        load.diagnostics.push_back(
-            {"NO_CURRENT_SCHEDULE", "최신 유효한 일정이 없어 자원 수요를 계산할 수 없습니다.", {}});
+        load.diagnostics.push_back({"NO_CURRENT_SCHEDULE", {}, {}, "NO_CURRENT_SCHEDULE"});
         return load;
     }
     WorkCalendar calendar(p);
@@ -147,22 +201,17 @@ ResourceLoad resourceLoad(const Project &p, const ScheduleResult &result) {
     if (overload && !unknown)
         load.status = CalculationStatus::Conflict;
     if (unknown)
-        load.diagnostics.push_back(
-            {"UNKNOWN_CAPACITY", "배정 구간에 가용량 미정이 있습니다. 미정은 가용량 0과 구분합니다.", {}});
+        load.diagnostics.push_back({"UNKNOWN_CAPACITY", {}, {}, "UNKNOWN_CAPACITY"});
     if (overload)
-        load.diagnostics.push_back(
-            {"RESOURCE_OVERLOAD",
-             "동시간대 배정률이 가용량을 초과합니다. 날짜별 과부하 시간과 초과 공수를 확인하세요.",
-             {}});
+        load.diagnostics.push_back({"RESOURCE_OVERLOAD", {}, {}, "RESOURCE_OVERLOAD"});
     if (assigned.size() < p.tasks.size())
-        load.diagnostics.push_back(
-            {"UNASSIGNED_TASKS", "미배정 작업은 자원 수요에 포함되지 않습니다. 배정된 자원에 한해 검증합니다.", {}});
+        load.diagnostics.push_back({"UNASSIGNED_TASKS", {}, {}, "UNASSIGNED_TASKS"});
     return load;
 }
 LevelingResult levelResources(const Project &p, const std::string &priority, int horizonWorkDays) {
     if ((priority != "task-order" && priority != "shortest-first" && priority != "longest-first") ||
         horizonWorkDays < 1 || horizonWorkDays > 5200)
-        throw std::runtime_error("지원하지 않는 우선순위 또는 탐색 범위입니다.");
+        throw AppError(ErrorCode::LEVEL_OPTIONS_INVALID, {});
     if (isEffort(p))
         return levelEffort(p, priority, horizonWorkDays);
     if (isPdm(p))
@@ -214,7 +263,7 @@ LevelingResult levelResources(const Project &p, const std::string &priority, int
                 chosen = i;
         }
         if (!chosen)
-            throw std::runtime_error("평준화 입력에 순환이 있습니다.");
+            throw AppError(ErrorCode::LEVEL_DEPENDENCY_CYCLE, {}, {}, "LEVEL_DEPENDENCY_CYCLE_2");
         auto i = *chosen;
         auto &row = rows[i];
         const auto &task = p.tasks[i];
@@ -231,18 +280,13 @@ LevelingResult levelResources(const Project &p, const std::string &priority, int
                 causes.push_back(pred);
             start = std::max(start, rows[indexes.at(pred)].earlyFinishMinutes);
         }
-        std::map<std::string, std::string> blocked;
-        auto reason = [&] {
-            std::string message;
-            if (causes.size() > 1)
-                message = " 선행 지연 ID:";
-            for (std::size_t n = 1; n < causes.size(); ++n)
-                message += " " + causes[n];
-            for (const auto &[id, text] : blocked) {
-                (void)id;
-                message += " 자원 대기: " + text + ";";
+        std::map<std::string, Diagnostic> blocked;
+        auto explain = [&](Diagnostic diagnostic) {
+            for (const auto &[id, issue] : blocked) {
+                diagnostic.resourceIds.push_back(id);
+                diagnostic.causes.push_back(issue);
             }
-            return message;
+            return diagnostic;
         };
         bool unknown = false, found = false;
         try {
@@ -257,9 +301,11 @@ LevelingResult levelResources(const Project &p, const std::string &priority, int
                             unknown = true;
                         if (!cap || used + a->units > *cap) {
                             if (!blocked.contains(r.id))
-                                blocked.emplace(r.id, r.name + " [" + r.id + "] " + calendar.boundary(s, false) +
-                                                          " · 수요 " + std::to_string(used + a->units) + "% / 가용 " +
-                                                          (cap ? std::to_string(*cap) + "%" : "미정"));
+                                blocked.emplace(r.id, Diagnostic{"RESOURCE_WAIT",
+                                                                 {r.name, r.id, calendar.boundary(s, false),
+                                                                  std::to_string(used + a->units),
+                                                                  cap ? std::to_string(*cap) : "?"},
+                                                                 {task.id}});
                             // The demand/capacity stays infeasible until its next real change,
                             // even when the trial task finishes earlier. Avoid one-minute retries.
                             Minute change = (s / 480 + 1) * 480;
@@ -287,11 +333,8 @@ LevelingResult levelResources(const Project &p, const std::string &priority, int
             out.leveled.status = unknown ? CalculationStatus::Incomplete : CalculationStatus::Conflict;
             out.leveled.tasks.clear();
             out.leveled.projectFinish.reset();
-            out.diagnostics.push_back({unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED",
-                                       "이 작업을 탐색 범위 안에서 배치하지 못했습니다. 가용량·배정률·탐색 "
-                                       "범위·우선순위를 확인하세요. 부분 결과는 확정하지 않습니다." +
-                                           reason(),
-                                       causes});
+            out.diagnostics.push_back(
+                explain({unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED", {}, causes}));
             return out;
         }
         finish = start + duration;
@@ -304,8 +347,7 @@ LevelingResult levelResources(const Project &p, const std::string &priority, int
             if (out.original.isForecast)
                 row.remainingStart = calendar.boundary(start, false);
             out.diagnostics.push_back(
-                {"RESOURCE_DELAY",
-                 "잔여 시작을 " + std::to_string(start - originalStart) + " 근무분 지연했습니다." + reason(), causes});
+                explain({"RESOURCE_DELAY", {std::to_string(start - originalStart)}, causes, "RESOURCE_DELAY_3"}));
         }
         row.earlyStartMinutes =
             out.original.isForecast && progressAsOf(p, task.id) && progressAsOf(p, task.id)->actualStart

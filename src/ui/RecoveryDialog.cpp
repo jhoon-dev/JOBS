@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/RecoveryDialog.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -172,7 +173,7 @@ void RecoveryDialog::reload() {
         try {
             out.scan = store.scan();
         } catch (const std::exception &e) {
-            out.error = QString::fromUtf8(e.what());
+            out.error = qErrorText(e);
         }
         return out;
     }));
@@ -203,7 +204,7 @@ void RecoveryDialog::restore() {
         try {
             out.claim = store.claim(candidate);
         } catch (const std::exception &e) {
-            out.error = QString::fromUtf8(e.what());
+            out.error = qErrorText(e);
         }
         return out;
     }));
@@ -236,7 +237,7 @@ void RecoveryDialog::discard() {
             store.discardSession(id);
             return QString{};
         } catch (const std::exception &e) {
-            return QString::fromUtf8(e.what());
+            return qErrorText(e);
         }
     }));
 }

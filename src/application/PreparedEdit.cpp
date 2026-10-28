@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "application/Document.h"
 #include "application/ProjectStore.h"
 #include <algorithm>
@@ -60,7 +61,7 @@ private:
 std::size_t taskRow(const Project &p, const std::string &id) {
     const auto found = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == id; });
     if (found == p.tasks.end())
-        throw std::runtime_error("편집할 작업이 없습니다.");
+        throw AppError(ErrorCode::TASK_NOT_FOUND, {});
     return std::size_t(found - p.tasks.begin());
 }
 std::unordered_map<std::string, std::string> assignmentLabels(const PlanInput &input) {
@@ -135,7 +136,7 @@ Document::EditRequest Document::makeEditRequest(EditCommand command, ViewPrepara
                                reserve ? store_.newId() : std::string{});
     if (auto *replay = std::get_if<HistoryEdit>(&request.command_)) {
         if (!historyNeedsWorker(replay->redo))
-            throw std::runtime_error("준비할 복합 이력이 없습니다.");
+            throw AppError(ErrorCode::HISTORY_NOT_AVAILABLE, {});
         request.replay_ = history_[replay->redo ? historyCursor_ : historyCursor_ - 1];
     }
     request.viewPreparation_ = std::move(viewPreparation);
@@ -242,7 +243,8 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
         result->state_ = EditState::Cancelled;
     } catch (const std::exception &error) {
         result->state_ = EditState::Failed;
-        result->error_ = error.what();
+        result->failure_ = diagnosticFromException(error);
+        result->error_ = result->failure_->code;
     }
     return result;
 }

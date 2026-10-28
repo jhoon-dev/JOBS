@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Costs.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Effort.h"
@@ -72,7 +73,7 @@ struct Budget {
     Minute start = 0, finish = 0;
     Money fixed;
     std::vector<Bucket> days;
-    std::vector<std::string> issues;
+    std::vector<Diagnostic> issues;
     bool valid = false;
     std::shared_ptr<WorkCalendar> work;
     Minute elapsed(const std::string &stamp, const WorkCalendar &clock) const {
@@ -158,9 +159,9 @@ Budget budget(const PlanInput &p, const Task &task, const TaskSchedule *row, con
         b.credit = c->credit;
     }
     if (!b.fixed)
-        b.issues.push_back("고정비 미정: 비용 없음은 0으로 입력하세요.");
+        b.issues.push_back({"COST_FIXED_UNKNOWN", {}, {task.id}});
     if (!row) {
-        b.issues.push_back("유효한 논리 일정이 없어 비용 발생일을 산정할 수 없습니다.");
+        b.issues.push_back({"COST_SCHEDULE_INVALID", {}, {task.id}});
         return b;
     }
     b.valid = true;
@@ -207,7 +208,9 @@ Budget budget(const PlanInput &p, const Task &task, const TaskSchedule *row, con
                             rate = &v;
                     Money amount = rate ? rate->hourlyMinor : Money{};
                     if (!amount && !warned) {
-                        b.issues.push_back("단가 미정: " + r->name + " [" + r->id + "] " + date);
+                        Diagnostic issue{"COST_RATE_UNKNOWN", {r->name, r->id, date}, {task.id}};
+                        issue.resourceIds = {r->id};
+                        b.issues.push_back(std::move(issue));
                         warned = true;
                     }
                     auto &d = days[at / calendar.dayMinutes()];
@@ -229,7 +232,7 @@ Budget budget(const PlanInput &p, const Task &task, const TaskSchedule *row, con
         b.days.push_back(std::move(d));
     }
     if (!b.at(b.finishStamp, calendar) && b.issues.empty())
-        b.issues.push_back("비용 계산/합계가 금액 한도(9조 최소 통화단위)를 초과했습니다.");
+        b.issues.push_back({"COST_MONEY_LIMIT", {}, {task.id}});
     return b;
 }
 const ProgressEntry *progressAt(const Project &p, const std::string &id, const std::string &stamp) {
@@ -279,7 +282,7 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
                           const std::optional<std::vector<std::string>> &taskScope) {
     validate(p);
     if (formula != "budget-remaining-v1" && formula != "cpi-v1" && formula != "cpi-spi-v1")
-        throw std::runtime_error("지원하지 않는 EAC 산식입니다.");
+        throw AppError(ErrorCode::EVM_FORMULA_UNSUPPORTED, {});
     CostAnalysis out;
     out.documentId = p.documentId;
     out.revision = p.revision;
@@ -292,7 +295,7 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
         if (b.id == baselineId)
             baseline = &b;
     if (!baselineId.empty() && !baseline)
-        throw std::runtime_error("비교할 원가 기준선이 없습니다.");
+        throw AppError(ErrorCode::BASELINE_NOT_FOUND, {});
     if (baseline)
         verifyBaseline(*baseline);
     std::set<std::string> selected;
@@ -305,21 +308,17 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
                 known.insert(t.id);
         for (const auto &id : *taskScope) {
             if (!known.contains(id))
-                throw std::runtime_error("원가 집계 범위의 작업이 존재하지 않습니다.");
+                throw AppError(ErrorCode::COST_TASK_NOT_FOUND, {});
             selected.insert(id);
         }
     }
     const bool compatible = baseline && baseline->input.currency == p.currency;
     if (baseline && !compatible)
-        out.diagnostics.push_back(
-            {"CURRENCY_MISMATCH", "기준선과 현재 통화가 다릅니다. 환산 없이 EVM·혼합 합계를 산정하지 않습니다.", {}});
+        out.diagnostics.push_back({"CURRENCY_MISMATCH", {}, {}, "CURRENCY_MISMATCH"});
     if (!baseline)
-        out.diagnostics.push_back(
-            {"NO_COST_BASELINE",
-             "기준선을 선택하면 BAC/PV/EV를 계산합니다. 현재 계획 예산은 기준선 예산과 구분합니다.",
-             {}});
+        out.diagnostics.push_back({"NO_COST_BASELINE", {}, {}, "NO_COST_BASELINE"});
     if (!p.statusAt)
-        out.diagnostics.push_back({"NO_COST_STATUS", "상태일을 설정하면 누적 실제원가·성과를 조회합니다.", {}});
+        out.diagnostics.push_back({"NO_COST_STATUS", {}, {}, "NO_COST_STATUS"});
     auto plan = calculatePlan(p);
     WorkCalendar calendar(p);
     std::optional<WorkCalendar> baselineCalendar;
@@ -383,8 +382,11 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
             const auto &b = frozen.at(t.id);
             row.credit = b.credit;
             row.evm.bac = b.at(b.finishStamp, *baselineCalendar);
-            for (const auto &issue : b.issues)
-                row.issues.push_back("기준선: " + issue);
+            for (const auto &issue : b.issues) {
+                Diagnostic frozen{"COST_BASELINE_INPUT", {}, {t.id}};
+                frozen.causes = {issue};
+                row.issues.push_back(std::move(frozen));
+            }
             if (p.statusAt) {
                 row.evm.pv = b.at(*p.statusAt, *baselineCalendar);
                 row.evm.ev = earned(p, t.id, b, row.evm.bac, *p.statusAt);
@@ -393,9 +395,9 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
         if (row.evm.ev && row.baselineMember)
             ++out.evCoverage;
         if (p.statusAt && !row.evm.ac)
-            row.issues.push_back("실제원가 미보고/미정");
+            row.issues.push_back({"COST_ACTUAL_UNKNOWN", {}, {t.id}});
         if (p.statusAt && row.baselineMember && !row.evm.ev)
-            row.issues.push_back("EV 예산 또는 성과 측정 근거 미정");
+            row.issues.push_back({"COST_EV_UNKNOWN", {}, {t.id}});
         derive(row.evm, formula);
         out.tasks.push_back(std::move(row));
     }
@@ -488,22 +490,18 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
         out.days.push_back(std::move(d));
     }
     for (const auto &row : out.tasks)
-        for (const auto &issue : row.issues)
-            out.diagnostics.push_back({"COST_INPUT_OR_LIMIT", issue, {row.taskId}});
+        for (const auto &issue : row.issues) {
+            Diagnostic summary{"COST_INPUT_OR_LIMIT", {}, {row.taskId}};
+            summary.causes = {issue};
+            out.diagnostics.push_back(std::move(summary));
+        }
     std::set<std::string> currentIds;
     for (const auto &t : p.tasks)
         if (current.contains(t.id))
             currentIds.insert(t.id);
     if (baseline && cohort != currentIds)
-        out.diagnostics.push_back(
-            {"BASELINE_SCOPE",
-             "EVM 총계는 선택 기준선의 작업 ID 범위입니다. 기준선 밖 작업 원가는 현재 계획/실제 총계에만 포함합니다.",
-             {}});
-    out.diagnostics.push_back(
-        {"EVM_POLICY",
-         "금액 반올림: 자원·배정·근무일별 최소 통화단위 half-up. EVM은 기준선 측정법과 상태일 보고를 사용하며 기간 "
-         "진척을 물리 진척으로 대체하지 않습니다. CPI/SPI는 합계 금액의 비율입니다.",
-         {}});
+        out.diagnostics.push_back({"BASELINE_SCOPE", {}, {}, "BASELINE_SCOPE"});
+    out.diagnostics.push_back({"EVM_POLICY", {}, {}, "EVM_POLICY"});
     return out;
 }
 } // namespace jobs

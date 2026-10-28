@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "persistence/JsonRecoveryStore.h"
 #include "persistence/ProjectJson.h"
 #include "persistence/JsonProjectStore.h"
@@ -20,9 +21,7 @@
 #include <stdexcept>
 namespace jobs {
 namespace {
-[[noreturn]] void fail(const QString &s) {
-    throw std::runtime_error(s.toUtf8().toStdString());
-}
+
 class Busy : public std::runtime_error {
 public:
     Busy() : std::runtime_error("다른 실행 중인 앱이 이 복구 세션을 사용하고 있습니다.") {}
@@ -48,57 +47,57 @@ std::optional<std::uint64_t> sequence(const QString &n) {
 }
 void keys(const QJsonObject &o, const QStringList &allowed) {
     if (o.size() != allowed.size())
-        fail("복구 메타데이터 필드가 누락되었습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_001, {});
     for (const auto &k : o.keys())
         if (!allowed.contains(k))
-            fail("지원하지 않는 복구 필드: " + k);
+            throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_002, {diagnosticArgument(k)});
 }
 QString string(const QJsonObject &o, const char *k) {
     if (!o[k].isString())
-        fail("복구 문자열 필드 오류");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_003, {});
     return o[k].toString();
 }
 bool boolean(const QJsonObject &o, const char *k) {
     if (!o[k].isBool())
-        fail("복구 논리 필드 오류");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_004, {});
     return o[k].toBool();
 }
 std::uint64_t integer(const QJsonValue &v, std::uint64_t max) {
     auto d = v.toDouble(-1);
     if (!v.isDouble() || !std::isfinite(d) || d < 1 || d > double(max) || d != double(std::uint64_t(d)))
-        fail("복구 정수 필드 오류");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_005, {});
     return std::uint64_t(d);
 }
 QString safeDirectory(const QString &root, const QString &id, bool create) {
     if (!uuid(id))
-        fail("잘못된 복구 세션 ID입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_006, {});
     QFileInfo base(root);
     if (link(base))
-        fail("복구 폴더에 링크/정션을 사용할 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_007, {});
     if (create && !QDir().mkpath(root))
-        fail("복구 폴더를 만들 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_008, {});
     base.refresh();
     if (!base.isDir())
-        fail("복구 폴더가 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_009, {});
     const auto path = QDir(base.canonicalFilePath()).filePath(id);
     QFileInfo f(path);
     if (create && !QDir(base.canonicalFilePath()).mkdir(id))
-        fail("복구 세션 폴더를 만들 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_010, {});
     f.refresh();
     if (link(f) || !f.isDir() || f.canonicalFilePath() != path)
-        fail("안전하지 않은 복구 세션 경로입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_011, {});
     return path;
 }
 QByteArray read(const QString &dir, std::uint64_t seq) {
     QFileInfo info(QDir(dir).filePath(name(seq)));
     if (link(info) || !info.isFile() || info.dir().canonicalPath() != dir)
-        fail("복구 파일 경로가 잘못되었습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_012, {});
     QFile f(info.absoluteFilePath());
     if (!f.open(QIODevice::ReadOnly) || f.size() > 64 * 1024 * 1024)
-        fail("복구 파일 읽기 실패/64 MiB 한도 초과입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_013, {});
     auto b = f.read(64 * 1024 * 1024 + 1);
     if (f.error() != QFileDevice::NoError || b.size() > 64 * 1024 * 1024)
-        fail("복구 파일을 끝까지 읽지 못했거나 64 MiB 한도를 초과했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_014, {});
     return b;
 }
 struct Record {
@@ -110,15 +109,15 @@ Record decode(const QByteArray &bytes, const QString &expectedSession, std::uint
     QJsonParseError error;
     auto json = QJsonDocument::fromJson(bytes, &error);
     if (error.error != QJsonParseError::NoError || !json.isObject())
-        fail("손상되었거나 미완료인 복구 JSON입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_015, {});
     auto root = json.object();
     keys(root, {"format", "schemaVersion", "complete", "payload", "sha256"});
     if (root["format"] != "JOBS-RECOVERY" || root["schemaVersion"] != QJsonValue(1) ||
         root["complete"] != QJsonValue(true) || !root["payload"].isObject())
-        fail("지원하지 않는 버전/미완료 복구본입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_016, {});
     auto p = root["payload"].toObject();
     if (root["sha256"] != QJsonValue(hash(QJsonDocument(p).toJson(QJsonDocument::Compact))))
-        fail("복구본 무결성 검사에 실패했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_017, {});
     keys(p, {"sessionId", "sequence", "capturedAt", "sourcePath", "sourceFingerprint", "sourceReadOnly",
              "sourceRequiresSaveAs", "lastSavedRevision", "projectSchema", "project"});
     Record r;
@@ -128,7 +127,7 @@ Record decode(const QByteArray &bytes, const QString &expectedSession, std::uint
         (p["projectSchema"] != QJsonValue(6) && p["projectSchema"] != QJsonValue(7) &&
          p["projectSchema"] != QJsonValue(8) && p["projectSchema"] != QJsonValue(9)) ||
         !p["project"].isObject())
-        fail("복구 세션·세대·프로젝트 버전이 일치하지 않습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_018, {});
     auto &s = r.snapshot;
     s.project = json::decodeProject(p["project"].toObject(), p["projectSchema"].toInt());
     s.capturedAt = string(p, "capturedAt").toStdString();
@@ -141,7 +140,7 @@ Record decode(const QByteArray &bytes, const QString &expectedSession, std::uint
     if (!validUtcStamp(s.capturedAt) ||
         (s.sourcePath.empty() && (!s.sourceFingerprint.empty() || s.lastSavedRevision)) ||
         (!s.sourcePath.empty() && (s.sourceFingerprint.empty() || !s.lastSavedRevision)))
-        fail("복구 시각/원본 저장 지점이 잘못되었습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_019, {});
     return r;
 }
 QByteArray encode(const RecoverySnapshot &s, const QString &session, std::uint64_t seq) {
@@ -163,10 +162,10 @@ QByteArray encode(const RecoverySnapshot &s, const QString &session, std::uint64
                                            {"sha256", hash(QJsonDocument(p).toJson(QJsonDocument::Compact))}})
                      .toJson();
     if (bytes.size() > 64 * 1024 * 1024)
-        fail("자동 복구본 64 MiB 한도를 초과했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_020, {});
     auto decoded = decode(bytes, session, seq);
     if (decoded.snapshot.project != s.project)
-        fail("자동 복구본 저장 전 검증에 실패했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_021, {});
     return bytes;
 }
 struct Original {
@@ -263,7 +262,7 @@ RecoverySession::RecoverySession(QString root, QString id, bool create, std::fun
     impl_->directory = safeDirectory(impl_->root, impl_->id, create);
     const auto lockPath = QDir(impl_->directory).filePath("session.lock");
     if (link(QFileInfo(lockPath)))
-        fail("복구 잠금에 링크를 사용할 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_022, {});
     impl_->lock = std::make_unique<QLockFile>(lockPath);
     impl_->lock->setStaleLockTime(0);
     if (!impl_->lock->tryLock(0)) {
@@ -272,10 +271,9 @@ RecoverySession::RecoverySession(QString root, QString id, bool create, std::fun
             QString host, app;
             if (impl_->lock->getLockInfo(&pid, &host, &app))
                 throw Busy();
-            fail("복구 잠금 소유자를 확인할 수 없습니다. 복구본을 보존했습니다. session.lock과 실행 중인 앱을 "
-                 "확인하세요.");
+            throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_023, {});
         }
-        fail("복구 세션의 잠금을 얻을 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_024, {});
     }
 }
 RecoverySession::~RecoverySession() {
@@ -301,36 +299,36 @@ void RecoverySession::retire() noexcept {
 void RecoverySession::cleanup() {
     std::lock_guard guard(impl_->mutex);
     if (!retired())
-        fail("진행 중인 복구 세션은 제거할 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_025, {});
     const auto dir = safeDirectory(impl_->root, impl_->id, false);
     for (const auto &f : QDir(dir).entryInfoList(QDir::Files | QDir::System | QDir::NoDotAndDotDot))
         if (sequence(f.fileName()) && !link(f)) {
             if (!QFile::remove(f.absoluteFilePath()))
-                fail("복구본 정리를 완료하지 못했습니다.");
+                throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_026, {});
         }
 }
 std::uint64_t RecoverySession::checkpoint(const RecoverySnapshot &snapshot) {
     std::lock_guard guard(impl_->mutex);
     if (retired() || !impl_->writable)
-        fail("종료되었거나 읽기 전용인 복구 세션입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_027, {});
     const auto dir = safeDirectory(impl_->root, impl_->id, false);
     const auto seq = ++impl_->sequence;
     if (seq > 999999999)
-        fail("자동 복구 세대 한도 초과입니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_028, {});
     auto bytes = encode(snapshot, impl_->id, seq);
     const auto path = QDir(dir).filePath(name(seq));
     if (QFileInfo::exists(path))
-        fail("동일 복구 세대가 이미 존재합니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_029, {});
     QSaveFile file(path);
     file.setDirectWriteFallback(false);
     if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size() || !file.flush())
-        fail("자동 복구본을 쓸 수 없습니다: " + file.errorString());
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_030, {diagnosticArgument(file.errorString())});
     if (impl_->beforePublish)
         impl_->beforePublish();
     if (retired())
-        fail("문서가 전환되어 자동 복구 저장을 취소했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_031, {});
     if (QFileInfo::exists(path) || !file.commit())
-        fail("자동 복구본을 완성하지 못했습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_032, {});
     // Retain three completed valid generations. Never prune a corrupt generation.
     std::vector<std::pair<std::uint64_t, QString>> valid;
     for (const auto &f : QDir(dir).entryInfoList(QDir::Files))
@@ -344,7 +342,7 @@ std::uint64_t RecoverySession::checkpoint(const RecoverySnapshot &snapshot) {
     std::sort(valid.begin(), valid.end());
     while (valid.size() > 3) {
         if (!QFile::remove(valid.front().second))
-            fail("새 복구본은 완성했으나 오래된 세대 정리에 실패했습니다.");
+            throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_033, {});
         valid.erase(valid.begin());
     }
     return seq;
@@ -352,7 +350,7 @@ std::uint64_t RecoverySession::checkpoint(const RecoverySnapshot &snapshot) {
 JsonRecoveryStore::JsonRecoveryStore(QString root, std::function<void()> hook)
     : root_(QDir::cleanPath(QFileInfo(root).absoluteFilePath())), beforePublish_(std::move(hook)) {
     if (root.isEmpty())
-        fail("복구 폴더 경로가 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_034, {});
 }
 QString JsonRecoveryStore::defaultDirectory() {
     return QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("recovery");
@@ -367,10 +365,10 @@ RecoveryScan JsonRecoveryStore::scan() const {
     if (!root.exists())
         return result;
     if (link(root) || !root.isDir())
-        fail("복구 폴더에 접근할 수 없습니다.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_035, {});
     auto dirs = QDir(root_).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System);
     if (dirs.size() > 1000)
-        fail("복구 세션 검색 한도(1,000개)를 초과했습니다. 복구 폴더를 확인하세요.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_036, {});
     for (const auto &dir : dirs) {
         if (!uuid(dir.fileName()))
             continue;
@@ -379,7 +377,7 @@ RecoveryScan JsonRecoveryStore::scan() const {
             auto files =
                 QDir(session->impl_->directory).entryInfoList(QDir::Files | QDir::System | QDir::NoDotAndDotDot);
             if (files.size() > 1000)
-                fail("복구 세대 검색 한도 초과입니다.");
+                throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_037, {});
             for (const auto &file : files)
                 if (auto seq = sequence(file.fileName())) {
                     RecoveryCandidate c;
@@ -430,10 +428,10 @@ RecoveryScan JsonRecoveryStore::scan() const {
 std::unique_ptr<RecoveryClaim> JsonRecoveryStore::claim(const RecoveryCandidate &candidate) const {
     auto session = std::shared_ptr<RecoverySession>(new RecoverySession(root_, candidate.sessionId, false));
     if (!candidate.valid || !candidate.sequence || candidate.fileHash.isEmpty())
-        fail("검증된 복구 세대를 선택하세요.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_038, {});
     auto bytes = read(session->impl_->directory, candidate.sequence);
     if (hash(bytes) != candidate.fileHash)
-        fail("선택 후 복구본이 변경되었습니다. 다시 검색하세요.");
+        throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_039, {});
     auto record = decode(bytes, candidate.sessionId, candidate.sequence);
     auto claim = std::make_unique<RecoveryClaim>();
     claim->session = std::move(session);

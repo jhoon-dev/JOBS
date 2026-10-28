@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
         conflict.inputRevision = doc.project()->revision;
         conflict.profile = doc.project()->calculationProfile;
         conflict.status = jobs::CalculationStatus::Conflict;
-        conflict.diagnostics = {{"TEST", "<unsafe & text>", {firstId}}};
+        conflict.diagnostics = {{"TEST", {"<unsafe & text>"}, {firstId}}};
         doc.applyCalculation(conflict);
         model.synchronize(rows);
         check(model.data(model.index(0, 0), Qt::BackgroundRole).value<QBrush>().color() == QColor("#ffddd7") &&

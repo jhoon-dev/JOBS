@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/CostAnalysisDialog.h"
 #include "ui/MoneyFields.h"
 #include <QComboBox>
@@ -210,7 +211,7 @@ void CostAnalysisDialog::recalculate() {
         try {
             c.report = analyzeCosts(snapshot, baseline, formula);
         } catch (const std::exception &e) {
-            c.error = QString::fromUtf8(e.what());
+            c.error = qErrorText(e);
         }
         return c;
     }));
@@ -241,7 +242,7 @@ void CostAnalysisDialog::display(const CostAnalysis &r) {
         const auto &e = row.evm;
         QStringList issues;
         for (const auto &text : row.issues)
-            issues << qs(text);
+            issues << qs(diagnosticMessage(text));
         auto detail = "작업 ID " + qs(row.taskId);
         if (r.statusAt)
             if (auto *report = costAsOf(*document_.project(), row.taskId, *r.statusAt))
@@ -286,7 +287,7 @@ void CostAnalysisDialog::display(const CostAnalysis &r) {
         QStringList ids;
         for (const auto &id : d.taskIds)
             ids << qs(id);
-        messages << "[" + qs(d.code) + "] " + qs(d.message) + (ids.empty() ? "" : " · " + ids.join(", "));
+        messages << "[" + qs(d.code) + "] " + qs(diagnosticMessage(d)) + (ids.empty() ? "" : " · " + ids.join(", "));
     }
     diagnostics_->setPlainText(messages.join('\n'));
     chart_->setReport(r);

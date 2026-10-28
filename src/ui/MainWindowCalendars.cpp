@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include <QComboBox>
 #include <QDialog>
@@ -24,7 +25,7 @@ int minute(const QString &text) {
     bool ok = false;
     auto h = match.captured(1).toInt(&ok), m = match.captured(2).toInt();
     if (!ok || h > 24 || m > 59 || (h == 24 && m))
-        throw std::runtime_error("시간은 HH:mm이며 구간 끝 24:00을 허용합니다.");
+        throw AppError(ErrorCode::MAINWINDOWCALENDARS_001, {});
     return h * 60 + m;
 }
 } // namespace
@@ -113,13 +114,13 @@ void MainWindow::manageCalendars() {
                 bool ok = false;
                 const auto d = s.toInt(&ok);
                 if (!ok)
-                    throw std::runtime_error("근무 요일은 1~7입니다.");
+                    throw AppError(ErrorCode::MAINWINDOWCALENDARS_002, {});
                 c.weekdays.push_back(d);
             }
             for (const auto &s : periods->text().split(',', Qt::SkipEmptyParts)) {
                 auto parts = s.trimmed().split('-');
                 if (parts.size() != 2)
-                    throw std::runtime_error("시간대 예: 09:00-12:00,13:00-18:00");
+                    throw AppError(ErrorCode::MAINWINDOWCALENDARS_003, {});
                 c.periods.push_back({minute(parts[0].trimmed()), minute(parts[1].trimmed())});
             }
             for (const auto &s : holidays->toPlainText().split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts))

@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/ComparisonDialog.h"
 #include <QAction>
@@ -35,7 +36,7 @@ std::optional<std::string> optional(const QString &s) {
 }
 struct BaselinePreparation {
     std::optional<Baseline> baseline;
-    std::string error;
+    std::optional<Diagnostic> error;
 };
 } // namespace
 void MainWindow::refreshTracking() {
@@ -107,7 +108,7 @@ void MainWindow::saveBaseline() {
         try {
             auto prepared = watcher->result();
             if (!prepared.baseline)
-                throw std::runtime_error(prepared.error);
+                throw AppError(prepared.error.value_or(Diagnostic{"INTERNAL_ERROR", {}, {}}));
             selectedBaseline_ = document_.appendBaseline(std::move(*prepared.baseline));
         } catch (const std::exception &e) {
             report(e);
@@ -119,7 +120,7 @@ void MainWindow::saveBaseline() {
         try {
             return BaselinePreparation{prepareBaseline(*snapshot, n, a, r, utc), {}};
         } catch (const std::exception &e) {
-            return BaselinePreparation{std::nullopt, e.what()};
+            return BaselinePreparation{std::nullopt, diagnosticFromException(e)};
         }
     }));
 }
@@ -160,7 +161,7 @@ void MainWindow::editStatusAt() {
                                       : std::optional<std::string>{str(date->dateTime().toString("yyyy-MM-dd HH:mm"))});
             dialog.accept();
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     if (dialog.exec() == QDialog::Accepted)
@@ -292,16 +293,16 @@ void MainWindow::reportProgress() {
         try {
             if (!document_.project() || document_.project()->documentId != sourceId ||
                 document_.project()->revision != sourceRevision || document_.sessionGeneration() != sourceSession)
-                throw std::runtime_error("문서가 변경되었습니다. 실적 창을 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWTRACKING_001, {});
             if (!remainingWork->text().trimmed().isEmpty()) {
                 bool ok = false;
                 const auto n = remainingWork->text().trimmed().toDouble(&ok);
                 if (!ok || !std::isfinite(n) || n < 0 || n > double(maxWork) / 6000.0)
-                    throw std::runtime_error("잔여 공수 범위를 확인하세요.");
+                    throw AppError(ErrorCode::MAINWINDOWTRACKING_002, {});
                 e.remainingWorkUnitMinutes = std::llround(n * 6000.0);
             }
             if (workBased && !e.actualFinish && !e.remainingWorkUnitMinutes)
-                throw std::runtime_error("공수 기준 작업에는 잔여 공수(h)를 명시적으로 입력하세요.");
+                throw AppError(ErrorCode::MAINWINDOWTRACKING_003, {});
             if (workBased && e.actualFinish)
                 e.remainingWorkUnitMinutes = 0;
             submitDialogEdit(
@@ -313,7 +314,7 @@ void MainWindow::reportProgress() {
                     buttons->button(QDialogButtonBox::Save)->setEnabled(!pending);
                 });
         } catch (const std::exception &ex) {
-            error->setText(QString::fromUtf8(ex.what()));
+            error->setText(qErrorText(ex));
         }
     });
     if (dialog.exec() == QDialog::Accepted)

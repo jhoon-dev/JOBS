@@ -84,6 +84,17 @@ int main(int argc, char **argv) {
         westernXer.replace("SITE-01", QByteArray("Caf\xe9", 4));
         check(jobs::fuzz::probe("xer", westernXer).accepted == 1, "XER encoding branches were not distinguished");
         seeds.push_back({"xer", "windows-1252.xer", westernXer, true});
+        const QJsonObject workspaceBody{
+            {"id", "workspace-seed"},
+            {"projects",
+             QJsonArray{QJsonObject{{"documentId", "parser-seed"}, {"name", "Project"}, {"path", "Project.jobs"}}}},
+            {"resources", QJsonArray{}},
+            {"bindings", QJsonArray{}}};
+        auto workspaceSeed = QJsonDocument::fromJson(envelope(workspaceBody, 1)).object();
+        workspaceSeed["format"] = "JOBS-WORKSPACE";
+        seeds.push_back({"workspace", "valid.jobsworkspace", QJsonDocument(workspaceSeed).toJson(), true});
+        workspaceSeed["sha256"] = "tampered";
+        seeds.push_back({"workspace", "checksum.jobsworkspace", QJsonDocument(workspaceSeed).toJson(), false});
         // Rich PDM, constraints and effort payloads reach profile-specific decoders.
         for (const auto *profile : {jobs::pdmProfile, jobs::constraintProfile, jobs::effortProfile}) {
             auto p = jobs::importProjectXml(xml, "seed.xml").project;
@@ -98,7 +109,7 @@ int main(int argc, char **argv) {
             // Truncating a raw payload is deliberately invalid JSON too.
             seeds.push_back({seeds[i].parser, seeds[i].name + ".truncated", bytes, false});
         }
-        for (const auto *parser : {"jobs", "xml", "xer"}) {
+        for (const auto *parser : {"jobs", "xml", "xer", "workspace"}) {
             seeds.push_back({parser, "empty", {}, false});
             seeds.push_back({parser, "binary", QByteArray("\0\xff\xfe\x01", 4), false});
         }

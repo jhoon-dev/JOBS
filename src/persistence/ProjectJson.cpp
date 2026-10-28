@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "persistence/ProjectJson.h"
 #include "calculation/Tracking.h"
@@ -12,22 +13,20 @@ QString qs(const std::string &s) {
 std::string str(const QString &s) {
     return s.toUtf8().toStdString();
 }
-[[noreturn]] void fail(const QString &message) {
-    throw std::runtime_error(str(message));
-}
+
 void keys(const QJsonObject &o, const QStringList &allowed) {
     for (const auto &key : o.keys())
         if (!allowed.contains(key))
-            fail("지원하지 않는 필드: " + key);
+            throw AppError(ErrorCode::FILE_UNKNOWN_FIELD, {diagnosticArgument(key)});
 }
 std::string string(const QJsonObject &o, const QString &key) {
     if (!o.value(key).isString())
-        fail("문자열 필드 누락 또는 형식 오류: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_002, {diagnosticArgument(key)});
     return str(o.value(key).toString());
 }
 std::optional<std::string> optionalString(const QJsonObject &o, const QString &key) {
     if (!o.contains(key))
-        fail("필드 누락: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_003, {diagnosticArgument(key)});
     if (o.value(key).isNull())
         return std::nullopt;
     return string(o, key);
@@ -36,22 +35,22 @@ std::int64_t integer(const QJsonObject &o, const QString &key, double maximum = 
     auto value = o.value(key);
     double n = value.toDouble(-1);
     if (!value.isDouble() || !std::isfinite(n) || n < 0 || n > maximum || std::floor(n) != n)
-        fail("정수 필드 오류: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_004, {diagnosticArgument(key)});
     return static_cast<std::int64_t>(n);
 }
 bool boolean(const QJsonObject &o, const QString &key) {
     if (!o.value(key).isBool())
-        fail("참/거짓 필드 오류: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_005, {diagnosticArgument(key)});
     return o.value(key).toBool();
 }
 QJsonArray array(const QJsonObject &o, const QString &key) {
     if (!o.value(key).isArray())
-        fail("목록 필드 누락 또는 형식 오류: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_006, {diagnosticArgument(key)});
     return o.value(key).toArray();
 }
 QJsonObject object(const QJsonValue &value) {
     if (!value.isObject())
-        fail("객체 형식 오류");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_007, {});
     return value.toObject();
 }
 QJsonArray strings(const std::vector<std::string> &values) {
@@ -64,7 +63,7 @@ std::vector<std::string> readStrings(const QJsonObject &o, const QString &key) {
     std::vector<std::string> result;
     for (const auto &v : array(o, key)) {
         if (!v.isString())
-            fail("문자열 목록 오류: " + key);
+            throw AppError(ErrorCode::FILE_PROJECTJSON_008, {diagnosticArgument(key)});
         result.push_back(str(v.toString()));
     }
     return result;
@@ -77,7 +76,7 @@ QJsonValue money(const std::optional<std::int64_t> &v) {
 }
 std::optional<std::int64_t> readMoney(const QJsonObject &o, const QString &key, double limit = double(maxMoney)) {
     if (!o.contains(key))
-        fail("금액 필드 누락: " + key);
+        throw AppError(ErrorCode::FILE_PROJECTJSON_009, {diagnosticArgument(key)});
     return o[key].isNull() ? std::optional<std::int64_t>{} : integer(o, key, limit);
 }
 QStringList planKeys(int schema) {
@@ -207,13 +206,13 @@ PlanInput decodePlan(const QJsonObject &o, int schema) {
     const bool constrained = schema >= 8 && hasConstraints(p);
     const bool effort = schema >= 9 && isEffort(p);
     if (isEffort(p) && !effort)
-        fail("공수·분할 정책에는 schema 9가 필요합니다.");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_010, {});
     if (isPdm(p) && !pdm)
-        fail("PDM 정책에는 schema 7 이상이 필요합니다.");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_011, {});
     if (hasConstraints(p) && !constrained)
-        fail("제약 정책에는 schema 8이 필요합니다.");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_012, {});
     if (!pdm && o.contains("calendars"))
-        fail("이전 계산 정책에 작업 달력을 추가할 수 없습니다.");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_013, {});
     if (pdm)
         for (const auto &v : array(o, "calendars")) {
             auto c = object(v);
@@ -257,13 +256,13 @@ PlanInput decodePlan(const QJsonObject &o, int schema) {
             if (effort)
                 resource.calendarId = string(r, "calendarId");
             if (!r.contains("maxUnits"))
-                fail("자원 가용량 누락");
+                throw AppError(ErrorCode::FILE_PROJECTJSON_014, {});
             resource.maxUnits = r["maxUnits"].isNull() ? std::optional<int>{} : int(integer(r, "maxUnits", 100000));
             for (const auto &x : array(r, "exceptions")) {
                 auto d = object(x);
                 keys(d, {"date", "units"});
                 if (!d.contains("units"))
-                    fail("자원 가용량 예외 값 누락");
+                    throw AppError(ErrorCode::FILE_PROJECTJSON_015, {});
                 resource.exceptions.push_back(
                     {string(d, "date"), d["units"].isNull() ? std::optional<int>{} : int(integer(d, "units", 100000))});
             }
@@ -309,7 +308,7 @@ PlanInput decodePlan(const QJsonObject &o, int schema) {
         Task task{string(t, "id"), string(t, "name"), std::nullopt, {}};
         if (schema >= 2) {
             if (!t.contains("durationMinutes"))
-                fail("기간 필드 누락");
+                throw AppError(ErrorCode::FILE_PROJECTJSON_016, {});
             if (!t.value("durationMinutes").isNull())
                 task.durationMinutes = integer(t, "durationMinutes", 5000000);
             task.predecessors = readStrings(t, "predecessors");
@@ -324,7 +323,7 @@ PlanInput decodePlan(const QJsonObject &o, int schema) {
                 const auto lag = d["lagMinutes"].toDouble(9000000);
                 if (!d["lagMinutes"].isDouble() || !std::isfinite(lag) || std::floor(lag) != lag ||
                     std::abs(lag) > 5000000)
-                    fail("선행/지연은 정수 근무분이어야 합니다.");
+                    throw AppError(ErrorCode::FILE_PROJECTJSON_017, {});
                 task.dependencyRules.push_back(
                     {string(d, "predecessorId"), dependencyTypeFromToken(string(d, "type")), std::int64_t(lag)});
             }
@@ -468,7 +467,7 @@ ProgressEntry decodeEntry(const QJsonObject &o, int schema) {
     e.recordedRevision = std::uint64_t(integer(o, "recordedRevision"));
     e.sourceDocumentId = string(o, "sourceDocumentId");
     if (!o.contains("planDurationMinutes"))
-        fail("보고 당시 계획 기간 누락");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_018, {});
     if (!o.value("planDurationMinutes").isNull())
         e.planDurationMinutes = integer(o, "planDurationMinutes", 5000000);
     e.actualStart = optionalString(o, "actualStart");
@@ -544,7 +543,7 @@ CostEntry decodeCostEntry(const QJsonObject &o) {
     e.currency = string(o, "currency");
     e.actualMinor = readMoney(o, "actualMinor");
     if (!o.contains("physicalBasisPoints"))
-        fail("물리 진척 필드 누락");
+        throw AppError(ErrorCode::FILE_PROJECTJSON_019, {});
     if (!o["physicalBasisPoints"].isNull())
         e.physicalBasisPoints = int(integer(o, "physicalBasisPoints", 10000));
     return e;

@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/AutoSaveController.h"
 #include <QDateTime>
 #include <QFutureWatcher>
@@ -51,7 +52,7 @@ void AutoSaveController::retire(std::shared_ptr<RecoverySession> session) {
             session->cleanup();
             return QString{};
         } catch (const std::exception &e) {
-            return QString::fromUtf8(e.what());
+            return qErrorText(e);
         }
     }));
 }
@@ -154,12 +155,12 @@ void AutoSaveController::checkpointNow() {
                 request = {}; // Release the read-only source before disk I/O.
                 out.sequence = session->checkpoint(snapshot);
             } catch (const std::exception &e) {
-                out.error = QString::fromUtf8(e.what());
+                out.error = qErrorText(e);
             }
             return out;
         }));
     } catch (const std::exception &e) {
-        setStatus("자동복구 저장 실패 · " + QString::fromUtf8(e.what()));
+        setStatus("자동복구 저장 실패 · " + qErrorText(e));
         deadline_.start(intervalMs_);
     }
 }

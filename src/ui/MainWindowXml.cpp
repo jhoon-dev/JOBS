@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "persistence/ProjectXml.h"
 #include <QDialog>
@@ -76,7 +77,7 @@ void MainWindow::importXml() {
             return;
         if (generation != document_.sessionGeneration() ||
             revision != (document_.project() ? document_.project()->revision : 0))
-            throw std::runtime_error("미리보기 중 문서가 변경되었습니다. 다시 가져오세요.");
+            throw AppError(ErrorCode::MAINWINDOWXER_001, {});
         if (!confirmChanges())
             return;
         auto folder = publishProjectXml(exchange, destination);
@@ -97,7 +98,7 @@ void MainWindow::exportXml() {
         if (destination.isEmpty())
             return;
         if (!document_.project() || *document_.project() != exchange.project)
-            throw std::runtime_error("미리보기 중 문서가 변경되었습니다. 다시 내보내세요.");
+            throw AppError(ErrorCode::MAINWINDOWXER_002, {});
         auto folder = publishProjectXml(exchange, destination);
         statusBar()->showMessage("XML 내보내기 완료 · 원본/진단: " + folder);
     } catch (const std::exception &e) {

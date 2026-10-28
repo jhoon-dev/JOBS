@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "ui/TaskInput.h"
@@ -292,11 +293,11 @@ void MainWindow::insertSelectedTasks() {
     try {
         if (document_.sessionGeneration() != session || !document_.project() ||
             document_.project()->revision != revision)
-            throw std::runtime_error("입력 중 프로젝트가 변경되었습니다. 다시 삽입하세요.");
+            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_001, {});
         const auto text = names->toPlainText();
         submitEdit(DeferredTaskEdit{[text, before, wbs](const Project &) -> BulkTaskCommand {
                        if (text.size() > 4 * 1024 * 1024 || text.toUtf8().size() > 4 * 1024 * 1024)
-                           throw std::runtime_error("작업 이름 목록은 최대 4 MiB입니다.");
+                           throw AppError(ErrorCode::MAINWINDOWTASKEDITING_002, {});
                        std::vector<std::string> values;
                        for (const auto &line : text.split('\n')) {
                            calculationCheckpoint();
@@ -352,7 +353,7 @@ void MainWindow::deleteSelectedTasks() {
             } catch (const CalculationCancelled &) {
                 return std::pair{TaskRemoval{}, QString("삭제 확인을 취소했습니다.")};
             } catch (const std::exception &e) {
-                return std::pair{TaskRemoval{}, QString::fromUtf8(e.what())};
+                return std::pair{TaskRemoval{}, qErrorText(e)};
             }
         }));
         const auto answer = confirm.exec();
@@ -361,7 +362,7 @@ void MainWindow::deleteSelectedTasks() {
             return;
         if (document_.sessionGeneration() != session || !document_.project() ||
             document_.project()->revision != revision)
-            throw std::runtime_error("확인 중 프로젝트가 변경되었습니다. 삭제 대상을 다시 확인하세요.");
+            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_003, {});
         submitEdit(RemoveTasksEdit{ids}, "작업 삭제");
     } catch (const std::exception &e) {
         report(e);
@@ -388,11 +389,11 @@ void MainWindow::copySelectedCells() {
             right = std::max(right, i.column());
         }
         if (indices.size() != qsizetype(bottom - top + 1) * (right - left + 1))
-            throw std::runtime_error("복사할 셀은 구멍 없는 연속 직사각형으로 선택하세요.");
+            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_004, {});
         if (left == 0 && right == table_->columnCount() - 1)
             right = 2;
         if (bottom - top + 1 > 10000 || (bottom - top + 1) * (right - left + 1) > 30000)
-            throw std::runtime_error("복사는 최대 10,000행·30,000셀입니다.");
+            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_005, {});
         QList<QStringList> rows;
         for (int r = top; r <= bottom; ++r) {
             QStringList row;
@@ -403,7 +404,7 @@ void MainWindow::copySelectedCells() {
         }
         const auto text = encodeTaskTsv(rows);
         if (text.toUtf8().size() > 4 * 1024 * 1024)
-            throw std::runtime_error("복사 텍스트는 최대 4 MiB입니다.");
+            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_006, {});
         QApplication::clipboard()->setText(text);
         statusBar()->showMessage("선택 표를 복사했습니다.");
     } catch (const std::exception &e) {
@@ -419,9 +420,9 @@ void MainWindow::pasteCells() {
         submitEdit(DeferredTaskEdit{[text, row, column, rows = visibleRows_](const Project &p) -> BulkTaskCommand {
                        const auto cells = decodeTaskTsv(text);
                        if (cells.isEmpty() || row < 0 || column < 0 || column >= 3 || column + cells.front().size() > 3)
-                           throw std::runtime_error("이름·기간·선행 입력 3열 범위에 붙여넣으세요.");
+                           throw AppError(ErrorCode::MAINWINDOWTASKEDITING_007, {});
                        if (std::size_t(row) + std::size_t(cells.size()) > rows.size())
-                           throw std::runtime_error("보이는 작업 행이 부족합니다. 작업 삽입으로 행을 먼저 만드세요.");
+                           throw AppError(ErrorCode::MAINWINDOWTASKEDITING_008, {});
                        std::vector<TaskEdit> edits;
                        for (qsizetype r = 0; r < cells.size(); ++r) {
                            calculationCheckpoint();
@@ -432,15 +433,17 @@ void MainWindow::pasteCells() {
                                    const auto &value = cells[r][c];
                                    if (column + c == 0) {
                                        if (value.trimmed().isEmpty())
-                                           throw std::runtime_error("작업 이름은 빈칸일 수 없습니다.");
+                                           throw AppError(ErrorCode::MAINWINDOWTASKEDITING_009, {});
                                        e.name = value.trimmed().toUtf8().toStdString();
                                    } else if (column + c == 1)
                                        e.duration.emplace(taskDurationInput(value));
                                    else
                                        e.edges = taskDependencyInput(value, p, e.taskId);
                                } catch (const std::exception &error) {
-                                   throw std::runtime_error("붙여넣기 " + std::to_string(r + 1) + "행 " +
-                                                            std::to_string(c + 1) + "열: " + error.what());
+                                   throw AppError(ErrorCode::MAINWINDOWTASKEDITING_010,
+                                                  {diagnosticArgument(std::to_string(r + 1)),
+                                                   diagnosticArgument(std::to_string(c + 1)),
+                                                   diagnosticArgument(error.what())});
                                }
                            }
                            edits.push_back(std::move(e));

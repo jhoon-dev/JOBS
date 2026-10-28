@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/ResourceComparisonDialog.h"
 #include <QDialog>
@@ -167,14 +168,14 @@ void MainWindow::manageResources() {
             for (auto line : dates->toPlainText().split('\n', Qt::SkipEmptyParts)) {
                 auto parts = line.trimmed().split('=');
                 if (parts.size() != 2)
-                    throw std::runtime_error("날짜 예외는 YYYY-MM-DD=정수 또는 ? 형식입니다.");
+                    throw AppError(ErrorCode::MAINWINDOWRESOURCES_001, {});
                 auto value = parts[1].trimmed();
                 std::optional<int> n;
                 if (value != "?") {
                     bool ok;
                     n = value.toInt(&ok);
                     if (!ok)
-                        throw std::runtime_error("가용량은 정수% 또는 ?입니다.");
+                        throw AppError(ErrorCode::MAINWINDOWRESOURCES_002, {});
                 }
                 r.exceptions.push_back({str(parts[0].trimmed()), n});
             }
@@ -182,7 +183,7 @@ void MainWindow::manageResources() {
             fill();
             error->setText("문서에 반영했습니다. 파일 저장으로 보존하세요.");
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     connect(remove, &QPushButton::clicked, &dialog, [&] {
@@ -194,7 +195,7 @@ void MainWindow::manageResources() {
             dates->clear();
             error->setText("자원을 삭제했습니다.");
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     auto *close = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
@@ -262,7 +263,7 @@ void MainWindow::assignResources() {
         try {
             if (!document_.project() || document_.project()->documentId != sourceId ||
                 document_.project()->revision != sourceRevision || document_.sessionGeneration() != sourceSession)
-                throw std::runtime_error("문서가 변경되었습니다. 배정을 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWRESOURCES_003, {});
             std::vector<Assignment> assignments;
             for (std::size_t i = 0; i < spins.size(); ++i)
                 if (spins[i]->value())
@@ -273,7 +274,7 @@ void MainWindow::assignResources() {
                                  buttons->button(QDialogButtonBox::Ok)->setEnabled(!pending);
                              });
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     dialog.exec();

@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "reporting/ReportExport.h"
 #include "reporting/ExportFile.h"
 #include <QXmlStreamWriter>
@@ -15,7 +16,7 @@ QByteArray xml(const std::function<void(QXmlStreamWriter &)> &write) {
     write(x);
     x.writeEndDocument();
     if (x.hasError())
-        throw std::runtime_error("XML 보고서를 작성할 수 없습니다.");
+        throw AppError(ErrorCode::XLSXEXPORT_001, {});
     return bytes;
 }
 std::uint32_t crc32(const QByteArray &bytes) {
@@ -37,7 +38,7 @@ class Zip {
     std::vector<Entry> entries_;
     void raw(const QByteArray &b) {
         if (device_.write(b) != b.size())
-            throw std::runtime_error("ZIP 파일 쓰기에 실패했습니다.");
+            throw AppError(ErrorCode::XLSXEXPORT_002, {});
     }
 
 public:
@@ -46,7 +47,7 @@ public:
     }
     void add(const QByteArray &name, const QByteArray &bytes) {
         if (device_.pos() + bytes.size() > 64 * 1024 * 1024)
-            throw std::runtime_error("엑셀 보고서 파일 한도(64 MiB)를 초과했습니다.");
+            throw AppError(ErrorCode::XLSXEXPORT_003, {});
         Entry e{name, crc32(bytes), std::uint32_t(bytes.size()), std::uint32_t(device_.pos())};
         stream_ << quint32(0x04034b50) << quint16(20) << quint16(0x800) << quint16(0) << quint16(0) << quint16(33)
                 << quint32(e.crc) << quint32(e.size) << quint32(e.size) << quint16(name.size()) << quint16(0);
@@ -66,7 +67,7 @@ public:
         stream_ << quint32(0x06054b50) << quint16(0) << quint16(0) << quint16(entries_.size())
                 << quint16(entries_.size()) << directorySize << at << quint16(0);
         if (stream_.status() != QDataStream::Ok)
-            throw std::runtime_error("ZIP 디렉터리 쓰기에 실패했습니다.");
+            throw AppError(ErrorCode::XLSXEXPORT_004, {});
     }
 };
 QString column(int n) {
@@ -84,7 +85,7 @@ void empty(QXmlStreamWriter &x, const QString &name, const std::initializer_list
 }
 void textCell(QXmlStreamWriter &x, const QString &ref, const QString &value, int style) {
     if (value.size() > 32767)
-        throw std::runtime_error("엑셀 셀 문자 한도(32,767자)를 초과했습니다. PDF 또는 더 좁은 범위를 사용하세요.");
+        throw AppError(ErrorCode::XLSXEXPORT_005, {});
     x.writeStartElement("c");
     x.writeAttribute("r", ref);
     x.writeAttribute("s", QString::number(style));
@@ -126,13 +127,12 @@ double rowHeight(const std::vector<QString> &values, const std::vector<int> &wid
     }
     const auto h = std::max(minimum, lines * 15.0 + 8);
     if (h > 409)
-        throw std::runtime_error(
-            "엑셀 행 표시 한도를 초과하는 긴 내용이 있습니다. PDF 내보내기를 사용하거나 범위를 좁히세요.");
+        throw AppError(ErrorCode::XLSXEXPORT_006, {});
     return h;
 }
 QByteArray sheet(const ProjectReport &r, const ReportTable &t) {
     if (t.rows.size() > 1048570 || t.columns.size() > 16384 || t.columns.empty())
-        throw std::runtime_error("엑셀 시트 행/열 한도를 초과했습니다.");
+        throw AppError(ErrorCode::XLSXEXPORT_007, {});
     return xml([&](auto &x) {
         x.writeStartElement("worksheet");
         x.writeDefaultNamespace(mainNs);
@@ -315,7 +315,7 @@ void exportXlsx(const ProjectReport &r, const QString &path, ReportFamily family
         if (includeTable(t, family))
             tables.push_back(&t);
     if (tables.empty() || tables.size() > 100)
-        throw std::runtime_error("내보낼 보고서가 없거나 시트 수 한도 초과입니다.");
+        throw AppError(ErrorCode::XLSXEXPORT_008, {});
     ExportFile file(path, "xlsx");
     Zip zip(file.file);
     zip.add(
@@ -381,7 +381,7 @@ void exportXlsx(const ProjectReport &r, const QString &path, ReportFamily family
             for (std::size_t i = 0; i < tables.size(); ++i) {
                 auto title = reportText(tables[i]->title);
                 if (title.size() > 31)
-                    throw std::runtime_error("엑셀 시트 이름 한도 초과입니다.");
+                    throw AppError(ErrorCode::XLSXEXPORT_009, {});
                 empty(x, "sheet",
                       {{"name", title}, {"sheetId", QString::number(i + 1)}, {"r:id", "rId" + QString::number(i + 1)}});
             }

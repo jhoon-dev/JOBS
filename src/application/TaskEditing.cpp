@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "application/Document.h"
 #include "calculation/Effort.h"
 #include <algorithm>
@@ -9,7 +10,7 @@ namespace jobs {
 namespace {
 std::unordered_set<std::string> selected(const Project &p, const std::vector<std::string> &ids) {
     if (ids.empty() || ids.size() > 10000)
-        throw std::runtime_error("한 번에 1~10,000개 작업을 선택하세요.");
+        throw AppError(ErrorCode::TASK_SELECTION_LIMIT, {});
     std::unordered_set<std::string> available, result;
     for (const auto &t : p.tasks) {
         calculationCheckpoint();
@@ -17,7 +18,7 @@ std::unordered_set<std::string> selected(const Project &p, const std::vector<std
     }
     for (const auto &id : ids)
         if (!available.contains(id) || !result.insert(id).second)
-            throw std::runtime_error("선택 작업이 변경되었거나 ID가 중복되었습니다. 다시 선택하세요.");
+            throw AppError(ErrorCode::TASK_SELECTION_STALE, {});
     return result;
 }
 void validateGraph(const Project &p) {
@@ -31,7 +32,7 @@ void validateGraph(const Project &p) {
         calculationCheckpoint();
         for (const auto &prev : p.tasks[i].predecessors) {
             if (!ids.contains(prev) || ids.at(prev) == i)
-                throw std::runtime_error("선행 작업 참조가 없거나 자기 참조입니다: " + p.tasks[i].name);
+                throw AppError(ErrorCode::PREDECESSOR_REFERENCE_INVALID, {diagnosticArgument(p.tasks[i].name)});
             next[ids.at(prev)].push_back(i);
             ++degree[i];
         }
@@ -49,20 +50,20 @@ void validateGraph(const Project &p) {
                 ready.push_back(j);
     }
     if (count != p.tasks.size())
-        throw std::runtime_error("선행관계에 순환이 있습니다. 붙여넣기를 적용하지 않았습니다.");
+        throw AppError(ErrorCode::DEPENDENCY_CYCLE, {});
 }
 } // namespace
 std::vector<std::string> Document::insertTasks(const std::vector<std::string> &names, const std::string &beforeId,
                                                const std::string &wbsId) {
     requireEditable();
     if (names.empty() || names.size() > 10000)
-        throw std::runtime_error("한 번에 1~10,000개 작업 이름을 입력하세요.");
+        throw AppError(ErrorCode::TASK_INSERT_LIMIT, {});
     auto p = *project_;
     auto position = p.tasks.end();
     if (!beforeId.empty()) {
         position = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == beforeId; });
         if (position == p.tasks.end())
-            throw std::runtime_error("삽입 기준 작업이 변경되었습니다.");
+            throw AppError(ErrorCode::INSERT_REFERENCE_STALE, {});
     }
     std::vector<Task> added;
     std::vector<std::string> ids;
@@ -78,7 +79,7 @@ std::vector<std::string> Document::insertTasks(const std::vector<std::string> &n
 }
 TaskRemoval Document::previewRemoveTasks(const std::vector<std::string> &ids) const {
     if (!project_)
-        throw std::runtime_error("열린 프로젝트가 없습니다.");
+        throw AppError(ErrorCode::DOCUMENT_NOT_OPEN, {});
     return previewRemoveTasks(*project_, ids);
 }
 TaskRemoval Document::previewRemoveTasks(const Project &project, const std::vector<std::string> &ids) {
@@ -112,7 +113,7 @@ void Document::removeTasks(const std::vector<std::string> &ids) {
     requireEditable();
     const auto summary = previewRemoveTasks(ids);
     if (!summary.protectedTaskIds.empty())
-        throw std::runtime_error("실적/원가 보고 이력이 있는 작업은 삭제할 수 없습니다. 승인·실제 원장을 보존합니다.");
+        throw AppError(ErrorCode::TASK_HAS_FACTS, {});
     auto p = *project_;
     const auto targets = selected(p, ids);
     std::erase_if(p.tasks, [&](const auto &t) { return targets.contains(t.id); });
@@ -171,7 +172,7 @@ std::vector<std::string> Document::duplicateTasks(const std::vector<std::string>
 void Document::editTasks(const std::vector<TaskEdit> &changes) {
     requireEditable();
     if (changes.empty() || changes.size() > 10000)
-        throw std::runtime_error("한 번에 1~10,000개 작업을 편집하세요.");
+        throw AppError(ErrorCode::TASK_EDIT_LIMIT, {});
     auto p = *project_;
     std::unordered_map<std::string, std::size_t> indices;
     for (std::size_t i = 0; i < p.tasks.size(); ++i)
@@ -182,7 +183,7 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
     for (const auto &e : changes) {
         calculationCheckpoint();
         if (!indices.contains(e.taskId) || !seen.insert(e.taskId).second)
-            throw std::runtime_error("일괄 편집 대상 ID가 없거나 중복되었습니다.");
+            throw AppError(ErrorCode::TASK_EDIT_TARGET_INVALID, {});
         const auto i = indices.at(e.taskId);
         auto &t = p.tasks[i];
         ordered[i] = &e;
@@ -218,7 +219,9 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
             try {
                 changeDuration(p, i, *e->duration, true);
             } catch (const std::exception &error) {
-                throw std::runtime_error("작업 " + p.tasks[i].name + " · 기간: " + error.what());
+                auto diagnostic = diagnosticFromException(error, "TASK_EDIT_FAILED", {p.tasks[i].id});
+                diagnostic.arguments = {p.tasks[i].name};
+                throw AppError(std::move(diagnostic));
             }
         }
     const bool inverse = std::any_of(ordered.begin(), ordered.end(), [&](const auto &item) {
@@ -232,7 +235,7 @@ void Document::editPlan(Project p, std::string label, bool validated) {
     if (static_cast<const PlanInput &>(p) == static_cast<const PlanInput &>(*project_))
         return;
     if (p.revision >= 9007199254740991ULL)
-        throw std::runtime_error("프로젝트 revision 한도를 초과했습니다.");
+        throw AppError(ErrorCode::PROJECT_REVISION_LIMIT, {});
     if (!validated)
         validatePlan(p);
     std::unordered_set<std::string> ids;

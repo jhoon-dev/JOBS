@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
 #include "calculation/Effort.h"
@@ -45,7 +46,7 @@ EffortPreview previewEffort(const Project &snapshot, const Task &task,
     } catch (const CalculationCancelled &) {
         return {{}, {}, "미리보기 계산을 취소했습니다."};
     } catch (const std::exception &error) {
-        return {{}, {}, QString::fromUtf8(error.what())};
+        return {{}, {}, qErrorText(error)};
     }
 }
 } // namespace
@@ -199,7 +200,7 @@ void MainWindow::editTaskEffort() {
         try {
             if (!document_.project() || document_.project()->documentId != snapshot->documentId ||
                 document_.project()->revision != snapshot->revision || document_.sessionGeneration() != session)
-                throw std::runtime_error("문서가 변경되었습니다. 편집 창을 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWEFFORT_001, {});
             auto minutes = task.durationMinutes, hours = task.workUnitMinutes;
             bool okay = false;
             if (duration->isEnabled()) {
@@ -207,7 +208,7 @@ void MainWindow::editTaskEffort() {
                 if (!duration->text().trimmed().isEmpty()) {
                     const auto value = duration->text().trimmed().toLongLong(&okay);
                     if (!okay || value < 0 || value > 5000000)
-                        throw std::runtime_error("기간은 0~5,000,000 근무분 정수입니다.");
+                        throw AppError(ErrorCode::MAINWINDOWEFFORT_002, {});
                     minutes = value;
                 }
             }
@@ -216,7 +217,7 @@ void MainWindow::editTaskEffort() {
                 if (!work->text().trimmed().isEmpty()) {
                     const auto value = work->text().trimmed().toDouble(&okay);
                     if (!okay || !std::isfinite(value) || value < 0 || value > double(maxWork) / 6000.0)
-                        throw std::runtime_error("공수 범위를 확인하세요.");
+                        throw AppError(ErrorCode::MAINWINDOWEFFORT_003, {});
                     hours = std::llround(value * 6000.0);
                 }
             }
@@ -224,7 +225,7 @@ void MainWindow::editTaskEffort() {
             for (const auto &line : gaps->toPlainText().split('\n', Qt::SkipEmptyParts)) {
                 const auto parts = line.split('|');
                 if (parts.size() != 2)
-                    throw std::runtime_error("중단 시작 | 재개 시각으로 입력하세요.");
+                    throw AppError(ErrorCode::MAINWINDOWEFFORT_004, {});
                 breaks.push_back({parts[0].trimmed().toStdString(), parts[1].trimmed().toStdString()});
             }
             previewControl->cancel();
@@ -236,7 +237,7 @@ void MainWindow::editTaskEffort() {
                                  fields();
                              });
         } catch (const std::exception &exception) {
-            error->setText(QString::fromUtf8(exception.what()));
+            error->setText(qErrorText(exception));
         }
     });
     dialog.exec();

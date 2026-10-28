@@ -1,3 +1,5 @@
+#include "formatting/DiagnosticText.h"
+#include "formatting/DiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "calculation/Reports.h"
 #include "calculation/Constraints.h"
@@ -60,7 +62,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
     validate(p);
     if (o.reportId.empty() || !validUtcStamp(o.generatedAt) || (o.fromDate && !validDate(*o.fromDate)) ||
         (o.toDate && !validDate(*o.toDate)) || (o.fromDate && o.toDate && *o.fromDate > *o.toDate))
-        throw std::runtime_error("보고서 ID·생성 시각·일별 명세 기간이 잘못되었습니다.");
+        throw AppError(ErrorCode::REPORT_OPTIONS_INVALID, {});
     ProjectReport report;
     report.projectName = p.name;
     report.documentId = p.documentId;
@@ -482,7 +484,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
                     refs += ", ";
                 refs += id;
             }
-            diagnostics.rows.push_back({text(source), text(d.code), text(d.message), text(refs)});
+            diagnostics.rows.push_back({text(source), text(d.code), text(diagnosticMessage(d)), text(refs)});
         }
     };
     append("계획 일정", comparison.plan.diagnostics);
@@ -556,11 +558,11 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
     for (const auto &t : report.tables) {
         for (const auto &r : t.rows)
             if (r.size() != t.columns.size())
-                throw std::runtime_error("보고서 열 개수가 일치하지 않습니다.");
+                throw AppError(ErrorCode::REPORT_COLUMN_MISMATCH, {});
         cells += t.rows.size() * t.columns.size();
     }
     if (cells > 1000000)
-        throw std::runtime_error("한 보고서의 100만 셀 한도를 초과했습니다. WBS 또는 일별 명세 기간을 좁히세요.");
+        throw AppError(ErrorCode::REPORT_CELL_LIMIT, {});
     return report;
 }
 } // namespace jobs

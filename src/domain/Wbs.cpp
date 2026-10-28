@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "domain/Wbs.h"
 #include <unordered_map>
 #include <stdexcept>
@@ -10,7 +11,7 @@ std::unordered_set<std::string> wbsSubtree(const PlanInput &p, const std::string
         found |= node.id == id;
     }
     if (!found)
-        throw std::runtime_error("선택한 WBS가 존재하지 않습니다.");
+        throw AppError(ErrorCode::WBS_NOT_FOUND, {}, {}, "WBS_NOT_FOUND_2");
     std::unordered_set<std::string> result;
     std::vector<std::string> pending{id};
     while (!pending.empty()) {

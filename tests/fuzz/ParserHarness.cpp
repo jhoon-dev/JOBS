@@ -3,6 +3,7 @@
 #include "persistence/ProjectJson.h"
 #include "persistence/ProjectXml.h"
 #include "persistence/PrimaveraXer.h"
+#include "persistence/WorkspaceFile.h"
 #include <QJsonDocument>
 #include <stdexcept>
 
@@ -35,6 +36,8 @@ ProbeResult probe(std::string_view parser, const QByteArray &bytes) {
     } else if (parser == "xer") {
         for (auto encoding : {XerEncoding::Utf8, XerEncoding::Windows1252})
             attempt(result, [&] { (void)importPrimaveraXer(bytes, "fuzz.xer", encoding); });
+    } else if (parser == "workspace") {
+        attempt(result, [&] { (void)decodeWorkspaceFile(bytes, QStringLiteral("/fuzz")); });
     } else {
         throw std::logic_error("unknown parser harness");
     }

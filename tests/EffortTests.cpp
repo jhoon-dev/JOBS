@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "application/Document.h"
 #include "calculation/Effort.h"
 #include "calculation/Costs.h"
@@ -49,7 +50,7 @@ jobs::TaskSchedule row(const jobs::Project &p, std::size_t i = 0) {
     auto r = jobs::calculatePlan(p);
     if (r.status != jobs::CalculationStatus::Valid) {
         for (const auto &d : r.diagnostics)
-            std::cerr << d.code << " " << d.message << '\n';
+            std::cerr << d.code << " " << d.code << '\n';
         throw std::runtime_error("expected valid effort schedule");
     }
     return r.tasks.at(i);

@@ -6,7 +6,7 @@ import sys
 
 build = Path(sys.argv[1] if len(sys.argv) > 1 else "build-sanitized")
 commands = json.loads((build / "compile_commands.json").read_text())
-required_coverage = {"jobs_domain", "jobs_application", "jobs_calculation", "jobs_persistence", "jobs_parser_harness"}
+required_coverage = {"jobs_domain", "jobs_formatting", "jobs_application", "jobs_calculation", "jobs_persistence", "jobs_parser_harness"}
 seen = set()
 fuzz_entries = 0
 checked = []
@@ -26,7 +26,7 @@ for entry in commands:
     if source.name == "FuzzerEntry.cpp":
         assert "-fsanitize=fuzzer" in args, source
         fuzz_entries += 1
-assert seen == required_coverage and fuzz_entries == 3, (seen, fuzz_entries)
+assert seen == required_coverage and fuzz_entries == 4, (seen, fuzz_entries)
 (build / "instrumentation.json").write_text(json.dumps({"status": "success", "coverage_targets": sorted(seen),
     "fuzz_entries": fuzz_entries, "checked_translation_units": checked}, indent=2), encoding="utf-8")
-print(f"PASS: ASan/UBSan in {len(checked)} translation units; coverage in all five parser/dependency libraries")
+print(f"PASS: ASan/UBSan in {len(checked)} translation units; coverage in all {len(seen)} parser/dependency libraries")

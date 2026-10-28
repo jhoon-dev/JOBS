@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "application/Document.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Effort.h"
@@ -10,7 +11,7 @@ bool Document::isEditable() const {
 }
 void Document::requireEditable() const {
     if (!isEditable())
-        throw std::runtime_error("편집 가능한 프로젝트가 없습니다.");
+        throw AppError(ErrorCode::DOCUMENT_NOT_EDITABLE, {});
 }
 void Document::create(std::string name, std::string date, const std::vector<std::string> &tasks) {
     Project p;
@@ -89,7 +90,7 @@ void Document::renameTask(std::size_t row, std::string name) {
         return;
     validateTaskName(name);
     if (project_->revision >= 9007199254740991ULL)
-        throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+        throw AppError(ErrorCode::PROJECT_ID_REVISION_INVALID, {});
     TaskNameDelta delta{row, task.id, task.name, name};
     const auto weight = sizeof(HistoryStep) + delta.taskId.size() + delta.before.size() + delta.after.size();
     pushHistory({std::move(delta), "작업 이름 변경", weight + std::string("작업 이름 변경").size()});
@@ -121,7 +122,7 @@ void Document::renameWbs(const std::string &id, std::string name) {
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto &n) { return n.id == id; });
     if (it == p.wbsNodes.end())
-        throw std::runtime_error("WBS가 존재하지 않습니다.");
+        throw AppError(ErrorCode::WBS_NOT_FOUND, {});
     it->name = std::move(name);
     edit(std::move(p), "WBS 이름 변경");
 }
@@ -130,7 +131,7 @@ void Document::moveWbs(const std::string &id, std::string parentId) {
     auto p = *project_;
     auto it = std::find_if(p.wbsNodes.begin(), p.wbsNodes.end(), [&](const auto &n) { return n.id == id; });
     if (it == p.wbsNodes.end())
-        throw std::runtime_error("WBS가 존재하지 않습니다.");
+        throw AppError(ErrorCode::WBS_NOT_FOUND, {});
     it->parentId = std::move(parentId);
     edit(std::move(p), "WBS 이동");
 }
@@ -139,13 +140,13 @@ void Document::removeWbs(const std::string &id) {
     auto p = *project_;
     for (const auto &n : p.wbsNodes)
         if (n.parentId == id)
-            throw std::runtime_error("하위 WBS를 먼저 이동하거나 제거하세요.");
+            throw AppError(ErrorCode::WBS_HAS_CHILDREN, {});
     for (const auto &t : p.tasks)
         if (t.wbsId == id)
-            throw std::runtime_error("소속 작업을 먼저 다른 WBS로 이동하세요.");
+            throw AppError(ErrorCode::WBS_HAS_TASKS, {});
     const auto count = std::erase_if(p.wbsNodes, [&](const auto &n) { return n.id == id; });
     if (!count)
-        throw std::runtime_error("WBS가 존재하지 않습니다.");
+        throw AppError(ErrorCode::WBS_NOT_FOUND, {});
     edit(std::move(p), "빈 WBS 삭제");
 }
 void Document::assignWbs(std::size_t row, std::string id) {
@@ -165,7 +166,7 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
     // For a valid project these fields only affect the task's duration/work basis.
     // Reports retain their own captured plan duration; IDs/references stay fixed.
     if (minutes && (*minutes < 0 || *minutes > 5000000))
-        throw std::runtime_error("기간은 0~5,000,000 근무분 또는 미정이어야 합니다.");
+        throw AppError(ErrorCode::TASK_DURATION_INVALID, {});
     auto before = project_->tasks.at(row), after = before;
     after.durationMinutes = minutes;
     if (after.taskType == TaskType::FixedUnits) {
@@ -175,7 +176,7 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
     if (before == after)
         return;
     if (project_->revision >= 9007199254740991ULL)
-        throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+        throw AppError(ErrorCode::PROJECT_ID_REVISION_INVALID, {});
     auto values = std::make_shared<const std::pair<Task, Task>>(before, after);
     const auto weight = sizeof(HistoryStep) + sizeof(*values) + inputExtraBytes(before) + inputExtraBytes(after) + 32;
     // Detach before changing history so allocation failure is not a partial edit.
@@ -201,7 +202,7 @@ void Document::setTaskEffort(std::size_t row, TaskType type, bool workInput, std
     t.workUnitMinutes.reset();
     if (t.taskType == TaskType::FixedWork || workInput) {
         if (!work)
-            throw std::runtime_error("공수 입력이 필요합니다.");
+            throw AppError(ErrorCode::WORK_INPUT_REQUIRED, {});
         changeWork(p, row, *work);
         if (t.taskType == TaskType::FixedWork && !workInput)
             changeDuration(p, row, duration);
@@ -250,12 +251,12 @@ void Document::removeCalendar(const std::string &id) {
     auto p = *project_;
     for (const auto &t : p.tasks)
         if (t.calendarId == id)
-            throw std::runtime_error("작업의 달력을 먼저 변경하세요.");
+            throw AppError(ErrorCode::CALENDAR_HAS_TASKS, {});
     for (const auto &r : p.resources)
         if (r.calendarId == id)
-            throw std::runtime_error("자원의 달력을 먼저 변경하세요.");
+            throw AppError(ErrorCode::CALENDAR_HAS_RESOURCES, {});
     if (!std::erase_if(p.calendars, [&](const auto &c) { return c.id == id; }))
-        throw std::runtime_error("달력이 존재하지 않습니다.");
+        throw AppError(ErrorCode::CALENDAR_NOT_FOUND, {});
     edit(std::move(p), "작업 달력 삭제");
 }
 void Document::setTaskCalendar(std::size_t row, std::string id) {
@@ -285,25 +286,23 @@ void Document::editGantt(const std::string &id, std::uint64_t revision, const st
     if (!isEditable() || project_->documentId != id || project_->revision != revision || !calculation_ ||
         calculation_->status != CalculationStatus::Valid || calculation_->inputRevision != revision ||
         project_->statusAt)
-        throw std::runtime_error(
-            "최신 계획 일정에서만 드래그할 수 있습니다. 실제/잔여 예측은 실적·잔여 입력을 사용하세요.");
+        throw AppError(ErrorCode::GANTT_REQUIRES_CURRENT_PLAN, {});
     if (!validStamp(target))
-        throw std::runtime_error("드래그 시각이 잘못되었습니다.");
+        throw AppError(ErrorCode::GANTT_TIMESTAMP_INVALID, {});
     auto p = *project_;
     auto it = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == taskId; });
     auto row = std::find_if(calculation_->tasks.begin(), calculation_->tasks.end(),
                             [&](const auto &t) { return t.taskId == taskId; });
     if (it == p.tasks.end() || row == calculation_->tasks.end() || (!it->durationMinutes && !usesWork(*it)))
-        throw std::runtime_error("편집할 작업이 없습니다.");
+        throw AppError(ErrorCode::TASK_NOT_FOUND, {});
     if (std::any_of(p.progress.begin(), p.progress.end(),
                     [&](const auto &e) { return e.taskId == taskId && e.actualStart.has_value(); }))
-        throw std::runtime_error("실제 시작 이력이 있는 작업은 간트 드래그 대신 실적/잔여를 편집하세요.");
+        throw AppError(ErrorCode::GANTT_HAS_ACTUAL_PROGRESS, {});
     WorkCalendar cal(p, *it);
     if (resize) {
         const auto duration = cal.offset(target) - cal.offset(row->start);
         if (duration <= 0 || duration > 5000000 || row->start == row->finish)
-            throw std::runtime_error(
-                "오른쪽 끝은 시작 뒤의 양수 근무 기간이어야 합니다. 마일스톤은 기간 표에서 편집하세요.");
+            throw AppError(ErrorCode::GANTT_DURATION_INVALID, {});
         if (duration == cal.offset(row->finish) - cal.offset(row->start))
             return;
         changeDuration(p, std::size_t(it - p.tasks.begin()), duration);
@@ -344,7 +343,7 @@ std::string Document::appendBaseline(Baseline b) {
     requireEditable();
     if (b.sourceDocumentId != project_->documentId || b.inputRevision != project_->revision ||
         b.input != static_cast<const PlanInput &>(*project_))
-        throw std::runtime_error("기준선 준비 중 문서가 변경되었습니다. 최신 계획으로 다시 저장하세요.");
+        throw AppError(ErrorCode::BASELINE_SOURCE_CHANGED, {});
     verifyBaseline(b);
     auto p = *project_;
     b.id = store_.newId();
@@ -361,7 +360,7 @@ std::string Document::captureBaseline(std::string name, std::string author, std:
 }
 void Document::recordProgress(ProgressEntry entry) {
     if (!isEditable() || !project_->statusAt)
-        throw std::runtime_error("실적 보고 전에 상태일을 설정하세요.");
+        throw AppError(ErrorCode::STATUS_DATE_REQUIRED, {});
     auto p = *project_;
     entry.id = store_.newId();
     entry.statusAt = *p.statusAt;
@@ -369,7 +368,7 @@ void Document::recordProgress(ProgressEntry entry) {
     entry.sourceDocumentId = p.documentId;
     const auto task = std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == entry.taskId; });
     if (task == p.tasks.end())
-        throw std::runtime_error("보고할 작업이 존재하지 않습니다.");
+        throw AppError(ErrorCode::PROGRESS_TASK_NOT_FOUND, {});
     entry.planDurationMinutes = task->durationMinutes;
     if (isEffort(p) && usesWork(*task)) {
         const auto plan = calculatePlan(p);
@@ -412,8 +411,7 @@ void Document::setCurrency(std::string currency) {
     for (const auto &s : project_->scenarios)
         used = used || monetary(s.input);
     if (used)
-        throw std::runtime_error(
-            "단가·예산·원가 이력이 있는 문서의 통화를 재해석할 수 없습니다. 새 프로젝트에서 통화를 먼저 설정하세요.");
+        throw AppError(ErrorCode::CURRENCY_HAS_HISTORY, {});
     auto p = *project_;
     p.currency = std::move(currency);
     edit(std::move(p), "프로젝트 통화 변경");
@@ -431,7 +429,7 @@ void Document::setTaskCost(TaskCost cost) {
 }
 void Document::recordCost(CostEntry entry) {
     if (!isEditable() || !project_->statusAt)
-        throw std::runtime_error("원가 보고 전에 편집 가능한 프로젝트와 상태일이 필요합니다.");
+        throw AppError(ErrorCode::COST_STATUS_DATE_REQUIRED, {});
     auto p = *project_;
     entry.id = store_.newId();
     entry.statusAt = *p.statusAt;
@@ -459,7 +457,7 @@ std::string Document::putResource(Resource r) {
         auto it =
             std::find_if(p.resources.begin(), p.resources.end(), [&](const auto &item) { return item.id == r.id; });
         if (it == p.resources.end())
-            throw std::runtime_error("자원이 존재하지 않습니다.");
+            throw AppError(ErrorCode::RESOURCE_NOT_FOUND, {});
         *it = r;
     }
     auto id = r.id;
@@ -471,19 +469,19 @@ void Document::removeResource(const std::string &id) {
     auto p = *project_;
     for (const auto &a : p.assignments)
         if (a.resourceId == id)
-            throw std::runtime_error("작업 배정을 먼저 해제하세요.");
+            throw AppError(ErrorCode::RESOURCE_HAS_ASSIGNMENTS, {});
     if (!std::erase_if(p.resources, [&](const auto &r) { return r.id == id; }))
-        throw std::runtime_error("자원이 존재하지 않습니다.");
+        throw AppError(ErrorCode::RESOURCE_NOT_FOUND, {});
     edit(std::move(p), "자원 삭제");
 }
 void Document::setAssignments(const std::string &id, std::vector<Assignment> assignments) {
     requireEditable();
     auto p = *project_;
     if (std::none_of(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == id; }))
-        throw std::runtime_error("작업이 존재하지 않습니다.");
+        throw AppError(ErrorCode::TASK_NOT_FOUND, {}, {}, "TASK_NOT_FOUND_2");
     for (auto &a : assignments) {
         if (a.taskId != id)
-            throw std::runtime_error("다른 작업의 배정이 포함되었습니다.");
+            throw AppError(ErrorCode::ASSIGNMENT_TASK_MISMATCH, {});
     }
     std::vector<Assignment> previous;
     for (const auto &a : p.assignments)
@@ -519,7 +517,7 @@ std::string Document::saveScenario(std::string name, std::string priority, int h
                                    const std::string &sourceId, std::uint64_t sourceRevision) {
     requireEditable();
     if (sourceId != project_->documentId || sourceRevision != project_->revision)
-        throw std::runtime_error("비교 중 문서가 변경되었습니다. 최신 입력으로 다시 계산하세요.");
+        throw AppError(ErrorCode::SCENARIO_SOURCE_CHANGED, {});
     auto p = *project_;
     LevelingScenario s;
     s.id = store_.newId();
@@ -575,7 +573,7 @@ void Document::applyCalculation(ScheduleResult result) {
 }
 void Document::save() {
     if (!isEditable() || path_.empty() || requiresSaveAs_)
-        throw std::runtime_error("다른 이름으로 저장하세요. 이전 형식의 원본은 보존합니다.");
+        throw AppError(ErrorCode::LEGACY_REQUIRES_SAVE_AS, {});
     auto fingerprint = store_.save(path_, *project_, fingerprint_);
     fingerprint_ = std::move(fingerprint);
     dirty_ = false;
@@ -587,10 +585,10 @@ void Document::save() {
 }
 void Document::saveAs(const std::string &path) {
     if (!project_)
-        throw std::runtime_error("열린 프로젝트가 없습니다.");
+        throw AppError(ErrorCode::DOCUMENT_NOT_OPEN, {});
     auto normalized = store_.normalizePath(path);
     if (store_.sameFile(normalized, path_)) {
-        throw std::runtime_error("독립 사본은 현재 파일과 다른 경로에 저장하세요.");
+        throw AppError(ErrorCode::SAVE_AS_REQUIRES_NEW_PATH, {});
     }
     auto lease = store_.lock(normalized);
     auto p = *project_;
@@ -673,7 +671,7 @@ void Document::pushHistory(HistoryStep step) {
 void Document::applyHistory(const HistoryStep &step, bool forward) {
     if (const auto *delta = std::get_if<TaskNameDelta>(&step.change)) {
         if (project_->revision >= 9007199254740991ULL)
-            throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+            throw AppError(ErrorCode::PROJECT_ID_REVISION_INVALID, {});
         auto before = project_->tasks.at(delta->row);
         auto &task = project_.write().tasks.at(delta->row);
         if (task.id != delta->taskId)
@@ -685,7 +683,7 @@ void Document::applyHistory(const HistoryStep &step, bool forward) {
         taskChange_ = TaskChange{project_->revision - 1, project_->revision, delta->row, true};
     } else if (const auto *value = std::get_if<HistoryStep::TaskValue>(&step.change)) {
         if (project_->revision >= 9007199254740991ULL)
-            throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+            throw AppError(ErrorCode::PROJECT_ID_REVISION_INVALID, {});
         auto before = project_->tasks.at(value->row);
         auto after = forward ? value->values->second : value->values->first;
         if (before.id != after.id)
@@ -697,7 +695,7 @@ void Document::applyHistory(const HistoryStep &step, bool forward) {
         taskChange_ = TaskChange{p.revision - 1, p.revision, value->row, false};
     } else {
         if (project_->revision >= 9007199254740991ULL)
-            throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
+            throw AppError(ErrorCode::PROJECT_ID_REVISION_INVALID, {});
         auto p = *project_;
         std::get<std::shared_ptr<const InputDelta>>(step.change)->apply(p, forward);
         ++p.revision;
@@ -716,14 +714,14 @@ bool Document::historyNeedsWorker(bool redo) const {
 }
 void Document::undo() {
     if (!canUndo())
-        throw std::runtime_error("실행 취소할 편집이 없습니다.");
+        throw AppError(ErrorCode::NOTHING_TO_UNDO, {});
     applyHistory(history_[historyCursor_ - 1], false);
     --historyCursor_;
     notify(Event::Edited);
 }
 void Document::redo() {
     if (!canRedo())
-        throw std::runtime_error("다시 실행할 편집이 없습니다.");
+        throw AppError(ErrorCode::NOTHING_TO_REDO, {});
     applyHistory(history_[historyCursor_], true);
     ++historyCursor_;
     notify(Event::Edited);
@@ -762,7 +760,7 @@ RecoverySnapshot Document::recoverySnapshot(std::string utc) const {
 }
 std::function<RecoverySnapshot()> Document::recoverySnapshotRequest(std::string utc) const {
     if (!isEditable() || !dirty_ || !validUtcStamp(utc))
-        throw std::runtime_error("자동 복구 저장할 편집 가능한 미저장 문서/시각이 없습니다.");
+        throw AppError(ErrorCode::RECOVERY_SNAPSHOT_INVALID, {});
     return
         [input = snapshot(), path = path_, fingerprint = fingerprint_, captured = std::move(utc), readOnly = readOnly_,
          saveAs = requiresSaveAs_, saved = savedState_ ? std::optional{savedState_->revision} : std::nullopt] {
@@ -772,7 +770,7 @@ std::function<RecoverySnapshot()> Document::recoverySnapshotRequest(std::string 
 void Document::recover(const RecoverySnapshot &snapshot) {
     validate(snapshot.project);
     if (!validUtcStamp(snapshot.capturedAt))
-        throw std::runtime_error("복구 시각이 잘못되었습니다.");
+        throw AppError(ErrorCode::RECOVERY_TIMESTAMP_INVALID, {});
     auto p = snapshot.project;
     p.derivedFrom = p.documentId;
     p.documentId = store_.newId();

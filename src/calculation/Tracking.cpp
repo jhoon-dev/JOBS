@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "formatting/PlanTokens.h"
 #include "calculation/Tracking.h"
 #include "calculation/WorkCalendar.h"
@@ -61,7 +62,7 @@ std::string wbsPath(const PlanInput &p, std::string id) {
 Baseline prepareBaseline(const Project &p, std::string name, std::string author, std::string reason, std::string utc) {
     auto plan = calculatePlan(p);
     if (plan.status != CalculationStatus::Valid)
-        throw std::runtime_error("기준선에는 기간·참조·순환 오류가 없는 완성된 현재 계획이 필요합니다.");
+        throw AppError(ErrorCode::BASELINE_REQUIRES_VALID_PLAN, {});
     Baseline b;
     b.name = std::move(name);
     b.approvedBy = std::move(author);
@@ -79,7 +80,7 @@ void verifyBaseline(const Baseline &b) {
     auto expected = calculatePlan(baselineProject(b));
     if (expected.status != CalculationStatus::Valid || expected.tasks != b.schedule ||
         expected.projectFinish != b.projectFinish || expected.engineVersion != b.engineVersion)
-        throw std::runtime_error("기준선의 고정 입력과 저장된 계산 결과가 일치하지 않습니다.");
+        throw AppError(ErrorCode::BASELINE_RESULT_MISMATCH, {});
 }
 ComparisonReport compareToBaseline(const Project &p, const std::string &baselineId) {
     ComparisonReport report;
@@ -93,7 +94,7 @@ ComparisonReport compareToBaseline(const Project &p, const std::string &baseline
         if (b.id == baselineId)
             baseline = &b;
     if (!baselineId.empty() && !baseline)
-        throw std::runtime_error("비교할 기준선이 존재하지 않습니다.");
+        throw AppError(ErrorCode::BASELINE_NOT_FOUND, {}, {}, "BASELINE_NOT_FOUND_2");
     std::optional<WorkCalendar> calendar;
     std::unordered_map<std::string, const Task *> before;
     std::unordered_map<std::string, const TaskSchedule *> baselineDates, planDates, forecastDates;

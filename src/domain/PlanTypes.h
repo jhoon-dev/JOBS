@@ -1,5 +1,5 @@
 #pragma once
-#include <stdexcept>
+#include "domain/Diagnostics.h"
 
 namespace jobs {
 enum class DependencyType { FS, SS, FF, SF };
@@ -41,12 +41,12 @@ constexpr bool isValid(TaskType value) {
 }
 constexpr bool dependencyFromFinish(DependencyType value) {
     if (!isValid(value))
-        throw std::runtime_error("지원하지 않는 선행관계 종류입니다.");
+        throw AppError(ErrorCode::DEPENDENCY_RULE_INVALID);
     return value == DependencyType::FS || value == DependencyType::FF;
 }
 constexpr bool dependencyToFinish(DependencyType value) {
     if (!isValid(value))
-        throw std::runtime_error("지원하지 않는 선행관계 종류입니다.");
+        throw AppError(ErrorCode::DEPENDENCY_RULE_INVALID);
     return value == DependencyType::FF || value == DependencyType::SF;
 }
 } // namespace jobs

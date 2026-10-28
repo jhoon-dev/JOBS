@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/ResourceComparisonDialog.h"
 #include "calculation/WorkCalendar.h"
 #include <QComboBox>
@@ -349,7 +350,7 @@ void ResourceComparisonDialog::recalculate() {
                         QStringList ids;
                         for (const auto &id : d.taskIds)
                             ids << qs(id);
-                        messages << label + " [" + qs(d.code) + "] " + qs(d.message) +
+                        messages << label + " [" + qs(d.code) + "] " + qs(diagnosticMessage(d)) +
                                         (ids.empty() ? "" : " · " + ids.join(", "));
                     }
                 };
@@ -370,7 +371,7 @@ void ResourceComparisonDialog::recalculate() {
                 c.other = levelResources(*c.otherProject, secondary->priority, secondary->horizonWorkDays);
             }
         } catch (const std::exception &e) {
-            c.error = QString::fromUtf8(e.what());
+            c.error = qErrorText(e);
         }
         return c;
     }));
@@ -392,7 +393,7 @@ void ResourceComparisonDialog::saveScenario() {
         }
         recalculate();
     } catch (const std::exception &e) {
-        diagnostics_->setPlainText(QString::fromUtf8(e.what()));
+        diagnostics_->setPlainText(qErrorText(e));
     }
 }
 } // namespace jobs

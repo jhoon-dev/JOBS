@@ -243,12 +243,16 @@ public:
     const std::string &error() const {
         return error_;
     }
+    const std::optional<Diagnostic> &failure() const {
+        return failure_;
+    }
     std::vector<std::shared_ptr<const Project>> takeRetiredProjects();
 
 private:
     friend class Document;
     EditState state_ = EditState::Failed;
     std::string error_, documentId_, notice_;
+    std::optional<Diagnostic> failure_;
     std::uint64_t revision_ = 0, session_ = 0;
     std::shared_ptr<CalculationControl> control_;
     ProjectState proposal_, retired_;

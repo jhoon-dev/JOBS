@@ -43,7 +43,7 @@ def record(command, name, timeout):
 
 try:
     record([build / "jobs_parser_seed_tests", "--write-corpus", output / "corpus"], "seeds", 120)
-    for kind in ("jobs", "xml", "xer"):
+    for kind in ("jobs", "xml", "xer", "workspace"):
         artifacts = output / "artifacts" / kind
         artifacts.mkdir(parents=True, exist_ok=True)
         binary = build / f"jobs_fuzz_{kind}"

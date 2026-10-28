@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Constraints.h"
 #include "formatting/PlanTokens.h"
 #include <algorithm>
@@ -32,7 +33,7 @@ ConstraintWindow constraintWindow(const PlanInput &p, const Task &t, const WorkC
     if (fixed) {
         auto local = value - (start ? 0 : duration);
         if (local < 0 || cal.boundary(value, !start || duration == 0) != at)
-            throw std::runtime_error("고정 시각이 작업 달력의 유효한 시작/완료 경계가 아닙니다: " + at);
+            throw AppError(ErrorCode::CONSTRAINT_BOUNDARY_INVALID, {diagnosticArgument(at)});
         w.lower = local;
         w.upper = local;
     } else if (upper) {
@@ -60,11 +61,7 @@ std::optional<Diagnostic> timingViolation(const Task &t, const TaskSchedule &row
         return {};
     auto ids = row.drivingPredecessors;
     ids.insert(ids.begin(), t.id);
-    return Diagnostic{"CONSTRAINT_CONFLICT",
-                      t.name + " · " + constraintName(type) + " (" + enumToken(type) + ") " + bound +
-                          " · 선행관계/달력/상태일을 반영한 " + (start ? "시작 " : "완료 ") + actual +
-                          " · 기간·제약 날짜·선행 ID·작업 달력을 확인하세요.",
-                      std::move(ids)};
+    return Diagnostic{"CONSTRAINT_CONFLICT", {t.name, enumToken(type), bound, actual}, std::move(ids)};
 }
 std::optional<std::int64_t> deadlineSlack(const PlanInput &p, const Task &t, const std::string &finish) {
     if (!t.deadlineAt)
@@ -85,12 +82,8 @@ std::vector<Diagnostic> deadlineDiagnostics(const PlanInput &p, const std::vecto
             if (it == rows.end() || it->finish <= *t.deadlineAt)
                 continue;
             const auto slack = deadlineSlack(p, t, it->finish);
-            out.push_back({"DEADLINE_MISSED",
-                           t.name + " · 마감 " + *t.deadlineAt + " < " +
-                               (it->completedActual ? "실제 완료 " : "완료 ") + it->finish + " · 마감 여유 " +
-                               (slack ? std::to_string(*slack) + " 근무분" : "계산 범위 밖") +
-                               " · 마감일은 경고 기준이며 날짜를 강제로 이동하지 않습니다.",
-                           {t.id}});
+            out.push_back(
+                {"DEADLINE_MISSED", {t.name, *t.deadlineAt, it->finish, slack ? std::to_string(*slack) : "?"}, {t.id}});
         }
     return out;
 }
@@ -128,9 +121,9 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
             try {
                 bounds[i] = constraintWindow(p, t, cal, *t.durationMinutes);
             } catch (const std::exception &e) {
-                out.diagnostics.push_back({"CONSTRAINT_CALENDAR",
-                                           t.name + " · " + constraintName(t.constraintType) + " · " + e.what(),
-                                           {t.id}});
+                auto issue = diagnosticFromException(e, "CONSTRAINT_CALENDAR", {t.id});
+                issue.calendarIds = {t.calendarId};
+                out.diagnostics.push_back(std::move(issue));
                 continue;
             }
             early[i] = bounds[i].lower;
@@ -213,18 +206,14 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
         out.projectFinish = finish;
         out.status = CalculationStatus::Valid;
         out.diagnostics = deadlineDiagnostics(p, out.tasks);
-        out.diagnostics.push_back(
-            {"CONSTRAINT_POLICY",
-             "선행관계·작업 달력·날짜 제약을 함께 적용합니다. ALAP은 현재 프로젝트 완료일 안에서 후행 작업을 늦추지 "
-             "않는 가장 늦은 배치입니다. 마감일은 경고/마감 여유이며 CPM 여유를 변경하지 않습니다.",
-             {}});
+        out.diagnostics.push_back({"CONSTRAINT_POLICY", {}, {}, "CONSTRAINT_POLICY"});
     } catch (const std::exception &e) {
         out.status = CalculationStatus::Conflict;
         out.tasks.clear();
         out.projectFinish.reset();
-        out.diagnostics.push_back(
-            {"CONSTRAINT_HORIZON", e.what(),
-             currentTask.empty() ? std::vector<std::string>{} : std::vector<std::string>{currentTask}});
+        out.diagnostics.push_back(diagnosticFromException(e, "CONSTRAINT_HORIZON",
+                                                          currentTask.empty() ? std::vector<std::string>{}
+                                                                              : std::vector<std::string>{currentTask}));
     }
     return out;
 }

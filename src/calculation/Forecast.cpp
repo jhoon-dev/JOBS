@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Scheduler.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Pdm.h"
@@ -102,10 +103,7 @@ ScheduleResult calculate(const Project &p) {
             if (entry && entry->actualStart)
                 for (const auto &id : p.tasks[i].predecessors)
                     if (*entry->actualStart < rows[ids.at(id)].finish)
-                        result.diagnostics.push_back(
-                            {"OUT_OF_SEQUENCE",
-                             "실제 시작이 선행 완료보다 빠릅니다. 실제 날짜는 보존하고 잔여에 FS 논리를 적용했습니다.",
-                             {id, p.tasks[i].id}});
+                        result.diagnostics.push_back({"OUT_OF_SEQUENCE", {}, {id, p.tasks[i].id}, "OUT_OF_SEQUENCE_2"});
             if (!result.projectFinish || rows[i].finish > *result.projectFinish)
                 result.projectFinish = rows[i].finish;
         }
@@ -113,18 +111,13 @@ ScheduleResult calculate(const Project &p) {
         result.status = CalculationStatus::Valid;
         if (unreported)
             result.diagnostics.push_back(
-                {"UNREPORTED_REMAINING",
-                 "미보고 " + std::to_string(unreported) + "개 작업은 현재 계획 기간을 잔여 기간으로 사용했습니다.",
-                 {}});
-        result.diagnostics.push_back({"FORECAST_POLICY",
-                                      "상태일 이후 retained remaining logic 예측입니다. 실제 날짜는 고정하며 예측의 "
-                                      "여유·임계 및 자원 가용량은 미산정입니다.",
-                                      {}});
+                {"UNREPORTED_REMAINING", {diagnosticArgument(std::to_string(unreported))}, {}, "UNREPORTED_REMAINING"});
+        result.diagnostics.push_back({"FORECAST_POLICY", {}, {}, "FORECAST_POLICY"});
     } catch (const std::exception &e) {
         result.status = CalculationStatus::Conflict;
         result.tasks.clear();
         result.projectFinish.reset();
-        result.diagnostics.push_back({"FORECAST_HORIZON", e.what(), {}});
+        result.diagnostics.push_back(diagnosticFromException(e, "FORECAST_HORIZON", {}));
     }
     return result;
 }
@@ -144,9 +137,7 @@ ScheduleResult calculate(const Project &p, const std::shared_ptr<CalculationCont
         result.status = CalculationStatus::Cancelled;
         result.statusAt = p.statusAt;
         result.isForecast = p.statusAt.has_value();
-        result.diagnostics.push_back({"CALCULATION_CANCELLED",
-                                      "사용자가 일정 계산을 취소했습니다. 부분 날짜와 완료일은 적용하지 않았습니다.",
-                                      {}});
+        result.diagnostics.push_back({"CALCULATION_CANCELLED", {}, {}, "CALCULATION_CANCELLED"});
         return result;
     }
 }

@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/GanttView.h"
 #include "formatting/PlanTokens.h"
 #include "calculation/WorkCalendar.h"
@@ -72,12 +73,12 @@ void GanttView::updateDrag(const QPoint &point) {
         WorkCalendar cal(*input_, *it);
         const auto raw = shifted(d.resize ? d.finish : d.start, delta);
         if (!validStamp(raw.toStdString()))
-            throw std::runtime_error("지원 날짜 범위 밖입니다.");
+            throw AppError(ErrorCode::GANTTEDITING_001, {});
         QString start, finish, description;
         if (d.resize) {
             const auto duration = cal.offset(raw.toStdString()) - cal.offset(d.start.toStdString());
             if (duration <= 0 || duration > 5000000)
-                throw std::runtime_error("기간은 시작 뒤의 양수 근무분이어야 합니다.");
+                throw AppError(ErrorCode::GANTTEDITING_002, {});
             start = d.start;
             finish = QString::fromStdString(cal.boundary(cal.offset(d.start.toStdString()) + duration, true));
             d.target = finish;
@@ -122,7 +123,7 @@ void GanttView::updateDrag(const QPoint &point) {
         if (ghost_)
             ghost_->setPen(QPen(QColor("#df5040"), 2, Qt::DashLine));
         if (editHint)
-            editHint("드래그 적용 불가: " + QString::fromUtf8(error.what()));
+            editHint("드래그 적용 불가: " + qErrorText(error));
     }
 }
 void GanttView::mouseMoveEvent(QMouseEvent *e) {

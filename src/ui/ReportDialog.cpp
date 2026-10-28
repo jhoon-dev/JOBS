@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/ReportDialog.h"
 #include <QApplication>
 #include <QAbstractTableModel>
@@ -270,7 +271,7 @@ void ReportDialog::prepare() {
             validateReportExport(*report);
             out.report = std::move(report);
         } catch (const std::exception &e) {
-            out.error = QString::fromUtf8(e.what());
+            out.error = qErrorText(e);
         }
         return out;
     }));
@@ -407,7 +408,7 @@ void ReportDialog::exportFile(bool pdf) {
                 exportXlsx(*snapshot, path, family);
             return QString{};
         } catch (const std::exception &e) {
-            return QString::fromUtf8(e.what());
+            return qErrorText(e);
         }
     }));
 }

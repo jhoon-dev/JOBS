@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/ComparisonDialog.h"
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -107,7 +108,7 @@ void ComparisonDialog::recalculate() {
             try {
                 display(watcher->result());
             } catch (const std::exception &e) {
-                summary_->setText(QString::fromUtf8(e.what()));
+                summary_->setText(qErrorText(e));
             }
         }
         watcher->deleteLater();
@@ -190,9 +191,9 @@ void ComparisonDialog::display(const ComparisonReport &r) {
         table_->setCurrentCell(0, 0);
     QString diagnostics = "현재 계획: " + state(r.plan) + " · 실적 반영 예측: " + state(r.forecast) + "\n";
     for (const auto &d : r.plan.diagnostics)
-        diagnostics += "[계획/" + qs(d.code) + "] " + qs(d.message) + "\n";
+        diagnostics += "[계획/" + qs(d.code) + "] " + qs(diagnosticMessage(d)) + "\n";
     for (const auto &d : r.forecast.diagnostics)
-        diagnostics += "[예측/" + qs(d.code) + "] " + qs(d.message) + "\n";
+        diagnostics += "[예측/" + qs(d.code) + "] " + qs(diagnosticMessage(d)) + "\n";
     diagnostics_->setPlainText(diagnostics);
 }
 } // namespace jobs

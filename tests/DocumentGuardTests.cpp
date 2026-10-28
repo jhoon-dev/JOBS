@@ -47,7 +47,7 @@ private:
 struct Case {
     const char *name;
     std::function<void(jobs::Document &)> call;
-    std::string message = "편집 가능한 프로젝트가 없습니다.";
+    jobs::ErrorCode code = jobs::ErrorCode::DOCUMENT_NOT_EDITABLE;
 };
 template <class F> void unchanged(jobs::Document &doc, CountingStore &store, F call) {
     const auto root = doc.snapshot();
@@ -82,9 +82,10 @@ void rejected(jobs::Document &doc, CountingStore &store, const Case &test) {
         bool failed = false;
         try {
             test.call(doc);
-        } catch (const std::runtime_error &error) {
+        } catch (const jobs::AppError &error) {
             failed = true;
-            check(error.what() == test.message, std::string(test.name) + ": wrong rejection priority/message");
+            check(error.code() == jobs::errorCodeToken(test.code),
+                  std::string(test.name) + ": wrong rejection priority/code");
         }
         check(failed, std::string(test.name) + ": edit was accepted");
     });
@@ -139,14 +140,13 @@ int main(int argc, char **argv) {
             {"duplicateTasks", [](auto &d) { (void)d.duplicateTasks({}); }},
             {"editTasks", [](auto &d) { d.editTasks({}); }},
             {"makeEditRequest", [](auto &d) { (void)d.makeEditRequest(jobs::DurationEdit{"missing", -1}); }},
-            {"recordProgress", [](auto &d) { d.recordProgress({}); }, "실적 보고 전에 상태일을 설정하세요."},
-            {"recordCost", [](auto &d) { d.recordCost({}); },
-             "원가 보고 전에 편집 가능한 프로젝트와 상태일이 필요합니다."},
+            {"recordProgress", [](auto &d) { d.recordProgress({}); }, jobs::ErrorCode::STATUS_DATE_REQUIRED},
+            {"recordCost", [](auto &d) { d.recordCost({}); }, jobs::ErrorCode::COST_STATUS_DATE_REQUIRED},
             {"editGantt", [](auto &d) { d.editGantt("", 0, "", false, "invalid"); },
-             "최신 계획 일정에서만 드래그할 수 있습니다. 실제/잔여 예측은 실적·잔여 입력을 사용하세요."},
-            {"save", [](auto &d) { d.save(); }, "다른 이름으로 저장하세요. 이전 형식의 원본은 보존합니다."},
+             jobs::ErrorCode::GANTT_REQUIRES_CURRENT_PLAN},
+            {"save", [](auto &d) { d.save(); }, jobs::ErrorCode::LEGACY_REQUIRES_SAVE_AS},
             {"recoverySnapshotRequest", [](auto &d) { (void)d.recoverySnapshotRequest("invalid"); },
-             "자동 복구 저장할 편집 가능한 미저장 문서/시각이 없습니다."}};
+             jobs::ErrorCode::RECOVERY_SNAPSHOT_INVALID}};
         for (const auto &test : cases) {
             rejected(closed, store, test);
             rejected(readOnly, store, test);

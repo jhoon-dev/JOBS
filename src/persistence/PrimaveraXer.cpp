@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "persistence/PrimaveraXer.h"
 #include "persistence/ExchangePackage.h"
@@ -24,9 +25,7 @@ QString qs(const std::string &s) {
 std::string str(const QString &s) {
     return s.toUtf8().toStdString();
 }
-[[noreturn]] void fail(const QString &s) {
-    throw std::runtime_error(str(s));
-}
+
 QString hash(const QByteArray &b) {
     return QString::fromLatin1(QCryptographicHash::hash(b, QCryptographicHash::Sha256).toHex());
 }
@@ -43,18 +42,18 @@ bool forbiddenTextCharacter(QChar c) {
 }
 QString decode(const QByteArray &bytes, XerEncoding encoding) {
     if (bytes.size() > byteLimit)
-        fail("XER 16 MiB 한도 초과");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_001, {});
     if (encoding == XerEncoding::Utf8) {
         QStringDecoder decoder(QStringDecoder::Utf8);
         QString text = decoder.decode(bytes);
         if (decoder.hasError())
-            fail("유효한 UTF-8이 아닙니다. 원본 인코딩을 확인하세요. CP949는 지원하지 않습니다.");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_002, {});
         if (text.startsWith(QChar(0xfeff)))
             text.remove(0, 1);
         return text;
     }
     if (bytes.startsWith("\xef\xbb\xbf"))
-        fail("UTF-8 BOM 파일은 UTF-8을 선택하세요.");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_003, {});
     static constexpr char16_t cp[32] = {0x20ac, 0,      0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
                                         0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0,      0x017d, 0,
                                         0,      0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
@@ -65,7 +64,7 @@ QString decode(const QByteArray &bytes, XerEncoding encoding) {
         if (c >= 0x80 && c <= 0x9f) {
             auto v = cp[c - 0x80];
             if (!v)
-                fail("Windows-1252에 정의되지 않은 문자입니다.");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_004, {});
             out += QChar(v);
         } else
             out += QChar(c);
@@ -77,14 +76,14 @@ qint64 integer(const QString &s, const QString &path, qint64 lo = 0, qint64 hi =
     bool ok = false;
     auto n = s.toLongLong(&ok);
     if (!re.match(s).hasMatch() || !ok || n < lo || n > hi)
-        fail("정수/ID 범위 오류: " + path);
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_005, {diagnosticArgument(path)});
     return n;
 }
 qint64 micro(const QString &s, const QString &path, bool negative = false) {
     static const QRegularExpression re("^(-?)([0-9]+)(?:\\.([0-9]{1,6}))?$");
     auto m = re.match(s);
     if (!m.hasMatch() || (!negative && !m.captured(1).isEmpty()))
-        fail("소수 6자리 이내 십진수가 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_006, {diagnosticArgument(path)});
     auto n = integer(m.captured(2), path, 0, 1000000000) * 1000000 + m.captured(3).leftJustified(6, '0').toLongLong();
     return m.captured(1).isEmpty() ? n : -n;
 }
@@ -92,7 +91,7 @@ qint64 minutes(const QString &s, const QString &path, QJsonArray &diagnostics, b
     auto scaled = micro(s, path, negative) * 60;
     auto rounded = (scaled + (scaled < 0 ? -500000 : 500000)) / 1000000;
     if (std::abs(scaled - rounded * 1000000) > 30 || std::abs(rounded) > 5000000)
-        fail("정수 근무분 범위/정밀도 오류: " + path);
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_007, {diagnosticArgument(path)});
     if (scaled != rounded * 1000000)
         diagnostic(diagnostics, path, "6자리 소수 시간 표현의 양자화 오차를 정수 분으로 보정");
     return rounded;
@@ -100,12 +99,12 @@ qint64 minutes(const QString &s, const QString &path, QJsonArray &diagnostics, b
 int units(const QString &s, const QString &path, bool allowZero) {
     auto m = micro(s, path);
     if (m % 10000 || m > 1000000000 || (!allowZero && !m))
-        fail("정확한 1% 단위 가용량/배정률이 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_008, {diagnosticArgument(path)});
     return int(m / 10000);
 }
 QString stamp(const QString &s, const QString &path) {
     if (!validStamp(str(s)))
-        fail("YYYY-MM-DD HH:mm 시각이 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_009, {diagnosticArgument(path)});
     return s;
 }
 struct Row {
@@ -139,7 +138,7 @@ File parse(const QString &text) {
     bool ended = false, header = false;
     qsizetype totalCells = 0;
     if (text.count('\n') > 300001)
-        fail("XER 행 300,000개 한도 초과");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_010, {});
     auto lines = text.split('\n', Qt::KeepEmptyParts);
     static const QRegularExpression tableName("^[A-Z][A-Z0-9_]{0,127}$"), fieldName("^[a-z][a-z0-9_]{0,127}$");
     int lineNumber = 0;
@@ -150,23 +149,23 @@ File parse(const QString &text) {
         if (line.isEmpty())
             continue;
         if (ended)
-            fail("%E 뒤에 데이터가 있습니다.");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_011, {});
         for (auto c : line)
             if (forbiddenTextCharacter(c) && c != '\t')
-                fail("XER 제어 문자 오류: " + QString::number(lineNumber));
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_012, {diagnosticArgument(QString::number(lineNumber))});
         if (line.count('\t') > 256)
-            fail("XER 열 256개 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_013, {});
         const auto cells = line.split('\t', Qt::KeepEmptyParts);
         totalCells += cells.size();
         if (totalCells > 1000000)
-            fail("XER 전체 셀 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_014, {});
         for (const auto &c : cells)
             if (c.size() > 1024 * 1024)
-                fail("XER 셀 1 Mi자 한도 초과");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_015, {});
         if (!header) {
             if (cells.size() != 9 || cells[0] != "ERMHDR" ||
                 !QRegularExpression("^[0-9]+(?:\\.[0-9]+){1,2}$").match(cells[1]).hasMatch())
-                fail("유효한 ERMHDR 헤더가 필요합니다.");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_016, {});
             file.header = cells;
             header = true;
             continue;
@@ -174,49 +173,49 @@ File parse(const QString &text) {
         if (cells[0] == "%T") {
             if (cells.size() != 2 || !tableName.match(cells[1]).hasMatch() || file.tables.contains(cells[1]) ||
                 (current && current->fields.isEmpty()) || file.tables.size() >= 128)
-                fail("XER 테이블 이름/중복/한도 오류");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_017, {});
             auto [it, inserted] = file.tables.emplace(cells[1], Table{cells[1], {}, {}, {}});
             (void)inserted;
             current = &it->second;
         } else if (cells[0] == "%F") {
             if (!current || !current->fields.isEmpty() || cells.size() < 2)
-                fail("XER %F 순서/중복 오류");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_018, {});
             std::set<QString> names;
             for (qsizetype i = 1; i < cells.size(); ++i)
                 if (!fieldName.match(cells[i]).hasMatch() || !names.insert(cells[i]).second)
-                    fail("XER 열 이름/중복 오류");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_019, {});
             current->fields = cells.mid(1);
         } else if (cells[0] == "%R") {
             if (!current || current->fields.isEmpty() || cells.size() != current->fields.size() + 1)
-                fail("XER 행 폭/순서 오류: " + QString::number(lineNumber));
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_020, {diagnosticArgument(QString::number(lineNumber))});
             current->rows.push_back({cells.mid(1), lineNumber});
         } else if (cells[0] == "%E") {
             if (cells.size() != 1 || (current && current->fields.isEmpty()))
-                fail("XER %E 오류");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_021, {});
             ended = true;
         } else
-            fail("알 수 없는 XER 레코드: " + QString::number(lineNumber));
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_022, {diagnosticArgument(QString::number(lineNumber))});
     }
     if (!header || !ended)
-        fail("XER 헤더/%E가 누락되었습니다.");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_023, {});
     return file;
 }
 const Table &table(File &file, const char *name) {
     auto [it, inserted] = file.tables.try_emplace(name, Table{name, {}, {}, {}});
     (void)inserted;
     if (it->second.rows.size() > 10000)
-        fail("XER 주요 테이블 10,000행 한도 초과: " + QString::fromLatin1(name));
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_024, {diagnosticArgument(QString::fromLatin1(name))});
     return it->second;
 }
 void unique(const Table &t, const QString &field) {
     std::set<QString> seen;
     for (const auto &r : t.rows)
         if (!seen.insert(id(t, r, field)).second)
-            fail("중복 XER ID: " + path(t, r, field));
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_025, {diagnosticArgument(path(t, r, field))});
 }
 void projectRef(const Table &t, const Row &r, const QString &project, const QString &field = "proj_id") {
     if (id(t, r, field) != project)
-        fail("다른 프로젝트 참조: " + path(t, r, field));
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_026, {diagnosticArgument(path(t, r, field))});
 }
 struct Record {
     QString name;
@@ -230,7 +229,7 @@ public:
         auto r = node(1);
         space();
         if (pos_ != s_.size())
-            fail("clndr_data 후행 내용 오류");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_027, {});
         return r;
     }
 
@@ -245,39 +244,39 @@ private:
     void expect(QChar c) {
         space();
         if (pos_ >= s_.size() || s_[pos_++] != c)
-            fail("clndr_data 괄호/문법 오류");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_028, {});
     }
     QString until(QChar c) {
         auto start = pos_;
         while (pos_ < s_.size() && s_[pos_] != c)
             ++pos_;
         if (pos_ == s_.size())
-            fail("clndr_data 잘림");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_029, {});
         return s_.mid(start, pos_ - start).trimmed();
     }
     Record node(int depth) {
         if (depth > 32 || ++count_ > 300000)
-            fail("clndr_data 깊이/노드 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_030, {});
         expect('(');
         auto head = until('(');
         expect('(');
         auto divider = head.indexOf("||");
         if (divider < 1)
-            fail("clndr_data 레코드 헤더 오류");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_031, {});
         integer(head.left(divider), "clndr_data/record");
         Record out;
         out.name = head.mid(divider + 2).trimmed();
         if (out.name.size() > 128)
-            fail("clndr_data 이름 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_032, {});
         auto attrs = until(')');
         expect(')');
         if (!attrs.isEmpty()) {
             auto parts = attrs.split('|', Qt::KeepEmptyParts);
             if (parts.size() % 2)
-                fail("clndr_data 속성 쌍 오류");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_033, {});
             for (qsizetype i = 0; i < parts.size(); i += 2)
                 if (!out.attrs.emplace(parts[i], parts[i + 1]).second)
-                    fail("clndr_data 속성 중복");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_034, {});
         }
         expect('(');
         space();
@@ -294,7 +293,7 @@ int clockMinute(const QString &s) {
     if (s == "24:00")
         return 1440;
     if (!QRegularExpression("^[0-2][0-9]:[0-5][0-9]$").match(s).hasMatch() || s.left(2).toInt() > 23)
-        fail("clndr_data 근무 시각 오류");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_035, {});
     return s.left(2).toInt() * 60 + s.right(2).toInt();
 }
 const Record *find(const Record &r, const QString &name) {
@@ -302,7 +301,7 @@ const Record *find(const Record &r, const QString &name) {
     for (const auto &c : r.children)
         if (c.name == name) {
             if (result)
-                fail("clndr_data 중복: " + name);
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_036, {diagnosticArgument(name)});
             result = &c;
         }
     return result;
@@ -315,7 +314,7 @@ void graph(const Project &p) {
     for (const auto &t : p.tasks)
         for (const auto &pred : t.predecessors) {
             if (t.id == pred || !incoming.contains(pred))
-                fail("자기/고아 선행관계");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_037, {});
             ++incoming[t.id];
             outgoing[pred].push_back(t.id);
         }
@@ -333,7 +332,7 @@ void graph(const Project &p) {
                 ready.push_back(to);
     }
     if (visited != p.tasks.size())
-        fail("선행관계 순환");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_038, {});
 }
 QJsonObject reportFor(const Project &p, bool importing) {
     return {{"contract", "jobs-xer-plan-v1"},
@@ -365,19 +364,19 @@ const std::map<QString, ConstraintType> constraintMap{{"", ConstraintType::ASAP}
 QByteArray readPrimaveraXer(const QString &path) {
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
-        fail("XER 읽기 실패: " + f.errorString());
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_039, {diagnosticArgument(f.errorString())});
     if (f.size() > byteLimit)
-        fail("XER 16 MiB 한도 초과");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_040, {});
     auto b = f.read(byteLimit + 1);
     if (f.error() != QFileDevice::NoError || b.size() > byteLimit || !f.atEnd())
-        fail("XER 읽기 오류/한도 초과");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_041, {});
     return b;
 }
 PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &sourceName, XerEncoding encoding) {
     auto file = parse(decode(bytes, encoding));
     auto &projects = table(file, "PROJECT");
     if (projects.rows.size() != 1)
-        fail("단일 PROJECT만 지원합니다.");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_042, {});
     const auto &pr = projects.rows.front();
     const auto projectId = id(projects, pr, "proj_id");
     auto code = get(projects, pr, "proj_short_name");
@@ -404,7 +403,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     };
     const auto &options = table(file, "SCHEDOPTIONS");
     if (options.rows.size() > 1)
-        fail("SCHEDOPTIONS는 한 행만 지원합니다.");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_043, {});
     QString lagPolicy;
     if (!options.rows.empty()) {
         projectRef(options, options.rows[0], projectId);
@@ -420,7 +419,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     for (const auto &r : ct.rows) {
         auto ref = get(ct, r, "proj_id");
         if (!ref.isEmpty() && QString::number(integer(ref, "CALENDAR/proj_id")) != projectId)
-            fail("다른 프로젝트 달력");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_044, {});
         calendarRows[id(ct, r, "clndr_id")] = &r;
     }
     std::map<QString, TaskCalendar> calendars;
@@ -431,7 +430,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         if (calendars.contains(calendarId))
             return;
         if (depth > 32 || resolving.contains(calendarId) || !calendarRows.contains(calendarId))
-            fail("달력 부모 누락/상속 순환/깊이 초과: " + calendarId);
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_045, {diagnosticArgument(calendarId)});
         resolving.insert(calendarId);
         const auto &r = *calendarRows.at(calendarId);
         TaskCalendar c;
@@ -449,27 +448,27 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         CalendarParser parser(data, calendarNodes);
         auto root = parser.parse();
         if (root.name != "CalendarData" || !root.attrs.empty())
-            fail("CalendarData 루트 오류");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_046, {});
         for (const auto &section : root.children)
             if (section.name != "DaysOfWeek" && section.name != "Exceptions") {
                 if (section.name == "VIEW")
                     diagnostic(diagnostics, "CALENDAR/" + calendarId + "/VIEW", "달력 표시 옵션은 원본에만 보존");
                 else
-                    fail("미지원 달력 구조: " + section.name);
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_047, {diagnosticArgument(section.name)});
             }
         auto *week = find(root, "DaysOfWeek");
         if (!week || week->children.size() != 7 || !week->attrs.empty())
-            fail("명시된 7개 요일이 필요합니다.");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_048, {});
         std::set<int> days;
         for (const auto &day : week->children) {
             int type = int(integer(day.name, "CALENDAR/day", 1, 7));
             if (!days.insert(type).second || !day.attrs.empty())
-                fail("요일 중복/미지원 속성");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_049, {});
             std::vector<WorkPeriod> periods;
             for (const auto &hours : day.children) {
                 if (hours.attrs.size() != 2 || !hours.attrs.contains("s") || !hours.attrs.contains("f") ||
                     !hours.children.empty())
-                    fail("근무 시간 구조 오류");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_050, {});
                 auto end = clockMinute(hours.attrs.at("f"));
                 periods.push_back({clockMinute(hours.attrs.at("s")), end == 0 ? 1440 : end});
             }
@@ -478,30 +477,30 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
                 if (c.periods.empty())
                     c.periods = periods;
                 else if (c.periods != periods)
-                    fail("요일별 다른 근무 시간은 지원하지 않습니다.");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_051, {});
             }
         }
         std::sort(c.weekdays.begin(), c.weekdays.end());
         std::set<std::string> holidays(c.holidays.begin(), c.holidays.end()), ownDates;
         if (auto *exceptions = find(root, "Exceptions")) {
             if (!exceptions->attrs.empty())
-                fail("휴일 속성 오류");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_052, {});
             for (const auto &exception : exceptions->children) {
                 if (exception.attrs.size() != 1 || !exception.attrs.contains("d") || !exception.children.empty())
-                    fail("전일 휴일 이외의 달력 예외는 지원하지 않습니다.");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_053, {});
                 auto day = QDate(1899, 12, 30)
                                .addDays(integer(exception.attrs.at("d"), "CALENDAR/exception", -693593, 2958465));
                 auto date = str(day.toString(Qt::ISODate));
                 if (!validDate(date) || !ownDates.insert(date).second)
-                    fail("휴일 날짜 중복/범위 오류");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_054, {});
                 holidays.insert(date);
             }
         }
         if (holidays.size() > 10000)
-            fail("달력별 휴일 10,000일 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_055, {});
         holidayCount += holidays.size();
         if (holidayCount > 100000)
-            fail("상속 후 휴일 100,000일 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_056, {});
         c.holidays.assign(holidays.begin(), holidays.end());
         calendars[calendarId] = c;
         p.calendars.push_back(c);
@@ -514,7 +513,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     }
     auto defaultCalendar = id(projects, pr, "clndr_id");
     if (!calendars.contains(defaultCalendar))
-        fail("프로젝트 달력 누락");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_057, {});
     auto calendar = [&](const Table &t, const Row &r) {
         auto ref = get(t, r, "clndr_id");
         if (ref.isEmpty())
@@ -522,7 +521,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         else
             ref = QString::number(integer(ref, path(t, r, "clndr_id")));
         if (!calendars.contains(ref))
-            fail("달력 참조 누락: " + ref);
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_058, {diagnosticArgument(ref)});
         return calendars.at(ref).id;
     };
     const auto &wbs = table(file, "PROJWBS");
@@ -535,10 +534,10 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         auto wid = id(wbs, r, "wbs_id");
         auto rootFlag = get(wbs, r, "proj_node_flag");
         if (rootFlag != "Y" && rootFlag != "N")
-            fail("proj_node_flag Y/N 필요");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_059, {});
         if (rootFlag == "Y") {
             if (!rootId.isEmpty())
-                fail("프로젝트 WBS 루트 중복");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_060, {});
             rootId = wid;
             p.name = str(get(wbs, r, "wbs_name"));
             wbsIds[wid] = "";
@@ -552,14 +551,14 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         }
     }
     if (rootId.isEmpty())
-        fail("프로젝트 WBS 루트가 필요합니다.");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_061, {});
     for (const auto &r : wbs.rows) {
         auto wid = id(wbs, r, "wbs_id");
         if (wid == rootId)
             continue;
         auto parent = QString::number(integer(parents.at(wid), "PROJWBS/parent_wbs_id"));
         if (!wbsIds.contains(parent))
-            fail("고아 WBS 부모");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_062, {});
         p.wbsNodes.push_back({wbsIds.at(wid), str(get(wbs, r, "wbs_name")), wbsIds.at(parent)});
         map("wbs", wid, wbsIds.at(wid));
     }
@@ -570,10 +569,10 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         projectRef(tasks, r, projectId);
         auto tid = id(tasks, r, "task_id"), wid = id(tasks, r, "wbs_id");
         if (!wbsIds.contains(wid))
-            fail("작업 WBS 누락");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_063, {});
         auto type = get(tasks, r, "task_type");
         if (type != "TT_Task" && type != "TT_Rsrc" && type != "TT_Mile" && type != "TT_FinMile")
-            fail("미지원 작업 유형: " + type);
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_064, {diagnosticArgument(type)});
         Task t;
         t.id = "xer-task-" + str(tid);
         t.name = str(get(tasks, r, "task_name"));
@@ -584,7 +583,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             t.durationMinutes = minutes(d, path(tasks, r, "target_drtn_hr_cnt"), diagnostics);
         if (type == "TT_Mile" || type == "TT_FinMile") {
             if (t.durationMinutes != 0)
-                fail("마일스톤 기간은 0이어야 합니다.");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_065, {});
             diagnostic(diagnostics, path(tasks, r, "task_type"), "시작/완료 마일스톤을 native 0분 이벤트로 투영");
         } else if (type == "TT_Rsrc")
             diagnostic(diagnostics, path(tasks, r, "task_type"), "자원 종속 작업을 기간 기반 작업으로 투영");
@@ -593,10 +592,10 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             diagnostic(diagnostics, path(tasks, r, "duration_type"),
                        "작업 유형/공수 유지 규칙은 기간 기반 고정 기간으로 투영");
         if (!get(tasks, r, "cstr_type2").isEmpty() || !get(tasks, r, "cstr_date2").isEmpty())
-            fail("보조 제약은 지원하지 않습니다.");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_066, {});
         auto constraint = get(tasks, r, "cstr_type");
         if (!constraintMap.contains(constraint))
-            fail("미지원 제약: " + constraint);
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_067, {diagnosticArgument(constraint)});
         t.constraintType = constraintMap.at(constraint);
         auto at = get(tasks, r, "cstr_date");
         if (t.constraintType != ConstraintType::ASAP && t.constraintType != ConstraintType::ALAP)
@@ -620,10 +619,10 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         projectRef(links, r, projectId, "pred_proj_id");
         auto to = id(links, r, "task_id"), from = id(links, r, "pred_task_id");
         if (!taskIds.contains(to) || !taskIds.contains(from))
-            fail("고아 선행관계");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_068, {});
         auto type = get(links, r, "pred_type");
         if (type != "PR_FS" && type != "PR_SS" && type != "PR_FF" && type != "PR_SF")
-            fail("미지원 관계 유형");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_069, {});
         auto lag = minutes(get(links, r, "lag_hr_cnt"), path(links, r, "lag_hr_cnt"), diagnostics, true);
         auto &t = p.tasks[taskIndex.at(taskIds.at(to))];
         t.predecessors.push_back(taskIds.at(from));
@@ -642,7 +641,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         auto rid = id(resources, r, "rsrc_id");
         auto type = get(resources, r, "rsrc_type");
         if (type != "RT_Labor" && type != "RT_Equip")
-            fail("미지원 자원 유형: " + type);
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_070, {diagnosticArgument(type)});
         Resource resource;
         resource.id = "xer-resource-" + str(rid);
         resource.name = str(get(resources, r, "rsrc_name"));
@@ -668,7 +667,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     for (const auto &[rid, rows] : rateRows) {
         (void)rows;
         if (!resourceIds.contains(rid))
-            fail("가용량/단가의 자원 참조 누락");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_071, {});
     }
     const auto &assignments = table(file, "TASKRSRC");
     unique(assignments, "taskrsrc_id");
@@ -676,10 +675,10 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         projectRef(assignments, r, projectId);
         auto tid = id(assignments, r, "task_id"), rid = id(assignments, r, "rsrc_id");
         if (!taskIds.contains(tid) || !resourceIds.contains(rid))
-            fail("고아 작업/자원 배정");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_072, {});
         auto curve = get(assignments, r, "curv_id");
         if (!curve.isEmpty() && curve != "0")
-            fail("곡선 배정은 지원하지 않습니다.");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_073, {});
         p.assignments.push_back(
             {taskIds.at(tid), resourceIds.at(rid),
              units(get(assignments, r, "target_qty_per_hr"), path(assignments, r, "target_qty_per_hr"), false)});
@@ -753,19 +752,19 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     graph(p);
     if (p.tasks.size() > 10000 || p.wbsNodes.size() >= 10000 || p.resources.size() > 10000 ||
         p.assignments.size() > 10000 || p.calendars.size() >= 10000)
-        fail("XER 주요 테이블 10,000행 한도 초과");
+        throw AppError(ErrorCode::FILE_PRIMAVERAXER_074, {});
     QByteArray bytes("\xef\xbb\xbf");
     auto line = [&](const QStringList &cells) {
         for (const auto &cell : cells) {
             if (cell.size() > 1024 * 1024)
-                fail("XER 셀 한도 초과");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_075, {});
             for (auto c : cell)
                 if (forbiddenTextCharacter(c))
-                    fail("XER 필드에 탭/줄바꿈/제어 문자를 기록할 수 없습니다.");
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_076, {});
         }
         bytes += cells.join('\t').toUtf8() + "\r\n";
         if (bytes.size() > byteLimit)
-            fail("XER 16 MiB 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_077, {});
     };
     auto header = [&](const QString &name, const QStringList &fields) {
         line({"%T", name});
@@ -811,7 +810,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     int next = 1;
     for (const auto &c : allCalendars) {
         if (c.holidays.size() > 10000)
-            fail("달력 휴일 10,000일 한도 초과");
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_078, {});
         int minutes = 0;
         for (const auto &period : c.periods)
             minutes += period.end - period.begin;
@@ -887,7 +886,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     for (const auto &t : p.tasks)
         for (const auto &d : dependencies(t)) {
             if (next > 10000)
-                fail("선행관계 10,000개 한도 초과");
+                throw AppError(ErrorCode::FILE_PRIMAVERAXER_079, {});
             row({QString::number(next++), QString::number(tasks.at(t.id)), QString::number(tasks.at(d.predecessorId)),
                  "1", "1", "PR_" + qs(enumToken(d.type)), hourText(d.lagMinutes)});
         }

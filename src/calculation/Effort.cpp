@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Effort.h"
 #include "calculation/Constraints.h"
 #include <algorithm>
@@ -43,7 +44,7 @@ TaskExecution::TaskExecution(const PlanInput &p, const Task &t, const ExecutionI
                     break;
                 }
         if (!resource)
-            throw std::runtime_error("배정 자원이 없습니다.");
+            throw AppError(ErrorCode::WORK_RESOURCE_REQUIRED, {});
         Task resourceTask;
         resourceTask.calendarId = resource->calendarId;
         resourceCalendars.emplace_back(p, resourceTask);
@@ -112,14 +113,14 @@ TaskSchedule TaskExecution::dates(Minute local) const {
         auto it = std::lower_bound(weighted.begin(), weighted.end(), first,
                                    [](const auto &w, Minute n) { return w.finish <= n; });
         if (it == weighted.end())
-            throw std::runtime_error("공수 작업의 배정/자원·작업 달력 교집합에 가용 시간이 없습니다.");
+            throw AppError(ErrorCode::WORK_CALENDAR_NO_INTERSECTION, {});
         const auto begin = std::max(first, it->start), target = integrated(begin) + amount;
         row.start = clock_.boundary(begin, false);
         auto end = std::lower_bound(weighted.begin(), weighted.end(), target, [](const auto &w, Minute n) {
             return w.prefix + (w.finish - w.start) * w.units < n;
         });
         if (end == weighted.end())
-            throw std::runtime_error("20년 계산 범위 안에 요구 공수를 완료할 가용 시간이 부족합니다.");
+            throw AppError(ErrorCode::WORK_HORIZON_EXHAUSTED, {});
         const auto finish = end->start + (target - end->prefix + end->units - 1) / end->units;
         row.finish = clock_.boundary(finish, true);
     } else if (amount > 0)
@@ -162,7 +163,7 @@ std::vector<WorkSpan> TaskExecution::spans(const TaskSchedule &row) const {
         const auto before = integrated(end - 1) - integrated(begin), last = target - before,
                    total = integrated(end) - integrated(end - 1);
         if (last < 0 || last > total)
-            throw std::runtime_error("공수 일정 결과와 입력 공수가 일치하지 않습니다.");
+            throw AppError(ErrorCode::WORK_RESULT_MISMATCH, {});
         if (last < total) {
             std::vector<WorkSpan> kept, tail;
             Minute allocated = 0;
@@ -217,10 +218,10 @@ Task pendingTask(const Project &p, const Task &t) {
         else if (e->remainingWorkUnitMinutes)
             pending.workUnitMinutes = e->remainingWorkUnitMinutes;
         else
-            throw std::runtime_error("공수 작업에는 명시적인 잔여 공수 보고가 필요합니다: " + t.name);
+            throw AppError(ErrorCode::REMAINING_WORK_REQUIRED, {diagnosticArgument(t.name)});
     } else {
         if (!e->actualFinish && e->remainingMinutes == 0 && e->remainingWorkUnitMinutes)
-            throw std::runtime_error("기간 기준으로 변경한 작업에는 새 잔여 기간 보고가 필요합니다: " + t.name);
+            throw AppError(ErrorCode::REMAINING_DURATION_REQUIRED, {diagnosticArgument(t.name)});
         pending.durationMinutes = e->remainingMinutes;
     }
     return pending;

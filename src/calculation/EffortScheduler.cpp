@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Effort.h"
 #include "calculation/Constraints.h"
 #include <algorithm>
@@ -44,8 +45,8 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                 pending.push_back(forecast ? pendingTask(p, t) : t);
             } catch (const std::exception &e) {
                 out.status = CalculationStatus::Incomplete;
-                out.diagnostics.push_back(
-                    {usesWork(t) ? "MISSING_REMAINING_WORK" : "MISSING_REMAINING_DURATION", e.what(), {t.id}});
+                out.diagnostics.push_back(diagnosticFromException(
+                    e, usesWork(t) ? "MISSING_REMAINING_WORK" : "MISSING_REMAINING_DURATION", {t.id}));
                 return out;
             }
             models.push_back(std::make_unique<TaskExecution>(p, pending.back(), &inputs));
@@ -104,7 +105,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
         for (std::size_t count = 0; count < n; ++count) {
             calculationProgress(CalculationStage::Forward, count, n);
             if (ready.empty())
-                throw std::runtime_error("공수 일정의 선행관계 순환 또는 참조 오류입니다.");
+                throw AppError(ErrorCode::EFFORT_DEPENDENCY_INVALID, {});
             const auto i = ready.begin()->second;
             ready.erase(ready.begin());
             for (const auto &[j, edge] : successors[i]) {
@@ -157,9 +158,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     if (row.finish > horizon) {
                         out.status = unknown ? CalculationStatus::Incomplete : CalculationStatus::Conflict;
                         out.diagnostics.push_back(
-                            {unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED",
-                             "자원·공수·분할·날짜 제약을 만족하는 전체 배치를 탐색 범위에서 찾지 못했습니다.",
-                             {t.id}});
+                            {unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED", {}, {t.id}});
                         return out;
                     }
                     const auto spans = model.spans(row);
@@ -211,10 +210,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     for (const auto &before : source.tasks)
                         if (before.taskId == t.id &&
                             row.remainingStart.value_or(row.start) != before.remainingStart.value_or(before.start))
-                            out.diagnostics.push_back(
-                                {"RESOURCE_DELAY",
-                                 "선행/자원 가용량을 만족하도록 공수·수동 중단을 유지해 지연 배치했습니다.",
-                                 {t.id}});
+                            out.diagnostics.push_back({"RESOURCE_DELAY", {}, {t.id}, "RESOURCE_DELAY"});
             }
             if (auto error = timingViolation(t, row)) {
                 out.diagnostics.push_back(*error);
@@ -229,10 +225,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     historical.remainingStart.reset();
                     if ((!dependencyToFinish(d.type) || actual->actualFinish) &&
                         !edgeFits(model, d, rows[ids.at(d.predecessorId)], historical))
-                        out.diagnostics.push_back(
-                            {"OUT_OF_SEQUENCE",
-                             "실제 날짜가 선행관계보다 빠릅니다. 실제는 보존하고 잔여 공수에 선행 논리를 적용했습니다.",
-                             {d.predecessorId, t.id}});
+                        out.diagnostics.push_back({"OUT_OF_SEQUENCE", {}, {d.predecessorId, t.id}, "OUT_OF_SEQUENCE"});
                 }
             finish = std::max(finish, row.finish);
         }
@@ -300,22 +293,16 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
         out.status = CalculationStatus::Valid;
         auto deadlines = deadlineDiagnostics(p, out.tasks);
         out.diagnostics.insert(out.diagnostics.end(), deadlines.begin(), deadlines.end());
-        out.diagnostics.push_back({"EFFORT_POLICY",
-                                   "공수 = 작업·자원 달력 교집합의 배정률 적분. 수동 중단은 공수/부하/원가에서 "
-                                   "제외합니다. 1분 완료 경계의 마지막 분은 자원 ID 순으로 잔여를 배분하여 입력 공수를 "
-                                   "정확히 보존합니다. 단가 반올림은 자원별/일별 1회입니다.",
-                                   {}});
+        out.diagnostics.push_back({"EFFORT_POLICY", {}, {}, "EFFORT_POLICY"});
         if (forecast || !priority.empty())
-            out.diagnostics.push_back({"EFFORT_FORECAST_LEVEL_POLICY",
-                                       "실제 날짜는 보존하며 잔여만 배치합니다. 예측·평준화의 여유/임계 및 ALAP "
-                                       "재배치는 미산정입니다. 평준화는 수동 분할을 유지하는 직렬 지연 방식입니다.",
-                                       {}});
+            out.diagnostics.push_back({"EFFORT_FORECAST_LEVEL_POLICY", {}, {}, "EFFORT_FORECAST_LEVEL_POLICY"});
     } catch (const std::exception &e) {
         out.status = CalculationStatus::Conflict;
         out.tasks.clear();
         out.projectFinish.reset();
-        out.diagnostics.push_back({"EFFORT_AVAILABILITY", e.what(),
-                                   current.empty() ? std::vector<std::string>{} : std::vector<std::string>{current}});
+        out.diagnostics.push_back(
+            diagnosticFromException(e, "EFFORT_AVAILABILITY",
+                                    current.empty() ? std::vector<std::string>{} : std::vector<std::string>{current}));
     }
     return out;
 }

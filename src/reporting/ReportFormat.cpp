@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "reporting/ReportExport.h"
 #include "formatting/Money.h"
 #include <QPainter>
@@ -12,10 +13,10 @@ namespace jobs {
 QString reportText(const std::string &s) {
     auto text = QString::fromUtf8(s.data(), qsizetype(s.size()));
     if (text.toUtf8().toStdString() != s)
-        throw std::runtime_error("보고서 원문에 올바르지 않은 UTF-8이 있습니다.");
+        throw AppError(ErrorCode::REPORTFORMAT_001, {});
     for (auto c : text.toUcs4())
         if ((c < 32 && c != 9 && c != 10 && c != 13) || c == 0xfffe || c == 0xffff)
-            throw std::runtime_error("보고서 원문에 출력할 수 없는 제어 문자가 있습니다.");
+            throw AppError(ErrorCode::REPORTFORMAT_002, {});
     return text;
 }
 QString numericCell(const ReportCell &c, const std::string &currency) {
@@ -23,7 +24,7 @@ QString numericCell(const ReportCell &c, const std::string &currency) {
     if (const auto *i = std::get_if<std::int64_t>(&c.value)) {
         if (c.format == CellFormat::Money) {
             if (*i < -maxMoney || *i > maxMoney)
-                throw std::runtime_error("보고서 금액 한도 초과입니다.");
+                throw AppError(ErrorCode::REPORTFORMAT_003, {});
             return moneyui::format(*i, currency);
         }
         n = double(*i);
@@ -40,7 +41,7 @@ QString numericCell(const ReportCell &c, const std::string &currency) {
     else
         return {};
     if (!std::isfinite(n))
-        throw std::runtime_error("보고서에 유한하지 않은 수치가 있습니다.");
+        throw AppError(ErrorCode::REPORTFORMAT_004, {});
     return QString::number(n, 'g', 17);
 }
 QString displayCell(const ReportCell &c, const std::string &currency) {
@@ -62,7 +63,7 @@ QString displayCell(const ReportCell &c, const std::string &currency) {
 void validateReportExport(const ProjectReport &r) {
     if (r.tables.empty() || r.tables.size() > 100 || r.documentId.empty() || r.options.reportId.empty() ||
         !validUtcStamp(r.options.generatedAt))
-        throw std::runtime_error("보고서 출처/생성 시각/시트 수가 잘못되었습니다.");
+        throw AppError(ErrorCode::REPORTFORMAT_005, {});
     currencyDecimals(r.currency);
     reportText(r.documentId);
     reportText(r.options.reportId);
@@ -76,20 +77,20 @@ void validateReportExport(const ProjectReport &r) {
         if (title.isEmpty() || title.size() > 31 || title.contains(QRegularExpression("[\\[\\]:*?/\\\\]")) ||
             title.startsWith('\'') || title.endsWith('\'') || !titles.insert(title.toCaseFolded()).second ||
             t.columns.empty() || t.columns.size() > 16384)
-            throw std::runtime_error("보고서 시트 이름/열이 잘못되었습니다.");
+            throw AppError(ErrorCode::REPORTFORMAT_006, {});
         for (const auto &col : t.columns) {
             reportText(col.title);
             if (col.width < 1 || col.width > 255)
-                throw std::runtime_error("보고서 열 너비가 잘못되었습니다.");
+                throw AppError(ErrorCode::REPORTFORMAT_007, {});
         }
         for (const auto &row : t.rows) {
             if (row.size() != t.columns.size())
-                throw std::runtime_error("보고서 열 개수가 일치하지 않습니다.");
+                throw AppError(ErrorCode::REPORT_COLUMN_MISMATCH, {});
             for (const auto &c : row)
                 displayCell(c, r.currency);
             cells += row.size();
             if (cells > 1000000)
-                throw std::runtime_error("보고서 100만 셀 한도 초과입니다.");
+                throw AppError(ErrorCode::REPORTFORMAT_008, {});
         }
     }
 }

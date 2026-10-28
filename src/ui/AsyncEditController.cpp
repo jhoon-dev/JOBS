@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/AsyncEditController.h"
 #include <QFutureWatcher>
 #include <QPointer>
@@ -121,11 +122,12 @@ void AsyncEditController::start(Pending pending) {
                         }
                     }
                     if (state == EditState::Failed)
-                        message = QString::fromUtf8(prepared->error());
+                        message = prepared->failure() ? qDiagnosticText(*prepared->failure())
+                                                      : QString::fromStdString(prepared->error());
                 } catch (const CalculationCancelled &) {
                     state = EditState::Cancelled;
                 } catch (const std::exception &error) {
-                    message = QString::fromUtf8(error.what());
+                    message = qErrorText(error);
                 }
                 if (!guard)
                     return;

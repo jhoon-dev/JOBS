@@ -1,5 +1,6 @@
 #pragma once
 #include "calculation/Scheduler.h"
+#include <set>
 namespace jobs {
 struct ResourceDay {
     std::string resourceId, date;
@@ -24,4 +25,11 @@ struct LevelingResult {
 ResourceLoad resourceLoad(const Project &, const ScheduleResult &);
 LevelingResult levelResources(const Project &, const std::string &priority, int horizonWorkDays);
 Project scenarioProject(const LevelingScenario &);
+struct ResourceOccupancy {
+    std::string resourceId, taskId, start, finish;
+    int units = 0;
+};
+// Civil half-open intervals. Forecasts contain remaining demand only.
+std::vector<ResourceOccupancy> resourceOccupancies(const Project &, const ScheduleResult &, std::size_t limit = 500000,
+                                                   const std::set<std::string> *includedResources = nullptr);
 } // namespace jobs

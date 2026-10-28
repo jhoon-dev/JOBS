@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "persistence/ProjectXml.h"
 #include "persistence/ExchangePackage.h"
@@ -32,9 +33,7 @@ QString qs(const std::string &s) {
 std::string str(const QString &s) {
     return s.toUtf8().toStdString();
 }
-[[noreturn]] void fail(const QString &s) {
-    throw std::runtime_error(str(s));
-}
+
 QString hash(const QByteArray &b) {
     return QString::fromLatin1(QCryptographicHash::hash(b, QCryptographicHash::Sha256).toHex());
 }
@@ -45,20 +44,20 @@ struct Node {
 };
 Node readNode(QXmlStreamReader &r, const QString &path, int depth, int &count, qsizetype &pathCharacters) {
     if (depth > 32 || ++count > 300000)
-        fail("XML 깊이/요소 수 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_001, {});
     pathCharacters += path.size();
     if (r.name().size() > 128 || path.size() > 4096 || pathCharacters > 16 * 1024 * 1024)
-        fail("XML 요소 이름/진단 경로 메모리 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_002, {});
     if (r.namespaceUri() != QLatin1StringView(ns))
-        fail("지원하지 않는 XML namespace: " + r.namespaceUri().toString());
+        throw AppError(ErrorCode::FILE_PROJECTXML_003, {diagnosticArgument(r.namespaceUri().toString())});
     if (!r.attributes().isEmpty())
-        fail("지원하지 않는 XML 속성: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_004, {diagnosticArgument(path)});
     Node n{r.name().toString(), {}, path, {}, false};
     std::map<QString, int> indices;
     while (!r.atEnd()) {
         auto t = r.readNext();
         if (t == QXmlStreamReader::DTD || t == QXmlStreamReader::EntityReference)
-            fail("DTD/entity는 허용하지 않습니다.");
+            throw AppError(ErrorCode::FILE_PROJECTXML_005, {});
         if (t == QXmlStreamReader::StartElement) {
             auto name = r.name().toString();
             int i = ++indices[name];
@@ -70,7 +69,7 @@ Node readNode(QXmlStreamReader &r, const QString &path, int depth, int &count, q
             break;
     }
     if (!n.children.empty() && !n.text.trimmed().isEmpty())
-        fail("혼합 XML 내용은 지원하지 않습니다: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_006, {diagnosticArgument(path)});
     return n;
 }
 const Node *child(const Node &n, const QString &name) {
@@ -78,7 +77,7 @@ const Node *child(const Node &n, const QString &name) {
     for (const auto &c : n.children)
         if (c.name == name) {
             if (found)
-                fail("중복 XML 필드: " + c.path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_007, {diagnosticArgument(c.path)});
             found = &c;
         }
     if (found)
@@ -90,7 +89,7 @@ QString field(const Node &n, const QString &name, const QString &fallback = {}) 
     if (!c)
         return fallback;
     if (!c->children.empty())
-        fail("단일 값이 필요합니다: " + c->path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_008, {diagnosticArgument(c->path)});
     return c->text;
 }
 qint64 number(const QString &s, const QString &path, qint64 lo, qint64 hi) {
@@ -98,7 +97,7 @@ qint64 number(const QString &s, const QString &path, qint64 lo, qint64 hi) {
     bool ok = false;
     auto n = s.trimmed().toLongLong(&ok);
     if (!ok || !re.match(s.trimmed()).hasMatch() || n < lo || n > hi)
-        fail("정수 범위 오류: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_009, {diagnosticArgument(path)});
     return n;
 }
 qint64 num(const Node &n, const QString &name, qint64 lo, qint64 hi, const QString &fallback = {}) {
@@ -113,7 +112,7 @@ bool flag(const Node &n, const QString &name, bool fallback = false) {
         return true;
     if (s == "0" || s == "false")
         return false;
-    fail("boolean 오류: " + n.path + "/" + name);
+    throw AppError(ErrorCode::FILE_PROJECTXML_010, {diagnosticArgument(n.path), diagnosticArgument(name)});
 }
 std::vector<const Node *> list(const Node &n, const QString &wrapper, const QString &item) {
     std::vector<const Node *> out;
@@ -126,7 +125,7 @@ std::vector<const Node *> list(const Node &n, const QString &wrapper, const QStr
             out.push_back(&c);
         }
     if (out.size() > 10000)
-        fail("XML 목록 10,000개 한도 초과: " + w->path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_011, {diagnosticArgument(w->path)});
     return out;
 }
 void diagnostic(QJsonArray &d, const QString &path, const QString &text) {
@@ -145,18 +144,18 @@ QString stamp(const QString &s, const QString &path) {
     auto m = re.match(s.trimmed());
     auto out = m.captured(1) + " " + m.captured(2);
     if (!m.hasMatch() || !validStamp(str(out)))
-        fail("timezone 없는 정수 분 시각이 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_012, {diagnosticArgument(path)});
     return out;
 }
 qint64 duration(const QString &s, const QString &path) {
     static const QRegularExpression re("^PT(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?$");
     auto m = re.match(s.trimmed());
     if (!m.hasMatch() || (m.captured(1).isEmpty() && m.captured(2).isEmpty() && m.captured(3).isEmpty()))
-        fail("PT 시간/분/초 기간이 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_013, {diagnosticArgument(path)});
     auto part = [&](int i) { return m.captured(i).isEmpty() ? qint64(0) : number(m.captured(i), path, 0, 300000000); };
     auto seconds = part(1) * 3600 + part(2) * 60 + part(3);
     if (seconds % 60 || seconds / 60 > 5000000)
-        fail("정수 근무분 기간 범위/정밀도 오류: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_014, {diagnosticArgument(path)});
     return seconds / 60;
 }
 bool workingFormat(qint64 n) {
@@ -166,12 +165,12 @@ int units(const QString &s, const QString &path, bool zero) {
     static const QRegularExpression re("^(\\d+)(?:\\.(\\d{1,2})0*)?$");
     auto m = re.match(s.trimmed());
     if (!m.hasMatch())
-        fail("1% 정밀도 배정률/가용량이 필요합니다: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_015, {diagnosticArgument(path)});
     auto whole = number(m.captured(1), path, 0, 1000);
     auto fraction = m.captured(2).leftJustified(2, '0').toInt();
     auto value = whole * 100 + fraction;
     if (value > 100000 || (!zero && value == 0))
-        fail("배정률/가용량 범위 오류: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_016, {diagnosticArgument(path)});
     return int(value);
 }
 void graph(const Project &p) {
@@ -182,7 +181,7 @@ void graph(const Project &p) {
     for (const auto &t : p.tasks)
         for (const auto &pred : t.predecessors) {
             if (pred == t.id || !incoming.contains(pred))
-                fail("자기/고아/요약 작업 선행관계입니다: " + qs(t.id));
+                throw AppError(ErrorCode::FILE_PROJECTXML_017, {diagnosticArgument(qs(t.id))});
             ++incoming[t.id];
             outgoing[pred].push_back(t.id);
         }
@@ -200,14 +199,14 @@ void graph(const Project &p) {
                 ready.push_back(next);
     }
     if (visited != p.tasks.size())
-        fail("선행관계 순환이 있습니다.");
+        throw AppError(ErrorCode::FILE_PROJECTXML_018, {});
 }
 int minute(const QString &s, const QString &path) {
     static const QRegularExpression re("^([0-9]{2}):([0-9]{2}):00$");
     auto m = re.match(s.trimmed());
     int h = m.captured(1).toInt(), v = m.captured(2).toInt();
     if (!m.hasMatch() || h > 24 || v > 59 || (h == 24 && v))
-        fail("정수 분 근무시간 오류: " + path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_019, {diagnosticArgument(path)});
     return h * 60 + v;
 }
 using Week = std::array<std::vector<WorkPeriod>, 7>;
@@ -221,25 +220,25 @@ struct CalendarValue {
 };
 void holiday(const Node &n, CalendarValue &c) {
     if (!child(n, "DayWorking"))
-        fail("휴일의 DayWorking 누락: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_020, {diagnosticArgument(n.path)});
     if (flag(n, "DayWorking"))
-        fail("근무 예외 달력은 지원하지 않습니다: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_021, {diagnosticArgument(n.path)});
     if (auto *times = child(n, "WorkingTimes"); times && !times->children.empty())
-        fail("비근무 예외의 근무 구간 오류: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_022, {diagnosticArgument(n.path)});
     auto *range = child(n, "TimePeriod");
     if (!range)
-        fail("휴일 범위 누락: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_023, {diagnosticArgument(n.path)});
     auto from = stamp(field(*range, "FromDate"), range->path);
     auto to = stamp(field(*range, "ToDate"), range->path);
     if (from.mid(11) != "00:00" || (to.mid(11) != "00:00" && to.mid(11) != "23:59"))
-        fail("전일 휴일 범위만 지원합니다: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_024, {diagnosticArgument(n.path)});
     auto a = QDate::fromString(from.left(10), Qt::ISODate), b = QDate::fromString(to.left(10), Qt::ISODate);
     if (a > b || a.daysTo(b) > 10000)
-        fail("휴일 범위/10,000일 한도 오류: " + n.path);
+        throw AppError(ErrorCode::FILE_PROJECTXML_025, {diagnosticArgument(n.path)});
     for (auto day = a; day <= b; day = day.addDays(1)) {
         c.holidays.insert(str(day.toString(Qt::ISODate)));
         if (c.holidays.size() > 10000)
-            fail("달력 휴일 10,000일 한도 초과");
+            throw AppError(ErrorCode::FILE_PROJECTXML_026, {});
     }
 }
 QJsonObject baseReport(const Project &p, bool importing) {
@@ -266,17 +265,17 @@ QJsonObject baseReport(const Project &p, bool importing) {
 QByteArray readProjectXml(const QString &path) {
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
-        fail("XML 읽기 실패: " + f.errorString());
+        throw AppError(ErrorCode::FILE_PROJECTXML_027, {diagnosticArgument(f.errorString())});
     if (f.size() > byteLimit)
-        fail("XML 16 MiB 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_028, {});
     auto bytes = f.read(byteLimit + 1);
     if (f.error() != QFileDevice::NoError || bytes.size() > byteLimit || !f.atEnd())
-        fail("XML 읽기 실패/한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_029, {});
     return bytes;
 }
 ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sourceName) {
     if (bytes.size() > byteLimit)
-        fail("XML 16 MiB 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_030, {});
     QXmlStreamReader reader(bytes);
     reader.setEntityExpansionLimit(0);
     int count = 0;
@@ -285,15 +284,15 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     while (!reader.atEnd()) {
         auto token = reader.readNext();
         if (token == QXmlStreamReader::DTD || token == QXmlStreamReader::EntityReference)
-            fail("DTD/entity는 허용하지 않습니다.");
+            throw AppError(ErrorCode::FILE_PROJECTXML_031, {});
         if (token == QXmlStreamReader::StartElement) {
             if (root || reader.name() != QLatin1StringView("Project"))
-                fail("단일 Project XML이 필요합니다.");
+                throw AppError(ErrorCode::FILE_PROJECTXML_032, {});
             root = readNode(reader, "/Project", 1, count, pathCharacters);
         }
     }
     if (reader.hasError() || !root)
-        fail("XML 구문 오류: " + reader.errorString());
+        throw AppError(ErrorCode::FILE_PROJECTXML_033, {diagnosticArgument(reader.errorString())});
     auto &r = *root;
     Project p;
     p.documentId = str(QUuid::createUuid().toString(QUuid::WithoutBraces));
@@ -304,7 +303,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     p.currency = str(field(r, "CurrencyCode", "KRW"));
     currencyDecimals(p.currency);
     if (!flag(r, "ScheduleFromStart", true))
-        fail("완료일부터 역산하는 프로젝트는 지원하지 않습니다.");
+        throw AppError(ErrorCode::FILE_PROJECTXML_034, {});
     QJsonArray diagnostics, mapping;
     diagnostic(diagnostics, "/Project",
                "기간 기반 계획 변환입니다. 원본 날짜·공수·실적·비용의 계산 동등성은 미검증입니다.");
@@ -314,7 +313,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
         diagnostic(diagnostics, "/Project/StartDate", "시작 날짜는 보존하며 JOBS의 날짜 시작 기준은 09:00입니다.");
     auto saveVersion = field(r, "SaveVersion"), build = field(r, "BuildNumber");
     if (saveVersion.isEmpty())
-        fail("SaveVersion 누락");
+        throw AppError(ErrorCode::FILE_PROJECTXML_035, {});
     number(saveVersion, "/Project/SaveVersion", 1, 999);
     auto map = [&](const QString &kind, const QString &id, const std::string &target) {
         mapping.append(QJsonObject{{"kind", kind}, {"xmlUid", id}, {"jobsId", qs(target)}});
@@ -325,11 +324,11 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     for (auto *c : list(r, "Calendars", "Calendar")) {
         auto id = uid(*c);
         if (inputs.contains(id))
-            fail("중복 달력 UID: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_036, {diagnosticArgument(id)});
         bool base = flag(*c, "IsBaseCalendar", true);
         auto parent = field(*c, "BaseCalendarUID", "-1").trimmed();
         if (base && parent != "-1")
-            fail("기본 달력의 부모 지정 오류: " + c->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_037, {diagnosticArgument(c->path)});
         inputs[id] = {c, base ? QString{} : QString::number(number(parent, c->path, 0, 2147483647))};
         calendarOrder.push_back(id);
     }
@@ -340,9 +339,9 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
         if (resolved.contains(id))
             return resolved.at(id);
         if (depth > 32 || resolving.contains(id))
-            fail("달력 상속 순환/깊이 초과: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_038, {diagnosticArgument(id)});
         if (!inputs.contains(id))
-            fail("달력 참조 누락: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_039, {diagnosticArgument(id)});
         resolving.insert(id);
         const auto &input = inputs.at(id);
         const auto &c = *input.node;
@@ -357,36 +356,36 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                 continue;
             }
             if (!child(*day, "DayWorking"))
-                fail("요일의 DayWorking 누락: " + day->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_040, {diagnosticArgument(day->path)});
             int index = type == 1 ? 6 : type - 2;
             if (!seen.insert(index).second)
-                fail("달력 요일 중복: " + day->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_041, {diagnosticArgument(day->path)});
             auto &periods = value.week[std::size_t(index)];
             periods.clear();
             auto times = list(*day, "WorkingTimes", "WorkingTime");
             if (flag(*day, "DayWorking")) {
                 if (times.empty() || times.size() > 5)
-                    fail("근무 구간 1~5개가 필요합니다: " + day->path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_042, {diagnosticArgument(day->path)});
                 for (auto *time : times)
                     periods.push_back(
                         {minute(field(*time, "FromTime"), time->path), minute(field(*time, "ToTime"), time->path)});
             } else if (!times.empty())
-                fail("비근무일의 근무 구간 오류: " + day->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_043, {diagnosticArgument(day->path)});
         }
         if (input.base.isEmpty() && seen.size() != 7)
-            fail("기본 달력에는 7개 요일을 명시해야 합니다: " + c.path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_044, {diagnosticArgument(c.path)});
         for (auto *exception : list(c, "Exceptions", "Exception")) {
             auto type = num(*exception, "Type", 1, 9, "1");
             if ((type != 1 && type != 9) || num(*exception, "Period", 1, 10000, "1") != 1 ||
                 flag(*exception, "EnteredByOccurrences"))
-                fail("반복 달력 예외는 지원하지 않습니다: " + exception->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_045, {diagnosticArgument(exception->path)});
             for (const auto &name : {"DaysOfWeek", "MonthItem", "MonthPosition", "Month", "MonthDay"})
                 if (child(*exception, name))
-                    fail("반복 달력 지정은 지원하지 않습니다: " + exception->path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_046, {diagnosticArgument(exception->path)});
             holiday(*exception, value);
         }
         if (child(c, "WorkWeeks"))
-            fail("WorkWeeks 달력은 지원하지 않습니다: " + c.path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_047, {diagnosticArgument(c.path)});
         TaskCalendar out;
         out.id = "xml-cal-" + str(id);
         out.name = str(field(c, "Name", "Calendar " + id));
@@ -398,12 +397,12 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                 if (out.periods.empty())
                     out.periods = value.week[i];
                 else if (out.periods != value.week[i])
-                    fail("요일별 다른 근무 시간대는 지원하지 않습니다: " + c.path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_048, {diagnosticArgument(c.path)});
             }
         out.holidays.assign(value.holidays.begin(), value.holidays.end());
         expandedHolidays += out.holidays.size();
         if (expandedHolidays > 100000)
-            fail("상속 후 전체 달력 휴일 100,000일 한도 초과");
+            throw AppError(ErrorCode::FILE_PROJECTXML_049, {});
         p.calendars.push_back(out);
         map("calendar", id, out.id);
         resolving.erase(id);
@@ -414,7 +413,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
         resolve(id, 0);
     auto projectCalendar = QString::number(num(r, "CalendarUID", 0, 2147483647));
     if (!inputs.contains(projectCalendar))
-        fail("프로젝트 달력 누락: " + projectCalendar);
+        throw AppError(ErrorCode::FILE_PROJECTXML_050, {diagnosticArgument(projectCalendar)});
     auto calendar = [&](const Node &n) {
         auto id = field(n, "CalendarUID", "-1").trimmed();
         if (id == "-1")
@@ -422,7 +421,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
         else
             id = QString::number(number(id, n.path, 0, 2147483647));
         if (!inputs.contains(id))
-            fail("달력 참조 누락: " + n.path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_051, {diagnosticArgument(n.path)});
         return "xml-cal-" + str(id);
     };
 
@@ -435,30 +434,30 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     for (auto *n : list(r, "Tasks", "Task")) {
         auto id = uid(*n);
         if (!taskUids.insert(id).second)
-            fail("중복 작업 UID: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_052, {diagnosticArgument(id)});
         if (flag(*n, "IsSubproject") || child(*n, "Project"))
-            fail("하위 프로젝트는 지원하지 않습니다: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_053, {diagnosticArgument(n->path)});
         if (id == "0") {
             diagnostic(diagnostics, n->path, "프로젝트 요약 · 실행 작업으로 변환하지 않음");
             continue;
         }
         if (flag(*n, "IsNull"))
-            fail("빈 작업 행은 지원하지 않습니다: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_054, {diagnosticArgument(n->path)});
         if (flag(*n, "Manual") || flag(*n, "ExternalTask") || !field(*n, "SubprojectName").isEmpty())
-            fail("수동 일정/외부 작업/하위 프로젝트는 지원하지 않습니다: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_055, {diagnosticArgument(n->path)});
         auto level = int(num(*n, "OutlineLevel", 1, 32, "1"));
         if (level > previousLevel + 1 || (previousLeaf && level > previousLevel))
-            fail("잘못된 WBS OutlineLevel: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_056, {diagnosticArgument(n->path)});
         while (!stack.empty() && stack.back().first >= level)
             stack.pop_back();
         auto parent = stack.empty() ? std::string{} : stack.back().second;
         if (level > 1 && (stack.empty() || stack.back().first != level - 1))
-            fail("WBS 부모 누락: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_057, {diagnosticArgument(n->path)});
         auto name = str(field(*n, "Name"));
         bool summary = flag(*n, "Summary");
         if (summary) {
             if (child(*n, "PredecessorLink"))
-                fail("요약 작업 선행관계는 지원하지 않습니다: " + n->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_058, {diagnosticArgument(n->path)});
             WbsNode group{"xml-wbs-" + str(id), name, parent};
             p.wbsNodes.push_back(group);
             stack.emplace_back(level, group.id);
@@ -474,12 +473,12 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                 t.durationMinutes = duration(d, n->path + "/Duration");
             const auto format = num(*n, "DurationFormat", 0, 100, "7");
             if (!workingFormat(format))
-                fail("경과/백분율 기간은 지원하지 않습니다: " + n->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_059, {diagnosticArgument(n->path)});
             if (format >= 35)
                 diagnostic(diagnostics, n->path + "/DurationFormat",
                            "근무분 값만 매핑 · 추정 기간 표시를 변환하지 않음");
             if (flag(*n, "Milestone") && t.durationMinutes != 0)
-                fail("마일스톤의 기간이 0이 아닙니다: " + n->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_060, {diagnosticArgument(n->path)});
             if (num(*n, "Type", 0, 2, "0") != 1)
                 diagnostic(diagnostics, n->path + "/Type",
                            "기간 기반 고정 기간으로 투영 · 공수/작업 유형 계산 규칙은 보존 원본 참조");
@@ -494,7 +493,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
             if (!deadline.isEmpty())
                 t.deadlineAt = str(stamp(deadline, n->path + "/Deadline"));
             if (flag(*n, "IgnoreResourceCalendar"))
-                fail("자원 달력 무시는 지원하지 않습니다: " + n->path);
+                throw AppError(ErrorCode::FILE_PROJECTXML_061, {diagnosticArgument(n->path)});
             taskIds[id] = t.id;
             map("task", id, t.id);
             taskNodes.emplace_back(n, p.tasks.size());
@@ -510,18 +509,18 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                 link.used = true;
                 auto pred = uid(link, "PredecessorUID");
                 if (!taskIds.contains(pred) || flag(link, "CrossProject") || !field(link, "CrossProjectName").isEmpty())
-                    fail("고아/요약/외부 선행 작업: " + link.path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_062, {diagnosticArgument(link.path)});
                 static const std::array<DependencyType, 4> types{DependencyType::FF, DependencyType::FS,
                                                                  DependencyType::SF, DependencyType::SS};
                 auto type = types[std::size_t(num(link, "Type", 0, 3, "1"))];
                 if (child(link, "LinkLag") && !child(link, "LagFormat"))
-                    fail("LinkLag에는 LagFormat이 필요합니다: " + link.path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_063, {diagnosticArgument(link.path)});
                 auto lag = num(link, "LinkLag", -50000000, 50000000, "0");
                 if (lag % 10)
-                    fail("소수 분 LinkLag는 지원하지 않습니다: " + link.path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_064, {diagnosticArgument(link.path)});
                 const auto format = num(link, "LagFormat", 0, 100, "7");
                 if (!workingFormat(format))
-                    fail("경과/백분율 지연은 지원하지 않습니다: " + link.path);
+                    throw AppError(ErrorCode::FILE_PROJECTXML_065, {diagnosticArgument(link.path)});
                 if (format >= 35)
                     diagnostic(diagnostics, link.path + "/LagFormat",
                                "근무분 값만 매핑 · 추정 지연 표시를 변환하지 않음");
@@ -535,14 +534,14 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     for (auto *n : list(r, "Resources", "Resource")) {
         auto id = uid(*n);
         if (!resourceUids.insert(id).second)
-            fail("중복 자원 UID: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_066, {diagnosticArgument(id)});
         auto name = field(*n, "Name");
         if (id == "0" && name.trimmed().isEmpty()) {
             diagnostic(diagnostics, n->path, "미배정 placeholder · 자원으로 변환하지 않음");
             continue;
         }
         if (num(*n, "Type", 0, 2, "1") != 1)
-            fail("work 이외 자원은 지원하지 않습니다: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_067, {diagnosticArgument(n->path)});
         Resource resource;
         resource.id = "xml-resource-" + str(id);
         resource.name = str(name);
@@ -557,10 +556,10 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     for (auto *n : list(r, "Assignments", "Assignment")) {
         auto id = uid(*n);
         if (!assignments.insert(id).second)
-            fail("중복 배정 UID: " + id);
+            throw AppError(ErrorCode::FILE_PROJECTXML_068, {diagnosticArgument(id)});
         auto t = uid(*n, "TaskUID"), resource = uid(*n, "ResourceUID");
         if (!taskIds.contains(t) || !resources.contains(resource))
-            fail("고아/요약 배정: " + n->path);
+            throw AppError(ErrorCode::FILE_PROJECTXML_069, {diagnosticArgument(n->path)});
         p.assignments.push_back({taskIds.at(t), resources.at(resource), units(field(*n, "Units"), n->path, false)});
         map("assignment", id, taskIds.at(t) + "/" + resources.at(resource));
     }
@@ -598,22 +597,22 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     validate(p);
     graph(p);
     if (qs(p.name).size() > 255)
-        fail("Project XML 프로젝트 이름은 최대 255자입니다.");
+        throw AppError(ErrorCode::FILE_PROJECTXML_070, {});
     for (const auto &t : p.tasks)
         if (qs(t.name).size() > 512)
-            fail("Project XML 작업 이름은 최대 512자입니다: " + qs(t.id));
+            throw AppError(ErrorCode::FILE_PROJECTXML_071, {diagnosticArgument(qs(t.id))});
     for (const auto &g : p.wbsNodes)
         if (qs(g.name).size() > 512)
-            fail("Project XML WBS 이름은 최대 512자입니다: " + qs(g.id));
+            throw AppError(ErrorCode::FILE_PROJECTXML_072, {diagnosticArgument(qs(g.id))});
     for (const auto &r : p.resources)
         if (qs(r.name).size() > 512)
-            fail("Project XML 자원 이름은 최대 512자입니다: " + qs(r.id));
+            throw AppError(ErrorCode::FILE_PROJECTXML_073, {diagnosticArgument(qs(r.id))});
     for (const auto &c : p.calendars)
         if (qs(c.name).size() > 512)
-            fail("Project XML 달력 이름은 최대 512자입니다: " + qs(c.id));
+            throw AppError(ErrorCode::FILE_PROJECTXML_074, {diagnosticArgument(qs(c.id))});
     if (p.tasks.size() + p.wbsNodes.size() > 10000 || p.resources.size() > 10000 || p.assignments.size() > 10000 ||
         p.calendars.size() >= 10000)
-        fail("XML 내보내기 요소 10,000개 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_075, {});
     QByteArray bytes;
     QXmlStreamWriter w(&bytes);
     w.setAutoFormatting(true);
@@ -623,7 +622,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     auto value = [&](const QString &name, const QString &text) {
         w.writeTextElement(name, text);
         if (bytes.size() > byteLimit)
-            fail("XML 16 MiB 한도 초과");
+            throw AppError(ErrorCode::FILE_PROJECTXML_076, {});
     };
     value("SaveVersion", "12");
     value("Name", qs(p.name));
@@ -648,7 +647,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     w.writeStartElement("Calendars");
     auto calendar = [&](const TaskCalendar &c, int id) {
         if (c.periods.size() > 5 || c.holidays.size() > 10000)
-            fail("XML 달력 근무 구간 5개/휴일 10,000개 한도 초과");
+            throw AppError(ErrorCode::FILE_PROJECTXML_077, {});
         w.writeStartElement("Calendar");
         value("UID", QString::number(id));
         value("Name", qs(c.name));
@@ -713,7 +712,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     std::vector<Row> rows;
     std::function<void(const std::string &, int)> visit = [&](const std::string &parent, int level) {
         if (level > 32)
-            fail("XML WBS 깊이 32 초과");
+            throw AppError(ErrorCode::FILE_PROJECTXML_078, {});
         for (auto *g : groups[parent]) {
             rows.push_back({g, nullptr, level});
             visit(g->id, level + 1);
@@ -817,7 +816,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     w.writeEndElement();
     w.writeEndDocument();
     if (w.hasError() || bytes.size() > byteLimit)
-        fail("XML 쓰기 오류/16 MiB 한도 초과");
+        throw AppError(ErrorCode::FILE_PROJECTXML_079, {});
     // Parsing our own output is a support-boundary check, never a Microsoft Project compatibility claim.
     importProjectXml(bytes, "project.xml");
     if (!p.baselines.empty() || !p.progress.empty() || !p.costEntries.empty() || !p.scenarios.empty() || p.statusAt ||

@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/WorkCalendar.h"
 #include "domain/CalculationControl.h"
 #include <algorithm>
@@ -17,7 +18,7 @@ std::string stamp(sys_days anchor, std::int64_t minute) {
     const int m = int(minute % 1440);
     char out[32];
     if (int(ymd.year()) > 9999)
-        throw std::runtime_error("달력 시각이 지원 연도 범위를 초과했습니다.");
+        throw AppError(ErrorCode::CALENDAR_YEAR_LIMIT, {});
     std::snprintf(out, sizeof(out), "%04d-%02u-%02u %02d:%02d", int(ymd.year()), unsigned(ymd.month()),
                   unsigned(ymd.day()), m / 60, m % 60);
     return out;
@@ -41,7 +42,7 @@ void WorkCalendar::initialize(const PlanInput &p, const Task *task) {
         auto it = std::find_if(p.calendars.begin(), p.calendars.end(),
                                [&](const auto &c) { return c.id == task->calendarId; });
         if (it == p.calendars.end())
-            throw std::runtime_error("작업 달력이 없습니다.");
+            throw AppError(ErrorCode::CALENDAR_NOT_FOUND, {}, {}, "CALENDAR_NOT_FOUND_2");
         calendar = *it;
     }
     anchor_ = date(p.startDate);
@@ -133,23 +134,23 @@ std::vector<std::pair<std::int64_t, std::int64_t>> WorkCalendar::civilIntervals(
 std::string WorkCalendar::boundary(std::int64_t value, bool finish) const {
     calculationCheckpoint();
     if (value < 0 || intervals_->empty())
-        throw std::runtime_error("달력 근무분이 음수이거나 20년 범위에 가용 시간이 없습니다.");
+        throw AppError(ErrorCode::CALENDAR_AVAILABILITY_INVALID, {});
     auto it = std::upper_bound(intervals_->begin(), intervals_->end(), value - (finish && value > 0 ? 1 : 0),
                                [](auto n, const auto &i) { return n < i.prefix; });
     if (it == intervals_->begin())
-        throw std::runtime_error("달력 범위 밖입니다.");
+        throw AppError(ErrorCode::CALENDAR_RANGE_INVALID, {});
     --it;
     if (value > it->prefix + it->end - it->begin || (!finish && value == it->prefix + it->end - it->begin))
-        throw std::runtime_error("계획 시작부터 20년 이내에 근무시간이 부족합니다.");
+        throw AppError(ErrorCode::CALENDAR_HORIZON_EXHAUSTED, {});
     return stamp(anchor_, it->begin + value - it->prefix);
 }
 std::int64_t WorkCalendar::offset(const std::string &s) const {
     calculationCheckpoint();
     if (!validStamp(s))
-        throw std::runtime_error("잘못된 현지 날짜·시각입니다.");
+        throw AppError(ErrorCode::CIVIL_TIMESTAMP_INVALID, {});
     const auto d = date(s);
     if (d < anchor_ || d >= horizon_)
-        throw std::runtime_error("시각이 프로젝트 시작부터 20년의 계산 범위 밖입니다.");
+        throw AppError(ErrorCode::CALENDAR_TIMESTAMP_RANGE, {});
     auto civil = (d - anchor_).count() * 1440 + std::stoi(s.substr(11, 2)) * 60 + std::stoi(s.substr(14, 2));
     auto it = std::upper_bound(intervals_->begin(), intervals_->end(), civil,
                                [](auto n, const auto &i) { return n < i.begin; });

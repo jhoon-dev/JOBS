@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
 #include <algorithm>
@@ -116,13 +117,10 @@ ScheduleResult calculatePdmPlan(const Project &p, const std::vector<std::size_t>
         out.tasks = std::move(rows);
         out.projectFinish = finish;
         out.status = CalculationStatus::Valid;
-        out.diagnostics.push_back({"PDM_POLICY",
-                                   "FS·SS·FF·SF 하한 관계 · 지연/선행=후행 달력 근무분 · 시작일 이전 배치 없음 · "
-                                   "여유=작업 달력 근무분 · 자원 미검증",
-                                   {}});
+        out.diagnostics.push_back({"PDM_POLICY", {}, {}, "PDM_POLICY"});
     } catch (const std::exception &e) {
         out.status = CalculationStatus::Conflict;
-        out.diagnostics.push_back({"NO_AVAILABILITY_IN_HORIZON", e.what(), {}});
+        out.diagnostics.push_back(diagnosticFromException(e, "NO_AVAILABILITY_IN_HORIZON", {}));
     }
     return out;
 }
@@ -200,9 +198,7 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
                     if (target &&
                         *target < cal.shift(dependencyFromFinish(d.type) ? prev.finish : prev.start, d.lagMinutes))
                         out.diagnostics.push_back(
-                            {"OUT_OF_SEQUENCE",
-                             "실제 날짜가 선행관계 하한보다 빠릅니다. 실제는 보존하며 잔여에 관계를 적용합니다.",
-                             {d.predecessorId, t.id}});
+                            {"OUT_OF_SEQUENCE", {}, {d.predecessorId, t.id}, "OUT_OF_SEQUENCE_3"});
                 }
             if (!out.projectFinish || row.finish > *out.projectFinish)
                 out.projectFinish = row.finish;
@@ -225,23 +221,16 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
             out.calculationPolicy = "retained-remaining-constrained-v1";
             if (std::any_of(p.tasks.begin(), p.tasks.end(),
                             [](const auto &t) { return t.constraintType == ConstraintType::ALAP; }))
-                out.diagnostics.push_back({"CONSTRAINT_POLICY",
-                                           "잔여 예측은 상태일 이후 가장 이른 재개를 사용합니다. ALAP은 계획 모드에만 "
-                                           "적용하며 예측의 늦은 날짜/여유는 미산정입니다.",
-                                           {}});
+                out.diagnostics.push_back({"CONSTRAINT_POLICY", {}, {}, "CONSTRAINT_POLICY_2"});
         }
         if (unreported)
-            out.diagnostics.push_back(
-                {"UNREPORTED_REMAINING", "미보고 작업은 현재 계획 기간을 잔여로 사용합니다.", {}});
-        out.diagnostics.push_back(
-            {"FORECAST_POLICY",
-             "실제 날짜 고정 · 상태일 이후 잔여에 PDM 관계/작업 달력 적용 · 예측 여유/임계 미산정",
-             {}});
+            out.diagnostics.push_back({"UNREPORTED_REMAINING", {}, {}, "UNREPORTED_REMAINING_2"});
+        out.diagnostics.push_back({"FORECAST_POLICY", {}, {}, "FORECAST_POLICY_2"});
     } catch (const std::exception &e) {
         out.status = CalculationStatus::Conflict;
         out.tasks.clear();
         out.projectFinish.reset();
-        out.diagnostics.push_back({"FORECAST_HORIZON", e.what(), {}});
+        out.diagnostics.push_back(diagnosticFromException(e, "FORECAST_HORIZON", {}));
     }
     return out;
 }

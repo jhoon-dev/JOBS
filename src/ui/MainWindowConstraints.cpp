@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
 #include <QComboBox>
@@ -162,7 +163,7 @@ void MainWindow::showScheduleIssues() {
                 : result.status == CalculationStatus::Valid                                      ? "정보"
                 : d.code.find("POLICY") != std::string::npos || d.code == "UNREPORTED_REMAINING" ? "정보"
                                                                                                  : "충돌/입력",
-                QString::fromStdString(d.code), QString::fromStdString(d.message), names.join(", ")};
+                QString::fromStdString(d.code), QString::fromStdString(diagnosticMessage(d)), names.join(", ")};
             for (int c = 0; c < 4; ++c) {
                 auto *item = new QTableWidgetItem(cells[c]);
                 item->setToolTip("<qt>" + cells[c].toHtmlEscaped() + "</qt>");

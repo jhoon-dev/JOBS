@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/AsyncEditController.h"
 #include "ui/TaskInput.h"
@@ -170,12 +171,12 @@ void MainWindow::applyGanttEdit(const std::string &id, std::uint64_t revision, c
                                 const std::string &target) {
     try {
         if (!document_.project() || id != document_.project()->documentId || revision != document_.project()->revision)
-            throw std::runtime_error("문서가 변경되었습니다. 최신 일정으로 다시 편집하세요.");
+            throw AppError(ErrorCode::MAINWINDOWASYNC_001, {});
         if (isEffort(*document_.project())) {
             // The source gesture must refer to a currently editable valid plan.
             if (!document_.calculation() || document_.calculation()->status != CalculationStatus::Valid ||
                 document_.project()->statusAt)
-                throw std::runtime_error("최신 계획 일정에서만 드래그할 수 있습니다.");
+                throw AppError(ErrorCode::MAINWINDOWASYNC_002, {});
             submitEdit(GanttTaskEdit{taskId, resize, target}, "간트 공수·날짜 편집",
                        [this](EditState state, const QString &) {
                            if (state == EditState::Applied)

@@ -22,16 +22,21 @@ class JsonRecoveryStore;
 class AutoSaveController;
 class AsyncEditController;
 class TaskTableModel;
+class DesktopWorkspace;
 class MainWindow final : public QMainWindow {
 public:
-    explicit MainWindow(Document &document, JsonRecoveryStore *recoveryStore = nullptr);
+    explicit MainWindow(Document &document, JsonRecoveryStore *recoveryStore = nullptr,
+                        DesktopWorkspace *workspace = nullptr);
     ~MainWindow() override;
+    bool selectTaskById(const std::string &taskId);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
+    friend class DesktopWorkspace;
+    DesktopWorkspace *workspace_ = nullptr;
     Document &document_;
     TaskTableView *table_;
     TaskTableModel *taskModel_;

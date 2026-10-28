@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/AutoSaveController.h"
 #include "ui/AsyncEditController.h"
@@ -125,7 +126,7 @@ void MainWindow::showRecovery(bool startup) {
             try {
                 result.scan = store.scan();
             } catch (const std::exception &e) {
-                result.error = QString::fromUtf8(e.what());
+                result.error = qErrorText(e);
             }
             return result;
         }));

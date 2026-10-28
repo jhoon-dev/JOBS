@@ -1,4 +1,6 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/DesktopWorkspace.h"
 #include "ui/GanttView.h"
 #include "ui/ReportDialog.h"
 #include "ui/TaskInput.h"
@@ -53,9 +55,26 @@ std::string str(const QString &s) {
     return s.toUtf8().toStdString();
 }
 } // namespace
-MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore) : document_(document) {
+MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, DesktopWorkspace *workspace)
+    : workspace_(workspace), document_(document) {
     resize(1560, 900);
     auto *menu = menuBar()->addMenu("파일(&F)");
+    if (workspace_) {
+        auto *multiple = menu->addAction("다중 프로젝트·공유 자원…");
+        multiple->setObjectName("showWorkspace");
+        connect(multiple, &QAction::triggered, this, [this] { workspace_->showWorkspace(this); });
+        auto *extra = menu->addAction("새 프로젝트 창");
+        extra->setObjectName("newProjectWindow");
+        extra->setShortcut(QKeySequence("Ctrl+Shift+N"));
+        connect(extra, &QAction::triggered, this, [this] {
+            try {
+                workspace_->createProject();
+            } catch (const std::exception &error) {
+                report(error);
+            }
+        });
+        menu->addSeparator();
+    }
     auto *tools = addToolBar("파일 및 작업");
     tools->setMovable(false);
     auto action = [&](const QString &name, const QKeySequence &shortcut, std::function<void()> callback) {
@@ -122,7 +141,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore) : d
             try {
                 if (!document_.project() || document_.sessionGeneration() != session ||
                     document_.project()->revision != revision)
-                    throw std::runtime_error("입력 중 프로젝트가 변경되었습니다. 다시 추가하세요.");
+                    throw AppError(ErrorCode::MAINWINDOW_001, {});
                 submitEdit(InsertTasksEdit{{str(name)}, {}, wbs}, "작업 추가");
             } catch (const std::exception &e) {
                 report(e);
@@ -374,8 +393,46 @@ MainWindow::~MainWindow() {
     if (autosave_)
         autosave_->statusChanged = {};
 }
-void MainWindow::report(const std::exception &e) {
-    QMessageBox::warning(this, "JOBS · 작업 실패", QString::fromUtf8(e.what()));
+void MainWindow::report(const std::exception &error) {
+    const auto diagnostic = diagnosticFromException(error);
+    QMessageBox box(QMessageBox::Warning, "JOBS · 작업 실패", qDiagnosticText(diagnostic), QMessageBox::Ok, this);
+    box.setTextFormat(Qt::PlainText);
+    std::string task;
+    if (document_.project())
+        for (const auto &id : diagnostic.taskIds)
+            if (std::any_of(document_.project()->tasks.begin(), document_.project()->tasks.end(),
+                            [&](const auto &item) { return item.id == id; })) {
+                task = id;
+                break;
+            }
+    if (task.empty() && document_.project()) {
+        const auto &project = *document_.project();
+        for (const auto &item : project.tasks) {
+            const bool calendar = std::find(diagnostic.calendarIds.begin(), diagnostic.calendarIds.end(),
+                                            item.calendarId) != diagnostic.calendarIds.end();
+            const bool resource =
+                std::any_of(project.assignments.begin(), project.assignments.end(), [&](const auto &assignment) {
+                    if (assignment.taskId != item.id)
+                        return false;
+                    if (std::find(diagnostic.resourceIds.begin(), diagnostic.resourceIds.end(),
+                                  assignment.resourceId) != diagnostic.resourceIds.end())
+                        return true;
+                    return std::any_of(project.resources.begin(), project.resources.end(), [&](const auto &value) {
+                        return value.id == assignment.resourceId &&
+                               std::find(diagnostic.calendarIds.begin(), diagnostic.calendarIds.end(),
+                                         value.calendarId) != diagnostic.calendarIds.end();
+                    });
+                });
+            if (calendar || resource) {
+                task = item.id;
+                break;
+            }
+        }
+    }
+    auto *select = task.empty() ? nullptr : box.addButton("관련 작업 선택", QMessageBox::ActionRole);
+    box.exec();
+    if (select && box.clickedButton() == select)
+        selectTaskById(task);
 }
 void MainWindow::refresh(bool rebuildTree) {
     updateHistoryActions();
@@ -500,7 +557,7 @@ void MainWindow::refresh(bool rebuildTree) {
                     state += "\n추가 진단 " + QString::number(calculation->diagnostics.size() - 20) + "개";
                     break;
                 }
-                state += "\n[" + qs(d.code) + "] " + qs(d.message);
+                state += "\n[" + qs(d.code) + "] " + qs(diagnosticMessage(d));
                 if (!d.taskIds.empty()) {
                     QStringList path;
                     for (const auto &id : d.taskIds)
@@ -554,10 +611,7 @@ void MainWindow::calculateSchedule() {
                             result.tasks.clear();
                             result.plannedTasks.clear();
                             result.projectFinish.reset();
-                            result.diagnostics = {
-                                {"CALCULATION_CANCELLED",
-                                 "사용자가 일정 계산을 취소했습니다. 부분 결과는 적용하지 않았습니다.",
-                                 {}}};
+                            result.diagnostics = {{"CALCULATION_CANCELLED", {}, {}, "CALCULATION_CANCELLED_2"}};
                         }
                         document_.applyCalculation(std::move(result));
                     }
@@ -783,6 +837,10 @@ void MainWindow::commitPendingCell() {
     table_->commitEditors();
 }
 void MainWindow::create() {
+    if (workspace_ && document_.project()) {
+        workspace_->createProject();
+        return;
+    }
     QDialog dialog(this);
     dialog.setWindowTitle("새 프로젝트");
     dialog.resize(480, 440);
@@ -829,15 +887,36 @@ void MainWindow::create() {
 }
 void MainWindow::open() {
     auto path = QFileDialog::getOpenFileName(this, "프로젝트 열기", {}, "JOBS 프로젝트 (*.jobs);;모든 파일 (*)");
-    if (path.isEmpty() || !confirmChanges())
+    if (path.isEmpty())
+        return;
+    if (workspace_) {
+        try {
+            workspace_->openProject(str(path));
+        } catch (const AppError &error) {
+            if (error.code() == "FILE_LOCKED" &&
+                QMessageBox::question(this, "프로젝트 잠김", qErrorText(error) + "\n읽기 전용으로 여시겠습니까?",
+                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+                try {
+                    workspace_->openProject(str(path), true);
+                } catch (const std::exception &inner) {
+                    report(inner);
+                }
+            } else if (error.code() != "FILE_LOCKED")
+                report(error);
+        } catch (const std::exception &error) {
+            report(error);
+        }
+        return;
+    }
+    if (!confirmChanges())
         return;
     try {
         document_.open(str(path));
         refresh();
     } catch (const std::exception &e) {
-        auto result = QMessageBox::warning(this, "열기 실패",
-                                           QString::fromUtf8(e.what()) + "\n읽기 전용으로 열기를 시도하시겠습니까?",
-                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        auto result =
+            QMessageBox::warning(this, "열기 실패", qErrorText(e) + "\n읽기 전용으로 열기를 시도하시겠습니까?",
+                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (result == QMessageBox::Yes) {
             try {
                 document_.open(str(path), true);
@@ -860,7 +939,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         event->ignore();
         return;
     }
-    if (confirmChanges()) {
+    if (confirmChanges() && (!workspace_ || workspace_->confirmClosing(this))) {
         if (calculationControl_) {
             calculationControl_->cancel();
             queuedCalculation_.reset();

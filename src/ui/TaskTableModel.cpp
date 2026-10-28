@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/TaskTableModel.h"
 #include "calculation/WorkCalendar.h"
@@ -423,7 +424,7 @@ void TaskTableModel::synchronize(const std::vector<std::size_t> &rows) {
                 for (const auto &diagnostic : source.diagnostics)
                     for (const auto &id : diagnostic.taskIds)
                         if (!issues_.contains(id))
-                            issues_[id] = qs(diagnostic.message);
+                            issues_[id] = qs(diagnosticMessage(diagnostic));
         }
     }
     if (metadata || !changed.empty() || reset)

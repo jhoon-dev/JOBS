@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/CostAnalysisDialog.h"
 #include "ui/MoneyFields.h"
@@ -94,15 +95,15 @@ void MainWindow::editRates() {
             error->setText("통화를 설정했습니다. 파일 저장으로 보존하세요.");
         } catch (const std::exception &e) {
             currency->setCurrentText(qs(document_.project()->currency));
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     connect(save, &QPushButton::clicked, &dialog, [&] {
         try {
             if (sourceId != document_.project()->documentId || sourceRevision != document_.project()->revision)
-                throw std::runtime_error("단가 편집 중 문서가 변경되었습니다. 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWCOSTS_001, {});
             if (currency->currentText() != qs(document_.project()->currency))
-                throw std::runtime_error("먼저 통화 설정을 적용하세요.");
+                throw AppError(ErrorCode::MAINWINDOWCOSTS_002, {});
             auto id = str(choice->currentData().toString());
             for (auto r : document_.project()->resources)
                 if (r.id == id) {
@@ -110,7 +111,7 @@ void MainWindow::editRates() {
                     for (auto line : rates->toPlainText().split('\n', Qt::SkipEmptyParts)) {
                         auto parts = line.trimmed().split('=');
                         if (parts.size() != 2 || parts[1].trimmed().isEmpty())
-                            throw std::runtime_error("단가는 YYYY-MM-DD=금액 또는 ? 형식입니다.");
+                            throw AppError(ErrorCode::MAINWINDOWCOSTS_003, {});
                         r.rates.push_back(
                             {str(parts[0].trimmed()), parts[1].trimmed() == "?"
                                                           ? Money{}
@@ -122,7 +123,7 @@ void MainWindow::editRates() {
                     break;
                 }
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     auto *close = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
@@ -184,12 +185,12 @@ void MainWindow::editTaskCost() {
         try {
             if (document_.project()->documentId != snapshot.documentId ||
                 document_.project()->revision != snapshot.revision)
-                throw std::runtime_error("편집 중 문서가 변경되었습니다. 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWCOSTS_004, {});
             document_.setTaskCost({id, moneyui::parse(fixed->text(), snapshot.currency),
                                    str(accrual->currentData().toString()), str(credit->currentData().toString())});
             dialog.accept();
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     dialog.exec();
@@ -264,13 +265,13 @@ void MainWindow::reportCost() {
         try {
             if (document_.project()->documentId != snapshot.documentId ||
                 document_.project()->revision != snapshot.revision)
-                throw std::runtime_error("보고 중 문서가 변경되었습니다. 다시 여세요.");
+                throw AppError(ErrorCode::MAINWINDOWCOSTS_005, {});
             CostEntry e;
             e.taskId = id;
             e.actualMinor = moneyui::parse(actual->text(), snapshot.currency);
             auto value = moneyui::parse(physical->text(), "USD");
             if (value && *value > 10000)
-                throw std::runtime_error("물리 진척은 0~100%입니다.");
+                throw AppError(ErrorCode::MAINWINDOWCOSTS_006, {});
             if (value)
                 e.physicalBasisPoints = int(*value);
             e.reporter = str(author->text().trimmed());
@@ -279,7 +280,7 @@ void MainWindow::reportCost() {
             document_.recordCost(std::move(e));
             dialog.accept();
         } catch (const std::exception &e) {
-            error->setText(QString::fromUtf8(e.what()));
+            error->setText(qErrorText(e));
         }
     });
     dialog.exec();

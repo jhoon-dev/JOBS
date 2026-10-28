@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/TaskInput.h"
 #include <QRegularExpression>
@@ -18,8 +19,7 @@ std::optional<std::int64_t> taskDurationInput(const QString &value) {
         minutes = text.toDouble(&okay) * 60;
     if (!okay || !std::isfinite(minutes) || minutes < 0 || minutes > 5000000 ||
         std::abs(minutes - std::round(minutes)) > 0.000001)
-        throw std::runtime_error(
-            "기간은 0~5,000,000 정수 근무분으로 환산되는 시간(예: 8, 1.5) 또는 분(1m)입니다. 빈칸은 미정입니다.");
+        throw AppError(ErrorCode::TASKINPUT_001, {});
     return std::int64_t(std::round(minutes));
 }
 std::vector<Dependency> taskDependencyInput(const QString &value, const Project &p, const std::string &taskId) {
@@ -32,17 +32,17 @@ std::vector<Dependency> taskDependencyInput(const QString &value, const Project 
         bool okay = false;
         const auto number = match.captured(1).toULongLong(&okay);
         if (!match.hasMatch() || !okay || number < 1 || number > p.tasks.size())
-            throw std::runtime_error("선행 입력은 프로젝트 원본 행 번호입니다: 1, 2SS+2h, 3FF-30m (d=480 근무분).");
+            throw AppError(ErrorCode::TASKINPUT_002, {});
         const auto &predecessor = p.tasks[std::size_t(number - 1)];
         if (predecessor.id == taskId)
-            throw std::runtime_error("자기 자신을 선행 작업으로 지정할 수 없습니다.");
+            throw AppError(ErrorCode::TASKINPUT_003, {});
         const auto lag = match.captured(3).toLower();
         double minutes = 0;
         if (!lag.isEmpty()) {
             minutes = lag.chopped(1).toDouble(&okay) * (lag.endsWith('d') ? 480 : lag.endsWith('h') ? 60 : 1);
             if (!okay || !std::isfinite(minutes) || std::abs(minutes) > 5000000 ||
                 std::abs(minutes - std::round(minutes)) > 0.000001)
-                throw std::runtime_error("지연/선행은 ±5,000,000 정수 근무분 이내입니다.");
+                throw AppError(ErrorCode::TASKINPUT_004, {});
         }
         edges.push_back({predecessor.id,
                          match.captured(2).isEmpty()
@@ -70,9 +70,9 @@ QString encodeTaskTsv(const QList<QStringList> &rows) {
 QList<QStringList> decodeTaskTsv(const QString &text) {
     constexpr qsizetype limit = 4 * 1024 * 1024;
     if (text.size() > limit || text.toUtf8().size() > limit)
-        throw std::runtime_error("붙여넣기 텍스트는 최대 4 MiB입니다.");
+        throw AppError(ErrorCode::TASKINPUT_005, {});
     if (text.isEmpty())
-        throw std::runtime_error("붙여넣을 텍스트가 없습니다.");
+        throw AppError(ErrorCode::TASKINPUT_006, {});
     QList<QStringList> rows;
     QStringList row;
     QString field;
@@ -84,14 +84,14 @@ QList<QStringList> decodeTaskTsv(const QString &text) {
         closed = false;
         started = false;
         if (++cells > 30000)
-            throw std::runtime_error("붙여넣기는 최대 30,000개 입력 셀입니다.");
+            throw AppError(ErrorCode::TASKINPUT_007, {});
     };
     auto finishRow = [&] {
         finishField();
         if (rows.size() >= 10000)
-            throw std::runtime_error("붙여넣기는 최대 10,000행입니다.");
+            throw AppError(ErrorCode::TASKINPUT_008, {});
         if (!rows.isEmpty() && row.size() != rows.front().size())
-            throw std::runtime_error("붙여넣기 " + std::to_string(rows.size() + 1) + "행의 열 수가 다릅니다.");
+            throw AppError(ErrorCode::TASKINPUT_009, {diagnosticArgument(std::to_string(rows.size() + 1))});
         rows << row;
         row.clear();
     };
@@ -123,7 +123,7 @@ QList<QStringList> decodeTaskTsv(const QString &text) {
             continue;
         }
         if (closed)
-            throw std::runtime_error("닫힌 인용부호 뒤에 잘못된 문자가 있습니다.");
+            throw AppError(ErrorCode::TASKINPUT_010, {});
         if (c == '"' && !started) {
             quoted = true;
             started = true;
@@ -133,7 +133,7 @@ QList<QStringList> decodeTaskTsv(const QString &text) {
         }
     }
     if (quoted)
-        throw std::runtime_error("닫히지 않은 TSV 인용부호가 있습니다.");
+        throw AppError(ErrorCode::TASKINPUT_011, {});
     if (started || closed || !field.isEmpty() || !row.isEmpty())
         finishRow();
     return rows;

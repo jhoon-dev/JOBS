@@ -4,11 +4,6 @@
 
 namespace jobs {
 enum class CalculationStatus { Valid, Incomplete, Conflict, Stale, Cancelled };
-struct Diagnostic {
-    std::string code;
-    std::string message;
-    std::vector<std::string> taskIds;
-};
 struct ScheduleResult {
     std::string documentId;
     std::uint64_t inputRevision = 0;

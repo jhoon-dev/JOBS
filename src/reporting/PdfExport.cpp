@@ -1,3 +1,4 @@
+#include "formatting/QtDiagnosticText.h"
 #include "reporting/ReportExport.h"
 #include "reporting/ExportFile.h"
 #include <QPdfWriter>
@@ -54,9 +55,9 @@ class Pages {
     }
     void page() {
         if (pages && !writer_.newPage())
-            throw std::runtime_error("PDF 새 페이지를 작성할 수 없습니다.");
+            throw AppError(ErrorCode::PDFEXPORT_001, {});
         if (++pages > 10000)
-            throw std::runtime_error("PDF 페이지 한도(10,000)를 초과했습니다.");
+            throw AppError(ErrorCode::PDFEXPORT_002, {});
         p_.setPen(QColor("#17324d"));
         auto title = font_;
         title.setBold(true);
@@ -90,7 +91,7 @@ class Pages {
         auto note = wrap(reportText(t.note), font_, width(), &writer_);
         auto noteHeight = note.layout->lineCount() * note.height;
         if (noteHeight > bottom() - y_ - 60)
-            throw std::runtime_error("PDF 설명이 페이지를 초과합니다.");
+            throw AppError(ErrorCode::PDFEXPORT_003, {});
         note.layout->draw(&p_, QPointF(margin_, y_));
         y_ += noteHeight + 8;
         drawHeaders(t);
@@ -136,12 +137,12 @@ class Pages {
             auto available = int(std::floor((bottom() - y_ - pad * 2) / lineHeight));
             if (available < 1) {
                 if (header)
-                    throw std::runtime_error("PDF 표 머리글이 페이지를 초과합니다.");
+                    throw AppError(ErrorCode::PDFEXPORT_004, {});
                 page();
                 heading(t, true);
                 available = int(std::floor((bottom() - y_ - pad * 2) / lineHeight));
                 if (available < 1)
-                    throw std::runtime_error("PDF 행을 배치할 공간이 없습니다.");
+                    throw AppError(ErrorCode::PDFEXPORT_005, {});
             }
             const auto count = std::min(maxLines - offset, available);
             const auto height = count * lineHeight + pad * 2;
@@ -163,7 +164,7 @@ class Pages {
             offset += count;
             if (offset < maxLines) {
                 if (header)
-                    throw std::runtime_error("PDF 머리글이 너무 깁니다.");
+                    throw AppError(ErrorCode::PDFEXPORT_006, {});
                 page();
                 heading(t, true);
             }
@@ -176,7 +177,7 @@ public:
         : writer_(w), p_(painter), r_(r), font_(std::move(font)) {}
     void table(const ReportTable &t) {
         if (t.columns.empty())
-            throw std::runtime_error("PDF 보고서에 열이 없습니다.");
+            throw AppError(ErrorCode::PDFEXPORT_007, {});
         if (!pages || bottom() - y_ < 160)
             page();
         else
@@ -190,7 +191,7 @@ public:
         }
         for (std::size_t i = 0; i < t.rows.size(); ++i) {
             if (t.rows[i].size() != t.columns.size())
-                throw std::runtime_error("PDF 보고서 열 개수가 일치하지 않습니다.");
+                throw AppError(ErrorCode::PDFEXPORT_008, {});
             std::vector<QString> values;
             for (const auto &c : t.rows[i])
                 values.push_back(displayCell(c, r_.currency));
@@ -207,7 +208,7 @@ public:
 int exportPdf(const ProjectReport &r, const QString &path, ReportFamily family, const PdfOptions &options) {
     validateReportExport(r);
     if (options.fontPoints < 9 || options.fontPoints > 12)
-        throw std::runtime_error("PDF 글자 크기는 9~12pt입니다.");
+        throw AppError(ErrorCode::PDFEXPORT_009, {});
     ExportFile file(path, "pdf");
     int pages = 0;
     {
@@ -220,7 +221,7 @@ int exportPdf(const ProjectReport &r, const QString &path, ReportFamily family, 
         writer.setTitle(reportText(r.projectName) + " 프로젝트 보고서");
         QPainter painter(&writer);
         if (!painter.isActive())
-            throw std::runtime_error("PDF 렌더러를 시작할 수 없습니다.");
+            throw AppError(ErrorCode::PDFEXPORT_010, {});
         auto font = options.font;
 #ifdef Q_OS_MACOS
         // CoreText's private UI fonts can emit a broken PDF ToUnicode map
@@ -236,7 +237,7 @@ int exportPdf(const ProjectReport &r, const QString &path, ReportFamily family, 
                     break;
                 }
             if (!found)
-                throw std::runtime_error("PDF 출력용 Arial/Helvetica/Noto Sans 글꼴을 찾지 못했습니다.");
+                throw AppError(ErrorCode::PDFEXPORT_011, {});
         }
 #endif
         font.setPointSize(options.fontPoints);
@@ -249,7 +250,7 @@ int exportPdf(const ProjectReport &r, const QString &path, ReportFamily family, 
             renderer.chart();
         pages = renderer.pages;
         if (!pages || !painter.end())
-            throw std::runtime_error("PDF를 완료할 수 없습니다.");
+            throw AppError(ErrorCode::PDFEXPORT_012, {});
     }
     file.commit();
     return pages;

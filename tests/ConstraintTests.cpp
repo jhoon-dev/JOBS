@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "application/Document.h"
 #include "calculation/Constraints.h"
 #include "calculation/Resources.h"
@@ -43,7 +44,7 @@ bool diagnostic(const jobs::ScheduleResult &r, const std::string &code) {
 void date(const jobs::ScheduleResult &r, std::size_t i, const std::string &a, const std::string &b) {
     if (r.status != jobs::CalculationStatus::Valid || r.tasks.at(i).start != a || r.tasks.at(i).finish != b) {
         for (const auto &d : r.diagnostics)
-            std::cerr << d.code << ": " << d.message << '\n';
+            std::cerr << d.code << ": " << d.code << '\n';
         if (i < r.tasks.size())
             std::cerr << r.tasks[i].start << " -> " << r.tasks[i].finish << '\n';
         throw std::runtime_error("constraint dates wrong");
@@ -80,7 +81,8 @@ int main(int argc, char **argv) {
                   conflict.tasks.empty() && diagnostic(conflict, "CONSTRAINT_CONFLICT"),
               "upper conflict reported as valid");
         check(conflict.diagnostics[0].taskIds.size() == 2 &&
-                  conflict.diagnostics[0].message.find("2026-10-26 17:00") != std::string::npos,
+                  std::find(conflict.diagnostics[0].arguments.begin(), conflict.diagnostics[0].arguments.end(),
+                            "2026-10-26 17:00") != conflict.diagnostics[0].arguments.end(),
               "conflict lacks dates/causal IDs");
         timing(p.tasks[1], jobs::ConstraintType::FNLT, "2026-10-27 13:00");
         check(diagnostic(jobs::calculatePlan(p), "CONSTRAINT_CONFLICT"), "finish upper ignored");

@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/Scheduler.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Pdm.h"
@@ -24,11 +25,11 @@ ScheduleResult calculatePlan(const Project &p) {
         validate(p);
     } catch (const std::exception &e) {
         result.status = CalculationStatus::Conflict;
-        result.diagnostics.push_back({"INVALID_INPUT", e.what(), {}});
+        result.diagnostics.push_back(diagnosticFromException(e, "INVALID_INPUT", {}));
         return result;
     }
     if (p.tasks.empty()) {
-        result.diagnostics.push_back({"NO_TASKS", "계산할 작업이 없습니다.", {}});
+        result.diagnostics.push_back({"NO_TASKS", {}, {}, "NO_TASKS"});
         return result;
     }
     const auto n = p.tasks.size();
@@ -47,19 +48,20 @@ ScheduleResult calculatePlan(const Project &p) {
         const auto &task = p.tasks[i];
         if (!task.durationMinutes && !(isEffort(p) && usesWork(task))) {
             missing = true;
-            result.diagnostics.push_back({"MISSING_DURATION", "작업 기간이 미정입니다: " + task.name, {task.id}});
+            result.diagnostics.push_back(
+                {"MISSING_DURATION", {diagnosticArgument(task.name)}, {task.id}, "MISSING_DURATION"});
         }
         if (isEffort(p) && usesWork(task) && task.workUnitMinutes.value_or(0) > 0 && !assignedTasks.contains(task.id)) {
             missing = true;
             result.diagnostics.push_back(
-                {"MISSING_WORK_ASSIGNMENT", "공수 작업에 자원을 배정하세요: " + task.name, {task.id}});
+                {"MISSING_WORK_ASSIGNMENT", {diagnosticArgument(task.name)}, {task.id}, "MISSING_WORK_ASSIGNMENT"});
         }
         for (const auto &id : task.predecessors) {
             const auto found = ids.find(id);
             if (found == ids.end() || found->second == i) {
                 invalid = true;
                 result.diagnostics.push_back(
-                    {"INVALID_DEPENDENCY", "존재하지 않거나 자기 자신인 선행 작업입니다: " + task.name, {task.id, id}});
+                    {"INVALID_DEPENDENCY", {diagnosticArgument(task.name)}, {task.id, id}, "INVALID_DEPENDENCY"});
             } else {
                 predecessors[i].push_back(found->second);
                 successors[found->second].push_back(i);
@@ -101,8 +103,7 @@ ScheduleResult calculatePlan(const Project &p) {
             cycle.push_back(p.tasks[chain[j]].id);
         cycle.push_back(p.tasks[current].id);
         std::reverse(cycle.begin(), cycle.end());
-        result.diagnostics.push_back(
-            {"DEPENDENCY_CYCLE", "선행관계 순환이 있습니다. 진단의 작업 ID 경로를 확인하세요.", std::move(cycle)});
+        result.diagnostics.push_back({"DEPENDENCY_CYCLE", {}, std::move(cycle), "DEPENDENCY_CYCLE_2"});
         invalid = true;
     }
     if (invalid || missing) {
@@ -154,13 +155,12 @@ ScheduleResult calculatePlan(const Project &p) {
         result.projectFinish = calendar.boundary(finish, true);
     } catch (const std::exception &e) {
         result.status = CalculationStatus::Conflict;
-        result.diagnostics.push_back({"NO_AVAILABILITY_IN_HORIZON", e.what(), {}});
+        result.diagnostics.push_back(diagnosticFromException(e, "NO_AVAILABILITY_IN_HORIZON", {}));
         return result;
     }
     result.tasks = std::move(rows);
     result.status = CalculationStatus::Valid;
-    result.diagnostics.push_back(
-        {"RESOURCE_NOT_CHECKED", "기간·FS 논리 일정입니다. 자원 가용량은 검증하지 않았습니다.", {}});
+    result.diagnostics.push_back({"RESOURCE_NOT_CHECKED", {}, {}, "RESOURCE_NOT_CHECKED"});
     return result;
 }
 } // namespace jobs

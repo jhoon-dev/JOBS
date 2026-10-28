@@ -1,5 +1,6 @@
 #pragma once
 #include "domain/PlanTypes.h"
+#include "domain/Diagnostics.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -166,13 +167,10 @@ const ProgressEntry *progressAsOf(const Project &project, const std::string &tas
 const CostEntry *costAsOf(const Project &, const std::string &taskId, const std::string &statusAt);
 int currencyDecimals(const std::string &currency);
 std::vector<Dependency> dependencies(const Task &);
-std::string taskCalendarName(const PlanInput &, const Task &);
 bool isPdm(const PlanInput &);
 bool hasConstraints(const PlanInput &);
 bool isEffort(const PlanInput &);
 bool usesWork(const Task &);
-std::string taskTypeName(TaskType);
 std::string engineFor(const PlanInput &);
 std::string levelingPolicyFor(const PlanInput &);
-std::string constraintName(ConstraintType type);
 } // namespace jobs

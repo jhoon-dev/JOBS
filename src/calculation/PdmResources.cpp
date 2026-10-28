@@ -1,3 +1,4 @@
+#include "domain/Diagnostics.h"
 #include "calculation/PdmResources.h"
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
@@ -46,7 +47,7 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
                     chosen = i;
             }
             if (!chosen)
-                throw std::runtime_error("평준화 관계에 순환이 있습니다.");
+                throw AppError(ErrorCode::LEVEL_DEPENDENCY_CYCLE, {});
             const auto i = *chosen;
             const auto &task = p.tasks[i];
             auto &row = rows[i];
@@ -141,10 +142,8 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
                 out.leveled.status = unknown ? CalculationStatus::Incomplete : CalculationStatus::Conflict;
                 out.leveled.tasks.clear();
                 out.leveled.projectFinish.reset();
-                out.diagnostics.push_back({unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED",
-                                           "PDM 관계·작업 달력·자원 가용량을 만족하는 배치를 탐색 범위에 찾지 "
-                                           "못했습니다. 부분 결과를 확정하지 않습니다.",
-                                           {task.id}});
+                out.diagnostics.push_back(
+                    {unknown ? "LEVEL_UNKNOWN_CAPACITY" : "LEVEL_HORIZON_EXHAUSTED", {}, {task.id}});
                 return out;
             }
             for (const auto &a : p.assignments)
@@ -163,10 +162,7 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
                 trial.remainingStart = cal.boundary(local, duration == 0);
             row = trial;
             if (row.remainingStart.value_or(row.start) != originalStart)
-                out.diagnostics.push_back(
-                    {"RESOURCE_DELAY",
-                     "선행·자원 제약으로 잔여/계획 작업을 작업 달력의 다음 가용 구간으로 지연했습니다.",
-                     {task.id}});
+                out.diagnostics.push_back({"RESOURCE_DELAY", {}, {task.id}, "RESOURCE_DELAY_2"});
         }
         out.leveled.tasks = std::move(rows);
         out.leveled.projectFinish.reset();
@@ -179,15 +175,12 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
             auto warnings = deadlineDiagnostics(p, out.leveled.tasks);
             out.diagnostics.insert(out.diagnostics.end(), warnings.begin(), warnings.end());
         }
-        out.diagnostics.push_back({"LEVEL_POLICY",
-                                   "직렬 우선순위 · 작업 달력의 근무 구간만 자원 예약 · 비근무 중단은 허용, 자원에 "
-                                   "따른 작업 분할 없음 · 여유/임계 미산정",
-                                   {}});
+        out.diagnostics.push_back({"LEVEL_POLICY", {}, {}, "LEVEL_POLICY"});
     } catch (const std::exception &e) {
         out.leveled.status = CalculationStatus::Conflict;
         out.leveled.tasks.clear();
         out.leveled.projectFinish.reset();
-        out.diagnostics.push_back({"LEVEL_HORIZON_EXHAUSTED", e.what(), {}});
+        out.diagnostics.push_back(diagnosticFromException(e, "LEVEL_HORIZON_EXHAUSTED", {}));
     }
     return out;
 }
