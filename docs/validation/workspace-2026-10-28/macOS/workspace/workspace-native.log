@@ -1,0 +1,1 @@
+PASS: independent windows, leases/duplicate IDs, dirty/undo, workspace save/reopen/rollback, cancellation and stale-result UI

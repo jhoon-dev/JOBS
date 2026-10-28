@@ -1,0 +1,40 @@
+{
+    "apply_gui": {
+        "median_ms": 0.0132,
+        "observed_p95_ms": 0.0136,
+        "samples_ms": [
+            0.0018,
+            0.0136,
+            0.0132
+        ]
+    },
+    "baseline_count": 3,
+    "built_product_source_sha256": "7792fcc014817a7fd42ea22a9879aba4dda016195d6f4af905276141ece2f937",
+    "fixture": "jobs-responsive-phases-v1",
+    "os": "Windows Server 2025 Version 24H2",
+    "platform": "windows",
+    "prepare_worker": {
+        "median_ms": 110.1512,
+        "observed_p95_ms": 110.6211,
+        "samples_ms": [
+            110.6211,
+            110.1512,
+            108.1743
+        ]
+    },
+    "qt": "6.8.3",
+    "repeats": 3,
+    "request_gui": {
+        "median_ms": 7e-04,
+        "observed_p95_ms": 0.001,
+        "samples_ms": [
+            0.001,
+            6e-04,
+            7e-04
+        ]
+    },
+    "scope": "Sealed request creation, isolated worker preparation, Document GUI commit only; excludes UI refresh, explicit save/open, controlled result destruction and OS presentation",
+    "source_revision": "ae8d9edaa360388012fdb98cd79b633192919971+dirty",
+    "status": "success",
+    "task_count": 1000
+}

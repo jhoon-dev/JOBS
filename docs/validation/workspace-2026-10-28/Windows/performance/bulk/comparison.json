@@ -1,0 +1,869 @@
+{
+  "scope": "Single observations, includes automated modal delays; no timing gate",
+  "operations": [
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "insert",
+      "before": {
+        "heartbeat_ticks": 4,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 48.7955,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 19.4368
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 17,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 55.0979,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 28.5151
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "undo_insert",
+      "before": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 13,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 23.754,
+        "setup_ready_ms": 0.0005,
+        "trigger_return_ms": 0.2656
+      },
+      "after": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 17,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 18.5128,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.212
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "duplicate",
+      "before": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 12,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 22.6432,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.2623
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 13,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 22.8062,
+        "setup_ready_ms": 0,
+        "trigger_return_ms": 0.2338
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "undo_duplicate",
+      "before": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 20.0645,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2177
+      },
+      "after": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 20.7565,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.3641
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "paste",
+      "before": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 17.3897,
+        "setup_ready_ms": 3.0491,
+        "trigger_return_ms": 0.2674
+      },
+      "after": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 18.0017,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.4942
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "undo_paste",
+      "before": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 16,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 17.8472,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.1924
+      },
+      "after": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 15,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 16.6509,
+        "setup_ready_ms": 0.0004,
+        "trigger_return_ms": 0.2322
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "delete",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 73.2737,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 46.3692
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 20,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 73.9174,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 40.8388
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 0,
+      "operation": "undo_delete",
+      "before": {
+        "heartbeat_ticks": 1,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 20,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 21.664,
+        "setup_ready_ms": 0.0004,
+        "trigger_return_ms": 0.2243
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 17,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 29.7958,
+        "setup_ready_ms": 0.0004,
+        "trigger_return_ms": 0.6956
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "insert",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 58.9346,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 29.6003
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 55.502,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 26.7488
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "undo_insert",
+      "before": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 28.8478,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2053
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 15,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 26.5962,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.2102
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "duplicate",
+      "before": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 27.9349,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.2495
+      },
+      "after": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 28.8768,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 2.3353
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "undo_duplicate",
+      "before": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 28.2647,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2246
+      },
+      "after": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 16,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 27.9153,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2053
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "paste",
+      "before": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 12,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 26.0112,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.4658
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 15,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 22.4022,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.4578
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "undo_paste",
+      "before": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 25.2335,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2673
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 14,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 21.6053,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2545
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "delete",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 81.4261,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 44.6573
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 20,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 69.0382,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 39.8328
+      }
+    },
+    {
+      "tasks": 1000,
+      "baselines": 3,
+      "operation": "undo_delete",
+      "before": {
+        "heartbeat_ticks": 3,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 27.7563,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2262
+      },
+      "after": {
+        "heartbeat_ticks": 2,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 29.5452,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.5583
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "insert",
+      "before": {
+        "heartbeat_ticks": 9,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 17,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 79.2698,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 32.2558
+      },
+      "after": {
+        "heartbeat_ticks": 9,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 14,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 76.2898,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 32.1444
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "undo_insert",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 42.4436,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.3766
+      },
+      "after": {
+        "heartbeat_ticks": 4,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 35.8911,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2011
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "duplicate",
+      "before": {
+        "heartbeat_ticks": 8,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 10,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 50.7448,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.5062
+      },
+      "after": {
+        "heartbeat_ticks": 6,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 17,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 45.273,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.6518
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "undo_duplicate",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 41.8417,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.1888
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 13,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 39.0205,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2056
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "paste",
+      "before": {
+        "heartbeat_ticks": 6,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 10,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 42.3415,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.4784
+      },
+      "after": {
+        "heartbeat_ticks": 6,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 13,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 40.2795,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.3872
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "undo_paste",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 8,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 33.4863,
+        "setup_ready_ms": 0.0007,
+        "trigger_return_ms": 0.1972
+      },
+      "after": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 9,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 33.7257,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2045
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "delete",
+      "before": {
+        "heartbeat_ticks": 8,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 77.7273,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 36.348
+      },
+      "after": {
+        "heartbeat_ticks": 8,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 18,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 80.4862,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 39.8204
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 0,
+      "operation": "undo_delete",
+      "before": {
+        "heartbeat_ticks": 5,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 41.5187,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2999
+      },
+      "after": {
+        "heartbeat_ticks": 4,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 20,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 37.0583,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.1866
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "insert",
+      "before": {
+        "heartbeat_ticks": 18,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 13,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 119.0056,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 26.5348
+      },
+      "after": {
+        "heartbeat_ticks": 12,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 15,
+        "operation": "insert",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 91.9222,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 31.1601
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "undo_insert",
+      "before": {
+        "heartbeat_ticks": 13,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 22,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 83.689,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.1892
+      },
+      "after": {
+        "heartbeat_ticks": 9,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 16,
+        "operation": "undo_insert",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 61.9235,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2358
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "duplicate",
+      "before": {
+        "heartbeat_ticks": 14,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 82.6655,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.8387
+      },
+      "after": {
+        "heartbeat_ticks": 9,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 14,
+        "operation": "duplicate",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 61.4994,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.6146
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "undo_duplicate",
+      "before": {
+        "heartbeat_ticks": 13,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 19,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 82.7682,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.3272
+      },
+      "after": {
+        "heartbeat_ticks": 8,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 20,
+        "operation": "undo_duplicate",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 58.6953,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2136
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "paste",
+      "before": {
+        "heartbeat_ticks": 16,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 14,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 94.5011,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 0.3762
+      },
+      "after": {
+        "heartbeat_ticks": 12,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 70.2342,
+        "setup_ready_ms": 0.0002,
+        "trigger_return_ms": 0.3293
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "undo_paste",
+      "before": {
+        "heartbeat_ticks": 13,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 14,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 77.3145,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2081
+      },
+      "after": {
+        "heartbeat_ticks": 9,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 11,
+        "operation": "undo_paste",
+        "row_insert_signals": 0,
+        "row_remove_signals": 0,
+        "settled_ms": 55.8044,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2149
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "delete",
+      "before": {
+        "heartbeat_ticks": 15,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 22,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 127.2573,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 46.3306
+      },
+      "after": {
+        "heartbeat_ticks": 11,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 21,
+        "operation": "delete",
+        "row_insert_signals": 0,
+        "row_remove_signals": 1,
+        "settled_ms": 99.8291,
+        "setup_ready_ms": 0.0001,
+        "trigger_return_ms": 42.1928
+      }
+    },
+    {
+      "tasks": 10000,
+      "baselines": 3,
+      "operation": "undo_delete",
+      "before": {
+        "heartbeat_ticks": 12,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 22,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 81.3859,
+        "setup_ready_ms": 0.0005,
+        "trigger_return_ms": 0.2478
+      },
+      "after": {
+        "heartbeat_ticks": 8,
+        "model_resets": 0,
+        "observed_max_heartbeat_gap_ms": 15,
+        "operation": "undo_delete",
+        "row_insert_signals": 1,
+        "row_remove_signals": 0,
+        "settled_ms": 55.6431,
+        "setup_ready_ms": 0.0003,
+        "trigger_return_ms": 0.2251
+      }
+    }
+  ]
+}

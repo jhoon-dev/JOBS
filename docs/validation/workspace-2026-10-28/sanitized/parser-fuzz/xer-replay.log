@@ -1,0 +1,26 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 165501418
+INFO: Loaded 1 modules   (44558 inline 8-bit counters): 44558 [0x55dcd5bdeb70, 0x55dcd5be997e), 
+INFO: Loaded 1 PC tables (44558 PCs): 44558 [0x55dcd5be9980,0x55dcd5c97a60), 
+/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_xer: Running 6 inputs 1 time(s) each.
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/binary
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/binary in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/empty
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/empty in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer in 8 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/plan.xer.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer in 4 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/xer/windows-1252.xer.truncated in 0 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***
+stat::number_of_executed_units: 8
+stat::average_exec_per_sec:     0
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              73

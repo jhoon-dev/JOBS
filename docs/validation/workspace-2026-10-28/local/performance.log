@@ -1,0 +1,4 @@
+legacy/1000: calculation median 7.04 ms; UI 191.31 ms; peak 57.9 MiB
+legacy/10000: calculation median 25.67 ms; UI 253.01 ms; peak 98.2 MiB
+effort/1000: calculation median 285.86 ms; UI 267.05 ms; peak 72.8 MiB
+effort/10000: calculation median 837.09 ms; UI 330.33 ms; peak 117.1 MiB

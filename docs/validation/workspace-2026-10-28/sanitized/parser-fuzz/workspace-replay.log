@@ -1,0 +1,26 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1658262283
+INFO: Loaded 1 modules   (44558 inline 8-bit counters): 44558 [0x55dae954db70, 0x55dae955897e), 
+INFO: Loaded 1 PC tables (44558 PCs): 44558 [0x55dae9558980,0x55dae9606a60), 
+/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_workspace: Running 6 inputs 1 time(s) each.
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/binary
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/binary in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/checksum.jobsworkspace
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/checksum.jobsworkspace in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/checksum.jobsworkspace.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/checksum.jobsworkspace.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/empty
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/empty in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/valid.jobsworkspace
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/valid.jobsworkspace in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/valid.jobsworkspace.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace/valid.jobsworkspace.truncated in 0 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***
+stat::number_of_executed_units: 6
+stat::average_exec_per_sec:     0
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              60

@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": "5b97badeae284e7c3e2c9a409a744aa19b068fc5",
+  "files": [
+    "src/application/Document.cpp",
+    "src/application/Document.h",
+    "src/application/PreparedEdit.cpp",
+    "src/application/TaskEditing.cpp",
+    "src/formatting/DiagnosticText.cpp",
+    "src/ui/AsyncEditController.cpp",
+    "src/ui/TaskTableModel.cpp",
+    "tests/DiagnosticTests.cpp"
+  ],
+  "format_changes": [],
+  "fix": false
+}

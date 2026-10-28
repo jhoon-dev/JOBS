@@ -10,11 +10,11 @@ Qt 6.8.3의 windeployqt로 필요한 동적 라이브러리·플러그인·컴�
 
 ## 설치와 완전 제거
 
-산출물은 `dist/JOBS-0.1.0-Setup-win64-2ff28ff8.exe`이며 크기는 12,830,792 bytes다. Windows x64용 미서명 0.1.0 Preview다. 설치 파일 하나만 실행하면 되며 Qt·Python·Office를 추가로 설치할 필요가 없다. 설치 전용 폴더 이름은 `JOBS`로 제한한다. 기본 경로를 쓰거나 `D:\Apps\JOBS`처럼 선택한다. 시작 메뉴의 JOBS로 실행한다.
+최신 산출물은 `dist/JOBS-0.1.0-Setup-win64-a2039fed.exe`이며 크기는 12,992,450 bytes다. 구조화 진단과 다중 프로젝트·공유 자원 작업공간을 포함한다. Windows x64용 미서명 0.1.0 Preview다. 설치 파일 하나만 실행하면 되며 Qt·Python·Office를 추가로 설치할 필요가 없다. 설치 전용 폴더 이름은 `JOBS`로 제한한다. 기본 경로를 쓰거나 `D:\Apps\JOBS`처럼 선택한다. 시작 메뉴의 JOBS로 실행한다.
 
 Windows 설정의 앱 목록 또는 시작 메뉴의 JOBS 제거에서 제거한다. **설치 폴더 안의 모든 파일, JOBS 설정·캐시·자동 복구 자료를 삭제**한다. 제거 전에 앱을 닫아야 한다. 문서 폴더 등 설치 폴더 밖에 별도로 저장한 `.jobs` 프로젝트는 유지한다. 삭제 경로는 등록된 설치 폴더와 현재 사용자의 `LocalAppData/ToolMoa/JOBS`, `Roaming AppData/ToolMoa/JOBS`, `HKCU/Software/ToolMoa/JOBS`로 제한한다. 다른 ToolMoa 앱의 폴더는 삭제하지 않는다.
 
-SHA-256: `6bd51edefd03d881d8c0f2974bb933d015f67adf3500b6602891452258190668`
+SHA-256: `c3a74e1c96c325475759e2c8bd6fdb6aa3fc1115f4c747c5db6c01895bb899de`
 
 ## 개발자 재현
 
@@ -32,13 +32,19 @@ Qt 고지/라이선스 원문·SPDX, GCC/MinGW/winpthreads와 NSIS 고지를 포
 수용 helper는 **격리된/비어 있는 JOBS 데이터**에서만 사용한다. 기존 사용자 데이터나 설정이 있으면 중단한다. Windows Store/MSIX Python alias는 registry/AppData를 가상화할 수 있어 helper가 거부하므로 일반 `python.exe`의 실제 경로를 사용한다. 이 작업에서는 아래 가상환경의 일반 Python 3.12로 검사했다.
 
 ```powershell
-& ./build/validation-python/Scripts/python.exe scripts/check-windows-installer.py install --installer ./dist/JOBS-0.1.0-Setup-win64-2ff28ff8.exe
+& ./build/validation-python/Scripts/python.exe scripts/check-windows-installer.py install --installer ./dist/JOBS-0.1.0-Setup-win64-a2039fed.exe
 & ./build/validation-python/Scripts/python.exe scripts/check-windows-installer.py launch
 # 실제 설치 앱 UI에서 프로젝트를 만들고 state JSON의 project_file에 저장/재열기한 뒤 닫는다.
 & ./build/validation-python/Scripts/python.exe scripts/check-windows-installer.py uninstall
 ```
 
-## 검증 결과
+## 최신 설치본 검증
+
+제품 소스 `a2039fed0140c02bc8051d7cb3c67a3655056815`의 [검증 기록](validation/workspace-2026-10-28/verification.json)과 [설치·제거 기록](validation/workspace-2026-10-28/local/installer-smoke.json)을 보존한다. 최신 exe를 한글/공백/미생성 부모 경로에 설치하고 payload 76개 SHA, 재설치 바로가기 소유, 개발 PATH 없는 실행을 확인했다. 전체 제거 후 설치 폴더의 추가 파일, Local/Roaming AppData·설정·캐시·복구·바로가기·제거 등록이 없어졌고 외부 프로젝트 SHA와 다른 앱 데이터는 유지됐다.
+
+이번 세션의 설치본 직접 클릭 검증은 화면 자동화의 `CreateForMonitor 0x80070057` 및 `GetCursorPos 0x80070005` 접근 오류로 수행하지 못했다. 외부 파일 보존에는 고정 schema9 fixture를 사용했고 실제 새로 만들기·저장·재열기 및 작업공간 동작은 별도 네이티브 Qt 테스트로 검증했다. 이를 설치본에서 직접 클릭한 결과로 취급하지 않는다. 아래 이전 설치본의 직접 조작 증거는 이전 버전에 한정한다.
+
+## 이전 설치본 검증
 
 [전체 검증 기록](validation/windows-installer-2026-10-28/verification.json)에 설치 exe hash·소스·payload manifest·NSIS/deployment 로그·실제 화면의 접근성 기록·생성 프로젝트를 보존했다.
 

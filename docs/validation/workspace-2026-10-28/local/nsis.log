@@ -1,0 +1,28 @@
+MakeNSIS v3.11 - Copyright 1999-2025 Contributors
+See the file COPYING for license details.
+Credits can be found in the Users Manual.
+
+Command line defined: "AppVersion=0.1.0"
+Command line defined: "StageDir=C:\Users\dow\Development\ToolMoa\JOBS\build\packages\a2039fed-482ad07e\payload"
+Command line defined: "InstallerPath=C:\Users\dow\Development\ToolMoa\JOBS\dist\JOBS-0.1.0-Setup-win64-a2039fed.exe"
+Command line defined: "InstalledSizeKiB=42553"
+Processing config: C:\Users\dow\Development\ToolMoa\JOBS\.deps\nsis\nsis-3.11\nsisconf.nsh
+Processing script file: "C:\Users\dow\Development\ToolMoa\JOBS\build\packages\a2039fed-482ad07e\installer.nsi" (UTF8)
+
+Processed 1 file, writing output (x86-unicode):
+
+Output: "C:\Users\dow\Development\ToolMoa\JOBS\dist\JOBS-0.1.0-Setup-win64-a2039fed.exe"
+Install: 5 pages (320 bytes), 2 sections (1 required) (4144 bytes), 635 instructions (17780 bytes), 338 strings (9570 bytes), 1 language table (338 bytes).
+Uninstall: 2 pages (192 bytes), 1 section (2072 bytes), 115 instructions (3220 bytes), 119 strings (2564 bytes), 1 language table (246 bytes).
+Datablock optimizer saved 44594 bytes (~0.1%).
+
+Using lzma (compress whole) compression.
+
+EXE header size:               54272 / 38912 bytes
+Install code:                          (32616 bytes)
+Install data:                          (43605608 bytes)
+Uninstall code+data:                   (22658 bytes)
+Compressed data:            12938174 / 43660882 bytes
+CRC (0x6CD0C2A9):                  4 / 4 bytes
+
+Total size:                 12992450 / 43699798 bytes (29.7%)

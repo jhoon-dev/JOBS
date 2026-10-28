@@ -1,0 +1,40 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 20261028
+INFO: Loaded 1 modules   (44558 inline 8-bit counters): 44558 [0x5594d449db70, 0x5594d44a897e), 
+INFO: Loaded 1 PC tables (44558 PCs): 44558 [0x5594d44a8980,0x5594d4556a60), 
+INFO:        5 files found in /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/workspace
+INFO: seed corpus: files: 5 min: 4b max: 443b total: 1248b rss: 60Mb
+#6	INITED cov: 190 ft: 226 corp: 3/834b exec/s: 0 rss: 61Mb
+#26	REDUCE cov: 190 ft: 226 corp: 3/833b lim: 443 exec/s: 0 rss: 61Mb L: 3/443 MS: 5 InsertByte-ChangeBit-ShuffleBytes-CopyPart-EraseBytes-
+#32	NEW    cov: 192 ft: 228 corp: 4/1220b lim: 443 exec/s: 0 rss: 61Mb L: 387/443 MS: 1 ChangeASCIIInt-
+#33	REDUCE cov: 192 ft: 228 corp: 4/1219b lim: 443 exec/s: 0 rss: 61Mb L: 2/443 MS: 1 EraseBytes-
+#146	REDUCE cov: 192 ft: 228 corp: 4/1218b lim: 443 exec/s: 0 rss: 63Mb L: 1/443 MS: 3 ChangeBit-ChangeByte-EraseBytes-
+	NEW_FUNC[1/4]: 0x5594d417b398 in jobs::(anonymous namespace)::str[abi:cxx11](QString const&) /home/runner/work/JOBS/JOBS/src/persistence/JsonWorkspaceStore.cpp:19
+	NEW_FUNC[2/4]: 0x5594d4186998 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> std::operator+<char, std::char_traits<char>, std::allocator<char>>(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&&) /usr/bin/../lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/basic_string.h:3721
+#187	NEW    cov: 212 ft: 259 corp: 5/1605b lim: 443 exec/s: 0 rss: 70Mb L: 387/443 MS: 1 ChangeByte-
+#213	NEW    cov: 213 ft: 260 corp: 6/1992b lim: 443 exec/s: 0 rss: 70Mb L: 387/443 MS: 1 ChangeByte-
+#339	NEW    cov: 213 ft: 263 corp: 7/2380b lim: 443 exec/s: 0 rss: 71Mb L: 388/443 MS: 1 InsertByte-
+#345	NEW    cov: 213 ft: 266 corp: 8/2767b lim: 443 exec/s: 0 rss: 71Mb L: 387/443 MS: 1 ChangeByte-
+#512	REDUCE cov: 213 ft: 266 corp: 8/2683b lim: 443 exec/s: 0 rss: 71Mb L: 303/443 MS: 2 ChangeBit-EraseBytes-
+#533	REDUCE cov: 213 ft: 266 corp: 8/2610b lim: 443 exec/s: 0 rss: 72Mb L: 315/443 MS: 1 EraseBytes-
+#742	REDUCE cov: 213 ft: 267 corp: 9/2925b lim: 443 exec/s: 0 rss: 73Mb L: 315/443 MS: 4 ChangeASCIIInt-ChangeASCIIInt-CrossOver-ChangeBinInt-
+#883	REDUCE cov: 213 ft: 267 corp: 9/2846b lim: 443 exec/s: 0 rss: 73Mb L: 308/443 MS: 1 EraseBytes-
+#952	NEW    cov: 213 ft: 268 corp: 10/3053b lim: 443 exec/s: 0 rss: 73Mb L: 207/443 MS: 4 EraseBytes-InsertByte-EraseBytes-ChangeASCIIInt-
+#968	NEW    cov: 213 ft: 269 corp: 11/3411b lim: 443 exec/s: 0 rss: 73Mb L: 358/443 MS: 1 CrossOver-
+#1114	REDUCE cov: 213 ft: 270 corp: 12/3715b lim: 443 exec/s: 0 rss: 74Mb L: 304/443 MS: 1 InsertByte-
+#1175	REDUCE cov: 216 ft: 273 corp: 13/4108b lim: 443 exec/s: 0 rss: 74Mb L: 393/443 MS: 1 InsertRepeatedBytes-
+#1226	REDUCE cov: 216 ft: 273 corp: 13/4033b lim: 443 exec/s: 0 rss: 74Mb L: 312/443 MS: 1 EraseBytes-
+#2377	REDUCE cov: 216 ft: 273 corp: 13/3973b lim: 451 exec/s: 0 rss: 78Mb L: 248/443 MS: 1 EraseBytes-
+#2488	NEW    cov: 216 ft: 275 corp: 14/4360b lim: 451 exec/s: 0 rss: 79Mb L: 387/443 MS: 1 CopyPart-
+#3909	REDUCE cov: 216 ft: 275 corp: 14/4357b lim: 459 exec/s: 0 rss: 84Mb L: 312/443 MS: 1 EraseBytes-
+#4360	REDUCE cov: 216 ft: 275 corp: 14/4195b lim: 459 exec/s: 0 rss: 85Mb L: 231/443 MS: 1 EraseBytes-
+#4426	REDUCE cov: 216 ft: 275 corp: 14/4187b lim: 459 exec/s: 0 rss: 85Mb L: 240/443 MS: 1 EraseBytes-
+#4462	REDUCE cov: 216 ft: 275 corp: 14/4056b lim: 459 exec/s: 0 rss: 86Mb L: 172/443 MS: 1 EraseBytes-
+#4639	REDUCE cov: 216 ft: 275 corp: 14/3987b lim: 459 exec/s: 0 rss: 86Mb L: 289/443 MS: 2 ChangeByte-EraseBytes-
+#5000	DONE   cov: 216 ft: 275 corp: 14/3987b lim: 459 exec/s: 0 rss: 87Mb
+Done 5000 runs in 0 second(s)
+stat::number_of_executed_units: 5000
+stat::average_exec_per_sec:     0
+stat::new_units_added:          24
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              87

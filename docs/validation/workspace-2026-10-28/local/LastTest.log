@@ -1,0 +1,781 @@
+Start testing: Oct 28 22:45 대한민국 표준시
+----------------------------------------------------------
+1/48 Testing: structured_diagnostics
+1/48 Test: structured_diagnostics
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_diagnostic_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"structured_diagnostics" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: stable codes, localization, related IDs, nested causes, parser and prepared edit failures
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"structured_diagnostics" end time: Oct 28 22:45 대한민국 표준시
+"structured_diagnostics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/48 Testing: shared_resource_intervals
+2/48 Test: shared_resource_intervals
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_shared_resource_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"shared_resource_intervals" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: absolute half-open overlap, capacity, scoped IDs, calendars, splits, remaining effort, missing scope and cancellation
+<end of output>
+Test time =   0.70 sec
+----------------------------------------------------------
+Test Passed.
+"shared_resource_intervals" end time: Oct 28 22:45 대한민국 표준시
+"shared_resource_intervals" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/48 Testing: workspace_file_contract
+3/48 Test: workspace_file_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_workspace_file_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"workspace_file_contract" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: workspace roundtrip, relative paths, checksum, version/field/size/reference validation, lock and external-change protection
+<end of output>
+Test time =   0.35 sec
+----------------------------------------------------------
+Test Passed.
+"workspace_file_contract" end time: Oct 28 22:45 대한민국 표준시
+"workspace_file_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/48 Testing: multi_project_workspace_ui
+4/48 Test: multi_project_workspace_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_workspace_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"multi_project_workspace_ui" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: independent windows, leases/duplicate IDs, dirty/undo, workspace save/reopen/rollback, cancellation and stale-result UI
+<end of output>
+Test time =   2.36 sec
+----------------------------------------------------------
+Test Passed.
+"multi_project_workspace_ui" end time: Oct 28 22:45 대한민국 표준시
+"multi_project_workspace_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+5/48 Testing: document_edit_guards
+5/48 Test: document_edit_guards
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_document_guard_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"document_edit_guards" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: 70 closed/read-only guard cases, special messages, no input/history/snapshot/IO/ID effects, stale preparation, writable undo/redo and independent copy
+<end of output>
+Test time =   0.37 sec
+----------------------------------------------------------
+Test Passed.
+"document_edit_guards" end time: Oct 28 22:45 대한민국 표준시
+"document_edit_guards" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/48 Testing: parser_seed_replay
+6/48 Test: parser_seed_replay
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_parser_seed_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"parser_seed_replay" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: 62 parser seeds, schema 1..9, checksum/body separation, byte limit and store parity
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"parser_seed_replay" end time: Oct 28 22:45 대한민국 표준시
+"parser_seed_replay" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/48 Testing: responsive_document_contract
+7/48 Test: responsive_document_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_responsive_document_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"responsive_document_contract" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: shared snapshot isolation, exact bounded dirty comparisons, duration validation/undo, structural fallback, save races, eviction and deferred recovery
+<end of output>
+Test time =  21.18 sec
+----------------------------------------------------------
+Test Passed.
+"responsive_document_contract" end time: Oct 28 22:45 대한민국 표준시
+"responsive_document_contract" time elapsed: 00:00:21
+----------------------------------------------------------
+
+8/48 Testing: responsive_editing_ui
+8/48 Test: responsive_editing_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_responsive_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"responsive_editing_ui" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: 10k/3 baseline bounded model updates, selection/scroll, WBS delta, search, stale and missed-revision fallbacks
+<end of output>
+Test time =   4.76 sec
+----------------------------------------------------------
+Test Passed.
+"responsive_editing_ui" end time: Oct 28 22:45 대한민국 표준시
+"responsive_editing_ui" time elapsed: 00:00:04
+----------------------------------------------------------
+
+9/48 Testing: prepared_edit_contract
+9/48 Test: prepared_edit_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_prepared_edit_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"prepared_edit_contract" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: sealed worker preparation, one commit/undo, cancellation/late cancel/failure/no-op, source session, work preservation, immutable progress and running cancellation
+<end of output>
+Test time =   1.67 sec
+----------------------------------------------------------
+Test Passed.
+"prepared_edit_contract" end time: Oct 28 22:45 대한민국 표준시
+"prepared_edit_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+10/48 Testing: task_table_model_contract
+10/48 Test: task_table_model_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_task_table_model_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"task_table_model_contract" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: Qt model tester, dimensions/roles/flags, sparse notifications/persistent index, dates/diagnostics, view mapping and session/read-only safety
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"task_table_model_contract" end time: Oct 28 22:45 대한민국 표준시
+"task_table_model_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/48 Testing: async_editing_ui
+11/48 Test: async_editing_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_async_editing_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"async_editing_ui" start time: Oct 28 22:45 대한민국 표준시
+Output:
+----------------------------------------------------------
+stage: responsive running cancellation
+stage: stale session, concurrent and latest-only edits
+stage: deferred save/F9, Gantt and batch inversion
+stage: progress/assignment running cancellation, draft retry, immutable facts and dialog close
+PASS: 10k model/view heartbeat, running/late cancellation, stale/session/latest-only requests, deferred save/F9, Gantt/batch, preview draft and lifetime safety
+<end of output>
+Test time =  20.07 sec
+----------------------------------------------------------
+Test Passed.
+"async_editing_ui" end time: Oct 28 22:46 대한민국 표준시
+"async_editing_ui" time elapsed: 00:00:20
+----------------------------------------------------------
+
+12/48 Testing: primavera_xer_contract
+12/48 Test: primavera_xer_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_primavera_xer_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"primavera_xer_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+Primavera XER planning contract, independent dates, roundtrip, encodings, preservation and rejections passed
+<end of output>
+Test time =   1.80 sec
+----------------------------------------------------------
+Test Passed.
+"primavera_xer_contract" end time: Oct 28 22:46 대한민국 표준시
+"primavera_xer_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+13/48 Testing: primavera_xer_ui
+13/48 Test: primavera_xer_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_primavera_xer_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"primavera_xer_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+Primavera XER UI preview/cancel/import/export/stale/readonly tests passed
+<end of output>
+Test time =   3.59 sec
+----------------------------------------------------------
+Test Passed.
+"primavera_xer_ui" end time: Oct 28 22:46 대한민국 표준시
+"primavera_xer_ui" time elapsed: 00:00:03
+----------------------------------------------------------
+
+14/48 Testing: project_xml_contract
+14/48 Test: project_xml_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_project_xml_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"project_xml_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+Project XML contract, source preservation, roundtrip and rejection tests passed
+<end of output>
+Test time =   1.46 sec
+----------------------------------------------------------
+Test Passed.
+"project_xml_contract" end time: Oct 28 22:46 대한민국 표준시
+"project_xml_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+15/48 Testing: project_xml_ui
+15/48 Test: project_xml_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_project_xml_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"project_xml_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+Project XML UI preview/cancel/import/export/stale/readonly tests passed
+<end of output>
+Test time =   2.70 sec
+----------------------------------------------------------
+Test Passed.
+"project_xml_ui" end time: Oct 28 22:46 대한민국 표준시
+"project_xml_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+16/48 Testing: bulk_editing_contract_ui
+16/48 Test: bulk_editing_contract_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_bulk_editing_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"bulk_editing_contract_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: bulk atomicity, validation oracle, cancellation/stale/save, shared undo, model tester/persistent IDs, compact selection, disjoint/sorted fallback
+<end of output>
+Test time =   2.87 sec
+----------------------------------------------------------
+Test Passed.
+"bulk_editing_contract_ui" end time: Oct 28 22:46 대한민국 표준시
+"bulk_editing_contract_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+17/48 Testing: projected_views_ui
+17/48 Test: projected_views_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_projected_views_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"projected_views_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: projected search/sort/WBS/filter oracle, membership/layout/persistent IDs, range budget, view race and stale critical/Gantt
+<end of output>
+Test time =   7.65 sec
+----------------------------------------------------------
+Test Passed.
+"projected_views_ui" end time: Oct 28 22:46 대한민국 표준시
+"projected_views_ui" time elapsed: 00:00:07
+----------------------------------------------------------
+
+18/48 Testing: task_editing_contract
+18/48 Test: task_editing_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_task_editing_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"task_editing_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: insert/delete/duplicate references and IDs, protected ledgers, atomic batch/fixed-work rules, undo/redo, failure/readonly, file and recovery
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"task_editing_contract" end time: Oct 28 22:46 대한민국 표준시
+"task_editing_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/48 Testing: task_editing_ui
+19/48 Test: task_editing_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_task_editing_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"task_editing_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: TSV/limits, sorted atomic clipboard/undo, stable IDs/Gantt, search/filter/selection, insert/duplicate/delete keyboard, readonly
+<end of output>
+Test time =   2.71 sec
+----------------------------------------------------------
+Test Passed.
+"task_editing_ui" end time: Oct 28 22:46 대한민국 표준시
+"task_editing_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+20/48 Testing: calculation_cancellation
+20/48 Test: calculation_cancellation
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_control_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"calculation_cancellation" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: pre-cancel, mid-calendar/backward cancel, no partial result, immutable input, restart and calendar cache isolation
+<end of output>
+Test time =   2.96 sec
+----------------------------------------------------------
+Test Passed.
+"calculation_cancellation" end time: Oct 28 22:46 대한민국 표준시
+"calculation_cancellation" time elapsed: 00:00:02
+----------------------------------------------------------
+
+21/48 Testing: integrated_project_workflow
+21/48 Test: integrated_project_workflow
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_integration_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"integrated_project_workflow" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: create/WBS/calendar/effort/split/resource/cost, plan/baseline/actual/forecast/EVM/level/report, cancel/save/reopen/recovery
+<end of output>
+Test time =   2.23 sec
+----------------------------------------------------------
+Test Passed.
+"integrated_project_workflow" end time: Oct 28 22:46 대한민국 표준시
+"integrated_project_workflow" time elapsed: 00:00:02
+----------------------------------------------------------
+
+22/48 Testing: performance_cancellation_ui
+22/48 Test: performance_cancellation_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_performance_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"performance_cancellation_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: viewport object bound, last row, offscreen stable selection, zoom, UI cancel/restart and late session rejection
+<end of output>
+Test time =   1.66 sec
+----------------------------------------------------------
+Test Passed.
+"performance_cancellation_ui" end time: Oct 28 22:46 대한민국 표준시
+"performance_cancellation_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+23/48 Testing: effort_work_calendar_split
+23/48 Test: effort_work_calendar_split
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_effort_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"effort_work_calendar_split" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: work/type edit matrix, heterogeneous calendars, splits, exact final minute, PDM/constraints/ALAP, resource leveling, frozen costs/PV, explicit remaining, undo/schema9/recovery
+<end of output>
+Test time =   2.84 sec
+----------------------------------------------------------
+Test Passed.
+"effort_work_calendar_split" end time: Oct 28 22:46 대한민국 표준시
+"effort_work_calendar_split" time elapsed: 00:00:02
+----------------------------------------------------------
+
+24/48 Testing: effort_ui
+24/48 Test: effort_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_effort_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"effort_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: effort/type/split UI, validation with no partial edit, automatic FS propagation, split Gantt paths, single-step undo/redo, resource calendar edit and read-only inspection
+<end of output>
+Test time =   1.88 sec
+----------------------------------------------------------
+Test Passed.
+"effort_ui" end time: Oct 28 22:46 대한민국 표준시
+"effort_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+25/48 Testing: constraint_contract
+25/48 Test: constraint_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_constraint_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"constraint_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: 8 constraints/ALAP chains, fixed-calendar and causal conflicts, soft deadlines, actual preservation, leveling, atomic guarded drag/undo, schema8 and old engine recovery/report
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"constraint_contract" end time: Oct 28 22:46 대한민국 표준시
+"constraint_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/48 Testing: constraint_gantt_ui
+26/48 Test: constraint_gantt_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_constraint_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"constraint_gantt_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: timing UI, causal deadline navigation, real mouse move/resize/undo/Esc/stale guards, successor propagation, week zoom, forecast/readonly drag exclusion
+<end of output>
+Test time =   1.87 sec
+----------------------------------------------------------
+Test Passed.
+"constraint_gantt_ui" end time: Oct 28 22:46 대한민국 표준시
+"constraint_gantt_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+27/48 Testing: pdm_calendar_contract
+27/48 Test: pdm_calendar_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_pdm_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"pdm_calendar_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: PDM endpoints/leads/lags, minute-grid floats, independent calendars, validation/cycles, legacy/new baselines, schema7/recovery/undo, resources/leveling/cost/forecast/report
+<end of output>
+Test time =   1.47 sec
+----------------------------------------------------------
+Test Passed.
+"pdm_calendar_contract" end time: Oct 28 22:46 대한민국 표준시
+"pdm_calendar_contract" time elapsed: 00:00:01
+----------------------------------------------------------
+
+28/48 Testing: pdm_calendar_ui
+28/48 Test: pdm_calendar_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_pdm_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"pdm_calendar_ui" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: calendar registration/assignment/readonly, typed PDM units and invalid input, undo/redo, F9 dates, Gantt endpoint metadata
+<end of output>
+Test time =   1.32 sec
+----------------------------------------------------------
+Test Passed.
+"pdm_calendar_ui" end time: Oct 28 22:46 대한민국 표준시
+"pdm_calendar_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+29/48 Testing: undo_contract
+29/48 Test: undo_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_undo_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"undo_contract" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: atomic input history, monotonic revisions/STALE, saved-content dirty state, save/branch/no-op/error boundaries, stable WBS/resource/cost IDs, immutable facts, count/memory limits, readonly and observers
+<end of output>
+Test time =   6.78 sec
+----------------------------------------------------------
+Test Passed.
+"undo_contract" end time: Oct 28 22:46 대한민국 표준시
+"undo_contract" time elapsed: 00:00:06
+----------------------------------------------------------
+
+30/48 Testing: plan_enum_compatibility
+30/48 Test: plan_enum_compatibility
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_plan_enum_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"plan_enum_compatibility" start time: Oct 28 22:46 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: 402 checks; 13 pre-enum SHA fixtures, schemas1-9, strict tokens, typed validation, full history, SaveAs, undo and recovery
+<end of output>
+Test time =   1.51 sec
+----------------------------------------------------------
+Test Passed.
+"plan_enum_compatibility" end time: Oct 28 22:47 대한민국 표준시
+"plan_enum_compatibility" time elapsed: 00:00:01
+----------------------------------------------------------
+
+31/48 Testing: input_delta_contract
+31/48 Test: input_delta_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_input_delta_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"input_delta_contract" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: sparse, inserted/deleted/empty vectors, all scalar/input fields and inverse order
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"input_delta_contract" end time: Oct 28 22:47 대한민국 표준시
+"input_delta_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/48 Testing: editing_performance_ui
+32/48 Test: editing_performance_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_editing_performance_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"editing_performance_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+stage: initial
+stage: incremental
+stage: undo/redo
+stage: sort
+stage: search
+stage: filtered undo
+PASS: incremental rows/items/tree, stale dates, normalization, undo/redo, selection, scrolling, sorting/filtering and save
+<end of output>
+Test time =   1.71 sec
+----------------------------------------------------------
+Test Passed.
+"editing_performance_ui" end time: Oct 28 22:47 대한민국 표준시
+"editing_performance_ui" time elapsed: 00:00:01
+----------------------------------------------------------
+
+33/48 Testing: recovery_crash_file
+33/48 Test: recovery_crash_file
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_recovery_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"recovery_crash_file" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: actual process kill and pre-commit kill, stale/live locks, three generations, never-saved and Unicode recovery, immutable facts, detached copy, corruption/future/partial/race, missing/changed original, failed publish, exclusive discard and path confinement
+<end of output>
+Test time =   2.88 sec
+----------------------------------------------------------
+Test Passed.
+"recovery_crash_file" end time: Oct 28 22:47 대한민국 표준시
+"recovery_crash_file" time elapsed: 00:00:02
+----------------------------------------------------------
+
+34/48 Testing: recovery_ui
+34/48 Test: recovery_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_recovery_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"recovery_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: background save retirement race, continuous deadline/pause/readonly/failure, startup selection, detached save, editor/document undo shortcuts, immutable notice, close cancel/discard, later and explicit discard
+<end of output>
+Test time =   4.37 sec
+----------------------------------------------------------
+Test Passed.
+"recovery_ui" end time: Oct 28 22:47 대한민국 표준시
+"recovery_ui" time elapsed: 00:00:04
+----------------------------------------------------------
+
+35/48 Testing: reports_export
+35/48 Test: reports_export
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_report_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"reports_export" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: snapshot/WBS/shared resources/empty scope/filters/unknown/stale inputs/F10/no-baseline AC/typed OOXML/injection/atomic create-only/PDF pagination; 9 PDF pages
+<end of output>
+Test time =   2.16 sec
+----------------------------------------------------------
+Test Passed.
+"reports_export" end time: Oct 28 22:47 대한민국 표준시
+"reports_export" time elapsed: 00:00:02
+----------------------------------------------------------
+
+36/48 Testing: reports_ui
+36/48 Test: reports_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_report_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"reports_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: dashboard, report models, WBS/global demand, EAC/filter controls, XLSX/PDF dialogs, cancel/no mutation, stale snapshot during chooser/worker, readonly, invalid source text
+<end of output>
+Test time =   4.40 sec
+----------------------------------------------------------
+Test Passed.
+"reports_ui" end time: Oct 28 22:47 대한민국 표준시
+"reports_ui" time elapsed: 00:00:04
+----------------------------------------------------------
+
+37/48 Testing: cost_contract_file
+37/48 Test: cost_contract_file
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_cost_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"cost_contract_file" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: F10, EAC assumptions/zero denominator, asof/corrections, frozen budgets/rates/AC, effective dates/holidays, exact money rounding, WBS/cohort ratio, explicit physical/0-100 credit, overflow, persistence/provenance/schema5 migration
+<end of output>
+Test time =   1.14 sec
+----------------------------------------------------------
+Test Passed.
+"cost_contract_file" end time: Oct 28 22:47 대한민국 표준시
+"cost_contract_file" time elapsed: 00:00:01
+----------------------------------------------------------
+
+38/48 Testing: cost_ui
+38/48 Test: cost_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_cost_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"cost_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: currency/rate precision, capacity edits preserve rates, task budgets, cumulative actual/physical reporting/corrections, F10 EVM/EAC, WBS/timephased/curve, no baseline/future AC/stale results, persistence and readonly
+<end of output>
+Test time =   2.23 sec
+----------------------------------------------------------
+Test Passed.
+"cost_ui" end time: Oct 28 22:47 대한민국 표준시
+"cost_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+39/48 Testing: resource_contract_file
+39/48 Test: resource_contract_file
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_resource_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"resource_contract_file" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: F05 peak/work, short overlap, fractional/unknown/zero/date capacity, deterministic priority/FS/horizon, retained actuals, independent minute oracle, transactional commands, immutable snapshots, persistence/provenance, v4 migration
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"resource_contract_file" end time: Oct 28 22:47 대한민국 표준시
+"resource_contract_file" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/48 Testing: resource_ui
+40/48 Test: resource_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_resource_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"resource_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: resource registration/exception validation, stable IDs, task assignments, peak/daily load, options invalidate results, saved A/B scenarios, unresolved horizon, source preservation and persistence, readonly
+<end of output>
+Test time =   2.65 sec
+----------------------------------------------------------
+Test Passed.
+"resource_ui" end time: Oct 28 22:47 대한민국 표준시
+"resource_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+41/48 Testing: tracking_contract
+41/48 Test: tracking_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_tracking_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"tracking_contract" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: F09 +8h, immutable/versioned baseline, plan-vs-forecast variance, calendar snapshot, as-of corrections, validation/atomicity, completed actuals, F08 retained logic, unknowns/read-only
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_contract" end time: Oct 28 22:47 대한민국 표준시
+"tracking_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/48 Testing: tracking_file
+42/48 Test: tracking_file
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_tracking_file_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"tracking_file" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: tracking roundtrip, retained history/provenance/clone, calendar immutability, baseline recomputation integrity, malformed ledger rejection, schema-3 copy migration
+<end of output>
+Test time =   0.69 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_file" end time: Oct 28 22:47 대한민국 표준시
+"tracking_file" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/48 Testing: wbs_contract
+43/48 Test: wbs_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_wbs_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"wbs_contract" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: F11 rollups, stable IDs/graph/dates, nested filter/move, unknowns, stale dates, cycles/dangling refs, atomic rejection, read-only, deep tree
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"wbs_contract" end time: Oct 28 22:47 대한민국 표준시
+"wbs_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/48 Testing: schedule_contract
+44/48 Test: schedule_contract
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_schedule_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"schedule_contract" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: F01 CPM/float, multiple critical paths, calendar/holidays/lunch, milestones, missing duration, cycle path, dangling/self refs, horizon, provenance, determinism
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"schedule_contract" end time: Oct 28 22:47 대한민국 표준시
+"schedule_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/48 Testing: file_lifecycle
+45/48 Test: file_lifecycle
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_file_tests.exe"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"file_lifecycle" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, stale revision/identity, schema-1 copy migration
+<end of output>
+Test time =   0.83 sec
+----------------------------------------------------------
+Test Passed.
+"file_lifecycle" end time: Oct 28 22:47 대한민국 표준시
+"file_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/48 Testing: ui_lifecycle
+46/48 Test: ui_lifecycle
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"ui_lifecycle" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: new/save dialogs, task/duration/FS/holiday edits, async calculation, stale/incomplete/cycle handling, cancel/save on close
+<end of output>
+Test time =   2.73 sec
+----------------------------------------------------------
+Test Passed.
+"ui_lifecycle" end time: Oct 28 22:47 대한민국 표준시
+"ui_lifecycle" time elapsed: 00:00:02
+----------------------------------------------------------
+
+47/48 Testing: wbs_gantt_ui
+47/48 Test: wbs_gantt_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_wbs_gantt_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"wbs_gantt_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: WBS tree/filter/global rows, filtered edits, task and subtree moves, add/rename/delete, Gantt IDs/links/milestones/selection/zoom/stale hiding
+<end of output>
+Test time =   2.24 sec
+----------------------------------------------------------
+Test Passed.
+"wbs_gantt_ui" end time: Oct 28 22:47 대한민국 표준시
+"wbs_gantt_ui" time elapsed: 00:00:02
+----------------------------------------------------------
+
+48/48 Testing: tracking_ui
+48/48 Test: tracking_ui
+Command: "C:/Users/dow/Development/ToolMoa/JOBS/build/jobs_tracking_ui_tests.exe" "-platform" "offscreen"
+Directory: C:/Users/dow/Development/ToolMoa/JOBS/build
+"tracking_ui" start time: Oct 28 22:47 대한민국 표준시
+Output:
+----------------------------------------------------------
+PASS: baseline/status/progress dialogs, F09 comparison +8h, missing report coverage, baseline overlay/selection, invalid report error, immutable correction/versioning, UI save/reopen
+<end of output>
+Test time =   3.15 sec
+----------------------------------------------------------
+Test Passed.
+"tracking_ui" end time: Oct 28 22:47 대한민국 표준시
+"tracking_ui" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 28 22:47 대한민국 표준시

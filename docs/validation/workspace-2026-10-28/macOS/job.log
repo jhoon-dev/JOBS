@@ -1,0 +1,1708 @@
+﻿2026-10-28T13:42:55.1112900Z Current runner version: '2.338.0'
+2026-10-28T13:42:55.1130820Z ##[group]Runner Image Provisioner
+2026-10-28T13:42:55.1131400Z Hosted Compute Agent
+2026-10-28T13:42:55.1131770Z Version: 20260828.587
+2026-10-28T13:42:55.1132190Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-28T13:42:55.1132690Z Build Date: 2026-08-28T16:44:25Z
+2026-10-28T13:42:55.1133160Z Worker ID: {5632bb1d-93df-4b39-bd3a-50b2da9f6ca5}
+2026-10-28T13:42:55.1133700Z Azure Region: westus
+2026-10-28T13:42:55.1134090Z ##[endgroup]
+2026-10-28T13:42:55.1134930Z ##[group]Operating System
+2026-10-28T13:42:55.1135330Z macOS
+2026-10-28T13:42:55.1135660Z 15.7.9
+2026-10-28T13:42:55.1135990Z 24G830
+2026-10-28T13:42:55.1136340Z ##[endgroup]
+2026-10-28T13:42:55.1136730Z ##[group]Runner Image
+2026-10-28T13:42:55.1137180Z Image: macos-15-arm64
+2026-10-28T13:42:55.1137560Z Version: 20260907.0337.1
+2026-10-28T13:42:55.1138400Z Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20260907.0337/images/macos/macos-15-arm64-Readme.md
+2026-10-28T13:42:55.1139450Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20260907.0337
+2026-10-28T13:42:55.1140220Z ##[endgroup]
+2026-10-28T13:42:55.1141130Z ##[group]GITHUB_TOKEN Permissions
+2026-10-28T13:42:55.1142350Z Contents: read
+2026-10-28T13:42:55.1142720Z Metadata: read
+2026-10-28T13:42:55.1143090Z Packages: read
+2026-10-28T13:42:55.1143450Z ##[endgroup]
+2026-10-28T13:42:55.1144960Z Secret source: Actions
+2026-10-28T13:42:55.1145630Z Cache mode: write
+2026-10-28T13:42:55.1146090Z Prepare workflow directory
+2026-10-28T13:42:55.1386810Z Prepare all required actions
+2026-10-28T13:42:55.1425060Z Getting action download info
+2026-10-28T13:42:55.4270860Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-28T13:42:55.6130160Z Download action repository 'jurplel/install-qt-action@v4' (SHA:b344308e4483fc892e0d27b3cd1b173ebdd95f06)
+2026-10-28T13:42:57.9011470Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-28T13:42:58.2477290Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-28T13:42:58.3274640Z Download action repository 'actions/setup-java@v4' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-10-28T13:42:58.9328460Z Getting action download info
+2026-10-28T13:42:59.0593310Z Download action repository 'actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1' (SHA:ece7cb06caefa5fff74198d8649806c4678c61a1)
+2026-10-28T13:42:59.2020480Z Complete job name: build (macos-15, clang_64)
+2026-10-28T13:42:59.2597530Z ##[group]Run actions/checkout@v4
+2026-10-28T13:42:59.2597900Z with:
+2026-10-28T13:42:59.2598060Z   repository: jhoon-dev/JOBS
+2026-10-28T13:42:59.2600220Z   token: ***
+2026-10-28T13:42:59.2600370Z   ssh-strict: true
+2026-10-28T13:42:59.2600520Z   ssh-user: git
+2026-10-28T13:42:59.2600680Z   persist-credentials: true
+2026-10-28T13:42:59.2600850Z   clean: true
+2026-10-28T13:42:59.2601040Z   sparse-checkout-cone-mode: true
+2026-10-28T13:42:59.2601230Z   fetch-depth: 1
+2026-10-28T13:42:59.2601390Z   fetch-tags: false
+2026-10-28T13:42:59.2601540Z   show-progress: true
+2026-10-28T13:42:59.2601690Z   lfs: false
+2026-10-28T13:42:59.2601830Z   submodules: false
+2026-10-28T13:42:59.2601990Z   set-safe-directory: true
+2026-10-28T13:42:59.2602180Z   allow-unsafe-pr-checkout: false
+2026-10-28T13:42:59.2602480Z ##[endgroup]
+2026-10-28T13:42:59.7198300Z Syncing repository: jhoon-dev/JOBS
+2026-10-28T13:42:59.7199840Z ##[group]Getting Git version info
+2026-10-28T13:42:59.7200190Z Working directory is '/Users/runner/work/JOBS/JOBS'
+2026-10-28T13:42:59.7200620Z [command]/opt/homebrew/bin/git version
+2026-10-28T13:42:59.7682030Z git version 2.55.0
+2026-10-28T13:42:59.7700110Z ##[endgroup]
+2026-10-28T13:42:59.7705520Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/9c70b62c-e5af-4dc8-97c6-41c811ad06e1/.gitconfig'
+2026-10-28T13:42:59.7711600Z Temporarily overriding HOME='/Users/runner/work/_temp/9c70b62c-e5af-4dc8-97c6-41c811ad06e1' before making global git config changes
+2026-10-28T13:42:59.7712860Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T13:42:59.7715050Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/JOBS/JOBS
+2026-10-28T13:42:59.7812110Z Deleting the contents of '/Users/runner/work/JOBS/JOBS'
+2026-10-28T13:42:59.7816240Z ##[group]Initializing the repository
+2026-10-28T13:42:59.7820980Z [command]/opt/homebrew/bin/git init /Users/runner/work/JOBS/JOBS
+2026-10-28T13:42:59.8004610Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-28T13:42:59.8005220Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-28T13:42:59.8006240Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-28T13:42:59.8006670Z hint: call:
+2026-10-28T13:42:59.8006820Z hint:
+2026-10-28T13:42:59.8007130Z hint: 	git config --global init.defaultBranch <name>
+2026-10-28T13:42:59.8007570Z hint:
+2026-10-28T13:42:59.8007860Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-28T13:42:59.8008310Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-28T13:42:59.8008630Z hint:
+2026-10-28T13:42:59.8008810Z hint: 	git branch -m <name>
+2026-10-28T13:42:59.8009050Z hint:
+2026-10-28T13:42:59.8009410Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-28T13:42:59.8009990Z Initialized empty Git repository in /Users/runner/work/JOBS/JOBS/.git/
+2026-10-28T13:42:59.8017250Z [command]/opt/homebrew/bin/git remote add origin https://github.com/jhoon-dev/JOBS
+2026-10-28T13:42:59.8110640Z ##[endgroup]
+2026-10-28T13:42:59.8111110Z ##[group]Disabling automatic garbage collection
+2026-10-28T13:42:59.8111650Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-28T13:42:59.8168130Z ##[endgroup]
+2026-10-28T13:42:59.8169380Z ##[group]Setting up auth
+2026-10-28T13:42:59.8170370Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T13:42:59.8212530Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T13:42:59.9452450Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T13:42:59.9532590Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T13:43:00.0390630Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T13:43:00.0587900Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T13:43:00.1430650Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-28T13:43:00.1678390Z ##[endgroup]
+2026-10-28T13:43:00.1679060Z ##[group]Fetching the repository
+2026-10-28T13:43:00.1685480Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +a2039fed0140c02bc8051d7cb3c67a3655056815:refs/remotes/origin/main
+2026-10-28T13:43:00.8397680Z From https://github.com/jhoon-dev/JOBS
+2026-10-28T13:43:00.8402000Z  * [new ref]         a2039fed0140c02bc8051d7cb3c67a3655056815 -> origin/main
+2026-10-28T13:43:00.8406010Z ##[endgroup]
+2026-10-28T13:43:00.8407040Z ##[group]Determining the checkout info
+2026-10-28T13:43:00.8409050Z ##[endgroup]
+2026-10-28T13:43:00.8409730Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-28T13:43:00.8479570Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-28T13:43:00.8550840Z ##[group]Checking out the ref
+2026-10-28T13:43:00.8552790Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-28T13:43:00.9692130Z Switched to a new branch 'main'
+2026-10-28T13:43:00.9745160Z branch 'main' set up to track 'origin/main'.
+2026-10-28T13:43:00.9746530Z ##[endgroup]
+2026-10-28T13:43:00.9798970Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-28T13:43:00.9859130Z a2039fed0140c02bc8051d7cb3c67a3655056815
+2026-10-28T13:43:01.0057950Z ##[group]Run sudo xcode-select --switch /Applications/Xcode_16.4.app
+2026-10-28T13:43:01.0058510Z [36;1msudo xcode-select --switch /Applications/Xcode_16.4.app[0m
+2026-10-28T13:43:01.0096390Z shell: /bin/bash -e {0}
+2026-10-28T13:43:01.0096800Z ##[endgroup]
+2026-10-28T13:43:01.1828030Z ##[group]Run jurplel/install-qt-action@v4
+2026-10-28T13:43:01.1828470Z with:
+2026-10-28T13:43:01.1828630Z   version: 6.8.3
+2026-10-28T13:43:01.1828800Z   arch: clang_64
+2026-10-28T13:43:01.1828960Z   cache: true
+2026-10-28T13:43:01.1829120Z   target: desktop
+2026-10-28T13:43:01.1829350Z   install-deps: true
+2026-10-28T13:43:01.1829570Z   cache-key-prefix: install-qt-action
+2026-10-28T13:43:01.1829850Z   setup-python: true
+2026-10-28T13:43:01.1830060Z   add-tools-to-path: true
+2026-10-28T13:43:01.1830280Z   set-env: true
+2026-10-28T13:43:01.1830490Z   no-qt-binaries: false
+2026-10-28T13:43:01.1830700Z   tools-only: false
+2026-10-28T13:43:01.1830860Z   aqtversion: ==3.3.*
+2026-10-28T13:43:01.1831070Z   py7zrversion: ==1.1.0
+2026-10-28T13:43:01.1831300Z   source: false
+2026-10-28T13:43:01.1831500Z   documentation: false
+2026-10-28T13:43:01.1831710Z   examples: false
+2026-10-28T13:43:01.1831900Z   use-official: false
+2026-10-28T13:43:01.1832140Z ##[endgroup]
+2026-10-28T13:43:01.1888540Z ##[start-action display=Check the existence of built JavaScript action;id=__jurplel_install-qt-action.__run]
+2026-10-28T13:43:01.1921440Z ##[group]Run if [[ -f './action/lib/main.js' ]]; then
+2026-10-28T13:43:01.1921880Z [36;1mif [[ -f './action/lib/main.js' ]]; then[0m
+2026-10-28T13:43:01.1922250Z [36;1m  exit 0[0m
+2026-10-28T13:43:01.1922550Z [36;1mfi[0m
+2026-10-28T13:43:01.1922770Z [36;1m[0m
+2026-10-28T13:43:01.1923030Z [36;1m# Workflow commands must be in one line.[0m
+2026-10-28T13:43:01.1923340Z [36;1mprintf '%s' \[0m
+2026-10-28T13:43:01.1923620Z [36;1m  '::error title=Action not built::' \[0m
+2026-10-28T13:43:01.1937070Z [36;1m  'This TypeScript action cannot be used before building within Node.js environment. ' \[0m
+2026-10-28T13:43:01.1937800Z [36;1m  'Maybe you are currently using non-tagging branches, for example, the "master" branch. ' \[0m
+2026-10-28T13:43:01.1938290Z [36;1m  'Only v* branches have built JavaScript action file. ' \[0m
+2026-10-28T13:43:01.1938750Z [36;1m  'If you would like to test unreleased changes, please refer to the CI workflows ' \[0m
+2026-10-28T13:43:01.1939260Z [36;1m  'in our repository: https://github.com/jurplel/install-qt-action . ' \[0m
+2026-10-28T13:43:01.1939610Z [36;1m  'Exiting... '[0m
+2026-10-28T13:43:01.1939820Z [36;1m[0m
+2026-10-28T13:43:01.1939970Z [36;1mexit 1[0m
+2026-10-28T13:43:01.1979150Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-28T13:43:01.1979440Z ##[endgroup]
+2026-10-28T13:43:01.2290820Z ##[end-action id=__jurplel_install-qt-action.__run;outcome=success;conclusion=success;duration_ms=40]
+2026-10-28T13:43:01.2293550Z ##[start-action display=Check Python version for potential bugs and notify users;id=__jurplel_install-qt-action.__run_2]
+2026-10-28T13:43:01.2300950Z ##[end-action id=__jurplel_install-qt-action.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-28T13:43:01.2302950Z ##[start-action display=Setup Python;id=__jurplel_install-qt-action.__actions_setup-python]
+2026-10-28T13:43:01.2363130Z ##[group]Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+2026-10-28T13:43:01.2363480Z with:
+2026-10-28T13:43:01.2363640Z   python-version: >=3.14.0
+2026-10-28T13:43:01.2363820Z   check-latest: false
+2026-10-28T13:43:01.2365800Z   token: ***
+2026-10-28T13:43:01.2366190Z   update-environment: true
+2026-10-28T13:43:01.2366400Z   allow-prereleases: false
+2026-10-28T13:43:01.2366570Z   freethreaded: false
+2026-10-28T13:43:01.2366750Z ##[endgroup]
+2026-10-28T13:43:01.3527180Z ##[group]Installed versions
+2026-10-28T13:43:01.3617780Z Successfully set up CPython (3.14.7)
+2026-10-28T13:43:01.3618280Z ##[endgroup]
+2026-10-28T13:43:01.3642900Z ##[end-action id=__jurplel_install-qt-action.__actions_setup-python;outcome=success;conclusion=success;duration_ms=133]
+2026-10-28T13:43:01.3644960Z ##[start-action display=Setup and run aqtinstall;id=__jurplel_install-qt-action.aqtinstall]
+2026-10-28T13:43:01.3747230Z ##[group]Run jurplel/install-qt-action/action@v4
+2026-10-28T13:43:01.3747500Z with:
+2026-10-28T13:43:01.3747980Z   version: 6.8.3
+2026-10-28T13:43:01.3748160Z   target: desktop
+2026-10-28T13:43:01.3748310Z   arch: clang_64
+2026-10-28T13:43:01.3748450Z   install-deps: true
+2026-10-28T13:43:01.3748610Z   cache: true
+2026-10-28T13:43:01.3748800Z   cache-key-prefix: install-qt-action
+2026-10-28T13:43:01.3749040Z   add-tools-to-path: true
+2026-10-28T13:43:01.3749210Z   set-env: true
+2026-10-28T13:43:01.3749380Z   no-qt-binaries: false
+2026-10-28T13:43:01.3749540Z   tools-only: false
+2026-10-28T13:43:01.3749710Z   aqtversion: ==3.3.*
+2026-10-28T13:43:01.3749880Z   py7zrversion: ==1.1.0
+2026-10-28T13:43:01.3750040Z   source: false
+2026-10-28T13:43:01.3750200Z   documentation: false
+2026-10-28T13:43:01.3750350Z   examples: false
+2026-10-28T13:43:01.3750490Z   use-official: false
+2026-10-28T13:43:01.3750630Z env:
+2026-10-28T13:43:01.3750860Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:01.3751280Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig
+2026-10-28T13:43:01.3751670Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:01.3752040Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:01.3752410Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:01.3752680Z ##[endgroup]
+2026-10-28T13:43:01.8254040Z ##[group]Install Python dependencies
+2026-10-28T13:43:01.8398540Z [command]/Users/runner/hostedtoolcache/Python/3.14.7/arm64/bin/python3 -m pip install setuptools>=70.1.0 py7zr==1.1.0
+2026-10-28T13:43:03.8327710Z Collecting setuptools>=70.1.0
+2026-10-28T13:43:03.9141940Z   Downloading setuptools-84.2.1-py3-none-any.whl.metadata (6.6 kB)
+2026-10-28T13:43:03.9793870Z Collecting py7zr==1.1.0
+2026-10-28T13:43:03.9937450Z   Downloading py7zr-1.1.0-py3-none-any.whl.metadata (17 kB)
+2026-10-28T13:43:04.0236990Z Collecting texttable (from py7zr==1.1.0)
+2026-10-28T13:43:04.0385300Z   Downloading texttable-1.7.2-py2.py3-none-any.whl.metadata (10 kB)
+2026-10-28T13:43:04.2078420Z Collecting pycryptodomex>=3.20.0 (from py7zr==1.1.0)
+2026-10-28T13:43:04.2233210Z   Downloading pycryptodomex-3.24.1-cp37-abi3-macosx_10_9_universal2.whl.metadata (3.4 kB)
+2026-10-28T13:43:04.2583920Z Collecting brotli>=1.2.0 (from py7zr==1.1.0)
+2026-10-28T13:43:04.2729510Z   Downloading brotli-1.2.1-cp314-cp314-macosx_10_15_universal2.whl.metadata (6.1 kB)
+2026-10-28T13:43:04.3242020Z Collecting psutil (from py7zr==1.1.0)
+2026-10-28T13:43:04.3388140Z   Downloading psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl.metadata (22 kB)
+2026-10-28T13:43:04.3976420Z Collecting pyppmd>=1.3.1 (from py7zr==1.1.0)
+2026-10-28T13:43:04.4135150Z   Downloading pyppmd-1.3.1-cp314-cp314-macosx_11_0_arm64.whl.metadata (5.4 kB)
+2026-10-28T13:43:04.4697300Z Collecting pybcj>=1.0.6 (from py7zr==1.1.0)
+2026-10-28T13:43:04.4846210Z   Downloading pybcj-1.0.8-cp314-cp314-macosx_11_0_arm64.whl.metadata (3.8 kB)
+2026-10-28T13:43:04.5049930Z Collecting multivolumefile>=0.2.3 (from py7zr==1.1.0)
+2026-10-28T13:43:04.5196420Z   Downloading multivolumefile-0.2.3-py3-none-any.whl.metadata (6.3 kB)
+2026-10-28T13:43:04.5574520Z Collecting inflate64>=1.0.4 (from py7zr==1.1.0)
+2026-10-28T13:43:04.5720320Z   Downloading inflate64-1.0.4-cp314-cp314-macosx_11_0_arm64.whl.metadata (4.4 kB)
+2026-10-28T13:43:04.5918900Z Downloading py7zr-1.1.0-py3-none-any.whl (71 kB)
+2026-10-28T13:43:04.6219570Z Downloading setuptools-84.2.1-py3-none-any.whl (876 kB)
+2026-10-28T13:43:04.6632310Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 876.3/876.3 kB 25.8 MB/s  0:00:00
+2026-10-28T13:43:04.6808200Z Downloading brotli-1.2.1-cp314-cp314-macosx_10_15_universal2.whl (863 kB)
+2026-10-28T13:43:04.6925990Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 863.2/863.2 kB 61.5 MB/s  0:00:00
+2026-10-28T13:43:04.7075720Z Downloading inflate64-1.0.4-cp314-cp314-macosx_11_0_arm64.whl (36 kB)
+2026-10-28T13:43:04.7248580Z Downloading multivolumefile-0.2.3-py3-none-any.whl (17 kB)
+2026-10-28T13:43:04.7430020Z Downloading pybcj-1.0.8-cp314-cp314-macosx_11_0_arm64.whl (24 kB)
+2026-10-28T13:43:04.7644220Z Downloading pycryptodomex-3.24.1-cp37-abi3-macosx_10_9_universal2.whl (2.5 MB)
+2026-10-28T13:43:04.7919070Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.5/2.5 MB 87.6 MB/s  0:00:00
+2026-10-28T13:43:04.8069110Z Downloading pyppmd-1.3.1-cp314-cp314-macosx_11_0_arm64.whl (48 kB)
+2026-10-28T13:43:04.8247470Z Downloading psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl (129 kB)
+2026-10-28T13:43:04.8425360Z Downloading texttable-1.7.2-py2.py3-none-any.whl (10 kB)
+2026-10-28T13:43:04.8961240Z Installing collected packages: texttable, brotli, setuptools, pyppmd, pycryptodomex, pybcj, psutil, multivolumefile, inflate64, py7zr
+2026-10-28T13:43:05.8101440Z 
+2026-10-28T13:43:05.8110210Z Successfully installed brotli-1.2.1 inflate64-1.0.4 multivolumefile-0.2.3 psutil-7.2.2 py7zr-1.1.0 pybcj-1.0.8 pycryptodomex-3.24.1 pyppmd-1.3.1 setuptools-84.2.1 texttable-1.7.2
+2026-10-28T13:43:05.8115670Z 
+2026-10-28T13:43:05.8116210Z [notice] A new release of pip is available: 26.2.1 -> 26.2.2
+2026-10-28T13:43:05.8117070Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-28T13:43:05.8849280Z [command]/Users/runner/hostedtoolcache/Python/3.14.7/arm64/bin/python3 -m pip install aqtinstall==3.3.*
+2026-10-28T13:43:06.5265700Z Collecting aqtinstall==3.3.*
+2026-10-28T13:43:06.5661580Z   Downloading aqtinstall-3.3.0-py3-none-any.whl.metadata (11 kB)
+2026-10-28T13:43:06.5979880Z Collecting bs4 (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.6084690Z   Downloading bs4-0.0.2-py2.py3-none-any.whl.metadata (411 bytes)
+2026-10-28T13:43:06.6293290Z Collecting defusedxml (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.6398850Z   Downloading defusedxml-0.7.1-py2.py3-none-any.whl.metadata (32 kB)
+2026-10-28T13:43:06.6727270Z Collecting humanize (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.6833050Z   Downloading humanize-4.16.0-py3-none-any.whl.metadata (8.0 kB)
+2026-10-28T13:43:06.7070720Z Collecting patch-ng (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.7179770Z   Downloading patch_ng-1.19.1-py3-none-any.whl.metadata (3.2 kB)
+2026-10-28T13:43:06.7215940Z Requirement already satisfied: py7zr>=0.22.0 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from aqtinstall==3.3.*) (1.1.0)
+2026-10-28T13:43:06.7514740Z Collecting requests>=2.31.0 (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.7684850Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-10-28T13:43:06.7909710Z Collecting semantic-version (from aqtinstall==3.3.*)
+2026-10-28T13:43:06.8020900Z   Downloading semantic_version-2.10.0-py2.py3-none-any.whl.metadata (9.7 kB)
+2026-10-28T13:43:06.8086760Z Requirement already satisfied: texttable in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from aqtinstall==3.3.*) (1.7.2)
+2026-10-28T13:43:06.8095450Z Requirement already satisfied: pycryptodomex>=3.20.0 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (3.24.1)
+2026-10-28T13:43:06.8099790Z Requirement already satisfied: brotli>=1.2.0 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (1.2.1)
+2026-10-28T13:43:06.8102120Z Requirement already satisfied: psutil in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (7.2.2)
+2026-10-28T13:43:06.8104920Z Requirement already satisfied: pyppmd>=1.3.1 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (1.3.1)
+2026-10-28T13:43:06.8107010Z Requirement already satisfied: pybcj>=1.0.6 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (1.0.8)
+2026-10-28T13:43:06.8110750Z Requirement already satisfied: multivolumefile>=0.2.3 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (0.2.3)
+2026-10-28T13:43:06.8113190Z Requirement already satisfied: inflate64>=1.0.4 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from py7zr>=0.22.0->aqtinstall==3.3.*) (1.0.4)
+2026-10-28T13:43:06.9071500Z Collecting charset_normalizer<4,>=2 (from requests>=2.31.0->aqtinstall==3.3.*)
+2026-10-28T13:43:06.9189530Z   Downloading charset_normalizer-3.5.2-cp314-cp314-macosx_10_15_universal2.whl.metadata (46 kB)
+2026-10-28T13:43:06.9483460Z Collecting idna<4,>=2.5 (from requests>=2.31.0->aqtinstall==3.3.*)
+2026-10-28T13:43:06.9593070Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-10-28T13:43:06.9845590Z Collecting urllib3<3,>=1.26 (from requests>=2.31.0->aqtinstall==3.3.*)
+2026-10-28T13:43:06.9954830Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-28T13:43:07.0002250Z Requirement already satisfied: certifi>=2023.5.7 in /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages (from requests>=2.31.0->aqtinstall==3.3.*) (2026.7.22)
+2026-10-28T13:43:07.0216560Z Collecting beautifulsoup4 (from bs4->aqtinstall==3.3.*)
+2026-10-28T13:43:07.0323210Z   Downloading beautifulsoup4-4.15.0-py3-none-any.whl.metadata (3.8 kB)
+2026-10-28T13:43:07.0574480Z Collecting soupsieve>=1.6.1 (from beautifulsoup4->bs4->aqtinstall==3.3.*)
+2026-10-28T13:43:07.0678780Z   Downloading soupsieve-3.0.4-py3-none-any.whl.metadata (4.4 kB)
+2026-10-28T13:43:07.0917660Z Collecting typing-extensions>=4.0.0 (from beautifulsoup4->bs4->aqtinstall==3.3.*)
+2026-10-28T13:43:07.1025500Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-28T13:43:07.1200460Z Downloading aqtinstall-3.3.0-py3-none-any.whl (71 kB)
+2026-10-28T13:43:07.1350770Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-10-28T13:43:07.1490770Z Downloading charset_normalizer-3.5.2-cp314-cp314-macosx_10_15_universal2.whl (367 kB)
+2026-10-28T13:43:07.1744090Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+2026-10-28T13:43:07.1881730Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-10-28T13:43:07.2011210Z Downloading bs4-0.0.2-py2.py3-none-any.whl (1.2 kB)
+2026-10-28T13:43:07.2140770Z Downloading beautifulsoup4-4.15.0-py3-none-any.whl (109 kB)
+2026-10-28T13:43:07.2272670Z Downloading soupsieve-3.0.4-py3-none-any.whl (42 kB)
+2026-10-28T13:43:07.2410300Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-28T13:43:07.2543360Z Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+2026-10-28T13:43:07.2670970Z Downloading humanize-4.16.0-py3-none-any.whl (137 kB)
+2026-10-28T13:43:07.2813300Z Downloading patch_ng-1.19.1-py3-none-any.whl (17 kB)
+2026-10-28T13:43:07.2941030Z Downloading semantic_version-2.10.0-py2.py3-none-any.whl (15 kB)
+2026-10-28T13:43:07.3374540Z Installing collected packages: urllib3, typing-extensions, soupsieve, semantic-version, patch-ng, idna, humanize, defusedxml, charset_normalizer, requests, beautifulsoup4, bs4, aqtinstall
+2026-10-28T13:43:07.6762540Z 
+2026-10-28T13:43:07.6778460Z Successfully installed aqtinstall-3.3.0 beautifulsoup4-4.15.0 bs4-0.0.2 charset_normalizer-3.5.2 defusedxml-0.7.1 humanize-4.16.0 idna-3.20 patch-ng-1.19.1 requests-2.34.2 semantic-version-2.10.0 soupsieve-3.0.4 typing-extensions-4.16.0 urllib3-2.8.0
+2026-10-28T13:43:07.6783260Z 
+2026-10-28T13:43:07.6784090Z [notice] A new release of pip is available: 26.2.1 -> 26.2.2
+2026-10-28T13:43:07.6785140Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-28T13:43:07.7537730Z ##[endgroup]
+2026-10-28T13:43:07.7554660Z [command]/Users/runner/hostedtoolcache/Python/3.14.7/arm64/bin/python3 -m aqt version
+2026-10-28T13:43:08.0404510Z INFO    : aqtinstall(aqt) v3.3.0 on Python 3.14.7 [CPython Clang 21.0.0 (clang-2100.1.1.101)]
+2026-10-28T13:43:08.0699990Z ##[group]Resolve available Qt version "6.8.3" with host "mac" and target "desktop"
+2026-10-28T13:43:08.0706500Z [command]/Users/runner/hostedtoolcache/Python/3.14.7/arm64/bin/python3 -m aqt list-qt mac desktop --spec 6.8.3 --latest-version
+2026-10-28T13:43:08.8689250Z 6.8.3
+2026-10-28T13:43:08.9035640Z ##[endgroup]
+2026-10-28T13:43:08.9386910Z ##[group]Check and restore cache
+2026-10-28T13:43:09.0994410Z Cache hit for: install-qt-action-mac-24.6.0-desktop-clang_64-6.8.3-/Users/runner/work/JOBS/Qt-==1.1.0-==3.3.*
+2026-10-28T13:43:10.2502620Z Received 88080384 of 1233145763 (7.1%), 83.9 MBs/sec
+2026-10-28T13:43:11.2501650Z Received 134217728 of 1233145763 (10.9%), 63.9 MBs/sec
+2026-10-28T13:43:12.2518700Z Received 260046848 of 1233145763 (21.1%), 82.6 MBs/sec
+2026-10-28T13:43:13.2541740Z Received 352321536 of 1233145763 (28.6%), 83.9 MBs/sec
+2026-10-28T13:43:14.2610920Z Received 432013312 of 1233145763 (35.0%), 82.3 MBs/sec
+2026-10-28T13:43:15.2584330Z Received 536870912 of 1233145763 (43.5%), 85.2 MBs/sec
+2026-10-28T13:43:16.2563910Z Received 662700032 of 1233145763 (53.7%), 90.2 MBs/sec
+2026-10-28T13:43:17.2568590Z Received 734003200 of 1233145763 (59.5%), 87.4 MBs/sec
+2026-10-28T13:43:18.2569360Z Received 826277888 of 1233145763 (67.0%), 87.5 MBs/sec
+2026-10-28T13:43:19.2577330Z Received 939524096 of 1233145763 (76.2%), 89.5 MBs/sec
+2026-10-28T13:43:20.2579900Z Received 1035993088 of 1233145763 (84.0%), 89.7 MBs/sec
+2026-10-28T13:43:21.2643560Z Received 1119879168 of 1233145763 (90.8%), 88.9 MBs/sec
+2026-10-28T13:43:22.2602120Z Received 1207979939 of 1233145763 (98.0%), 88.5 MBs/sec
+2026-10-28T13:43:22.6257020Z Received 1233145763 of 1233145763 (100.0%), 87.9 MBs/sec
+2026-10-28T13:43:22.6433040Z Cache Size: ~1176 MB (1233145763 B)
+2026-10-28T13:43:22.6716930Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/933aea76-2b0d-4786-9531-d0c833cd05fd/cache.tzst -P -C /Users/runner/work/JOBS/JOBS --delay-directory-restore --use-compress-program unzstd
+2026-10-28T13:43:34.1053880Z Cache restored successfully
+2026-10-28T13:43:34.1752020Z Automatic cache hit with key "install-qt-action-mac-24.6.0-desktop-clang_64-6.8.3-/Users/runner/work/JOBS/Qt-==1.1.0-==3.3.*"
+2026-10-28T13:43:34.1755620Z ##[endgroup]
+2026-10-28T13:43:34.1818290Z ##[group]Post-process installed Qt
+2026-10-28T13:43:34.1818720Z Setting output "host" = "mac"
+2026-10-28T13:43:34.2012510Z Setting output "target" = "desktop"
+2026-10-28T13:43:34.2016320Z Setting output "version" = "6.8.3"
+2026-10-28T13:43:34.2028110Z Setting output "arch" = "clang_64"
+2026-10-28T13:43:34.2038240Z Setting output "qt-root-dir" = "/Users/runner/work/JOBS/Qt/6.8.3/macos"
+2026-10-28T13:43:34.2040690Z Setting output "qt-plugin-path" = "/Users/runner/work/JOBS/Qt/6.8.3/macos/plugins"
+2026-10-28T13:43:34.2042790Z Setting output "qml2-import-path" = "/Users/runner/work/JOBS/Qt/6.8.3/macos/qml"
+2026-10-28T13:43:34.2044980Z Prepending "/Users/runner/work/JOBS/Qt/6.8.3/macos/bin" to env "PATH"
+2026-10-28T13:43:34.2046690Z Appending "/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig" to env "PKG_CONFIG_PATH"
+2026-10-28T13:43:34.2048290Z Setting env "QT_ROOT_DIR" = "/Users/runner/work/JOBS/Qt/6.8.3/macos"
+2026-10-28T13:43:34.2051310Z Setting env "QT_PLUGIN_PATH" = "/Users/runner/work/JOBS/Qt/6.8.3/macos/plugins"
+2026-10-28T13:43:34.2052760Z Setting env "QML2_IMPORT_PATH" = "/Users/runner/work/JOBS/Qt/6.8.3/macos/qml"
+2026-10-28T13:43:34.2054610Z ##[endgroup]
+2026-10-28T13:43:34.2201090Z ##[end-action id=__jurplel_install-qt-action.aqtinstall;outcome=success;conclusion=success;duration_ms=32839]
+2026-10-28T13:43:34.2294420Z ##[group]Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+2026-10-28T13:43:34.2301160Z [36;1mcmake -S . -B build -DCMAKE_BUILD_TYPE=Release[0m
+2026-10-28T13:43:34.2560030Z shell: /bin/bash -e {0}
+2026-10-28T13:43:34.2560360Z env:
+2026-10-28T13:43:34.2560780Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:34.2561480Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:43:34.2562120Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:34.2562590Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:34.2563090Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:34.2563530Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:43:34.2563990Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:43:34.2564540Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:43:34.2564900Z ##[endgroup]
+2026-10-28T13:43:35.7790400Z -- The CXX compiler identification is AppleClang 17.0.0.17000013
+2026-10-28T13:43:36.2581110Z -- Detecting CXX compiler ABI info
+2026-10-28T13:43:36.8592690Z -- Detecting CXX compiler ABI info - done
+2026-10-28T13:43:36.8761680Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-28T13:43:36.8768070Z -- Detecting CXX compile features
+2026-10-28T13:43:36.8775510Z -- Detecting CXX compile features - done
+2026-10-28T13:43:36.9184750Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-28T13:43:37.1138420Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-28T13:43:37.1151710Z -- Found Threads: TRUE
+2026-10-28T13:43:37.1182480Z -- Performing Test HAVE_STDATOMIC
+2026-10-28T13:43:37.5183490Z -- Performing Test HAVE_STDATOMIC - Success
+2026-10-28T13:43:37.5189780Z -- Found WrapAtomic: TRUE
+2026-10-28T13:43:37.7638950Z -- Found OpenGL: /Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
+2026-10-28T13:43:37.7653200Z -- Found WrapOpenGL: TRUE
+2026-10-28T13:43:37.8584980Z -- Configuring done (3.5s)
+2026-10-28T13:43:38.0678420Z -- Generating done (0.2s)
+2026-10-28T13:43:38.0685390Z -- Build files have been written to: /Users/runner/work/JOBS/JOBS/build
+2026-10-28T13:43:38.0769790Z ##[group]Run cmake --build build --config Release --parallel 3
+2026-10-28T13:43:38.0770280Z [36;1mcmake --build build --config Release --parallel 3[0m
+2026-10-28T13:43:38.0802210Z shell: /bin/bash -e {0}
+2026-10-28T13:43:38.0815630Z env:
+2026-10-28T13:43:38.0815940Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:38.0816680Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:43:38.0817390Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:38.0817870Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:38.0818490Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:43:38.0818950Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:43:38.0819360Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:43:38.0819870Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:43:38.0820210Z ##[endgroup]
+2026-10-28T13:43:38.1757080Z [  0%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Project.cpp.o
+2026-10-28T13:43:38.1759180Z [  1%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Wbs.cpp.o
+2026-10-28T13:43:38.4579800Z [  1%] Built target jobs_build_identity
+2026-10-28T13:43:38.4670480Z [  1%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/CalculationControl.cpp.o
+2026-10-28T13:43:39.0055620Z [  2%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Diagnostics.cpp.o
+2026-10-28T13:43:39.2949080Z [  2%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Workspace.cpp.o
+2026-10-28T13:43:40.3615930Z [  3%] Linking CXX static library libjobs_domain.a
+2026-10-28T13:43:41.2393930Z [  3%] Built target jobs_domain
+2026-10-28T13:43:41.2681220Z [  4%] Building CXX object CMakeFiles/jobs_formatting.dir/src/formatting/DiagnosticText.cpp.o
+2026-10-28T13:43:41.8322460Z [  4%] Linking CXX static library libjobs_formatting.a
+2026-10-28T13:43:41.8835510Z [  4%] Built target jobs_formatting
+2026-10-28T13:43:41.9076040Z [  4%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/WbsSummary.cpp.o
+2026-10-28T13:43:41.9133240Z [  6%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Scheduler.cpp.o
+2026-10-28T13:43:41.9190630Z [  6%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/WorkCalendar.cpp.o
+2026-10-28T13:43:42.6678550Z [  6%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Forecast.cpp.o
+2026-10-28T13:43:42.9481760Z [  7%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Tracking.cpp.o
+2026-10-28T13:43:43.1364320Z [  7%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Resources.cpp.o
+2026-10-28T13:43:43.7978360Z [  8%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Costs.cpp.o
+2026-10-28T13:43:44.8047340Z [  9%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Reports.cpp.o
+2026-10-28T13:43:45.5431370Z [  9%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Pdm.cpp.o
+2026-10-28T13:43:45.8536730Z [ 10%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/PdmResources.cpp.o
+2026-10-28T13:43:47.6118090Z [ 10%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Constraints.cpp.o
+2026-10-28T13:43:48.1591170Z [ 11%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Effort.cpp.o
+2026-10-28T13:43:49.1722040Z [ 11%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/EffortScheduler.cpp.o
+2026-10-28T13:43:49.4324500Z [ 12%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/EffortEditing.cpp.o
+2026-10-28T13:43:50.4325840Z [ 12%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/SharedResources.cpp.o
+2026-10-28T13:43:52.6167510Z [ 13%] Linking CXX static library libjobs_calculation.a
+2026-10-28T13:43:52.8054050Z [ 13%] Built target jobs_calculation
+2026-10-28T13:43:52.8446270Z [ 14%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/ReportFormat.cpp.o
+2026-10-28T13:43:52.8559780Z [ 14%] Building CXX object CMakeFiles/jobs_application.dir/src/application/Document.cpp.o
+2026-10-28T13:43:52.8567140Z [ 14%] Building CXX object CMakeFiles/jobs_shared_resource_tests.dir/tests/SharedResourceTests.cpp.o
+2026-10-28T13:43:54.4906260Z [ 14%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/XlsxExport.cpp.o
+2026-10-28T13:43:55.2978960Z [ 15%] Linking CXX executable jobs_shared_resource_tests
+2026-10-28T13:43:55.3769000Z [ 15%] Built target jobs_shared_resource_tests
+2026-10-28T13:43:55.4120710Z [ 16%] Building CXX object CMakeFiles/jobs_control_tests.dir/tests/CalculationControlTests.cpp.o
+2026-10-28T13:43:56.2879770Z [ 17%] Building CXX object CMakeFiles/jobs_application.dir/src/application/TaskEditing.cpp.o
+2026-10-28T13:43:56.8291800Z [ 18%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/PdfExport.cpp.o
+2026-10-28T13:43:57.0437580Z [ 18%] Linking CXX executable jobs_control_tests
+2026-10-28T13:43:57.1143420Z [ 18%] Built target jobs_control_tests
+2026-10-28T13:43:57.1565060Z [ 18%] Building CXX object CMakeFiles/jobs_schedule_tests.dir/tests/SchedulerTests.cpp.o
+2026-10-28T13:43:58.2018720Z [ 19%] Linking CXX executable jobs_schedule_tests
+2026-10-28T13:43:58.2738920Z [ 19%] Built target jobs_schedule_tests
+2026-10-28T13:43:58.2844150Z [ 19%] Building CXX object CMakeFiles/jobs_application.dir/src/application/InputDelta.cpp.o
+2026-10-28T13:43:58.4566470Z [ 19%] Linking CXX static library libjobs_reporting.a
+2026-10-28T13:43:58.5211540Z [ 19%] Built target jobs_reporting
+2026-10-28T13:43:58.5316950Z [ 20%] Building CXX object CMakeFiles/jobs_application.dir/src/application/PreparedEdit.cpp.o
+2026-10-28T13:43:58.7391860Z [ 20%] Building CXX object CMakeFiles/jobs_application.dir/src/application/ProjectState.cpp.o
+2026-10-28T13:44:01.0041550Z [ 21%] Linking CXX static library libjobs_application.a
+2026-10-28T13:44:01.1943150Z [ 21%] Built target jobs_application
+2026-10-28T13:44:01.2215470Z [ 24%] Building CXX object CMakeFiles/jobs_tracking_tests.dir/tests/TrackingTests.cpp.o
+2026-10-28T13:44:01.2216210Z [ 24%] Building CXX object CMakeFiles/jobs_input_delta_tests.dir/tests/InputDeltaTests.cpp.o
+2026-10-28T13:44:01.2216990Z [ 24%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/JsonProjectStore.cpp.o
+2026-10-28T13:44:02.8361750Z [ 24%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ProjectJson.cpp.o
+2026-10-28T13:44:03.1663100Z [ 24%] Linking CXX executable jobs_input_delta_tests
+2026-10-28T13:44:03.2311430Z [ 24%] Built target jobs_input_delta_tests
+2026-10-28T13:44:03.2586720Z [ 25%] Building CXX object CMakeFiles/jobs_wbs_tests.dir/tests/WbsTests.cpp.o
+2026-10-28T13:44:03.8805310Z [ 25%] Linking CXX executable jobs_tracking_tests
+2026-10-28T13:44:03.9569780Z [ 25%] Built target jobs_tracking_tests
+2026-10-28T13:44:03.9633690Z [ 26%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/JsonRecoveryStore.cpp.o
+2026-10-28T13:44:05.8469180Z [ 26%] Linking CXX executable jobs_wbs_tests
+2026-10-28T13:44:05.9294070Z [ 26%] Built target jobs_wbs_tests
+2026-10-28T13:44:05.9415340Z [ 26%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ProjectFile.cpp.o
+2026-10-28T13:44:06.1418620Z [ 27%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/JsonWorkspaceStore.cpp.o
+2026-10-28T13:44:06.5798930Z [ 27%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ProjectXml.cpp.o
+2026-10-28T13:44:07.2204350Z [ 28%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ExchangePackage.cpp.o
+2026-10-28T13:44:07.8900750Z [ 28%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/PrimaveraXer.cpp.o
+2026-10-28T13:44:12.2449030Z [ 29%] Linking CXX static library libjobs_persistence.a
+2026-10-28T13:44:12.2979450Z [ 29%] Built target jobs_persistence
+2026-10-28T13:44:12.3246650Z [ 29%] Building CXX object CMakeFiles/jobs_parser_harness.dir/tests/fuzz/ParserHarness.cpp.o
+2026-10-28T13:44:12.3247650Z [ 30%] Building CXX object CMakeFiles/jobs_diagnostic_tests.dir/tests/DiagnosticTests.cpp.o
+2026-10-28T13:44:12.3248890Z [ 30%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindow.cpp.o
+2026-10-28T13:44:13.4989900Z [ 31%] Linking CXX static library libjobs_parser_harness.a
+2026-10-28T13:44:13.5488100Z [ 31%] Built target jobs_parser_harness
+2026-10-28T13:44:13.5769890Z [ 32%] Building CXX object CMakeFiles/jobs_workspace_file_tests.dir/tests/WorkspaceFileTests.cpp.o
+2026-10-28T13:44:13.9171400Z [ 32%] Linking CXX executable jobs_diagnostic_tests
+2026-10-28T13:44:14.0018060Z [ 32%] Built target jobs_diagnostic_tests
+2026-10-28T13:44:14.0307460Z [ 33%] Building CXX object CMakeFiles/jobs_document_guard_tests.dir/tests/DocumentGuardTests.cpp.o
+2026-10-28T13:44:15.6033680Z [ 33%] Linking CXX executable jobs_workspace_file_tests
+2026-10-28T13:44:15.6913380Z [ 33%] Built target jobs_workspace_file_tests
+2026-10-28T13:44:15.7315510Z [ 33%] Building CXX object CMakeFiles/jobs_parser_seed_tests.dir/tests/fuzz/ParserSeeds.cpp.o
+2026-10-28T13:44:17.5589060Z [ 34%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowTracking.cpp.o
+2026-10-28T13:44:17.8260940Z [ 35%] Linking CXX executable jobs_parser_seed_tests
+2026-10-28T13:44:17.9188920Z [ 35%] Built target jobs_parser_seed_tests
+2026-10-28T13:44:17.9575050Z [ 35%] Building CXX object CMakeFiles/jobs_responsive_document_tests.dir/tests/ResponsiveDocumentTests.cpp.o
+2026-10-28T13:44:18.0117280Z [ 36%] Linking CXX executable jobs_document_guard_tests
+2026-10-28T13:44:18.0873110Z [ 36%] Built target jobs_document_guard_tests
+2026-10-28T13:44:18.0978520Z [ 36%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowResources.cpp.o
+2026-10-28T13:44:20.2878180Z [ 37%] Building CXX object CMakeFiles/jobs_prepared_edit_tests.dir/tests/PreparedEditTests.cpp.o
+2026-10-28T13:44:20.5863040Z [ 38%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowCosts.cpp.o
+2026-10-28T13:44:20.8358520Z [ 39%] Linking CXX executable jobs_responsive_document_tests
+2026-10-28T13:44:20.9133220Z [ 39%] Built target jobs_responsive_document_tests
+2026-10-28T13:44:20.9439130Z [ 40%] Building CXX object CMakeFiles/jobs_primavera_xer_tests.dir/tests/PrimaveraXerTests.cpp.o
+2026-10-28T13:44:23.0435380Z [ 40%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowRecovery.cpp.o
+2026-10-28T13:44:23.1640670Z [ 40%] Linking CXX executable jobs_prepared_edit_tests
+2026-10-28T13:44:23.2552660Z [ 40%] Built target jobs_prepared_edit_tests
+2026-10-28T13:44:23.2955090Z [ 41%] Building CXX object CMakeFiles/jobs_project_xml_tests.dir/tests/ProjectXmlTests.cpp.o
+2026-10-28T13:44:24.5145000Z [ 41%] Linking CXX executable jobs_primavera_xer_tests
+2026-10-28T13:44:24.5846440Z [ 41%] Built target jobs_primavera_xer_tests
+2026-10-28T13:44:24.6121640Z [ 42%] Building CXX object CMakeFiles/jobs_task_editing_tests.dir/tests/TaskEditingTests.cpp.o
+2026-10-28T13:44:25.6415010Z [ 43%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/AutoSaveController.cpp.o
+2026-10-28T13:44:26.4330110Z [ 44%] Linking CXX executable jobs_project_xml_tests
+2026-10-28T13:44:26.5030920Z [ 44%] Built target jobs_project_xml_tests
+2026-10-28T13:44:26.5341570Z [ 45%] Building CXX object CMakeFiles/jobs_integration_tests.dir/tests/IntegratedProjectTests.cpp.o
+2026-10-28T13:44:28.1949560Z [ 45%] Linking CXX executable jobs_task_editing_tests
+2026-10-28T13:44:28.3280300Z [ 45%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/RecoveryDialog.cpp.o
+2026-10-28T13:44:28.3281240Z [ 45%] Built target jobs_task_editing_tests
+2026-10-28T13:44:28.3548600Z [ 46%] Building CXX object CMakeFiles/jobs_effort_tests.dir/tests/EffortTests.cpp.o
+2026-10-28T13:44:29.3117190Z [ 47%] Linking CXX executable jobs_integration_tests
+2026-10-28T13:44:29.3837880Z [ 47%] Built target jobs_integration_tests
+2026-10-28T13:44:29.4119520Z [ 47%] Building CXX object CMakeFiles/jobs_constraint_tests.dir/tests/ConstraintTests.cpp.o
+2026-10-28T13:44:30.5403900Z [ 48%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/CostAnalysisDialog.cpp.o
+2026-10-28T13:44:31.5572360Z [ 48%] Linking CXX executable jobs_effort_tests
+2026-10-28T13:44:31.7323600Z [ 48%] Built target jobs_effort_tests
+2026-10-28T13:44:31.7725630Z [ 48%] Building CXX object CMakeFiles/jobs_pdm_tests.dir/tests/PdmTests.cpp.o
+2026-10-28T13:44:32.5478250Z [ 49%] Linking CXX executable jobs_constraint_tests
+2026-10-28T13:44:32.6287680Z [ 49%] Built target jobs_constraint_tests
+2026-10-28T13:44:32.6598770Z [ 50%] Building CXX object CMakeFiles/jobs_undo_tests.dir/tests/UndoTests.cpp.o
+2026-10-28T13:44:34.0217620Z [ 50%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ResourceComparisonDialog.cpp.o
+2026-10-28T13:44:35.2350370Z [ 51%] Linking CXX executable jobs_pdm_tests
+2026-10-28T13:44:35.3181450Z [ 51%] Built target jobs_pdm_tests
+2026-10-28T13:44:35.3487890Z [ 52%] Building CXX object CMakeFiles/jobs_plan_enum_tests.dir/tests/PlanEnumTests.cpp.o
+2026-10-28T13:44:36.0273230Z [ 52%] Linking CXX executable jobs_undo_tests
+2026-10-28T13:44:36.0866510Z [ 52%] Built target jobs_undo_tests
+2026-10-28T13:44:36.0977800Z [ 53%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ComparisonDialog.cpp.o
+2026-10-28T13:44:37.8220340Z [ 54%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/GanttView.cpp.o
+2026-10-28T13:44:38.2310060Z [ 54%] Linking CXX executable jobs_plan_enum_tests
+2026-10-28T13:44:38.3001600Z [ 54%] Built target jobs_plan_enum_tests
+2026-10-28T13:44:38.3290690Z [ 54%] Building CXX object CMakeFiles/jobs_recovery_tests.dir/tests/RecoveryTests.cpp.o
+2026-10-28T13:44:38.8574010Z [ 54%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ReportDialog.cpp.o
+2026-10-28T13:44:40.7634780Z [ 55%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowCalendars.cpp.o
+2026-10-28T13:44:41.4998470Z [ 56%] Linking CXX executable jobs_recovery_tests
+2026-10-28T13:44:41.5701010Z [ 56%] Built target jobs_recovery_tests
+2026-10-28T13:44:41.5884240Z [ 56%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/GanttEditing.cpp.o
+2026-10-28T13:44:41.9902930Z [ 57%] Building CXX object CMakeFiles/jobs_report_tests.dir/tests/ReportTests.cpp.o
+2026-10-28T13:44:42.8227910Z [ 58%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowConstraints.cpp.o
+2026-10-28T13:44:43.1094940Z [ 58%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowEffort.cpp.o
+2026-10-28T13:44:45.4580910Z [ 58%] Linking CXX executable jobs_report_tests
+2026-10-28T13:44:45.6759970Z [ 58%] Built target jobs_report_tests
+2026-10-28T13:44:45.6939340Z [ 59%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowTaskEditing.cpp.o
+2026-10-28T13:44:45.7770620Z [ 59%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskInput.cpp.o
+2026-10-28T13:44:45.8751780Z [ 60%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowXml.cpp.o
+2026-10-28T13:44:47.0436930Z [ 60%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskViewProjection.cpp.o
+2026-10-28T13:44:48.1586300Z [ 61%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowXer.cpp.o
+2026-10-28T13:44:48.8312960Z [ 62%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskTableModel.cpp.o
+2026-10-28T13:44:49.0535570Z [ 62%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskTableView.cpp.o
+2026-10-28T13:44:50.2157040Z [ 63%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/AsyncEditController.cpp.o
+2026-10-28T13:44:50.2258570Z [ 63%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowAsync.cpp.o
+2026-10-28T13:44:51.7197180Z [ 64%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowResponsive.cpp.o
+2026-10-28T13:44:51.9075980Z [ 64%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/DesktopWorkspace.cpp.o
+2026-10-28T13:44:52.2478150Z [ 65%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/WorkspaceDialog.cpp.o
+2026-10-28T13:44:53.7187530Z [ 65%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowWorkspace.cpp.o
+2026-10-28T13:44:54.6279980Z [ 66%] Building CXX object CMakeFiles/jobs_cost_tests.dir/tests/CostTests.cpp.o
+2026-10-28T13:44:55.5074940Z [ 67%] Building CXX object CMakeFiles/jobs_resource_tests.dir/tests/ResourceTests.cpp.o
+2026-10-28T13:44:55.9663300Z [ 68%] Linking CXX static library libjobs_ui.a
+2026-10-28T13:44:56.0610520Z [ 68%] Built target jobs_ui
+2026-10-28T13:44:56.1040150Z [ 69%] Building CXX object CMakeFiles/jobs_tracking_file_tests.dir/tests/TrackingFileTests.cpp.o
+2026-10-28T13:44:57.8114540Z [ 69%] Linking CXX executable jobs_cost_tests
+2026-10-28T13:44:57.9309870Z [ 69%] Built target jobs_cost_tests
+2026-10-28T13:44:57.9720000Z [ 70%] Building CXX object CMakeFiles/jobs_file_tests.dir/tests/FileLifecycleTests.cpp.o
+2026-10-28T13:44:58.5387650Z [ 70%] Linking CXX executable jobs_tracking_file_tests
+2026-10-28T13:44:58.6136530Z [ 70%] Built target jobs_tracking_file_tests
+2026-10-28T13:44:58.6539580Z [ 70%] Building CXX object CMakeFiles/jobs_ui_tests.dir/tests/UiLifecycleTests.cpp.o
+2026-10-28T13:44:58.9199840Z [ 70%] Linking CXX executable jobs_resource_tests
+2026-10-28T13:44:59.0013710Z [ 70%] Built target jobs_resource_tests
+2026-10-28T13:44:59.0314250Z [ 71%] Building CXX object CMakeFiles/jobs_wbs_gantt_ui_tests.dir/tests/WbsGanttUiTests.cpp.o
+2026-10-28T13:45:01.2308630Z [ 72%] Linking CXX executable jobs_ui_tests
+2026-10-28T13:45:01.4326010Z [ 72%] Built target jobs_ui_tests
+2026-10-28T13:45:01.4659500Z [ 72%] Linking CXX executable jobs_file_tests
+2026-10-28T13:45:01.4671500Z [ 73%] Building CXX object CMakeFiles/jobs_tracking_ui_tests.dir/tests/TrackingUiTests.cpp.o
+2026-10-28T13:45:01.5356040Z [ 73%] Built target jobs_file_tests
+2026-10-28T13:45:01.5655890Z [ 73%] Building CXX object CMakeFiles/JOBS.dir/src/main.cpp.o
+2026-10-28T13:45:01.5724750Z [ 73%] Linking CXX executable jobs_wbs_gantt_ui_tests
+2026-10-28T13:45:01.7392170Z [ 73%] Built target jobs_wbs_gantt_ui_tests
+2026-10-28T13:45:01.7711990Z [ 74%] Building CXX object CMakeFiles/jobs_workspace_ui_tests.dir/tests/WorkspaceUiTests.cpp.o
+2026-10-28T13:45:03.1436660Z [ 75%] Linking CXX executable JOBS.app/Contents/MacOS/JOBS
+2026-10-28T13:45:03.3327700Z [ 75%] Built target JOBS
+2026-10-28T13:45:03.3634540Z [ 75%] Building CXX object CMakeFiles/jobs_responsive_ui_tests.dir/tests/ResponsiveUiTests.cpp.o
+2026-10-28T13:45:04.7674700Z [ 76%] Linking CXX executable jobs_workspace_ui_tests
+2026-10-28T13:45:04.7779370Z [ 77%] Linking CXX executable jobs_tracking_ui_tests
+2026-10-28T13:45:05.0529410Z [ 77%] Built target jobs_tracking_ui_tests
+2026-10-28T13:45:05.0631940Z [ 77%] Built target jobs_workspace_ui_tests
+2026-10-28T13:45:05.2210920Z [ 77%] Building CXX object CMakeFiles/jobs_async_editing_ui_tests.dir/tests/AsyncEditingUiTests.cpp.o
+2026-10-28T13:45:05.2380330Z [ 78%] Building CXX object CMakeFiles/jobs_task_table_model_tests.dir/tests/TaskTableModelTests.cpp.o
+2026-10-28T13:45:06.8561530Z [ 79%] Linking CXX executable jobs_responsive_ui_tests
+2026-10-28T13:45:07.0465350Z [ 79%] Built target jobs_responsive_ui_tests
+2026-10-28T13:45:07.0881540Z [ 80%] Building CXX object CMakeFiles/jobs_primavera_xer_ui_tests.dir/tests/PrimaveraXerUiTests.cpp.o
+2026-10-28T13:45:08.0131900Z [ 80%] Linking CXX executable jobs_task_table_model_tests
+2026-10-28T13:45:08.2639970Z [ 80%] Built target jobs_task_table_model_tests
+2026-10-28T13:45:08.3099590Z [ 80%] Building CXX object CMakeFiles/jobs_project_xml_ui_tests.dir/tests/ProjectXmlUiTests.cpp.o
+2026-10-28T13:45:10.3466560Z [ 80%] Linking CXX executable jobs_primavera_xer_ui_tests
+2026-10-28T13:45:10.5808860Z [ 80%] Built target jobs_primavera_xer_ui_tests
+2026-10-28T13:45:10.6169520Z [ 80%] Building CXX object CMakeFiles/jobs_performance_probe.dir/tests/PerformanceProbe.cpp.o
+2026-10-28T13:45:10.7501690Z [ 81%] Linking CXX executable jobs_async_editing_ui_tests
+2026-10-28T13:45:10.9281600Z [ 81%] Built target jobs_async_editing_ui_tests
+2026-10-28T13:45:10.9618450Z [ 82%] Building CXX object CMakeFiles/jobs_bulk_editing_tests.dir/tests/BulkEditingTests.cpp.o
+2026-10-28T13:45:11.4350820Z [ 83%] Linking CXX executable jobs_project_xml_ui_tests
+2026-10-28T13:45:11.6203130Z [ 83%] Built target jobs_project_xml_ui_tests
+2026-10-28T13:45:11.6605180Z [ 83%] Building CXX object CMakeFiles/jobs_projected_views_tests.dir/tests/ProjectedViewsTests.cpp.o
+2026-10-28T13:45:13.2466610Z [ 84%] Linking CXX executable jobs_performance_probe
+2026-10-28T13:45:13.4473410Z [ 84%] Built target jobs_performance_probe
+2026-10-28T13:45:13.4797790Z [ 84%] Building CXX object CMakeFiles/jobs_projected_view_probe.dir/tests/ProjectedViewPerformanceProbe.cpp.o
+2026-10-28T13:45:14.7847510Z [ 84%] Linking CXX executable jobs_bulk_editing_tests
+2026-10-28T13:45:14.9599410Z [ 84%] Built target jobs_bulk_editing_tests
+2026-10-28T13:45:14.9893540Z [ 85%] Building CXX object CMakeFiles/jobs_bulk_performance_probe.dir/tests/BulkPerformanceProbe.cpp.o
+2026-10-28T13:45:15.4087170Z [ 86%] Linking CXX executable jobs_projected_views_tests
+2026-10-28T13:45:15.5877320Z [ 86%] Built target jobs_projected_views_tests
+2026-10-28T13:45:15.6347110Z [ 86%] Building CXX object CMakeFiles/jobs_responsive_performance_probe.dir/tests/ResponsivePerformanceProbe.cpp.o
+2026-10-28T13:45:16.6384410Z [ 87%] Linking CXX executable jobs_projected_view_probe
+2026-10-28T13:45:16.8446360Z [ 87%] Built target jobs_projected_view_probe
+2026-10-28T13:45:16.8767770Z [ 87%] Building CXX object CMakeFiles/jobs_editing_performance_probe.dir/tests/EditingPerformanceProbe.cpp.o
+2026-10-28T13:45:18.5060840Z [ 87%] Linking CXX executable jobs_bulk_performance_probe
+2026-10-28T13:45:18.7473440Z [ 87%] Built target jobs_bulk_performance_probe
+2026-10-28T13:45:18.7986870Z [ 88%] Building CXX object CMakeFiles/jobs_task_editing_ui_tests.dir/tests/TaskEditingUiTests.cpp.o
+2026-10-28T13:45:19.1615030Z [ 89%] Linking CXX executable jobs_responsive_performance_probe
+2026-10-28T13:45:19.3890230Z [ 89%] Built target jobs_responsive_performance_probe
+2026-10-28T13:45:19.4494110Z [ 90%] Building CXX object CMakeFiles/jobs_performance_ui_tests.dir/tests/PerformanceUiTests.cpp.o
+2026-10-28T13:45:20.6649280Z [ 91%] Linking CXX executable jobs_editing_performance_probe
+2026-10-28T13:45:20.9232010Z [ 91%] Built target jobs_editing_performance_probe
+2026-10-28T13:45:20.9633560Z [ 92%] Building CXX object CMakeFiles/jobs_effort_ui_tests.dir/tests/EffortUiTests.cpp.o
+2026-10-28T13:45:22.7186440Z [ 92%] Linking CXX executable jobs_performance_ui_tests
+2026-10-28T13:45:22.9354450Z [ 92%] Built target jobs_performance_ui_tests
+2026-10-28T13:45:23.0190690Z [ 93%] Building CXX object CMakeFiles/jobs_constraint_ui_tests.dir/tests/ConstraintUiTests.cpp.o
+2026-10-28T13:45:23.6686320Z [ 93%] Linking CXX executable jobs_task_editing_ui_tests
+2026-10-28T13:45:23.8861210Z [ 93%] Built target jobs_task_editing_ui_tests
+2026-10-28T13:45:23.9276120Z [ 93%] Building CXX object CMakeFiles/jobs_pdm_ui_tests.dir/tests/PdmUiTests.cpp.o
+2026-10-28T13:45:24.4656670Z [ 93%] Linking CXX executable jobs_effort_ui_tests
+2026-10-28T13:45:24.6462910Z [ 93%] Built target jobs_effort_ui_tests
+2026-10-28T13:45:24.7008920Z [ 93%] Building CXX object CMakeFiles/jobs_editing_performance_ui_tests.dir/tests/EditingPerformanceUiTests.cpp.o
+2026-10-28T13:45:26.3199420Z [ 93%] Linking CXX executable jobs_constraint_ui_tests
+2026-10-28T13:45:26.5724940Z [ 93%] Built target jobs_constraint_ui_tests
+2026-10-28T13:45:26.6133780Z [ 93%] Building CXX object CMakeFiles/jobs_recovery_ui_tests.dir/tests/RecoveryUiTests.cpp.o
+2026-10-28T13:45:27.5768990Z [ 94%] Linking CXX executable jobs_pdm_ui_tests
+2026-10-28T13:45:27.8417830Z [ 94%] Built target jobs_pdm_ui_tests
+2026-10-28T13:45:27.9226390Z [ 95%] Building CXX object CMakeFiles/jobs_report_ui_tests.dir/tests/ReportUiTests.cpp.o
+2026-10-28T13:45:28.7817820Z [ 96%] Linking CXX executable jobs_editing_performance_ui_tests
+2026-10-28T13:45:29.0362120Z [ 96%] Built target jobs_editing_performance_ui_tests
+2026-10-28T13:45:29.0896310Z [ 97%] Building CXX object CMakeFiles/jobs_cost_ui_tests.dir/tests/CostUiTests.cpp.o
+2026-10-28T13:45:31.1059710Z [ 98%] Linking CXX executable jobs_recovery_ui_tests
+2026-10-28T13:45:31.3197960Z [ 98%] Built target jobs_recovery_ui_tests
+2026-10-28T13:45:31.3567700Z [ 99%] Building CXX object CMakeFiles/jobs_resource_ui_tests.dir/tests/ResourceUiTests.cpp.o
+2026-10-28T13:45:31.6359650Z [ 99%] Linking CXX executable jobs_report_ui_tests
+2026-10-28T13:45:31.8349460Z [ 99%] Built target jobs_report_ui_tests
+2026-10-28T13:45:32.6615500Z [ 99%] Linking CXX executable jobs_cost_ui_tests
+2026-10-28T13:45:32.8836870Z [ 99%] Built target jobs_cost_ui_tests
+2026-10-28T13:45:34.7473520Z [100%] Linking CXX executable jobs_resource_ui_tests
+2026-10-28T13:45:34.9385600Z [100%] Built target jobs_resource_ui_tests
+2026-10-28T13:45:34.9848150Z ##[group]Run ctest --test-dir build -C Release --output-on-failure
+2026-10-28T13:45:34.9849010Z [36;1mctest --test-dir build -C Release --output-on-failure[0m
+2026-10-28T13:45:35.0074840Z shell: /bin/bash -e {0}
+2026-10-28T13:45:35.0075330Z env:
+2026-10-28T13:45:35.0075630Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:45:35.0076390Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:45:35.0077060Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:45:35.0077490Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:45:35.0077950Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:45:35.0078400Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:45:35.0078780Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:45:35.0079430Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:45:35.0080080Z ##[endgroup]
+2026-10-28T13:45:35.1340260Z Test project /Users/runner/work/JOBS/JOBS/build
+2026-10-28T13:45:35.1370610Z       Start  1: structured_diagnostics
+2026-10-28T13:45:35.2501260Z  1/48 Test  #1: structured_diagnostics ...........   Passed    0.11 sec
+2026-10-28T13:45:35.2505280Z       Start  2: shared_resource_intervals
+2026-10-28T13:45:35.2872390Z  2/48 Test  #2: shared_resource_intervals ........   Passed    0.04 sec
+2026-10-28T13:45:35.2873640Z       Start  3: workspace_file_contract
+2026-10-28T13:45:35.3145940Z  3/48 Test  #3: workspace_file_contract ..........   Passed    0.03 sec
+2026-10-28T13:45:35.3146970Z       Start  4: multi_project_workspace_ui
+2026-10-28T13:45:36.5794940Z  4/48 Test  #4: multi_project_workspace_ui .......   Passed    1.26 sec
+2026-10-28T13:45:36.5797660Z       Start  5: document_edit_guards
+2026-10-28T13:45:36.6043450Z  5/48 Test  #5: document_edit_guards .............   Passed    0.02 sec
+2026-10-28T13:45:36.6045410Z       Start  6: parser_seed_replay
+2026-10-28T13:45:36.6770840Z  6/48 Test  #6: parser_seed_replay ...............   Passed    0.07 sec
+2026-10-28T13:45:36.6773990Z       Start  7: responsive_document_contract
+2026-10-28T13:45:52.0964870Z  7/48 Test  #7: responsive_document_contract .....   Passed   15.41 sec
+2026-10-28T13:45:52.1063800Z       Start  8: responsive_editing_ui
+2026-10-28T13:45:55.6208100Z  8/48 Test  #8: responsive_editing_ui ............   Passed    3.53 sec
+2026-10-28T13:45:55.6211830Z       Start  9: prepared_edit_contract
+2026-10-28T13:45:56.4657280Z  9/48 Test  #9: prepared_edit_contract ...........   Passed    0.84 sec
+2026-10-28T13:45:56.4726840Z       Start 10: task_table_model_contract
+2026-10-28T13:45:56.4977730Z 10/48 Test #10: task_table_model_contract ........   Passed    0.03 sec
+2026-10-28T13:45:56.4979160Z       Start 11: async_editing_ui
+2026-10-28T13:46:08.4259990Z 11/48 Test #11: async_editing_ui .................   Passed   11.92 sec
+2026-10-28T13:46:08.4267800Z       Start 12: primavera_xer_contract
+2026-10-28T13:46:08.6164540Z 12/48 Test #12: primavera_xer_contract ...........   Passed    0.19 sec
+2026-10-28T13:46:08.6266050Z       Start 13: primavera_xer_ui
+2026-10-28T13:46:09.7890900Z 13/48 Test #13: primavera_xer_ui .................   Passed    1.17 sec
+2026-10-28T13:46:09.7891890Z       Start 14: project_xml_contract
+2026-10-28T13:46:10.0644560Z 14/48 Test #14: project_xml_contract .............   Passed    0.27 sec
+2026-10-28T13:46:10.0645930Z       Start 15: project_xml_ui
+2026-10-28T13:46:10.9655120Z 15/48 Test #15: project_xml_ui ...................   Passed    0.90 sec
+2026-10-28T13:46:10.9658240Z       Start 16: bulk_editing_contract_ui
+2026-10-28T13:46:12.3383900Z 16/48 Test #16: bulk_editing_contract_ui .........   Passed    1.37 sec
+2026-10-28T13:46:12.3472130Z       Start 17: projected_views_ui
+2026-10-28T13:46:16.2808310Z 17/48 Test #17: projected_views_ui ...............   Passed    3.94 sec
+2026-10-28T13:46:16.2814570Z       Start 18: task_editing_contract
+2026-10-28T13:46:16.3565180Z 18/48 Test #18: task_editing_contract ............   Passed    0.07 sec
+2026-10-28T13:46:16.3566840Z       Start 19: task_editing_ui
+2026-10-28T13:46:18.1651520Z 19/48 Test #19: task_editing_ui ..................   Passed    1.81 sec
+2026-10-28T13:46:18.1652310Z       Start 20: calculation_cancellation
+2026-10-28T13:46:20.0622690Z 20/48 Test #20: calculation_cancellation .........   Passed    1.90 sec
+2026-10-28T13:46:20.0623380Z       Start 21: integrated_project_workflow
+2026-10-28T13:46:20.2821820Z 21/48 Test #21: integrated_project_workflow ......   Passed    0.22 sec
+2026-10-28T13:46:20.2822750Z       Start 22: performance_cancellation_ui
+2026-10-28T13:46:20.9544020Z 22/48 Test #22: performance_cancellation_ui ......   Passed    0.67 sec
+2026-10-28T13:46:20.9545080Z       Start 23: effort_work_calendar_split
+2026-10-28T13:46:21.2066140Z 23/48 Test #23: effort_work_calendar_split .......   Passed    0.25 sec
+2026-10-28T13:46:21.2067390Z       Start 24: effort_ui
+2026-10-28T13:46:21.8181390Z 24/48 Test #24: effort_ui ........................   Passed    0.61 sec
+2026-10-28T13:46:21.8182150Z       Start 25: constraint_contract
+2026-10-28T13:46:21.8553370Z 25/48 Test #25: constraint_contract ..............   Passed    0.04 sec
+2026-10-28T13:46:21.8555370Z       Start 26: constraint_gantt_ui
+2026-10-28T13:46:22.5087320Z 26/48 Test #26: constraint_gantt_ui ..............   Passed    0.65 sec
+2026-10-28T13:46:22.5091170Z       Start 27: pdm_calendar_contract
+2026-10-28T13:46:22.5886400Z 27/48 Test #27: pdm_calendar_contract ............   Passed    0.08 sec
+2026-10-28T13:46:22.5887260Z       Start 28: pdm_calendar_ui
+2026-10-28T13:46:23.0709070Z 28/48 Test #28: pdm_calendar_ui ..................   Passed    0.48 sec
+2026-10-28T13:46:23.0710020Z       Start 29: undo_contract
+2026-10-28T13:46:29.6151270Z 29/48 Test #29: undo_contract ....................   Passed    6.54 sec
+2026-10-28T13:46:29.6158930Z       Start 30: plan_enum_compatibility
+2026-10-28T13:46:29.7953130Z 30/48 Test #30: plan_enum_compatibility ..........   Passed    0.18 sec
+2026-10-28T13:46:29.7959160Z       Start 31: input_delta_contract
+2026-10-28T13:46:29.8262180Z 31/48 Test #31: input_delta_contract .............   Passed    0.03 sec
+2026-10-28T13:46:29.8263630Z       Start 32: editing_performance_ui
+2026-10-28T13:46:30.7872800Z 32/48 Test #32: editing_performance_ui ...........   Passed    0.96 sec
+2026-10-28T13:46:30.7874770Z       Start 33: recovery_crash_file
+2026-10-28T13:46:30.9677980Z 33/48 Test #33: recovery_crash_file ..............   Passed    0.18 sec
+2026-10-28T13:46:30.9682200Z       Start 34: recovery_ui
+2026-10-28T13:46:33.3682550Z 34/48 Test #34: recovery_ui ......................   Passed    2.40 sec
+2026-10-28T13:46:33.3683640Z       Start 35: reports_export
+2026-10-28T13:46:34.4396460Z 35/48 Test #35: reports_export ...................   Passed    1.07 sec
+2026-10-28T13:46:34.4397590Z       Start 36: reports_ui
+2026-10-28T13:46:35.4846300Z 36/48 Test #36: reports_ui .......................   Passed    1.04 sec
+2026-10-28T13:46:35.4847460Z       Start 37: cost_contract_file
+2026-10-28T13:46:35.5232570Z 37/48 Test #37: cost_contract_file ...............   Passed    0.04 sec
+2026-10-28T13:46:35.5233150Z       Start 38: cost_ui
+2026-10-28T13:46:36.2779660Z 38/48 Test #38: cost_ui ..........................   Passed    0.75 sec
+2026-10-28T13:46:36.2780960Z       Start 39: resource_contract_file
+2026-10-28T13:46:36.3228200Z 39/48 Test #39: resource_contract_file ...........   Passed    0.04 sec
+2026-10-28T13:46:36.3229070Z       Start 40: resource_ui
+2026-10-28T13:46:37.2920420Z 40/48 Test #40: resource_ui ......................   Passed    0.97 sec
+2026-10-28T13:46:37.2921350Z       Start 41: tracking_contract
+2026-10-28T13:46:37.3063330Z 41/48 Test #41: tracking_contract ................   Passed    0.01 sec
+2026-10-28T13:46:37.3064100Z       Start 42: tracking_file
+2026-10-28T13:46:37.3369180Z 42/48 Test #42: tracking_file ....................   Passed    0.03 sec
+2026-10-28T13:46:37.3369780Z       Start 43: wbs_contract
+2026-10-28T13:46:37.3473310Z 43/48 Test #43: wbs_contract .....................   Passed    0.01 sec
+2026-10-28T13:46:37.3473720Z       Start 44: schedule_contract
+2026-10-28T13:46:37.3547530Z 44/48 Test #44: schedule_contract ................   Passed    0.01 sec
+2026-10-28T13:46:37.3549950Z       Start 45: file_lifecycle
+2026-10-28T13:46:37.3877160Z 45/48 Test #45: file_lifecycle ...................   Passed    0.03 sec
+2026-10-28T13:46:37.3877670Z       Start 46: ui_lifecycle
+2026-10-28T13:46:38.1151470Z 46/48 Test #46: ui_lifecycle .....................   Passed    0.73 sec
+2026-10-28T13:46:38.1152250Z       Start 47: wbs_gantt_ui
+2026-10-28T13:46:38.9368300Z 47/48 Test #47: wbs_gantt_ui .....................   Passed    0.82 sec
+2026-10-28T13:46:38.9369280Z       Start 48: tracking_ui
+2026-10-28T13:46:39.8920160Z 48/48 Test #48: tracking_ui ......................   Passed    0.95 sec
+2026-10-28T13:46:39.8928890Z 
+2026-10-28T13:46:39.8929640Z 100% tests passed out of 48
+2026-10-28T13:46:39.8930200Z 
+2026-10-28T13:46:39.8930570Z Total Test time (real) =  64.73 sec
+2026-10-28T13:46:39.9019340Z ##[group]Run python scripts/check-workspace-native.py build
+2026-10-28T13:46:39.9026000Z [36;1mpython scripts/check-workspace-native.py build[0m
+2026-10-28T13:46:39.9075930Z shell: /bin/bash -e {0}
+2026-10-28T13:46:39.9076280Z env:
+2026-10-28T13:46:39.9076740Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:39.9077440Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:46:39.9078150Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:39.9078750Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:39.9079220Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:39.9079750Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:46:39.9080190Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:46:39.9080890Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:46:39.9081280Z ##[endgroup]
+2026-10-28T13:46:42.5386420Z PASS: native multi-project workspace, load analysis, navigation scope, cancellation and reopen
+2026-10-28T13:46:42.5571300Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:46:42.5571780Z with:
+2026-10-28T13:46:42.5572200Z   name: workspace-macOS
+2026-10-28T13:46:42.5572680Z   path: build/workspace-ui.png
+build/workspace-native.log
+
+2026-10-28T13:46:42.5573090Z   if-no-files-found: warn
+2026-10-28T13:46:42.5573460Z   compression-level: 6
+2026-10-28T13:46:42.5573820Z   overwrite: false
+2026-10-28T13:46:42.5574210Z   include-hidden-files: false
+2026-10-28T13:46:42.5574510Z env:
+2026-10-28T13:46:42.5574910Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:42.5575620Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:46:42.5576220Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:42.5576720Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:42.5577370Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:42.5578300Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:46:42.5578660Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:46:42.5579150Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:46:42.5579530Z ##[endgroup]
+2026-10-28T13:46:42.9968300Z (node:4677) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:46:42.9969540Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:46:43.0015950Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-28T13:46:43.0018730Z The least common ancestor is /Users/runner/work/JOBS/JOBS/build. This will be the root directory of the artifact
+2026-10-28T13:46:43.0019340Z With the provided path, there will be 2 files uploaded
+2026-10-28T13:46:43.0049380Z Artifact name is valid!
+2026-10-28T13:46:43.0049880Z Root directory input is valid!
+2026-10-28T13:46:43.3292290Z Beginning upload of artifact content to blob storage
+2026-10-28T13:46:43.3719300Z (node:4677) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:46:43.5570200Z Uploaded bytes 107365
+2026-10-28T13:46:43.5956350Z Finished uploading artifact content to blob storage!
+2026-10-28T13:46:43.5958490Z SHA256 digest of uploaded artifact zip is fc72f3c7ff91d8f856b8228045f184b811e24eeefba21d7ce41619f438019182
+2026-10-28T13:46:43.5961670Z Finalizing artifact upload
+2026-10-28T13:46:44.0467070Z Artifact workspace-macOS.zip successfully finalized. Artifact ID 12820597866
+2026-10-28T13:46:44.0468030Z Artifact workspace-macOS has been successfully uploaded! Final size is 107365 bytes. Artifact ID is 12820597866
+2026-10-28T13:46:44.0476880Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12820597866
+2026-10-28T13:46:44.0658380Z ##[group]Run actions/setup-python@v5
+2026-10-28T13:46:44.0658650Z with:
+2026-10-28T13:46:44.0658850Z   python-version: 3.12
+2026-10-28T13:46:44.0659090Z   check-latest: false
+2026-10-28T13:46:44.0661600Z   token: ***
+2026-10-28T13:46:44.0661800Z   update-environment: true
+2026-10-28T13:46:44.0662010Z   allow-prereleases: false
+2026-10-28T13:46:44.0662190Z   freethreaded: false
+2026-10-28T13:46:44.0662420Z env:
+2026-10-28T13:46:44.0662740Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:44.0663340Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.14.7/arm64/lib/pkgconfig:/Users/runner/work/JOBS/Qt/6.8.3/macos/lib/pkgconfig
+2026-10-28T13:46:44.0664000Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:44.0664400Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:44.0664880Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.14.7/arm64
+2026-10-28T13:46:44.0665360Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:46:44.0665720Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:46:44.0666190Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:46:44.0666530Z ##[endgroup]
+2026-10-28T13:46:44.2548820Z ##[group]Installed versions
+2026-10-28T13:46:44.2614460Z (node:4682) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:46:44.2615240Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:46:44.2627640Z Successfully set up CPython (3.12.10)
+2026-10-28T13:46:44.2628370Z ##[endgroup]
+2026-10-28T13:46:44.2730850Z ##[group]Run python -m pip install openpyxl==3.1.5 pypdf==6.10.0
+2026-10-28T13:46:44.2731460Z [36;1mpython -m pip install openpyxl==3.1.5 pypdf==6.10.0[0m
+2026-10-28T13:46:44.2732000Z [36;1mpython scripts/verify-report-fixtures.py build[0m
+2026-10-28T13:46:44.2732470Z [36;1mpython scripts/verify-project-xml.py build[0m
+2026-10-28T13:46:44.2809720Z shell: /bin/bash -e {0}
+2026-10-28T13:46:44.2810070Z env:
+2026-10-28T13:46:44.2810490Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:44.2811070Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:46:44.2811730Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:44.2812320Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:44.2813000Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:44.2813680Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:46:44.2814200Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:46:44.2814670Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:46:44.2815110Z ##[endgroup]
+2026-10-28T13:46:45.5245110Z Collecting openpyxl==3.1.5
+2026-10-28T13:46:45.5971350Z   Downloading openpyxl-3.1.5-py2.py3-none-any.whl.metadata (2.5 kB)
+2026-10-28T13:46:45.6337340Z Collecting pypdf==6.10.0
+2026-10-28T13:46:45.6464450Z   Downloading pypdf-6.10.0-py3-none-any.whl.metadata (7.1 kB)
+2026-10-28T13:46:45.6704980Z Collecting et-xmlfile (from openpyxl==3.1.5)
+2026-10-28T13:46:45.6826370Z   Downloading et_xmlfile-2.0.0-py3-none-any.whl.metadata (2.7 kB)
+2026-10-28T13:46:45.6989090Z Downloading openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)
+2026-10-28T13:46:45.7473620Z Downloading pypdf-6.10.0-py3-none-any.whl (334 kB)
+2026-10-28T13:46:45.7763670Z Downloading et_xmlfile-2.0.0-py3-none-any.whl (18 kB)
+2026-10-28T13:46:45.8129260Z Installing collected packages: pypdf, et-xmlfile, openpyxl
+2026-10-28T13:46:46.3809690Z 
+2026-10-28T13:46:46.3823290Z Successfully installed et-xmlfile-2.0.0 openpyxl-3.1.5 pypdf-6.10.0
+2026-10-28T13:46:46.3844140Z 
+2026-10-28T13:46:46.3845420Z [notice] A new release of pip is available: 26.2.1 -> 26.2.2
+2026-10-28T13:46:46.3846730Z [notice] To update, run: python -m pip install --upgrade pip
+2026-10-28T13:46:49.5949720Z PASS: reports-smoke.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T13:46:49.5952840Z PASS: reports-resources.xlsx: 7 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T13:46:49.5955540Z PASS: reports-pdm.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T13:46:49.5957420Z PASS: reports-constraints.xlsx: 15 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T13:46:49.5959010Z PASS: reports-effort.xlsx: 19 sheets, ZIP/OOXML/types/unknown/provenance
+2026-10-28T13:46:49.5960540Z PASS: reports-smoke.pdf: 8 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.5962020Z PASS: reports-long-portrait.pdf: 3 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.5963510Z PASS: reports-a3.pdf: 3 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.5964990Z PASS: reports-pdm.pdf: 6 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.5966260Z PASS: reports-constraints.pdf: 6 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.5967550Z PASS: reports-effort.pdf: 10 pages, size/text/provenance/continuation
+2026-10-28T13:46:49.6725930Z Independent Project XML reader: namespace, identities, four links, calendars, resource units and source verdicts passed
+2026-10-28T13:46:49.6920540Z ##[group]Run python scripts/run-performance-probes.py --repeats 3
+2026-10-28T13:46:49.6922540Z [36;1mpython scripts/run-performance-probes.py --repeats 3[0m
+2026-10-28T13:46:49.6987950Z shell: /bin/bash -e {0}
+2026-10-28T13:46:49.6988330Z env:
+2026-10-28T13:46:49.6988690Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:49.6989270Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:46:49.6989840Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:49.6990330Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:49.6990830Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:46:49.6991270Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:46:49.6991650Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:46:49.6992220Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:46:49.6992650Z ##[endgroup]
+2026-10-28T13:46:51.6731970Z legacy/1000: calculation median 2.15 ms; UI 237.43 ms; peak 120.4 MiB
+2026-10-28T13:46:56.6293320Z legacy/10000: calculation median 9.28 ms; UI 1152.15 ms; peak 211.1 MiB
+2026-10-28T13:46:58.8605580Z effort/1000: calculation median 85.90 ms; UI 214.57 ms; peak 150.3 MiB
+2026-10-28T13:47:09.1293880Z effort/10000: calculation median 599.53 ms; UI 1416.93 ms; peak 250.0 MiB
+2026-10-28T13:47:09.1603440Z ##[group]Run python scripts/run-editing-performance-probes.py --repeats 7
+2026-10-28T13:47:09.1606550Z [36;1mpython scripts/run-editing-performance-probes.py --repeats 7[0m
+2026-10-28T13:47:09.1670890Z shell: /bin/bash -e {0}
+2026-10-28T13:47:09.1672160Z env:
+2026-10-28T13:47:09.1673390Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:09.1674670Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:47:09.1676020Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:09.1677310Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:09.1678580Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:09.1679750Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:47:09.1680790Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:47:09.1682180Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:47:09.1683150Z ##[endgroup]
+2026-10-28T13:47:10.6773690Z 1000 tasks/0 baselines: name UI 6.20 ms; duration UI 8.73 ms; history 17370 bytes/100 steps
+2026-10-28T13:47:12.1874040Z 1000 tasks/3 baselines: name UI 6.74 ms; duration UI 9.23 ms; history 17370 bytes/100 steps
+2026-10-28T13:47:14.9706070Z 10000 tasks/0 baselines: name UI 6.23 ms; duration UI 9.35 ms; history 17370 bytes/100 steps
+2026-10-28T13:47:22.1796540Z 10000 tasks/3 baselines: name UI 7.51 ms; duration UI 11.76 ms; history 17370 bytes/100 steps
+2026-10-28T13:47:22.2265000Z ##[group]Run python scripts/run-responsive-performance-probes.py --repeats 3
+2026-10-28T13:47:22.2266200Z [36;1mpython scripts/run-responsive-performance-probes.py --repeats 3[0m
+2026-10-28T13:47:22.2401590Z shell: /bin/bash -e {0}
+2026-10-28T13:47:22.2402510Z env:
+2026-10-28T13:47:22.2403400Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:22.2404870Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:47:22.2406320Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:22.2408230Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:22.2409580Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:22.2410710Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:47:22.2411880Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:47:22.2413240Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:47:22.2414090Z ##[endgroup]
+2026-10-28T13:47:23.0178530Z 1000/0: request 0.026 ms; commit 0.005 ms; worker 105.34 ms
+2026-10-28T13:47:25.0801540Z 1000/3: request 0.007 ms; commit 0.008 ms; worker 141.32 ms
+2026-10-28T13:47:29.6181980Z 10000/0: request 0.001 ms; commit 0.014 ms; worker 680.58 ms
+2026-10-28T13:47:42.4655740Z 10000/3: request 0.004 ms; commit 0.007 ms; worker 571.12 ms
+2026-10-28T13:47:42.5162030Z ##[group]Run actions/checkout@v4
+2026-10-28T13:47:42.5162420Z with:
+2026-10-28T13:47:42.5162930Z   ref: ae8d9edaa360388012fdb98cd79b633192919971
+2026-10-28T13:47:42.5163270Z   path: build/editing-reference-source
+2026-10-28T13:47:42.5163680Z   repository: jhoon-dev/JOBS
+2026-10-28T13:47:42.5165960Z   token: ***
+2026-10-28T13:47:42.5166240Z   ssh-strict: true
+2026-10-28T13:47:42.5166460Z   ssh-user: git
+2026-10-28T13:47:42.5166770Z   persist-credentials: true
+2026-10-28T13:47:42.5167120Z   clean: true
+2026-10-28T13:47:42.5167350Z   sparse-checkout-cone-mode: true
+2026-10-28T13:47:42.5167790Z   fetch-depth: 1
+2026-10-28T13:47:42.5168100Z   fetch-tags: false
+2026-10-28T13:47:42.5168340Z   show-progress: true
+2026-10-28T13:47:42.5168630Z   lfs: false
+2026-10-28T13:47:42.5168970Z   submodules: false
+2026-10-28T13:47:42.5169230Z   set-safe-directory: true
+2026-10-28T13:47:42.5169560Z   allow-unsafe-pr-checkout: false
+2026-10-28T13:47:42.5169940Z env:
+2026-10-28T13:47:42.5170420Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:42.5171020Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:47:42.5171630Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:42.5172100Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:42.5172690Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:42.5173150Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:47:42.5173540Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:47:42.5174030Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:47:42.5174460Z ##[endgroup]
+2026-10-28T13:47:42.8003040Z Syncing repository: jhoon-dev/JOBS
+2026-10-28T13:47:42.8004690Z ##[group]Getting Git version info
+2026-10-28T13:47:42.8015470Z Working directory is '/Users/runner/work/JOBS/JOBS/build/editing-reference-source'
+2026-10-28T13:47:42.8016320Z [command]/opt/homebrew/bin/git version
+2026-10-28T13:47:42.8114560Z git version 2.55.0
+2026-10-28T13:47:42.8149930Z ##[endgroup]
+2026-10-28T13:47:42.8165680Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/58ee1ffd-f92c-4f5c-bdf5-44613f27da73/.gitconfig'
+2026-10-28T13:47:42.8179400Z Temporarily overriding HOME='/Users/runner/work/_temp/58ee1ffd-f92c-4f5c-bdf5-44613f27da73' before making global git config changes
+2026-10-28T13:47:42.8180740Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T13:47:42.8190380Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/JOBS/JOBS/build/editing-reference-source
+2026-10-28T13:47:42.8308370Z ##[group]Initializing the repository
+2026-10-28T13:47:42.8315430Z [command]/opt/homebrew/bin/git init /Users/runner/work/JOBS/JOBS/build/editing-reference-source
+2026-10-28T13:47:42.8667380Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-28T13:47:42.8668930Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-28T13:47:42.8670260Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-28T13:47:42.8671360Z hint: call:
+2026-10-28T13:47:42.8671830Z hint:
+2026-10-28T13:47:42.8672440Z hint: 	git config --global init.defaultBranch <name>
+2026-10-28T13:47:42.8673330Z hint:
+2026-10-28T13:47:42.8674260Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-28T13:47:42.8675620Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-28T13:47:42.8676540Z hint:
+2026-10-28T13:47:42.8677030Z hint: 	git branch -m <name>
+2026-10-28T13:47:42.8677780Z hint:
+2026-10-28T13:47:42.8678730Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-28T13:47:42.8682530Z Initialized empty Git repository in /Users/runner/work/JOBS/JOBS/build/editing-reference-source/.git/
+2026-10-28T13:47:42.8703290Z [command]/opt/homebrew/bin/git remote add origin https://github.com/jhoon-dev/JOBS
+2026-10-28T13:47:42.8826000Z ##[endgroup]
+2026-10-28T13:47:42.8826510Z ##[group]Disabling automatic garbage collection
+2026-10-28T13:47:42.8836450Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-28T13:47:42.8917380Z ##[endgroup]
+2026-10-28T13:47:42.8918270Z ##[group]Setting up auth
+2026-10-28T13:47:42.8923700Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T13:47:42.9013970Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T13:47:43.1302190Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T13:47:43.1381440Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T13:47:43.3192850Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T13:47:43.3263500Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T13:47:43.5331700Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-28T13:47:43.5445550Z ##[endgroup]
+2026-10-28T13:47:43.5504180Z ##[group]Fetching the repository
+2026-10-28T13:47:43.5519820Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin ae8d9edaa360388012fdb98cd79b633192919971
+2026-10-28T13:47:44.3860990Z From https://github.com/jhoon-dev/JOBS
+2026-10-28T13:47:44.3929840Z  * branch            ae8d9edaa360388012fdb98cd79b633192919971 -> FETCH_HEAD
+2026-10-28T13:47:44.4130330Z ##[endgroup]
+2026-10-28T13:47:44.4138720Z ##[group]Determining the checkout info
+2026-10-28T13:47:44.4147500Z ##[endgroup]
+2026-10-28T13:47:44.4160150Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-28T13:47:44.4161300Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-28T13:47:44.4162460Z ##[group]Checking out the ref
+2026-10-28T13:47:44.4163030Z [command]/opt/homebrew/bin/git checkout --progress --force ae8d9edaa360388012fdb98cd79b633192919971
+2026-10-28T13:47:44.5531070Z HEAD is now at ae8d9ed test: add paired filtered sorted and WBS editing probe
+2026-10-28T13:47:44.5548150Z ##[endgroup]
+2026-10-28T13:47:44.5740580Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-28T13:47:44.5894450Z ae8d9edaa360388012fdb98cd79b633192919971
+2026-10-28T13:47:44.6069500Z ##[group]Run cmake -E copy tests/BulkPerformanceProbe.cpp build/editing-reference-source/tests/BulkPerformanceProbe.cpp
+2026-10-28T13:47:44.6071780Z [36;1mcmake -E copy tests/BulkPerformanceProbe.cpp build/editing-reference-source/tests/BulkPerformanceProbe.cpp[0m
+2026-10-28T13:47:44.6073870Z [36;1mcmake -E copy tests/ProjectedViewPerformanceProbe.cpp build/editing-reference-source/tests/ProjectedViewPerformanceProbe.cpp[0m
+2026-10-28T13:47:44.6075970Z [36;1mcmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release[0m
+2026-10-28T13:47:44.6079810Z [36;1mcmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe jobs_bulk_performance_probe jobs_projected_view_probe --parallel 3[0m
+2026-10-28T13:47:44.6201400Z shell: /bin/bash -e {0}
+2026-10-28T13:47:44.6201650Z env:
+2026-10-28T13:47:44.6202230Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:44.6202710Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:47:44.6203200Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:44.6203670Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:44.6204090Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:47:44.6204460Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:47:44.6204820Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:47:44.6205210Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:47:44.6205490Z ##[endgroup]
+2026-10-28T13:47:45.1340060Z -- The CXX compiler identification is AppleClang 17.0.0.17000013
+2026-10-28T13:47:45.2210350Z -- Detecting CXX compiler ABI info
+2026-10-28T13:47:45.4979530Z -- Detecting CXX compiler ABI info - done
+2026-10-28T13:47:45.5157950Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-28T13:47:45.5170880Z -- Detecting CXX compile features
+2026-10-28T13:47:45.5186400Z -- Detecting CXX compile features - done
+2026-10-28T13:47:45.5991780Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-28T13:47:45.8319880Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-28T13:47:45.8345270Z -- Found Threads: TRUE
+2026-10-28T13:47:45.8386490Z -- Performing Test HAVE_STDATOMIC
+2026-10-28T13:47:46.2715740Z -- Performing Test HAVE_STDATOMIC - Success
+2026-10-28T13:47:46.2720980Z -- Found WrapAtomic: TRUE
+2026-10-28T13:47:46.4741770Z -- Found OpenGL: /Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
+2026-10-28T13:47:46.4758280Z -- Found WrapOpenGL: TRUE
+2026-10-28T13:47:46.6193470Z -- Configuring done (1.9s)
+2026-10-28T13:47:46.8435210Z -- Generating done (0.2s)
+2026-10-28T13:47:46.8449140Z -- Build files have been written to: /Users/runner/work/JOBS/JOBS/build/editing-reference-build
+2026-10-28T13:47:46.9428800Z [  0%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Project.cpp.o
+2026-10-28T13:47:46.9440860Z [  2%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/Wbs.cpp.o
+2026-10-28T13:47:47.0218440Z [  2%] Built target jobs_build_identity
+2026-10-28T13:47:47.0337230Z [  4%] Building CXX object CMakeFiles/jobs_domain.dir/src/domain/CalculationControl.cpp.o
+2026-10-28T13:47:49.8118730Z [  4%] Linking CXX static library libjobs_domain.a
+2026-10-28T13:47:49.8899430Z [  4%] Built target jobs_domain
+2026-10-28T13:47:49.9262920Z [  7%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/WorkCalendar.cpp.o
+2026-10-28T13:47:49.9288970Z [  9%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Scheduler.cpp.o
+2026-10-28T13:47:49.9398250Z [  9%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/WbsSummary.cpp.o
+2026-10-28T13:47:51.0532370Z [  9%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Forecast.cpp.o
+2026-10-28T13:47:51.3388890Z [ 12%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Tracking.cpp.o
+2026-10-28T13:47:51.6352580Z [ 12%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Resources.cpp.o
+2026-10-28T13:47:52.5885930Z [ 14%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Costs.cpp.o
+2026-10-28T13:47:53.9328490Z [ 17%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Reports.cpp.o
+2026-10-28T13:47:55.0006470Z [ 17%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Pdm.cpp.o
+2026-10-28T13:47:55.5342740Z [ 19%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/PdmResources.cpp.o
+2026-10-28T13:47:57.4128960Z [ 21%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Constraints.cpp.o
+2026-10-28T13:47:58.3774370Z [ 21%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/Effort.cpp.o
+2026-10-28T13:47:59.2087530Z [ 24%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/EffortScheduler.cpp.o
+2026-10-28T13:47:59.4208120Z [ 26%] Building CXX object CMakeFiles/jobs_calculation.dir/src/calculation/EffortEditing.cpp.o
+2026-10-28T13:48:02.0675150Z [ 26%] Linking CXX static library libjobs_calculation.a
+2026-10-28T13:48:02.3081740Z [ 26%] Built target jobs_calculation
+2026-10-28T13:48:02.3567030Z [ 29%] Building CXX object CMakeFiles/jobs_application.dir/src/application/TaskEditing.cpp.o
+2026-10-28T13:48:02.3670970Z [ 29%] Building CXX object CMakeFiles/jobs_application.dir/src/application/Document.cpp.o
+2026-10-28T13:48:02.3786270Z [ 31%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/ReportFormat.cpp.o
+2026-10-28T13:48:04.3995420Z [ 34%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/XlsxExport.cpp.o
+2026-10-28T13:48:05.7701780Z [ 34%] Building CXX object CMakeFiles/jobs_reporting.dir/src/reporting/PdfExport.cpp.o
+2026-10-28T13:48:06.8144680Z [ 36%] Building CXX object CMakeFiles/jobs_application.dir/src/application/InputDelta.cpp.o
+2026-10-28T13:48:07.9320250Z [ 36%] Building CXX object CMakeFiles/jobs_application.dir/src/application/PreparedEdit.cpp.o
+2026-10-28T13:48:08.3484690Z [ 39%] Linking CXX static library libjobs_reporting.a
+2026-10-28T13:48:08.4200540Z [ 39%] Built target jobs_reporting
+2026-10-28T13:48:08.4422790Z [ 41%] Building CXX object CMakeFiles/jobs_application.dir/src/application/ProjectState.cpp.o
+2026-10-28T13:48:10.9799970Z [ 43%] Linking CXX static library libjobs_application.a
+2026-10-28T13:48:11.0503500Z [ 43%] Built target jobs_application
+2026-10-28T13:48:11.0801280Z [ 43%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/JsonProjectStore.cpp.o
+2026-10-28T13:48:11.0813170Z [ 46%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/JsonRecoveryStore.cpp.o
+2026-10-28T13:48:11.0818870Z [ 48%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ProjectJson.cpp.o
+2026-10-28T13:48:12.9730970Z [ 48%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ProjectXml.cpp.o
+2026-10-28T13:48:13.8810940Z [ 51%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/ExchangePackage.cpp.o
+2026-10-28T13:48:14.8480400Z [ 53%] Building CXX object CMakeFiles/jobs_persistence.dir/src/persistence/PrimaveraXer.cpp.o
+2026-10-28T13:48:20.7165700Z [ 53%] Linking CXX static library libjobs_persistence.a
+2026-10-28T13:48:20.7956990Z [ 53%] Built target jobs_persistence
+2026-10-28T13:48:20.8331310Z [ 56%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindow.cpp.o
+2026-10-28T13:48:20.8436310Z [ 58%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowTracking.cpp.o
+2026-10-28T13:48:20.8444940Z [ 58%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowResources.cpp.o
+2026-10-28T13:48:24.6073590Z [ 60%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowCosts.cpp.o
+2026-10-28T13:48:24.6540150Z [ 63%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowRecovery.cpp.o
+2026-10-28T13:48:28.0867630Z [ 63%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/AutoSaveController.cpp.o
+2026-10-28T13:48:28.3190730Z [ 65%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/RecoveryDialog.cpp.o
+2026-10-28T13:48:28.3899340Z [ 68%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/CostAnalysisDialog.cpp.o
+2026-10-28T13:48:31.3342780Z [ 68%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ResourceComparisonDialog.cpp.o
+2026-10-28T13:48:31.5327800Z [ 70%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ComparisonDialog.cpp.o
+2026-10-28T13:48:32.5068930Z [ 73%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/GanttView.cpp.o
+2026-10-28T13:48:34.9041920Z [ 73%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/ReportDialog.cpp.o
+2026-10-28T13:48:36.0132730Z [ 75%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowCalendars.cpp.o
+2026-10-28T13:48:36.4541230Z [ 78%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/GanttEditing.cpp.o
+2026-10-28T13:48:38.6020850Z [ 78%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowConstraints.cpp.o
+2026-10-28T13:48:38.8237390Z [ 80%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowEffort.cpp.o
+2026-10-28T13:48:39.4095360Z [ 80%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowTaskEditing.cpp.o
+2026-10-28T13:48:42.5803220Z [ 82%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskInput.cpp.o
+2026-10-28T13:48:42.8953530Z [ 85%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowXml.cpp.o
+2026-10-28T13:48:43.8274100Z [ 85%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowXer.cpp.o
+2026-10-28T13:48:44.1045100Z [ 87%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskTableModel.cpp.o
+2026-10-28T13:48:45.1828160Z [ 90%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/TaskTableView.cpp.o
+2026-10-28T13:48:46.1156500Z [ 90%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/AsyncEditController.cpp.o
+2026-10-28T13:48:46.4410770Z [ 92%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowAsync.cpp.o
+2026-10-28T13:48:47.0872870Z [ 95%] Building CXX object CMakeFiles/jobs_ui.dir/src/ui/MainWindowResponsive.cpp.o
+2026-10-28T13:48:49.3564100Z [ 95%] Linking CXX static library libjobs_ui.a
+2026-10-28T13:48:49.4420070Z [ 95%] Built target jobs_ui
+2026-10-28T13:48:49.4846120Z [ 97%] Building CXX object CMakeFiles/jobs_editing_performance_probe.dir/tests/EditingPerformanceProbe.cpp.o
+2026-10-28T13:48:52.8187650Z [100%] Linking CXX executable jobs_editing_performance_probe
+2026-10-28T13:48:53.0150180Z [100%] Built target jobs_editing_performance_probe
+2026-10-28T13:48:53.1129290Z [  5%] Built target jobs_domain
+2026-10-28T13:48:53.1350490Z [  5%] Built target jobs_build_identity
+2026-10-28T13:48:53.2484860Z [ 27%] Built target jobs_calculation
+2026-10-28T13:48:53.3363550Z [ 35%] Built target jobs_reporting
+2026-10-28T13:48:53.3418370Z [ 45%] Built target jobs_application
+2026-10-28T13:48:53.4337680Z [ 55%] Built target jobs_persistence
+2026-10-28T13:48:53.7338230Z [ 97%] Built target jobs_ui
+2026-10-28T13:48:53.7625390Z [ 97%] Building CXX object CMakeFiles/jobs_responsive_performance_probe.dir/tests/ResponsivePerformanceProbe.cpp.o
+2026-10-28T13:48:57.2385190Z [100%] Linking CXX executable jobs_responsive_performance_probe
+2026-10-28T13:48:57.4396830Z [100%] Built target jobs_responsive_performance_probe
+2026-10-28T13:48:57.5198900Z [  4%] Built target jobs_domain
+2026-10-28T13:48:57.5276190Z [  4%] Built target jobs_build_identity
+2026-10-28T13:48:57.6068120Z [ 26%] Built target jobs_calculation
+2026-10-28T13:48:57.6682900Z [ 43%] Built target jobs_application
+2026-10-28T13:48:57.6684770Z [ 43%] Built target jobs_reporting
+2026-10-28T13:48:57.7346740Z [ 53%] Built target jobs_persistence
+2026-10-28T13:48:57.9038050Z [ 95%] Built target jobs_ui
+2026-10-28T13:48:57.9430630Z [ 97%] Building CXX object CMakeFiles/jobs_bulk_performance_probe.dir/tests/BulkPerformanceProbe.cpp.o
+2026-10-28T13:49:01.8454630Z [100%] Linking CXX executable jobs_bulk_performance_probe
+2026-10-28T13:49:02.2308770Z [100%] Built target jobs_bulk_performance_probe
+2026-10-28T13:49:02.5597470Z [  5%] Built target jobs_build_identity
+2026-10-28T13:49:02.5626290Z [  5%] Built target jobs_domain
+2026-10-28T13:49:02.6930580Z [ 27%] Built target jobs_calculation
+2026-10-28T13:49:02.7709980Z [ 35%] Built target jobs_reporting
+2026-10-28T13:49:02.7772250Z [ 45%] Built target jobs_application
+2026-10-28T13:49:02.8569680Z [ 55%] Built target jobs_persistence
+2026-10-28T13:49:03.0606460Z [ 97%] Built target jobs_ui
+2026-10-28T13:49:03.1002290Z [ 97%] Building CXX object CMakeFiles/jobs_projected_view_probe.dir/tests/ProjectedViewPerformanceProbe.cpp.o
+2026-10-28T13:49:07.7469330Z [100%] Linking CXX executable jobs_projected_view_probe
+2026-10-28T13:49:08.2319470Z [100%] Built target jobs_projected_view_probe
+2026-10-28T13:49:08.2998170Z ##[group]Run python scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history
+2026-10-28T13:49:08.3002660Z [36;1mpython scripts/run-editing-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/editing-reference --repeats 7 --allow-short-history[0m
+2026-10-28T13:49:08.3006680Z [36;1mpython scripts/compare-editing-performance.py build/performance/editing-reference build/performance/editing build/performance/editing-comparison.json[0m
+2026-10-28T13:49:08.3009250Z [36;1mpython scripts/run-responsive-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/responsive-reference --repeats 3[0m
+2026-10-28T13:49:08.3011020Z [36;1mpython scripts/compare-responsive-performance.py build/performance/responsive-reference build/performance/responsive build/performance/responsive-comparison.json[0m
+2026-10-28T13:49:08.3180230Z shell: /bin/bash -e {0}
+2026-10-28T13:49:08.3180500Z env:
+2026-10-28T13:49:08.3180790Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:08.3181570Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:49:08.3182130Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:08.3182640Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:08.3183210Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:08.3183690Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:49:08.3184150Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:49:08.3184720Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:49:08.3185190Z ##[endgroup]
+2026-10-28T13:49:10.6014060Z 1000 tasks/0 baselines: name UI 11.96 ms; duration UI 16.06 ms; history 17370 bytes/100 steps
+2026-10-28T13:49:12.5136680Z 1000 tasks/3 baselines: name UI 9.02 ms; duration UI 12.21 ms; history 17370 bytes/100 steps
+2026-10-28T13:49:15.9023430Z 10000 tasks/0 baselines: name UI 7.10 ms; duration UI 8.73 ms; history 17370 bytes/100 steps
+2026-10-28T13:49:22.6152690Z 10000 tasks/3 baselines: name UI 10.99 ms; duration UI 12.82 ms; history 17370 bytes/100 steps
+2026-10-28T13:49:22.6821970Z 1000/0: name 11.96 -> 6.20 ms; undo 100 -> 100 steps
+2026-10-28T13:49:22.6824090Z 1000/3: name 9.02 -> 6.74 ms; undo 100 -> 100 steps
+2026-10-28T13:49:22.6824660Z 10000/0: name 7.10 -> 6.23 ms; undo 100 -> 100 steps
+2026-10-28T13:49:22.6826370Z 10000/3: name 10.99 -> 7.51 ms; undo 100 -> 100 steps
+2026-10-28T13:49:23.2969060Z 1000/0: request 0.001 ms; commit 0.005 ms; worker 62.08 ms
+2026-10-28T13:49:24.6126540Z 1000/3: request 0.001 ms; commit 0.005 ms; worker 63.26 ms
+2026-10-28T13:49:27.4880640Z 10000/0: request 0.001 ms; commit 0.004 ms; worker 522.28 ms
+2026-10-28T13:49:39.5910760Z 10000/3: request 0.002 ms; commit 0.008 ms; worker 692.21 ms
+2026-10-28T13:49:39.6461600Z 1000/0: request 0.001 -> 0.026 ms; commit 0.005 -> 0.005 ms
+2026-10-28T13:49:39.6462340Z 1000/3: request 0.001 -> 0.007 ms; commit 0.005 -> 0.008 ms
+2026-10-28T13:49:39.6462860Z 10000/0: request 0.001 -> 0.001 ms; commit 0.004 -> 0.014 ms
+2026-10-28T13:49:39.6463300Z 10000/3: request 0.002 -> 0.004 ms; commit 0.008 -> 0.007 ms
+2026-10-28T13:49:39.6598060Z ##[group]Run python scripts/run-bulk-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/bulk-reference
+2026-10-28T13:49:39.6599420Z [36;1mpython scripts/run-bulk-performance-probes.py --build-dir build/editing-reference-build --output-dir build/performance/bulk-reference[0m
+2026-10-28T13:49:39.6600260Z [36;1mpython scripts/run-bulk-performance-probes.py --reference build/performance/bulk-reference[0m
+2026-10-28T13:49:39.6652360Z shell: /bin/bash -e {0}
+2026-10-28T13:49:39.6652690Z env:
+2026-10-28T13:49:39.6653190Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:39.6653720Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:49:39.6654300Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:39.6654860Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:39.6655480Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:49:39.6655890Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:49:39.6656320Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:49:39.6656960Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:49:39.6657290Z ##[endgroup]
+2026-10-28T13:49:41.1066200Z PASS: bulk UI 1000/0
+2026-10-28T13:49:42.5614270Z PASS: bulk UI 1000/3
+2026-10-28T13:49:45.7871570Z PASS: bulk UI 10000/0
+2026-10-28T13:49:52.2364950Z PASS: bulk UI 10000/3
+2026-10-28T13:49:53.8537300Z PASS: bulk UI 1000/0
+2026-10-28T13:49:55.4874960Z PASS: bulk UI 1000/3
+2026-10-28T13:49:58.5102600Z PASS: bulk UI 10000/0
+2026-10-28T13:50:04.0414710Z PASS: bulk UI 10000/3
+2026-10-28T13:50:04.0851360Z ##[group]Run python scripts/run-projected-view-probes.py --build-dir build/editing-reference-build --output-dir build/performance/projected-views-reference
+2026-10-28T13:50:04.0852870Z [36;1mpython scripts/run-projected-view-probes.py --build-dir build/editing-reference-build --output-dir build/performance/projected-views-reference[0m
+2026-10-28T13:50:04.0853890Z [36;1mpython scripts/run-projected-view-probes.py --reference build/performance/projected-views-reference[0m
+2026-10-28T13:50:04.1035060Z shell: /bin/bash -e {0}
+2026-10-28T13:50:04.1035570Z env:
+2026-10-28T13:50:04.1036040Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:50:04.1036660Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:50:04.1037320Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:50:04.1037890Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:50:04.1038700Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:50:04.1039130Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:50:04.1039680Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:50:04.1040240Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:50:04.1040510Z ##[endgroup]
+2026-10-28T13:50:05.5943740Z PASS: search 1000/0
+2026-10-28T13:50:07.1287410Z PASS: search 1000/3
+2026-10-28T13:50:09.8914120Z PASS: search 10000/0
+2026-10-28T13:50:14.8871620Z PASS: search 10000/3
+2026-10-28T13:50:16.0227220Z PASS: sort 1000/0
+2026-10-28T13:50:17.2716910Z PASS: sort 1000/3
+2026-10-28T13:50:20.0755080Z PASS: sort 10000/0
+2026-10-28T13:50:25.1629610Z PASS: sort 10000/3
+2026-10-28T13:50:26.4391700Z PASS: wbs 1000/0
+2026-10-28T13:50:27.8036220Z PASS: wbs 1000/3
+2026-10-28T13:50:30.2911180Z PASS: wbs 10000/0
+2026-10-28T13:50:34.9383090Z PASS: wbs 10000/3
+2026-10-28T13:50:36.0655180Z PASS: combined 1000/0
+2026-10-28T13:50:37.4517250Z PASS: combined 1000/3
+2026-10-28T13:50:40.2890770Z PASS: combined 10000/0
+2026-10-28T13:50:45.1908940Z PASS: combined 10000/3
+2026-10-28T13:50:46.5548910Z PASS: search 1000/0
+2026-10-28T13:50:47.9963170Z PASS: search 1000/3
+2026-10-28T13:50:50.6435770Z PASS: search 10000/0
+2026-10-28T13:50:55.5329500Z PASS: search 10000/3
+2026-10-28T13:50:56.6099310Z PASS: sort 1000/0
+2026-10-28T13:50:58.0998360Z PASS: sort 1000/3
+2026-10-28T13:51:01.3701450Z PASS: sort 10000/0
+2026-10-28T13:51:06.6124760Z PASS: sort 10000/3
+2026-10-28T13:51:07.7185540Z PASS: wbs 1000/0
+2026-10-28T13:51:08.7807040Z PASS: wbs 1000/3
+2026-10-28T13:51:11.0839990Z PASS: wbs 10000/0
+2026-10-28T13:51:15.0591050Z PASS: wbs 10000/3
+2026-10-28T13:51:16.2156880Z PASS: combined 1000/0
+2026-10-28T13:51:17.5752910Z PASS: combined 1000/3
+2026-10-28T13:51:20.6991520Z PASS: combined 10000/0
+2026-10-28T13:51:25.9566880Z PASS: combined 10000/3
+2026-10-28T13:51:25.9900130Z ##[group]Run python scripts/check-projected-views-native.py build
+2026-10-28T13:51:25.9903900Z [36;1mpython scripts/check-projected-views-native.py build[0m
+2026-10-28T13:51:26.0005020Z shell: /bin/bash -e {0}
+2026-10-28T13:51:26.0005280Z env:
+2026-10-28T13:51:26.0005650Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:26.0006260Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:26.0006890Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:26.0007530Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:26.0008040Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:26.0008500Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:26.0008860Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:26.0009420Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:26.0009810Z ##[endgroup]
+2026-10-28T13:51:33.7539620Z QAbstractItemView::commitData called with an editor that does not belong to this view
+2026-10-28T13:51:34.1445970Z PASS: projected search/sort/WBS/filter oracle, membership/layout/persistent IDs, range budget, view race and stale critical/Gantt
+2026-10-28T13:51:34.3222200Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:51:34.3222530Z with:
+2026-10-28T13:51:34.3222870Z   name: projected-views-macOS
+2026-10-28T13:51:34.3223210Z   path: build/projected-views-native.png
+2026-10-28T13:51:34.3223670Z   if-no-files-found: warn
+2026-10-28T13:51:34.3223960Z   compression-level: 6
+2026-10-28T13:51:34.3224250Z   overwrite: false
+2026-10-28T13:51:34.3224530Z   include-hidden-files: false
+2026-10-28T13:51:34.3224820Z env:
+2026-10-28T13:51:34.3225110Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:34.3225670Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:34.3226840Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:34.3227320Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:34.3228010Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:34.3228660Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:34.3229060Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:34.3229650Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:34.3241510Z ##[endgroup]
+2026-10-28T13:51:35.1091710Z (node:10516) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:51:35.1180530Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:51:35.1921950Z With the provided path, there will be 1 file uploaded
+2026-10-28T13:51:35.2130610Z Artifact name is valid!
+2026-10-28T13:51:35.2231080Z Root directory input is valid!
+2026-10-28T13:51:35.5443060Z (node:10516) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:51:35.5546750Z Beginning upload of artifact content to blob storage
+2026-10-28T13:51:35.7722960Z Uploaded bytes 113491
+2026-10-28T13:51:35.8147890Z Finished uploading artifact content to blob storage!
+2026-10-28T13:51:35.8249890Z SHA256 digest of uploaded artifact zip is ae960e030d36a253ff82cdccb55d12683c07f8768b2961d34a9a181bfc936a26
+2026-10-28T13:51:35.8351690Z Finalizing artifact upload
+2026-10-28T13:51:36.3119870Z Artifact projected-views-macOS.zip successfully finalized. Artifact ID 12821082502
+2026-10-28T13:51:36.3223520Z Artifact projected-views-macOS has been successfully uploaded! Final size is 113491 bytes. Artifact ID is 12821082502
+2026-10-28T13:51:36.3282110Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821082502
+2026-10-28T13:51:36.3365540Z ##[group]Run python scripts/check-bulk-native-ui.py build
+2026-10-28T13:51:36.3365940Z [36;1mpython scripts/check-bulk-native-ui.py build[0m
+2026-10-28T13:51:36.3432460Z shell: /bin/bash -e {0}
+2026-10-28T13:51:36.3433010Z env:
+2026-10-28T13:51:36.3433670Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:36.3434860Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:36.3436010Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:36.3437020Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:36.3438180Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:36.3439100Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:36.3440110Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:36.3441170Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:36.3441890Z ##[endgroup]
+2026-10-28T13:51:39.5003190Z PASS: bulk atomicity, validation oracle, cancellation/stale/save, shared undo, model tester/persistent IDs, compact selection, disjoint/sorted fallback
+2026-10-28T13:51:39.5482640Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:51:39.5482980Z with:
+2026-10-28T13:51:39.5483270Z   name: bulk-editing-macOS
+2026-10-28T13:51:39.5483600Z   path: build/bulk-editing-native.png
+2026-10-28T13:51:39.5483950Z   if-no-files-found: warn
+2026-10-28T13:51:39.5484450Z   compression-level: 6
+2026-10-28T13:51:39.5484750Z   overwrite: false
+2026-10-28T13:51:39.5485050Z   include-hidden-files: false
+2026-10-28T13:51:39.5485300Z env:
+2026-10-28T13:51:39.5485690Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:39.5486300Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:39.5486890Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:39.5487350Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:39.5487910Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:39.5488450Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:39.5488870Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:39.5489420Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:39.5490130Z ##[endgroup]
+2026-10-28T13:51:39.9252730Z (node:10765) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:51:39.9352370Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:51:39.9796330Z With the provided path, there will be 1 file uploaded
+2026-10-28T13:51:39.9800180Z Artifact name is valid!
+2026-10-28T13:51:39.9800690Z Root directory input is valid!
+2026-10-28T13:51:40.2356840Z Beginning upload of artifact content to blob storage
+2026-10-28T13:51:40.2694030Z (node:10765) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:51:40.4810910Z Uploaded bytes 113313
+2026-10-28T13:51:40.5224100Z Finished uploading artifact content to blob storage!
+2026-10-28T13:51:40.5225740Z SHA256 digest of uploaded artifact zip is 59d811be42d6a73afdd260c7c4bd0b984f9b897fae5ee3c30d8cd1726afd93b1
+2026-10-28T13:51:40.5227310Z Finalizing artifact upload
+2026-10-28T13:51:41.0010460Z Artifact bulk-editing-macOS.zip successfully finalized. Artifact ID 12821406777
+2026-10-28T13:51:41.0016710Z Artifact bulk-editing-macOS has been successfully uploaded! Final size is 113313 bytes. Artifact ID is 12821406777
+2026-10-28T13:51:41.0019340Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821406777
+2026-10-28T13:51:41.0197230Z ##[group]Run actions/setup-java@v4
+2026-10-28T13:51:41.0197570Z with:
+2026-10-28T13:51:41.0197780Z   distribution: temurin
+2026-10-28T13:51:41.0197970Z   java-version: 21
+2026-10-28T13:51:41.0198160Z   java-package: jdk
+2026-10-28T13:51:41.0198350Z   check-latest: false
+2026-10-28T13:51:41.0198550Z   server-id: github
+2026-10-28T13:51:41.0198740Z   server-username: GITHUB_ACTOR
+2026-10-28T13:51:41.0198960Z   server-password: GITHUB_TOKEN
+2026-10-28T13:51:41.0199180Z   overwrite-settings: true
+2026-10-28T13:51:41.0199410Z   job-status: success
+2026-10-28T13:51:41.0201620Z   token: ***
+2026-10-28T13:51:41.0201820Z env:
+2026-10-28T13:51:41.0202090Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.0202550Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:41.0203010Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.0203470Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.0203880Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.0204250Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:41.0204630Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:41.0204970Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:41.0205270Z ##[endgroup]
+2026-10-28T13:51:41.5193480Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-10-28T13:51:41.5199570Z ##[group]Installed distributions
+2026-10-28T13:51:41.5250480Z Resolved Java 21.0.12+101.0 from tool-cache
+2026-10-28T13:51:41.5251570Z Setting Java 21.0.12+101.0 as the default
+2026-10-28T13:51:41.5276070Z (node:10776) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:51:41.5278780Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:51:41.5281470Z Creating toolchains.xml for JDK version 21 from temurin
+2026-10-28T13:51:41.5364600Z Writing to /Users/runner/.m2/toolchains.xml
+2026-10-28T13:51:41.5365000Z 
+2026-10-28T13:51:41.5365220Z Java configuration:
+2026-10-28T13:51:41.5366180Z   Distribution: temurin
+2026-10-28T13:51:41.5392610Z   Version: 21.0.12+101.0
+2026-10-28T13:51:41.5398550Z   Path: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:41.5399020Z 
+2026-10-28T13:51:41.5400090Z ##[endgroup]
+2026-10-28T13:51:41.5433720Z Creating settings.xml with server-id: github
+2026-10-28T13:51:41.5434080Z Writing to /Users/runner/.m2/settings.xml
+2026-10-28T13:51:41.5510480Z ##[group]Run python -m pip install mpxj==16.10.0 JPype1==1.6.0
+2026-10-28T13:51:41.5510930Z [36;1mpython -m pip install mpxj==16.10.0 JPype1==1.6.0[0m
+2026-10-28T13:51:41.5511250Z [36;1mpython scripts/verify-primavera-xer.py build[0m
+2026-10-28T13:51:41.5566320Z shell: /bin/bash -e {0}
+2026-10-28T13:51:41.5566920Z env:
+2026-10-28T13:51:41.5567650Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.5568790Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:41.5569910Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.5570940Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.5571970Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:41.5572900Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:41.5573880Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:41.5574840Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:41.5576050Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:41.5577650Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:41.5578770Z ##[endgroup]
+2026-10-28T13:51:42.8820360Z Collecting mpxj==16.10.0
+2026-10-28T13:51:42.9618400Z   Downloading mpxj-16.10.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-28T13:51:43.0155690Z Collecting JPype1==1.6.0
+2026-10-28T13:51:43.0325770Z   Downloading jpype1-1.6.0-cp312-cp312-macosx_10_9_universal2.whl.metadata (5.0 kB)
+2026-10-28T13:51:43.0623220Z Collecting packaging (from JPype1==1.6.0)
+2026-10-28T13:51:43.0767350Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-28T13:51:43.1212570Z Downloading mpxj-16.10.0-py3-none-any.whl (31.3 MB)
+2026-10-28T13:51:43.4355990Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 31.3/31.3 MB 109.0 MB/s  0:00:00
+2026-10-28T13:51:43.4553730Z Downloading jpype1-1.6.0-cp312-cp312-macosx_10_9_universal2.whl (582 kB)
+2026-10-28T13:51:43.4609520Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 582.2/582.2 kB 37.7 MB/s  0:00:00
+2026-10-28T13:51:43.4763360Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-28T13:51:43.5343560Z Installing collected packages: packaging, mpxj, JPype1
+2026-10-28T13:51:43.7548660Z 
+2026-10-28T13:51:43.7572860Z 
+2026-10-28T13:51:43.7574010Z Successfully installed JPype1-1.6.0 mpxj-16.10.0 packaging-26.3
+2026-10-28T13:51:43.7584380Z [notice] A new release of pip is available: 26.2.1 -> 26.2.2
+2026-10-28T13:51:43.7593260Z [notice] To update, run: python -m pip install --upgrade pip
+2026-10-28T13:51:44.9190930Z PASS: independent TSV reader, XER tables/fields/references/values/encoding/hash/verdicts
+2026-10-28T13:51:44.9193620Z PASS: MPXJ 16.10.0 strict read, names/durations/relations/calendars/exceptions/resources/assignments
+2026-10-28T13:51:44.9327720Z ##[group]Run python scripts/capture-task-editing-ui.py build
+2026-10-28T13:51:44.9328230Z [36;1mpython scripts/capture-task-editing-ui.py build[0m
+2026-10-28T13:51:44.9367270Z shell: /bin/bash -e {0}
+2026-10-28T13:51:44.9367750Z env:
+2026-10-28T13:51:44.9368140Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:44.9368750Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:44.9369290Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:44.9369840Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:44.9370350Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:44.9370820Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:44.9371850Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:44.9372440Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:44.9373000Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:44.9373760Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:44.9374290Z ##[endgroup]
+2026-10-28T13:51:45.9139590Z PASS: native sorted task editing screen captured
+2026-10-28T13:51:45.9251050Z PASS: task-editing-native-smoke.png (131374 bytes)
+2026-10-28T13:51:45.9377530Z ##[group]Run python scripts/capture-model-async-ui.py build
+2026-10-28T13:51:45.9378160Z [36;1mpython scripts/capture-model-async-ui.py build[0m
+2026-10-28T13:51:45.9438890Z shell: /bin/bash -e {0}
+2026-10-28T13:51:45.9439750Z env:
+2026-10-28T13:51:45.9440630Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:45.9441980Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:51:45.9443430Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:45.9444650Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:45.9445850Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:51:45.9447010Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:51:45.9448060Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:51:45.9449240Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:51:45.9451310Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:45.9452980Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:51:45.9454010Z ##[endgroup]
+2026-10-28T13:51:48.5559070Z stage: responsive running cancellation
+2026-10-28T13:51:51.6342300Z stage: stale session, concurrent and latest-only edits
+2026-10-28T13:51:57.0932660Z stage: deferred save/F9, Gantt and batch inversion
+2026-10-28T13:51:59.7848640Z stage: progress/assignment running cancellation, draft retry, immutable facts and dialog close
+2026-10-28T13:52:04.7054750Z PASS: 10k model/view heartbeat, running/late cancellation, stale/session/latest-only requests, deferred save/F9, Gantt/batch, preview draft and lifetime safety
+2026-10-28T13:52:04.9078860Z PASS: native model/view + cancellable edits; GUI enqueue observation 2.07 ms
+2026-10-28T13:52:04.9330790Z ##[group]Run python scripts/check-responsive-native-ui.py build
+2026-10-28T13:52:04.9331460Z [36;1mpython scripts/check-responsive-native-ui.py build[0m
+2026-10-28T13:52:04.9429130Z shell: /bin/bash -e {0}
+2026-10-28T13:52:04.9429460Z env:
+2026-10-28T13:52:04.9430000Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:04.9430850Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:04.9431560Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:04.9433030Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:04.9435340Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:04.9435760Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:04.9437280Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:04.9439220Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:04.9440040Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:04.9441780Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:04.9443260Z ##[endgroup]
+2026-10-28T13:52:11.3094210Z PASS: 10k/3 baseline bounded model updates, selection/scroll, WBS delta, search, stale and missed-revision fallbacks
+2026-10-28T13:52:11.4346490Z PASS: native 10k/3-baseline incremental model, WBS, selection/scroll and full-refresh fallbacks
+2026-10-28T13:52:11.4691520Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:52:11.4692830Z with:
+2026-10-28T13:52:11.4693280Z   name: model-async-editing-macOS
+2026-10-28T13:52:11.4693650Z   path: build/async-editing-ui.png
+build/async-editing-ui.json
+
+2026-10-28T13:52:11.4694100Z   if-no-files-found: warn
+2026-10-28T13:52:11.4694470Z   compression-level: 6
+2026-10-28T13:52:11.4694770Z   overwrite: false
+2026-10-28T13:52:11.4695030Z   include-hidden-files: false
+2026-10-28T13:52:11.4695300Z env:
+2026-10-28T13:52:11.4696040Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:11.4697060Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:11.4698390Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:11.4699460Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:11.4700640Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:11.4702070Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:11.4703190Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:11.4704510Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:11.4705960Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:11.4707580Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:11.4708870Z ##[endgroup]
+2026-10-28T13:52:11.8081230Z (node:11353) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:11.8083480Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:11.8202180Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-28T13:52:11.8207470Z The least common ancestor is /Users/runner/work/JOBS/JOBS/build. This will be the root directory of the artifact
+2026-10-28T13:52:11.8209240Z With the provided path, there will be 2 files uploaded
+2026-10-28T13:52:11.8213410Z Artifact name is valid!
+2026-10-28T13:52:11.8214550Z Root directory input is valid!
+2026-10-28T13:52:12.1788920Z (node:11353) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:52:12.1798830Z Beginning upload of artifact content to blob storage
+2026-10-28T13:52:12.4245450Z Uploaded bytes 165535
+2026-10-28T13:52:12.4648390Z Finished uploading artifact content to blob storage!
+2026-10-28T13:52:12.4749780Z SHA256 digest of uploaded artifact zip is 035db3b2d19eb4f65ba3f9bf91106a65675db940a31c8f7ba50b779121d24a95
+2026-10-28T13:52:12.4850820Z Finalizing artifact upload
+2026-10-28T13:52:12.9775360Z Artifact model-async-editing-macOS.zip successfully finalized. Artifact ID 12821581509
+2026-10-28T13:52:12.9793780Z Artifact model-async-editing-macOS has been successfully uploaded! Final size is 165535 bytes. Artifact ID is 12821581509
+2026-10-28T13:52:12.9803730Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821581509
+2026-10-28T13:52:12.9981140Z ##[group]Run python scripts/capture-project-xml-ui.py build
+2026-10-28T13:52:12.9981630Z [36;1mpython scripts/capture-project-xml-ui.py build[0m
+2026-10-28T13:52:13.0075140Z shell: /bin/bash -e {0}
+2026-10-28T13:52:13.0075760Z env:
+2026-10-28T13:52:13.0076500Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:13.0077730Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:13.0079000Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:13.0080650Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:13.0081730Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:13.0082760Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:13.0083670Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:13.0084730Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:13.0086040Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:13.0088110Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:13.0089360Z ##[endgroup]
+2026-10-28T13:52:16.3987430Z Project XML UI preview/cancel/import/export/stale/readonly tests passed
+2026-10-28T13:52:16.4880750Z PASS: project-xml-preview-native.png (58089 bytes)
+2026-10-28T13:52:16.5155380Z ##[group]Run python scripts/capture-primavera-xer-ui.py build
+2026-10-28T13:52:16.5155960Z [36;1mpython scripts/capture-primavera-xer-ui.py build[0m
+2026-10-28T13:52:16.5199080Z shell: /bin/bash -e {0}
+2026-10-28T13:52:16.5199440Z env:
+2026-10-28T13:52:16.5199870Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:16.5200490Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:16.5201120Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:16.5201760Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:16.5203130Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:16.5204850Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:16.5206350Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:16.5207890Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:16.5209990Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:16.5211980Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:16.5213520Z ##[endgroup]
+2026-10-28T13:52:20.9903880Z Primavera XER UI preview/cancel/import/export/stale/readonly tests passed
+2026-10-28T13:52:21.0130820Z PASS: primavera-xer-preview-native.png (67689 bytes)
+2026-10-28T13:52:21.0369660Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:52:21.0369990Z with:
+2026-10-28T13:52:21.0370290Z   name: primavera-xer-macOS
+2026-10-28T13:52:21.0370890Z   path: build/primavera-export.xer
+build/primavera-24h.xer
+build/primavera-export.json
+build/primavera-xer-*-native.png
+
+2026-10-28T13:52:21.0371570Z   if-no-files-found: warn
+2026-10-28T13:52:21.0371970Z   compression-level: 6
+2026-10-28T13:52:21.0372290Z   overwrite: false
+2026-10-28T13:52:21.0372650Z   include-hidden-files: false
+2026-10-28T13:52:21.0373180Z env:
+2026-10-28T13:52:21.0373680Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:21.0374320Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:21.0374930Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:21.0375410Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:21.0376070Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:21.0376570Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:21.0377040Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:21.0378320Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:21.0380090Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:21.0380880Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:21.0382000Z ##[endgroup]
+2026-10-28T13:52:21.3405140Z (node:11526) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:21.3510350Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:21.3834270Z With the provided path, there will be 6 files uploaded
+2026-10-28T13:52:21.3836320Z Artifact name is valid!
+2026-10-28T13:52:21.3837250Z Root directory input is valid!
+2026-10-28T13:52:21.6425750Z Beginning upload of artifact content to blob storage
+2026-10-28T13:52:21.6855580Z (node:11526) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:52:21.9097940Z Uploaded bytes 231315
+2026-10-28T13:52:21.9499430Z Finished uploading artifact content to blob storage!
+2026-10-28T13:52:21.9600780Z SHA256 digest of uploaded artifact zip is 3a60f2889d05b778c29ad467431318683fcecc454cc5ae5d6d80354c0641720c
+2026-10-28T13:52:21.9702070Z Finalizing artifact upload
+2026-10-28T13:52:22.4144060Z Artifact primavera-xer-macOS.zip successfully finalized. Artifact ID 12820514404
+2026-10-28T13:52:22.4150330Z Artifact primavera-xer-macOS has been successfully uploaded! Final size is 231315 bytes. Artifact ID is 12820514404
+2026-10-28T13:52:22.4156820Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12820514404
+2026-10-28T13:52:22.4267070Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:52:22.4267360Z with:
+2026-10-28T13:52:22.4267560Z   name: project-xml-macOS
+2026-10-28T13:52:22.4268240Z   path: build/project-xml-export.xml
+build/project-xml-export.json
+build/project-xml-preview-native.png
+build/project-xml-import-native.png
+build/project-xml-export-native.png
+
+2026-10-28T13:52:22.4268940Z   if-no-files-found: warn
+2026-10-28T13:52:22.4269200Z   compression-level: 6
+2026-10-28T13:52:22.4269410Z   overwrite: false
+2026-10-28T13:52:22.4269620Z   include-hidden-files: false
+2026-10-28T13:52:22.4269850Z env:
+2026-10-28T13:52:22.4270130Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:22.4270620Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:22.4271110Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:22.4271550Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:22.4272010Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:22.4272380Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:22.4272870Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:22.4273260Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:22.4273760Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:22.4274420Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:22.4274870Z ##[endgroup]
+2026-10-28T13:52:22.6456200Z (node:11529) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:22.6558130Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:22.6999660Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-28T13:52:22.7005830Z The least common ancestor is /Users/runner/work/JOBS/JOBS/build. This will be the root directory of the artifact
+2026-10-28T13:52:22.7007580Z With the provided path, there will be 5 files uploaded
+2026-10-28T13:52:22.7009210Z Artifact name is valid!
+2026-10-28T13:52:22.7010000Z Root directory input is valid!
+2026-10-28T13:52:22.9558640Z Beginning upload of artifact content to blob storage
+2026-10-28T13:52:22.9968130Z (node:11529) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:52:23.2431590Z Uploaded bytes 238326
+2026-10-28T13:52:23.2812440Z Finished uploading artifact content to blob storage!
+2026-10-28T13:52:23.2813070Z SHA256 digest of uploaded artifact zip is 395d77e35e0bf053bd5a753419fefcccde4691f4ce6a454ff9e30651f12cbec1
+2026-10-28T13:52:23.2813930Z Finalizing artifact upload
+2026-10-28T13:52:23.7379480Z Artifact project-xml-macOS.zip successfully finalized. Artifact ID 12821432367
+2026-10-28T13:52:23.7380190Z Artifact project-xml-macOS has been successfully uploaded! Final size is 238326 bytes. Artifact ID is 12821432367
+2026-10-28T13:52:23.7398130Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821432367
+2026-10-28T13:52:23.7519330Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:52:23.7519630Z with:
+2026-10-28T13:52:23.7519840Z   name: task-editing-ui-macOS
+2026-10-28T13:52:23.7520110Z   path: build/task-editing-native-smoke.png
+2026-10-28T13:52:23.7520380Z   if-no-files-found: warn
+2026-10-28T13:52:23.7520610Z   compression-level: 6
+2026-10-28T13:52:23.7520830Z   overwrite: false
+2026-10-28T13:52:23.7521070Z   include-hidden-files: false
+2026-10-28T13:52:23.7521290Z env:
+2026-10-28T13:52:23.7521590Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:23.7522080Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:23.7522710Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:23.7523140Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:23.7523580Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:23.7524020Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:23.7524420Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:23.7524830Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:23.7525340Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:23.7526040Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:23.7526510Z ##[endgroup]
+2026-10-28T13:52:23.9744010Z (node:11531) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:23.9744840Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:23.9817730Z With the provided path, there will be 1 file uploaded
+2026-10-28T13:52:23.9874360Z Artifact name is valid!
+2026-10-28T13:52:23.9925220Z Root directory input is valid!
+2026-10-28T13:52:24.2914790Z Beginning upload of artifact content to blob storage
+2026-10-28T13:52:24.3135980Z (node:11531) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:52:24.5388370Z Uploaded bytes 126015
+2026-10-28T13:52:24.5778710Z Finished uploading artifact content to blob storage!
+2026-10-28T13:52:24.5779830Z SHA256 digest of uploaded artifact zip is d0acacc5c1ddd5db2ec8cd8572c4b3612e747500b8bbc80f9cf25b94b8c69a99
+2026-10-28T13:52:24.5780470Z Finalizing artifact upload
+2026-10-28T13:52:25.0060360Z Artifact task-editing-ui-macOS.zip successfully finalized. Artifact ID 12821716535
+2026-10-28T13:52:25.0063090Z Artifact task-editing-ui-macOS has been successfully uploaded! Final size is 126015 bytes. Artifact ID is 12821716535
+2026-10-28T13:52:25.0068990Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821716535
+2026-10-28T13:52:25.0257280Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T13:52:25.0257690Z with:
+2026-10-28T13:52:25.0257960Z   name: performance-macOS
+2026-10-28T13:52:25.0258220Z   path: build/performance/
+2026-10-28T13:52:25.0258510Z   if-no-files-found: warn
+2026-10-28T13:52:25.0258860Z   compression-level: 6
+2026-10-28T13:52:25.0259160Z   overwrite: false
+2026-10-28T13:52:25.0259580Z   include-hidden-files: false
+2026-10-28T13:52:25.0260050Z env:
+2026-10-28T13:52:25.0260460Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:25.0261170Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-10-28T13:52:25.0261830Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:25.0262290Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:25.0270810Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-10-28T13:52:25.0271550Z   QT_ROOT_DIR: /Users/runner/work/JOBS/Qt/6.8.3/macos
+2026-10-28T13:52:25.0272140Z   QT_PLUGIN_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/plugins
+2026-10-28T13:52:25.0272740Z   QML2_IMPORT_PATH: /Users/runner/work/JOBS/Qt/6.8.3/macos/qml
+2026-10-28T13:52:25.0273510Z   JAVA_HOME: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:25.0274380Z   JAVA_HOME_21_ARM64: /Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-101.0/arm64/Contents/Home
+2026-10-28T13:52:25.0275010Z ##[endgroup]
+2026-10-28T13:52:25.2404210Z (node:11533) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:25.2406190Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:25.2609150Z With the provided path, there will be 124 files uploaded
+2026-10-28T13:52:25.2610450Z Artifact name is valid!
+2026-10-28T13:52:25.2611090Z Root directory input is valid!
+2026-10-28T13:52:25.5575480Z Beginning upload of artifact content to blob storage
+2026-10-28T13:52:25.7121030Z (node:11533) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T13:52:25.9033090Z Uploaded bytes 83163
+2026-10-28T13:52:25.9333520Z Finished uploading artifact content to blob storage!
+2026-10-28T13:52:25.9435660Z SHA256 digest of uploaded artifact zip is e50b26ccff4368a33574475c4cce5b97fd4f587128375b29e69aaa7357196e3b
+2026-10-28T13:52:25.9535710Z Finalizing artifact upload
+2026-10-28T13:52:26.4057260Z Artifact performance-macOS.zip successfully finalized. Artifact ID 12821182411
+2026-10-28T13:52:26.4059810Z Artifact performance-macOS has been successfully uploaded! Final size is 83163 bytes. Artifact ID is 12821182411
+2026-10-28T13:52:26.4069140Z Artifact download URL: https://github.com/jhoon-dev/JOBS/actions/runs/40698951285/artifacts/12821182411
+2026-10-28T13:52:26.4245950Z Post job cleanup.
+2026-10-28T13:52:26.5756100Z (node:11536) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:26.5758820Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:26.6007280Z Post job cleanup.
+2026-10-28T13:52:26.7270390Z [command]/opt/homebrew/bin/git version
+2026-10-28T13:52:26.7597030Z git version 2.55.0
+2026-10-28T13:52:26.7642610Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/d6a5dc5d-c55a-41c9-827a-38c08936e808/.gitconfig'
+2026-10-28T13:52:26.7658220Z Temporarily overriding HOME='/Users/runner/work/_temp/d6a5dc5d-c55a-41c9-827a-38c08936e808' before making global git config changes
+2026-10-28T13:52:26.7660150Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T13:52:26.7665890Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/JOBS/JOBS/build/editing-reference-source
+2026-10-28T13:52:26.7863910Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T13:52:26.7997730Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T13:52:26.9279990Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T13:52:26.9335210Z http.https://github.com/.extraheader
+2026-10-28T13:52:26.9346740Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-28T13:52:26.9417380Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T13:52:27.0520620Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T13:52:27.0720260Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T13:52:27.2767560Z Post job cleanup.
+2026-10-28T13:52:27.4207060Z (node:11649) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T13:52:27.4209010Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T13:52:27.4499620Z Post job cleanup.
+2026-10-28T13:52:27.4507970Z ##[start-action display=Setup Python;id=__9307a837-5ee5-4fd3-9828-585001c3754f.__actions_setup-python]
+2026-10-28T13:52:27.4567190Z Post job cleanup.
+2026-10-28T13:52:27.6292860Z ##[end-action id=__9307a837-5ee5-4fd3-9828-585001c3754f.__actions_setup-python;outcome=success;conclusion=success;duration_ms=178]
+2026-10-28T13:52:27.6415680Z Post job cleanup.
+2026-10-28T13:52:27.7464760Z [command]/opt/homebrew/bin/git version
+2026-10-28T13:52:27.7579770Z git version 2.55.0
+2026-10-28T13:52:27.7707650Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/29eb36f2-0fbf-4e79-ad4c-097ce617911d/.gitconfig'
+2026-10-28T13:52:27.7708460Z Temporarily overriding HOME='/Users/runner/work/_temp/29eb36f2-0fbf-4e79-ad4c-097ce617911d' before making global git config changes
+2026-10-28T13:52:27.7710000Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T13:52:27.7710630Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/JOBS/JOBS
+2026-10-28T13:52:27.7728210Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T13:52:27.7794100Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T13:52:27.8899470Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T13:52:27.8957430Z http.https://github.com/.extraheader
+2026-10-28T13:52:27.8965030Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-28T13:52:27.9042480Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T13:52:28.0376900Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T13:52:28.0378360Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T13:52:28.2516790Z Cleaning up orphan processes
+2026-10-28T13:52:30.7909790Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

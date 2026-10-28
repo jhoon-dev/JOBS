@@ -1,0 +1,10 @@
+{
+  "installer": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\dist\\JOBS-0.1.0-Setup-win64-a2039fed.exe",
+  "bytes": 12992450,
+  "sha256": "c3a74e1c96c325475759e2c8bd6fdb6aa3fc1115f4c747c5db6c01895bb899de",
+  "source_revision": "a2039fed0140c02bc8051d7cb3c67a3655056815",
+  "version": "0.1.0",
+  "stage": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\a2039fed-482ad07e\\payload",
+  "logs": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\a2039fed-482ad07e",
+  "signed": false
+}

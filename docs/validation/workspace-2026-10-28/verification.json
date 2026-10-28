@@ -1,0 +1,134 @@
+{
+  "status": "success",
+  "source_revision": "a2039fed0140c02bc8051d7cb3c67a3655056815",
+  "prd_revisions": [
+    "b872750",
+    "68bfe59"
+  ],
+  "format_only_revisions": [
+    "d86c90d",
+    "4b5cf7b"
+  ],
+  "local_ctest": 48,
+  "local_ctest_seconds": 135.06,
+  "golden_files": 13,
+  "enum_checks": 402,
+  "schedule_hashes": [
+    {
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_change": true,
+      "platform": "local-MinGW"
+    },
+    {
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_change": true,
+      "platform": "local-MinGW"
+    },
+    {
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_change": true,
+      "platform": "local-MinGW"
+    },
+    {
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_change": true,
+      "platform": "local-MinGW"
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_change": true
+    }
+  ],
+  "source_sha256": "8e04b4757d8b9463daf29d0e58bb99b3a24e36f4f82948d7a189312a3cd3a846",
+  "desktop_run_id": 40698951285,
+  "quality_run_id": 40698951313,
+  "sanitized_run_id": 40698951237,
+  "installer": {
+    "installer": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\dist\\JOBS-0.1.0-Setup-win64-a2039fed.exe",
+    "bytes": 12992450,
+    "sha256": "c3a74e1c96c325475759e2c8bd6fdb6aa3fc1115f4c747c5db6c01895bb899de",
+    "source_revision": "a2039fed0140c02bc8051d7cb3c67a3655056815",
+    "version": "0.1.0",
+    "stage": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\a2039fed-482ad07e\\payload",
+    "logs": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\a2039fed-482ad07e",
+    "signed": false
+  },
+  "installer_click_check": "not_verified_desktop_access_denied",
+  "installed_clean_path_launch_and_full_removal": true,
+  "native_production_workspace_ui": true,
+  "limits": "Finite tests/fuzzing; English diagnostics foundation with generic fallback, no full UI translation, no cross-project links/global leveling.",
+  "static_translation_units": 67,
+  "static_all_returncodes_zero": true,
+  "fuzz_executions": 20000,
+  "fuzz_targets": [
+    "jobs",
+    "xml",
+    "xer",
+    "workspace"
+  ],
+  "sanitized_ctest": 48,
+  "sanitized_ctest_seconds": 180.45,
+  "macos_ctest_seconds": 64.73,
+  "ctest_per_platform": 48,
+  "windows_ctest_seconds": 85.67
+}
