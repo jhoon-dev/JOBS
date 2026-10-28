@@ -138,14 +138,14 @@ public:
     void removeWbs(const std::string &id);
     void assignWbs(std::size_t taskRow, std::string wbsId);
     void setDuration(std::size_t row, std::optional<std::int64_t> minutes);
-    void setTaskEffort(std::size_t row, std::string type, bool workInput, std::optional<std::int64_t> duration,
+    void setTaskEffort(std::size_t row, TaskType type, bool workInput, std::optional<std::int64_t> duration,
                        std::optional<std::int64_t> work, std::vector<TaskBreak> breaks);
     void setPredecessors(std::size_t row, std::vector<std::string> ids);
     void setDependencies(std::size_t row, std::vector<Dependency>);
     std::string putCalendar(TaskCalendar);
     void removeCalendar(const std::string &);
     void setTaskCalendar(std::size_t, std::string);
-    void setTaskTiming(std::size_t, std::string type, std::optional<std::string> at,
+    void setTaskTiming(std::size_t, ConstraintType type, std::optional<std::string> at,
                        std::optional<std::string> deadline);
     void editGantt(const std::string &documentId, std::uint64_t revision, const std::string &taskId, bool resize,
                    const std::string &target);

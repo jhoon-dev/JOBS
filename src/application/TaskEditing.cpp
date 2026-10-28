@@ -194,7 +194,7 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
             t.dependencyRules.clear();
             for (const auto &edge : *e.edges) {
                 t.predecessors.push_back(edge.predecessorId);
-                if (edge.type != "FS" || edge.lagMinutes)
+                if (edge.type != DependencyType::FS || edge.lagMinutes)
                     t.dependencyRules.push_back(edge);
             }
             if (!t.dependencyRules.empty() && !isPdm(p))
@@ -204,7 +204,7 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
     // Build the complete proposal before an inverse calculation requires a valid plan.
     for (const auto &[i, e] : ordered)
         if (e->duration) {
-            if (p.tasks[i].taskType == "fixed-work")
+            if (p.tasks[i].taskType == TaskType::FixedWork)
                 p.tasks[i].durationMinutes = *e->duration;
             else
                 changeDuration(p, i, *e->duration);
@@ -214,7 +214,7 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
         validateGraph(p);
     EvaluationScope evaluation;
     for (const auto &[i, e] : ordered)
-        if (e->duration && p.tasks[i].taskType == "fixed-work") {
+        if (e->duration && p.tasks[i].taskType == TaskType::FixedWork) {
             try {
                 changeDuration(p, i, *e->duration, true);
             } catch (const std::exception &error) {
@@ -222,7 +222,7 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
             }
         }
     const bool inverse = std::any_of(ordered.begin(), ordered.end(), [&](const auto &item) {
-        return item.second->duration && p.tasks[item.first].taskType == "fixed-work";
+        return item.second->duration && p.tasks[item.first].taskType == TaskType::FixedWork;
     });
     editPlan(std::move(p), "표 일괄 붙여넣기", !inverse);
 }

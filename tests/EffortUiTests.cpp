@@ -127,7 +127,8 @@ int main(int argc, char **argv) {
         check(splitPath, "gantt filled pause with work bar");
         window.grab().save("effort-gantt-smoke.png");
         action(window, "undoEdit");
-        check(doc.project()->tasks[0].taskType == "fixed-duration" && doc.project()->tasks[0].breaks.empty(),
+        check(doc.project()->tasks[0].taskType == jobs::TaskType::FixedDuration &&
+                  doc.project()->tasks[0].breaks.empty(),
               "effort not one undo");
         action(window, "redoEdit");
         calculate(window, doc);

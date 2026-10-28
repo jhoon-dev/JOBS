@@ -21,7 +21,7 @@ jobs::Project fixture() {
     p.resources = {r};
     for (int i = 0; i < 20000; ++i) {
         jobs::Task t{"T" + std::to_string(i), "Work", 60, {}};
-        t.taskType = "fixed-work";
+        t.taskType = jobs::TaskType::FixedWork;
         t.workDriven = true;
         t.workUnitMinutes = 6000;
         p.tasks.push_back(t);

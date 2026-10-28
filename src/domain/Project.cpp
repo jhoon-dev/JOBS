@@ -17,10 +17,12 @@ bool isPdm(const PlanInput &p) {
     return p.calculationProfile == pdmProfile || hasConstraints(p);
 }
 bool usesWork(const Task &t) {
-    return t.taskType == "fixed-work" || t.workDriven;
+    return t.taskType == TaskType::FixedWork || t.workDriven;
 }
-std::string taskTypeName(const std::string &t) {
-    return t == "fixed-work" ? "고정 공수" : t == "fixed-units" ? "고정 단위" : "고정 기간";
+std::string taskTypeName(TaskType t) {
+    if (!isValid(t))
+        throw std::runtime_error("지원하지 않는 작업 유형입니다.");
+    return t == TaskType::FixedWork ? "고정 공수" : t == TaskType::FixedUnits ? "고정 단위" : "고정 기간";
 }
 std::string engineFor(const PlanInput &p) {
     return isEffort(p)         ? "jobs-effort-1.0"
@@ -34,22 +36,24 @@ std::string levelingPolicyFor(const PlanInput &p) {
            : isPdm(p)          ? "serial-no-split-pdm-v1"
                                : "serial-no-split-v1";
 }
-std::string constraintName(const std::string &type) {
-    if (type == "ASAP")
+std::string constraintName(ConstraintType type) {
+    if (!isValid(type))
+        throw std::runtime_error("지원하지 않는 제약 종류입니다.");
+    if (type == ConstraintType::ASAP)
         return "가능한 빨리";
-    if (type == "ALAP")
+    if (type == ConstraintType::ALAP)
         return "가능한 늦게";
-    if (type == "SNET")
+    if (type == ConstraintType::SNET)
         return "시작 이후";
-    if (type == "SNLT")
+    if (type == ConstraintType::SNLT)
         return "시작 이전";
-    if (type == "FNET")
+    if (type == ConstraintType::FNET)
         return "완료 이후";
-    if (type == "FNLT")
+    if (type == ConstraintType::FNLT)
         return "완료 이전";
-    if (type == "MSO")
+    if (type == ConstraintType::MSO)
         return "시작 고정";
-    if (type == "MFO")
+    if (type == ConstraintType::MFO)
         return "완료 고정";
     return "알 수 없는 제약";
 }
@@ -58,15 +62,8 @@ std::vector<Dependency> dependencies(const Task &task) {
     for (const auto &id : task.predecessors) {
         auto it = std::find_if(task.dependencyRules.begin(), task.dependencyRules.end(),
                                [&](const auto &d) { return d.predecessorId == id; });
-        out.push_back(it == task.dependencyRules.end() ? Dependency{id, "FS", 0} : *it);
+        out.push_back(it == task.dependencyRules.end() ? Dependency{id, DependencyType::FS, 0} : *it);
     }
-    return out;
-}
-std::vector<std::string> dependencyLabels(const Task &task) {
-    std::vector<std::string> out;
-    for (const auto &d : dependencies(task))
-        out.push_back(d.predecessorId + " " + d.type + (d.lagMinutes >= 0 ? "+" : "") + std::to_string(d.lagMinutes) +
-                      "m");
     return out;
 }
 std::string taskCalendarName(const PlanInput &p, const Task &task) {
@@ -204,27 +201,23 @@ void validatePlan(const PlanInput &p) {
             throw std::runtime_error("작업 달력이 존재하지 않습니다.");
         std::unordered_set<std::string> rules;
         for (const auto &d : t.dependencyRules) {
-            if (!refs.contains(d.predecessorId) || !rules.insert(d.predecessorId).second ||
-                (d.type != "FS" && d.type != "SS" && d.type != "FF" && d.type != "SF") || d.lagMinutes < -5000000 ||
-                d.lagMinutes > 5000000 || (d.type == "FS" && d.lagMinutes == 0))
+            if (!refs.contains(d.predecessorId) || !rules.insert(d.predecessorId).second || !isValid(d.type) ||
+                d.lagMinutes < -5000000 || d.lagMinutes > 5000000 ||
+                (d.type == DependencyType::FS && d.lagMinutes == 0))
                 throw std::runtime_error("선행관계 종류·근무분 지연/선행·중복 속성 오류입니다.");
         }
         if ((!t.dependencyRules.empty() || !t.calendarId.empty()) && !isPdm(p))
             throw std::runtime_error("확장 선행관계에는 PDM 계산 정책이 필요합니다.");
-        const bool dated = t.constraintType != "ASAP" && t.constraintType != "ALAP";
-        if ((t.constraintType != "ASAP" && t.constraintType != "ALAP" && t.constraintType != "SNET" &&
-             t.constraintType != "SNLT" && t.constraintType != "FNET" && t.constraintType != "FNLT" &&
-             t.constraintType != "MSO" && t.constraintType != "MFO") ||
-            dated != t.constraintAt.has_value() || (t.constraintAt && !validStamp(*t.constraintAt)) ||
-            (t.deadlineAt && !validStamp(*t.deadlineAt)))
+        const bool dated = t.constraintType != ConstraintType::ASAP && t.constraintType != ConstraintType::ALAP;
+        if (!isValid(t.constraintType) || dated != t.constraintAt.has_value() ||
+            (t.constraintAt && !validStamp(*t.constraintAt)) || (t.deadlineAt && !validStamp(*t.deadlineAt)))
             throw std::runtime_error(
                 "작업 제약 종류·제약 시각·마감일이 잘못되었습니다. 날짜는 YYYY-MM-DD HH:mm입니다.");
-        if ((t.constraintType != "ASAP" || t.constraintAt || t.deadlineAt) && !hasConstraints(p))
+        if ((t.constraintType != ConstraintType::ASAP || t.constraintAt || t.deadlineAt) && !hasConstraints(p))
             throw std::runtime_error("작업 제약/마감일에는 제약 계산 정책이 필요합니다.");
-        if ((t.taskType != "fixed-duration" && t.taskType != "fixed-work" && t.taskType != "fixed-units") ||
-            (t.workUnitMinutes && (*t.workUnitMinutes < 0 || *t.workUnitMinutes > maxWork)) ||
-            (t.taskType == "fixed-duration" && (t.workDriven || t.workUnitMinutes)) ||
-            (t.taskType == "fixed-work" && !t.workDriven) || (t.workDriven != t.workUnitMinutes.has_value()))
+        if (!isValid(t.taskType) || (t.workUnitMinutes && (*t.workUnitMinutes < 0 || *t.workUnitMinutes > maxWork)) ||
+            (t.taskType == TaskType::FixedDuration && (t.workDriven || t.workUnitMinutes)) ||
+            (t.taskType == TaskType::FixedWork && !t.workDriven) || (t.workDriven != t.workUnitMinutes.has_value()))
             throw std::runtime_error("작업 유형·계산 기준·공수 값이 일치하지 않습니다.");
         std::string last;
         if (t.breaks.size() > 1000)
@@ -235,7 +228,7 @@ void validatePlan(const PlanInput &p) {
                 throw std::runtime_error("중단 구간은 시작 < 재개 시각이며 정렬되고 겹치지 않아야 합니다.");
             last = gap.finish;
         }
-        if ((t.taskType != "fixed-duration" || t.workDriven || !t.breaks.empty()) && !isEffort(p))
+        if ((t.taskType != TaskType::FixedDuration || t.workDriven || !t.breaks.empty()) && !isEffort(p))
             throw std::runtime_error("공수·분할 작업에는 공수 일정 정책이 필요합니다.");
     }
     std::unordered_set<std::string> resources, pairs;

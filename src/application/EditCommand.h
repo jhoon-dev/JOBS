@@ -15,7 +15,8 @@ struct DurationEdit {
     std::optional<std::int64_t> minutes;
 };
 struct EffortEdit {
-    std::string taskId, type;
+    std::string taskId;
+    TaskType type = TaskType::FixedDuration;
     bool workInput = false;
     std::optional<std::int64_t> duration, work;
     std::vector<TaskBreak> breaks;

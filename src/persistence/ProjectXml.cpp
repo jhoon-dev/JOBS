@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "persistence/ProjectXml.h"
 #include "persistence/ExchangePackage.h"
 #include "persistence/JsonProjectStore.h"
@@ -482,8 +483,9 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
             if (num(*n, "Type", 0, 2, "0") != 1)
                 diagnostic(diagnostics, n->path + "/Type",
                            "기간 기반 고정 기간으로 투영 · 공수/작업 유형 계산 규칙은 보존 원본 참조");
-            static const std::array<const char *, 8> constraints{"ASAP", "ALAP", "MSO",  "MFO",
-                                                                 "SNET", "SNLT", "FNET", "FNLT"};
+            static const std::array<ConstraintType, 8> constraints{
+                ConstraintType::ASAP, ConstraintType::ALAP, ConstraintType::MSO,  ConstraintType::MFO,
+                ConstraintType::SNET, ConstraintType::SNLT, ConstraintType::FNET, ConstraintType::FNLT};
             auto type = num(*n, "ConstraintType", 0, 7, "0");
             t.constraintType = constraints[std::size_t(type)];
             if (type > 1)
@@ -509,7 +511,8 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                 auto pred = uid(link, "PredecessorUID");
                 if (!taskIds.contains(pred) || flag(link, "CrossProject") || !field(link, "CrossProjectName").isEmpty())
                     fail("고아/요약/외부 선행 작업: " + link.path);
-                static const std::array<const char *, 4> types{"FF", "FS", "SF", "SS"};
+                static const std::array<DependencyType, 4> types{DependencyType::FF, DependencyType::FS,
+                                                                 DependencyType::SF, DependencyType::SS};
                 auto type = types[std::size_t(num(link, "Type", 0, 3, "1"))];
                 if (child(link, "LinkLag") && !child(link, "LagFormat"))
                     fail("LinkLag에는 LagFormat이 필요합니다: " + link.path);
@@ -523,7 +526,7 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
                     diagnostic(diagnostics, link.path + "/LagFormat",
                                "근무분 값만 매핑 · 추정 지연 표시를 변환하지 않음");
                 task.predecessors.push_back(taskIds.at(pred));
-                if (QString::fromLatin1(type) != "FS" || lag)
+                if (type != DependencyType::FS || lag)
                     task.dependencyRules.push_back({taskIds.at(pred), type, lag / 10});
             }
     }
@@ -743,8 +746,9 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
         value("Summary", row.group ? "1" : "0");
         if (row.task) {
             const auto &t = *row.task;
-            static const std::array<const char *, 8> constraints{"ASAP", "ALAP", "MSO",  "MFO",
-                                                                 "SNET", "SNLT", "FNET", "FNLT"};
+            static const std::array<ConstraintType, 8> constraints{
+                ConstraintType::ASAP, ConstraintType::ALAP, ConstraintType::MSO,  ConstraintType::MFO,
+                ConstraintType::SNET, ConstraintType::SNLT, ConstraintType::FNET, ConstraintType::FNLT};
             auto it = std::find(constraints.begin(), constraints.end(), t.constraintType);
             value("ConstraintType", QString::number(it - constraints.begin()));
             value("CalendarUID", QString::number(calendars.at(t.calendarId)));
@@ -755,14 +759,17 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
             for (const auto &d : dependencies(t)) {
                 w.writeStartElement("PredecessorLink");
                 value("PredecessorUID", QString::number(taskIds.at(d.predecessorId)));
-                int type = d.type == "FF" ? 0 : d.type == "FS" ? 1 : d.type == "SF" ? 2 : 3;
+                int type = d.type == DependencyType::FF   ? 0
+                           : d.type == DependencyType::FS ? 1
+                           : d.type == DependencyType::SF ? 2
+                                                          : 3;
                 value("Type", QString::number(type));
                 value("CrossProject", "0");
                 value("LinkLag", QString::number(d.lagMinutes * 10));
                 value("LagFormat", "3");
                 w.writeEndElement();
             }
-            if (t.taskType != "fixed-duration" || t.workUnitMinutes || !t.breaks.empty())
+            if (t.taskType != TaskType::FixedDuration || t.workUnitMinutes || !t.breaks.empty())
                 diagnostic(diagnostics, "/Task/" + qs(t.id),
                            "공수·작업 유형·분할을 내보내지 않음 · 명목 기간 기반 투영");
             if (!t.durationMinutes)

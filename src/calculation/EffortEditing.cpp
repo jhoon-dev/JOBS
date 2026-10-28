@@ -8,7 +8,7 @@ void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::i
                       bool planOnly = false) {
     calculationCheckpoint();
     auto t = p.tasks.at(index);
-    t.taskType = "fixed-duration";
+    t.taskType = TaskType::FixedDuration;
     t.workDriven = false;
     t.workUnitMinutes.reset();
     t.durationMinutes = duration;
@@ -46,11 +46,11 @@ void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::i
 } // namespace
 void changeDuration(Project &p, std::size_t index, std::optional<std::int64_t> duration, bool planOnly) {
     auto &t = p.tasks.at(index);
-    if (isEffort(p) && t.taskType == "fixed-work") {
+    if (isEffort(p) && t.taskType == TaskType::FixedWork) {
         if (!duration || (*duration == 0 && t.workUnitMinutes.value_or(0) > 0))
             throw std::runtime_error("고정 공수의 기간 편집에는 양수 기간이 필요합니다.");
         scaleAssignments(p, index, t.workUnitMinutes.value(), *duration, planOnly);
-    } else if (t.taskType == "fixed-units") {
+    } else if (t.taskType == TaskType::FixedUnits) {
         t.workDriven = false;
         t.workUnitMinutes.reset();
     }
@@ -61,7 +61,7 @@ void changeWork(Project &p, std::size_t index, std::int64_t work) {
         throw std::runtime_error("입력 공수 범위를 초과했습니다.");
     p.calculationProfile = effortProfile;
     auto &t = p.tasks.at(index);
-    if (t.taskType == "fixed-duration") {
+    if (t.taskType == TaskType::FixedDuration) {
         if (!t.durationMinutes)
             throw std::runtime_error("고정 기간 작업의 기간을 먼저 입력하세요.");
         scaleAssignments(p, index, work, *t.durationMinutes);

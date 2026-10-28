@@ -1,4 +1,5 @@
 #include "calculation/Constraints.h"
+#include "formatting/PlanTokens.h"
 #include <algorithm>
 #include <map>
 #include <unordered_map>
@@ -10,9 +11,9 @@ ConstraintWindow constraintWindow(const PlanInput &p, const Task &t, const WorkC
         return w;
     const auto &at = *t.constraintAt;
     const auto &type = t.constraintType;
-    const bool start = type == "SNET" || type == "SNLT" || type == "MSO";
-    const bool fixed = type == "MSO" || type == "MFO";
-    const bool upper = type == "SNLT" || type == "FNLT";
+    const bool start = type == ConstraintType::SNET || type == ConstraintType::SNLT || type == ConstraintType::MSO;
+    const bool fixed = type == ConstraintType::MSO || type == ConstraintType::MFO;
+    const bool upper = type == ConstraintType::SNLT || type == ConstraintType::FNLT;
     if (at < p.startDate + " 00:00") {
         if (fixed || upper)
             w.upper = -1;
@@ -49,18 +50,18 @@ std::optional<Diagnostic> timingViolation(const Task &t, const TaskSchedule &row
     if (!t.constraintAt)
         return {};
     const auto &type = t.constraintType;
-    const bool start = type == "SNET" || type == "SNLT" || type == "MSO";
+    const bool start = type == ConstraintType::SNET || type == ConstraintType::SNLT || type == ConstraintType::MSO;
     const auto &actual = start ? row.start : row.finish;
     const auto &bound = *t.constraintAt;
-    const bool bad = type == "MSO" || type == "MFO"     ? actual != bound
-                     : type == "SNET" || type == "FNET" ? actual < bound
-                                                        : actual > bound;
+    const bool bad = type == ConstraintType::MSO || type == ConstraintType::MFO     ? actual != bound
+                     : type == ConstraintType::SNET || type == ConstraintType::FNET ? actual < bound
+                                                                                    : actual > bound;
     if (!bad)
         return {};
     auto ids = row.drivingPredecessors;
     ids.insert(ids.begin(), t.id);
     return Diagnostic{"CONSTRAINT_CONFLICT",
-                      t.name + " · " + constraintName(type) + " (" + type + ") " + bound +
+                      t.name + " · " + constraintName(type) + " (" + enumToken(type) + ") " + bound +
                           " · 선행관계/달력/상태일을 반영한 " + (start ? "시작 " : "완료 ") + actual +
                           " · 기간·제약 날짜·선행 ID·작업 달력을 확인하세요.",
                       std::move(ids)};
@@ -185,7 +186,7 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
         };
         // Reverse order places ALAP chains as late as their already placed successors permit.
         for (auto it = order.rbegin(); it != order.rend(); ++it)
-            if (p.tasks[*it].constraintType == "ALAP") {
+            if (p.tasks[*it].constraintType == ConstraintType::ALAP) {
                 const auto i = *it;
                 early[i] = latest(i, early);
                 pdmDates(clock, calendars.at(p.tasks[i].calendarId), rows[i], early[i], *p.tasks[i].durationMinutes);

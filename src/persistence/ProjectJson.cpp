@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "persistence/ProjectJson.h"
 #include "calculation/Tracking.h"
 #include <QJsonArray>
@@ -109,13 +110,13 @@ QJsonObject encodePlan(const PlanInput &p) {
             QJsonArray edges;
             for (const auto &d : task.dependencyRules)
                 edges.append(QJsonObject{{"predecessorId", qs(d.predecessorId)},
-                                         {"type", qs(d.type)},
+                                         {"type", qs(enumToken(d.type))},
                                          {"lagMinutes", double(d.lagMinutes)}});
             t["dependencyRules"] = edges;
             t["calendarId"] = qs(task.calendarId);
             tasks[i] = t;
             if (hasConstraints(p)) {
-                t["constraintType"] = qs(task.constraintType);
+                t["constraintType"] = qs(enumToken(task.constraintType));
                 t["constraintAt"] = nullable(task.constraintAt);
                 t["deadlineAt"] = nullable(task.deadlineAt);
             }
@@ -123,7 +124,7 @@ QJsonObject encodePlan(const PlanInput &p) {
                 QJsonArray gaps;
                 for (const auto &b : task.breaks)
                     gaps.append(QJsonObject{{"start", qs(b.start)}, {"finish", qs(b.finish)}});
-                t["taskType"] = qs(task.taskType);
+                t["taskType"] = qs(enumToken(task.taskType));
                 t["workDriven"] = task.workDriven;
                 t["workUnitMinutes"] = money(task.workUnitMinutes);
                 t["breaks"] = gaps;
@@ -324,16 +325,17 @@ PlanInput decodePlan(const QJsonObject &o, int schema) {
                 if (!d["lagMinutes"].isDouble() || !std::isfinite(lag) || std::floor(lag) != lag ||
                     std::abs(lag) > 5000000)
                     fail("선행/지연은 정수 근무분이어야 합니다.");
-                task.dependencyRules.push_back({string(d, "predecessorId"), string(d, "type"), std::int64_t(lag)});
+                task.dependencyRules.push_back(
+                    {string(d, "predecessorId"), dependencyTypeFromToken(string(d, "type")), std::int64_t(lag)});
             }
         }
         if (constrained) {
-            task.constraintType = string(t, "constraintType");
+            task.constraintType = constraintTypeFromToken(string(t, "constraintType"));
             task.constraintAt = optionalString(t, "constraintAt");
             task.deadlineAt = optionalString(t, "deadlineAt");
         }
         if (effort) {
-            task.taskType = string(t, "taskType");
+            task.taskType = taskTypeFromToken(string(t, "taskType"));
             task.workDriven = boolean(t, "workDriven");
             task.workUnitMinutes = readMoney(t, "workUnitMinutes", double(maxWork));
             for (const auto &gap : array(t, "breaks")) {

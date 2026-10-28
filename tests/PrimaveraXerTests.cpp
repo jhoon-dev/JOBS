@@ -92,12 +92,13 @@ int main(int argc, char **argv) {
         check(p.resources[0].maxUnits == 150 && p.resources[1].maxUnits == 0 && p.resources[1].type == "equipment" &&
                   p.assignments[0].units == 50 && p.assignments[1].units == 125,
               "units/capacity zero/equipment");
-        check(p.tasks[1].constraintType == "SNET" && p.tasks[1].constraintAt == "2026-10-28 10:00" &&
-                  p.tasks[5].durationMinutes == 0,
+        check(p.tasks[1].constraintType == jobs::ConstraintType::SNET &&
+                  p.tasks[1].constraintAt == "2026-10-28 10:00" && p.tasks[5].durationMinutes == 0,
               "constraint/milestone");
         for (std::size_t i = 1; i < 5; ++i) {
             auto edges = jobs::dependencies(p.tasks[i]);
-            const std::vector<std::string> types{"FS", "SS", "FF", "SF"};
+            const jobs::DependencyType types[]{jobs::DependencyType::FS, jobs::DependencyType::SS,
+                                               jobs::DependencyType::FF, jobs::DependencyType::SF};
             check(edges.size() == 1 && edges[0].type == types[i - 1] &&
                       edges[0].lagMinutes == ((i == 2 || i == 3) ? -60 : 60),
                   "four links/negative hours lag");
@@ -191,14 +192,15 @@ int main(int argc, char **argv) {
         check(aroundBack.project.calendars.back().periods == std::vector<jobs::WorkPeriod>{{0, 1440}},
               "midnight endpoint/24-hour calendar");
         auto work = p;
-        work.tasks[0].taskType = "fixed-work";
+        work.tasks[0].taskType = jobs::TaskType::FixedWork;
         work.tasks[0].workDriven = true;
         work.tasks[0].workUnitMinutes = 24000;
         work.tasks[0].breaks = {{"2026-10-26 10:00", "2026-10-26 11:00"}};
         work.tasks[0].deadlineAt = "2026-10-28 18:00";
         auto projected = jobs::exportPrimaveraXer(work);
         check(diagnostic(projected, "deadline") && diagnostic(projected, "xer-task-20") &&
-                  jobs::importPrimaveraXer(projected.xer, "work.xer").project.tasks[0].taskType == "fixed-duration",
+                  jobs::importPrimaveraXer(projected.xer, "work.xer").project.tasks[0].taskType ==
+                      jobs::TaskType::FixedDuration,
               "work/split/deadline explicit loss");
         jobs::Project latin;
         latin.documentId = "latin";

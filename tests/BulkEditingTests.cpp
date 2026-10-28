@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
               "last row failure partially committed");
         jobs::TaskEdit cycle;
         cycle.taskId = "T0";
-        cycle.edges = std::vector<jobs::Dependency>{{"T100", "FS", 0}};
+        cycle.edges = std::vector<jobs::Dependency>{{"T100", jobs::DependencyType::FS, 0}};
         result = prepare(doc, jobs::BatchTaskEdit{{cycle}});
         check(result->state() == EditState::Failed && *doc.project() == original, "cycle accepted");
         result = prepare(doc, jobs::DuplicateTasksEdit{{"T0", "T100"}});

@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
         action(window, "undoEdit");
         check(doc.project()->tasks[1].predecessors.empty(), "relationship undo failed");
         action(window, "redoEdit");
-        check(doc.project()->tasks[1].dependencyRules[0].type == "SS", "relationship redo failed");
+        check(doc.project()->tasks[1].dependencyRules[0].type == jobs::DependencyType::SS, "relationship redo failed");
         for (auto *a : window.findChildren<QAction *>()) {
             if (a->shortcut() == QKeySequence(Qt::Key_F9))
                 a->trigger();

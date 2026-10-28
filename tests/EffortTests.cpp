@@ -41,7 +41,7 @@ jobs::Project sample() {
     return p;
 }
 void work(jobs::Task &t, std::int64_t n) {
-    t.taskType = "fixed-work";
+    t.taskType = jobs::TaskType::FixedWork;
     t.workDriven = true;
     t.workUnitMinutes = n;
 }
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
                   row(p).finish == "2026-10-27 18:00",
               "fixed work duration edit did not solve U");
         p = sample();
-        p.tasks[0].taskType = "fixed-units";
+        p.tasks[0].taskType = jobs::TaskType::FixedUnits;
         jobs::changeWork(p, 0, 96000);
         check(p.assignments[0].units == 100 && row(p).finish == "2026-10-27 18:00", "fixed units work edit changed U");
         jobs::changeDuration(p, 0, 240);
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
         check(jobs::analyzeCosts(p, {}).plan == 48000, "split cost accrued gap");
         p.tasks.push_back({"B", "중단 중 다른 작업", 240, {}});
         p.assignments.push_back({"B", "R", 100});
-        p.tasks[1].constraintType = "SNET";
+        p.tasks[1].constraintType = jobs::ConstraintType::SNET;
         p.tasks[1].constraintAt = "2026-10-26 13:00";
         auto level = jobs::levelResources(p, "task-order", 20);
         check(level.leveled.status == jobs::CalculationStatus::Valid &&
@@ -166,17 +166,17 @@ int main(int argc, char **argv) {
         p = sample();
         work(p.tasks[0], 48000);
         p.tasks.push_back({"B", "후행", 60, {"A"}});
-        p.tasks[1].dependencyRules = {{"A", "FF", 60}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FF, 60}};
         check(row(p, 1).finish == "2026-10-27 10:00", "FF finish inverse ignored work model");
-        p.tasks[1].dependencyRules = {{"A", "SS", 60}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::SS, 60}};
         check(row(p, 1).start == "2026-10-26 10:00", "SS lag ignored");
-        p.tasks[1].dependencyRules = {{"A", "SF", 60}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::SF, 60}};
         check(row(p, 1).finish == "2026-10-26 10:00", "SF work inverse ignored");
-        p.tasks[1].dependencyRules = {{"A", "FS", -60}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FS, -60}};
         check(row(p, 1).start == "2026-10-26 17:00", "FS lead ignored");
         p = sample();
         work(p.tasks[0], 48000);
-        p.tasks[0].constraintType = "MFO";
+        p.tasks[0].constraintType = jobs::ConstraintType::MFO;
         p.tasks[0].constraintAt = "2026-10-27 14:00";
         r = row(p);
         check(r.start == "2026-10-26 14:00" && r.finish == "2026-10-27 14:00", "fixed finish work inverse wrong");
@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
         p = sample();
         work(p.tasks[0], 24000);
         p.tasks.push_back({"B", "긴 작업", 960, {}});
-        p.tasks[0].constraintType = "ALAP";
+        p.tasks[0].constraintType = jobs::ConstraintType::ALAP;
         r = row(p);
         check(r.start == "2026-10-27 14:00" && r.finish == "2026-10-27 18:00" && r.totalFloatMinutes == 0,
               "work ALAP not late/critical");
@@ -194,9 +194,9 @@ int main(int argc, char **argv) {
         check(lateLevel.leveled.tasks[0].start == r.start, "leveling advanced ALAP before original");
         auto chain = sample();
         work(chain.tasks[0], 12000);
-        chain.tasks[0].constraintType = "ALAP";
+        chain.tasks[0].constraintType = jobs::ConstraintType::ALAP;
         chain.tasks.push_back({"B", "늦은 후행", 120, {"A"}});
-        chain.tasks[1].constraintType = "ALAP";
+        chain.tasks[1].constraintType = jobs::ConstraintType::ALAP;
         chain.tasks.push_back({"C", "긴 작업", 960, {}});
         auto chainPlan = jobs::calculatePlan(chain);
         check(chainPlan.status == jobs::CalculationStatus::Valid && chainPlan.tasks[1].start == "2026-10-27 16:00" &&
@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
         auto hard = sample();
         work(hard.tasks[0], 48000);
         hard.tasks.push_back({"B", "시작 상한", 60, {"A"}});
-        hard.tasks[1].constraintType = "SNLT";
+        hard.tasks[1].constraintType = jobs::ConstraintType::SNLT;
         hard.tasks[1].constraintAt = "2026-10-26 17:00";
         auto causal = jobs::calculatePlan(hard);
         check(causal.status == jobs::CalculationStatus::Conflict && causal.diagnostics[0].taskIds.size() == 2 &&
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
                   level.leveled.tasks[1].start == "2026-10-27 09:00" &&
                   level.after.status == jobs::CalculationStatus::Valid,
               "work leveling did not release resource");
-        p.tasks[1].constraintType = "MSO";
+        p.tasks[1].constraintType = jobs::ConstraintType::MSO;
         p.tasks[1].constraintAt = "2026-10-26 09:00";
         check(jobs::levelResources(p, "task-order", 20).leveled.status == jobs::CalculationStatus::Conflict,
               "work leveling overrode hard start");
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
         auto rid = doc.putResource(resource);
         doc.setAssignments(id, {{id, rid, 100}});
         doc.setTaskCost({id, 0, "uniform", "physical"});
-        doc.setTaskEffort(0, "fixed-work", true, {}, 48000, {{"2026-10-26 13:00", "2026-10-27 13:00"}});
+        doc.setTaskEffort(0, jobs::TaskType::FixedWork, true, {}, 48000, {{"2026-10-26 13:00", "2026-10-27 13:00"}});
         doc.captureBaseline("공수 승인", "PM", "승인", "2026-10-26T09:00:00Z");
         const auto baseline = doc.project()->baselines[0];
         doc.setAssignments(id, {{id, rid, 200}});
@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
               "work edit undo changed work");
         doc.redo();
         doc.setAssignments(id, {{id, rid, 100}});
-        doc.setTaskTiming(0, "ASAP", {}, "2026-10-27 18:00");
+        doc.setTaskTiming(0, jobs::ConstraintType::ASAP, {}, "2026-10-27 18:00");
         check(jobs::isEffort(*doc.project()), "timing edit downgraded effort profile");
         doc.saveScenario("공수 대안", "shortest-first", 20, "2026-10-26T09:00:00Z", doc.project()->documentId,
                          doc.project()->revision);
@@ -296,7 +296,7 @@ int main(int argc, char **argv) {
         doc.saveAs(file.toStdString());
         check(store.load(file.toStdString()).project == *doc.project(),
               "schema9 did not roundtrip work/baseline/remaining");
-        doc.setTaskEffort(0, "fixed-work", true, {}, 60000, {});
+        doc.setTaskEffort(0, jobs::TaskType::FixedWork, true, {}, 60000, {});
         jobs::JsonRecoveryStore recovery(dir.filePath("recovery"));
         auto session = recovery.newSession();
         session->checkpoint(doc.recoverySnapshot("2026-10-26T09:01:00Z"));
@@ -321,7 +321,7 @@ int main(int argc, char **argv) {
         jobs::Document legacy(store);
         legacy.create("schema8", "2026-10-26", {"old"});
         legacy.setDuration(0, 480);
-        legacy.setTaskTiming(0, "SNET", "2026-10-27 09:00", {});
+        legacy.setTaskTiming(0, jobs::ConstraintType::SNET, "2026-10-27 09:00", {});
         auto oldFile = dir.filePath("v8.jobs");
         legacy.saveAs(oldFile.toStdString());
         auto old = QJsonDocument::fromJson(read(oldFile)).object();
@@ -349,7 +349,7 @@ int main(int argc, char **argv) {
         dragResource.id.clear();
         const auto dragRid = drag.putResource(dragResource);
         drag.setAssignments(dragId, {{dragId, dragRid, 100}});
-        drag.setTaskEffort(0, "fixed-work", true, {}, 48000, {});
+        drag.setTaskEffort(0, jobs::TaskType::FixedWork, true, {}, 48000, {});
         drag.applyCalculation(jobs::calculate(*drag.project()));
         drag.editGantt(drag.project()->documentId, drag.project()->revision, dragId, true, "2026-10-27 18:00");
         check(drag.project()->assignments[0].units == 50 && drag.project()->tasks[0].workUnitMinutes == 48000,

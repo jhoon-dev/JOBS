@@ -213,7 +213,8 @@ int main(int argc, char **argv) {
         check(static_cast<const jobs::PlanInput &>(*doc.project()) == static_cast<const jobs::PlanInput &>(original),
               "paste was not one undo");
         action(window, "redoEdit");
-        check(doc.project()->tasks[2].dependencyRules[0].type == "SS", "paste redo lost relationship");
+        check(doc.project()->tasks[2].dependencyRules[0].type == jobs::DependencyType::SS,
+              "paste redo lost relationship");
         auto before = *doc.project();
         select(table, 0, 1, 0);
         QApplication::clipboard()->setText("Valid\t1\t1\nBad\t-1\t");

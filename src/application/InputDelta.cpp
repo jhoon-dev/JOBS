@@ -10,12 +10,12 @@ std::size_t valueBytes(const ValueDelta<std::string> &value) {
 }
 } // namespace
 std::size_t inputExtraBytes(const Task &t) {
-    std::size_t bytes = t.id.size() + t.name.size() + t.wbsId.size() + t.calendarId.size() + t.constraintType.size() +
-                        optionalBytes(t.constraintAt) + optionalBytes(t.deadlineAt) + t.taskType.size();
+    std::size_t bytes = t.id.size() + t.name.size() + t.wbsId.size() + t.calendarId.size() +
+                        optionalBytes(t.constraintAt) + optionalBytes(t.deadlineAt);
     for (const auto &id : t.predecessors)
         bytes += sizeof(std::string) + id.size();
     for (const auto &edge : t.dependencyRules)
-        bytes += sizeof(Dependency) + edge.predecessorId.size() + edge.type.size();
+        bytes += sizeof(Dependency) + edge.predecessorId.size();
     for (const auto &pause : t.breaks)
         bytes += sizeof(TaskBreak) + pause.start.size() + pause.finish.size();
     return bytes;

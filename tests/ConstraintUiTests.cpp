@@ -218,7 +218,7 @@ int main(int argc, char **argv) {
         check(doc.project()->revision == revision, "forecast drag changed input");
         doc.setStatusAt({});
         calculate(window, doc);
-        doc.setTaskTiming(1, "SNLT", "2026-10-26 17:00", {});
+        doc.setTaskTiming(1, jobs::ConstraintType::SNLT, "2026-10-26 17:00", {});
         calculate(window, doc);
         check(doc.calculation()->status == jobs::CalculationStatus::Conflict, "hard conflict hidden");
         QTimer hardPoll;

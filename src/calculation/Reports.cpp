@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "calculation/Reports.h"
 #include "calculation/Constraints.h"
 #include "calculation/Effort.h"
@@ -217,7 +218,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
             const auto &t = p.tasks[row];
             const auto *s = forecasts.contains(t.id) ? forecasts.at(t.id) : nullptr;
             timing.rows.push_back({text(t.id), text(t.name),
-                                   text(t.constraintType + " · " + constraintName(t.constraintType)),
+                                   text(enumToken(t.constraintType) + " · " + constraintName(t.constraintType)),
                                    stamp(t.constraintAt), stamp(t.deadlineAt), s ? text(s->finish) : ReportCell{},
                                    s ? optional(deadlineSlack(p, t, s->finish), CellFormat::Hours) : ReportCell{},
                                    text(!t.deadlineAt               ? "미설정"
@@ -334,7 +335,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
             auto it =
                 std::find_if(p.tasks.begin(), p.tasks.end(), [&](const auto &t) { return t.id == d.predecessorId; });
             links.rows.push_back({text(p.tasks[row].id), text(p.tasks[row].name), text(d.predecessorId),
-                                  text(it == p.tasks.end() ? "누락 참조" : it->name), text(d.type),
+                                  text(it == p.tasks.end() ? "누락 참조" : it->name), text(enumToken(d.type)),
                                   number(d.lagMinutes), text(taskCalendarName(p, p.tasks[row]))});
         }
     auto &assignments =

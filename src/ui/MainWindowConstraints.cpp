@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
 #include <QComboBox>
 #include <QDialog>
@@ -38,9 +39,11 @@ void MainWindow::editTaskConstraints() {
     layout->addLayout(form);
     auto *type = new QComboBox;
     type->setObjectName("constraintType");
-    for (const auto &key : {"ASAP", "ALAP", "SNET", "SNLT", "FNET", "FNLT", "MSO", "MFO"})
-        type->addItem(QString::fromStdString(constraintName(key)) + " (" + key + ")", key);
-    type->setCurrentIndex(type->findData(QString::fromStdString(it->constraintType)));
+    for (const auto &[kind, token] : plantokens::constraint) {
+        const auto key = QString::fromLatin1(token.data(), qsizetype(token.size()));
+        type->addItem(QString::fromStdString(constraintName(kind)) + " (" + key + ")", key);
+    }
+    type->setCurrentIndex(type->findData(QString::fromStdString(enumToken(it->constraintType))));
     form->addRow("제약 종류", type);
     auto *at = new QLineEdit(QString::fromStdString(it->constraintAt.value_or("")));
     at->setObjectName("constraintAt");
@@ -52,8 +55,8 @@ void MainWindow::editTaskConstraints() {
     form->addRow("마감일·시각", due);
     const bool editable = !document_.readOnly();
     auto enabled = [&] {
-        const auto key = type->currentData().toString();
-        at->setEnabled(editable && key != "ASAP" && key != "ALAP");
+        const auto key = constraintTypeFromToken(type->currentData().toString().toStdString());
+        at->setEnabled(editable && key != ConstraintType::ASAP && key != ConstraintType::ALAP);
     };
     type->setEnabled(editable);
     due->setReadOnly(!editable);
@@ -67,9 +70,9 @@ void MainWindow::editTaskConstraints() {
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     connect(apply, &QPushButton::clicked, &dialog, [&] {
         try {
-            auto key = type->currentData().toString().toStdString();
+            auto key = constraintTypeFromToken(type->currentData().toString().toStdString());
             std::optional<std::string> stamp, deadline;
-            if (key != "ASAP" && key != "ALAP")
+            if (key != ConstraintType::ASAP && key != ConstraintType::ALAP)
                 stamp = at->text().trimmed().toStdString();
             if (!due->text().trimmed().isEmpty())
                 deadline = due->text().trimmed().toStdString();

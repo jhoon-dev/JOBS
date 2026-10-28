@@ -1,4 +1,5 @@
 #pragma once
+#include "domain/PlanTypes.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -15,7 +16,8 @@ struct TaskBreak {
     bool operator==(const TaskBreak &) const = default;
 };
 struct Dependency {
-    std::string predecessorId, type = "FS";
+    std::string predecessorId;
+    DependencyType type = DependencyType::FS;
     std::int64_t lagMinutes = 0;
     bool operator==(const Dependency &) const = default;
 };
@@ -39,10 +41,10 @@ struct Task {
     // IDs are the graph; only non-FS0 edge attributes are stored as overrides.
     std::vector<Dependency> dependencyRules = {};
     std::string calendarId = {};
-    std::string constraintType = "ASAP";
+    ConstraintType constraintType = ConstraintType::ASAP;
     std::optional<std::string> constraintAt = {};
     std::optional<std::string> deadlineAt = {};
-    std::string taskType = "fixed-duration";
+    TaskType taskType = TaskType::FixedDuration;
     // 100 = one resource-minute, 6000 = one resource-hour. Never inferred actual work.
     std::optional<std::int64_t> workUnitMinutes = {};
     bool workDriven = false;
@@ -164,14 +166,13 @@ const ProgressEntry *progressAsOf(const Project &project, const std::string &tas
 const CostEntry *costAsOf(const Project &, const std::string &taskId, const std::string &statusAt);
 int currencyDecimals(const std::string &currency);
 std::vector<Dependency> dependencies(const Task &);
-std::vector<std::string> dependencyLabels(const Task &);
 std::string taskCalendarName(const PlanInput &, const Task &);
 bool isPdm(const PlanInput &);
 bool hasConstraints(const PlanInput &);
 bool isEffort(const PlanInput &);
 bool usesWork(const Task &);
-std::string taskTypeName(const std::string &);
+std::string taskTypeName(TaskType);
 std::string engineFor(const PlanInput &);
 std::string levelingPolicyFor(const PlanInput &);
-std::string constraintName(const std::string &type);
+std::string constraintName(ConstraintType type);
 } // namespace jobs

@@ -57,12 +57,12 @@ int main() {
         task.name = "updated";
         task.predecessors = {"T0"};
         task.wbsId = "W";
-        task.dependencyRules = {{"T0", "SS", -30}};
+        task.dependencyRules = {{"T0", jobs::DependencyType::SS, -30}};
         task.calendarId = "C";
-        task.constraintType = "SNET";
+        task.constraintType = jobs::ConstraintType::SNET;
         task.constraintAt = "2026-11-02 09:00";
         task.deadlineAt = "2026-11-03 18:00";
-        task.taskType = "fixed-work";
+        task.taskType = jobs::TaskType::FixedWork;
         task.workUnitMinutes = 6000;
         task.workDriven = true;
         task.breaks = {{"2026-11-02 10:00", "2026-11-02 11:00"}};

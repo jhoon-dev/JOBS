@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
         pdm.calendars = {shift};
         pdm.tasks[1].calendarId = shift.id;
         pdm.tasks[1].predecessors = {one};
-        pdm.tasks[1].dependencyRules = {{one, "SS", -60}};
+        pdm.tasks[1].dependencyRules = {{one, jobs::DependencyType::SS, -60}};
         auto pdmOptions = options;
         pdmOptions.wbsId.clear();
         pdmOptions.fromDate.reset();
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
         jobs::exportPdf(pdmReport, pdmPdf, jobs::ReportFamily::Schedule, pdfOptions);
         auto constrained = pdm;
         constrained.calculationProfile = jobs::constraintProfile;
-        constrained.tasks[0].constraintType = "SNET";
+        constrained.tasks[0].constraintType = jobs::ConstraintType::SNET;
         constrained.tasks[0].constraintAt = "2026-10-27 09:00";
         constrained.tasks[0].deadlineAt = "2026-10-27 17:00";
         auto timingOptions = pdmOptions;
@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
         effort.calculationProfile = jobs::effortProfile;
         effort.tasks = {{"design", "Effort design", {}, {}}, {"review", "Review", 120, {"design"}}};
         auto &design = effort.tasks[0];
-        design.taskType = "fixed-work";
+        design.taskType = jobs::TaskType::FixedWork;
         design.workDriven = true;
         design.workUnitMinutes = 48000;
         design.breaks = {{"2026-10-26 13:00", "2026-10-27 13:00"}};

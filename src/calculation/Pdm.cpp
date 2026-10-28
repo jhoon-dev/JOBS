@@ -7,11 +7,11 @@
 namespace jobs {
 std::int64_t pdmRequiredStart(const WorkCalendar &cal, const Dependency &edge, const TaskSchedule &predecessor,
                               std::int64_t duration) {
-    const auto source = edge.type[0] == 'F' ? predecessor.finish : predecessor.start;
+    const auto source = dependencyFromFinish(edge.type) ? predecessor.finish : predecessor.start;
     const auto bound = cal.shift(source, edge.lagMinutes);
     if (duration == 0)
         return cal.finishAtLeast(bound);
-    if (edge.type[1] == 'S')
+    if (!dependencyToFinish(edge.type))
         return cal.startAtLeast(bound);
     return std::max(std::int64_t{0}, cal.finishAtLeast(bound) - duration);
 }
@@ -177,8 +177,9 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
                 if (p.calculationProfile == constraintProfile) {
                     auto remainingTask = t;
                     if (e && e->actualStart &&
-                        (t.constraintType == "SNET" || t.constraintType == "SNLT" || t.constraintType == "MSO")) {
-                        remainingTask.constraintType = "ASAP";
+                        (t.constraintType == ConstraintType::SNET || t.constraintType == ConstraintType::SNLT ||
+                         t.constraintType == ConstraintType::MSO)) {
+                        remainingTask.constraintType = ConstraintType::ASAP;
                         remainingTask.constraintAt.reset();
                     }
                     local = std::max(local, constraintWindow(p, remainingTask, cal, duration).lower);
@@ -195,8 +196,9 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
             if (e)
                 for (const auto &d : dependencies(t)) {
                     const auto &prev = rows[ids.at(d.predecessorId)];
-                    const auto target = d.type[1] == 'S' ? e->actualStart : e->actualFinish;
-                    if (target && *target < cal.shift(d.type[0] == 'F' ? prev.finish : prev.start, d.lagMinutes))
+                    const auto target = !dependencyToFinish(d.type) ? e->actualStart : e->actualFinish;
+                    if (target &&
+                        *target < cal.shift(dependencyFromFinish(d.type) ? prev.finish : prev.start, d.lagMinutes))
                         out.diagnostics.push_back(
                             {"OUT_OF_SEQUENCE",
                              "실제 날짜가 선행관계 하한보다 빠릅니다. 실제는 보존하며 잔여에 관계를 적용합니다.",
@@ -221,7 +223,8 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
             if (out.status == CalculationStatus::Conflict)
                 out.projectFinish.reset();
             out.calculationPolicy = "retained-remaining-constrained-v1";
-            if (std::any_of(p.tasks.begin(), p.tasks.end(), [](const auto &t) { return t.constraintType == "ALAP"; }))
+            if (std::any_of(p.tasks.begin(), p.tasks.end(),
+                            [](const auto &t) { return t.constraintType == ConstraintType::ALAP; }))
                 out.diagnostics.push_back({"CONSTRAINT_POLICY",
                                            "잔여 예측은 상태일 이후 가장 이른 재개를 사용합니다. ALAP은 계획 모드에만 "
                                            "적용하며 예측의 늦은 날짜/여유는 미산정입니다.",

@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "ui/TaskTableModel.h"
 #include "calculation/WorkCalendar.h"
 #include <QBrush>
@@ -74,8 +75,9 @@ QString TaskTableModel::text(const Task &task, int column) const {
         for (const auto &edge : dependencies(task)) {
             auto value = numbers_.contains(edge.predecessorId) ? QString::number(numbers_.at(edge.predecessorId))
                                                                : "누락:" + qs(edge.predecessorId);
-            if (edge.type != "FS" || edge.lagMinutes)
-                value += qs(edge.type) + (edge.lagMinutes >= 0 ? "+" : "") + QString::number(edge.lagMinutes) + "m";
+            if (edge.type != DependencyType::FS || edge.lagMinutes)
+                value += qs(enumToken(edge.type)) + (edge.lagMinutes >= 0 ? "+" : "") +
+                         QString::number(edge.lagMinutes) + "m";
             edges << value;
         }
         return edges.join(',');
@@ -98,7 +100,7 @@ QString TaskTableModel::text(const Task &task, int column) const {
     case 9:
         return qs(taskCalendarName(plan_, task));
     case 10:
-        return qs(task.constraintType) + (task.constraintAt ? " " + qs(*task.constraintAt) : QString{});
+        return qs(enumToken(task.constraintType)) + (task.constraintAt ? " " + qs(*task.constraintAt) : QString{});
     case 11:
         return task.deadlineAt ? qs(*task.deadlineAt) : "없음";
     case 12:

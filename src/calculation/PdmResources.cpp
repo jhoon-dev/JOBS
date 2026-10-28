@@ -61,8 +61,9 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
                 auto pending = task;
                 const auto *actual = out.original.isForecast ? progressAsOf(p, task.id) : nullptr;
                 if (actual && actual->actualStart &&
-                    (task.constraintType == "SNET" || task.constraintType == "SNLT" || task.constraintType == "MSO")) {
-                    pending.constraintType = "ASAP";
+                    (task.constraintType == ConstraintType::SNET || task.constraintType == ConstraintType::SNLT ||
+                     task.constraintType == ConstraintType::MSO)) {
+                    pending.constraintType = ConstraintType::ASAP;
                     pending.constraintAt.reset();
                 }
                 local = std::max(local, constraintWindow(p, pending, cal, duration).lower);

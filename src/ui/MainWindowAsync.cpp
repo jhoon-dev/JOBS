@@ -135,7 +135,7 @@ bool MainWindow::hasInverseDuration(const std::string &id) const {
         return false;
     for (const auto &task : document_.project()->tasks)
         if (task.id == id)
-            return task.taskType == "fixed-work";
+            return task.taskType == TaskType::FixedWork;
     return false;
 }
 bool MainWindow::editTaskCell(std::string id, int column, const QString &text) {

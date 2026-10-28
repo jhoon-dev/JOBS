@@ -67,14 +67,15 @@ int main(int argc, char **argv) {
         check(p.resources[0].maxUnits == 150 && p.resources[0].calendarId == "xml-cal-2" &&
                   p.assignments[0].units == 50 && p.assignments[1].units == 125,
               "resource mapping");
-        check(p.tasks[1].constraintType == "SNET" && p.tasks[1].constraintAt == "2026-10-28 10:00" &&
-                  p.tasks[1].deadlineAt == "2026-10-29 18:00",
+        check(p.tasks[1].constraintType == jobs::ConstraintType::SNET &&
+                  p.tasks[1].constraintAt == "2026-10-28 10:00" && p.tasks[1].deadlineAt == "2026-10-29 18:00",
               "constraint mapping");
         check(p.tasks[5].durationMinutes == 0 && p.progress.empty() && p.costEntries.empty() && p.taskCosts.empty(),
               "no invented actual/cost");
         for (std::size_t i = 1; i < 5; ++i) {
             const auto d = jobs::dependencies(p.tasks[i]);
-            const std::vector<std::string> types{"FS", "SS", "FF", "SF"};
+            const jobs::DependencyType types[]{jobs::DependencyType::FS, jobs::DependencyType::SS,
+                                               jobs::DependencyType::FF, jobs::DependencyType::SF};
             check(d.size() == 1 && d[0].type == types[i - 1] && d[0].lagMinutes == ((i == 2 || i == 3) ? -60 : 60),
                   "four links and tenths lag");
         }
@@ -159,13 +160,14 @@ int main(int argc, char **argv) {
                   hasDiagnostic(un, "Duration") && hasDiagnostic(un, "MaxUnits"),
               "unknown not zero");
         auto work = p;
-        work.tasks[0].taskType = "fixed-work";
+        work.tasks[0].taskType = jobs::TaskType::FixedWork;
         work.tasks[0].workDriven = true;
         work.tasks[0].workUnitMinutes = 24000;
         work.tasks[0].breaks = {{"2026-10-26 10:00", "2026-10-26 11:00"}};
         auto projection = jobs::exportProjectXml(work);
         check(hasDiagnostic(projection, "xml-task-20") &&
-                  jobs::importProjectXml(projection.xml, "work.xml").project.tasks[0].taskType == "fixed-duration",
+                  jobs::importProjectXml(projection.xml, "work.xml").project.tasks[0].taskType ==
+                      jobs::TaskType::FixedDuration,
               "effort loss explicit");
         // Native export has no WBS: canonical order, a default calendar, and unknown duration survive.
         jobs::Project plain;

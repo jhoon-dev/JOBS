@@ -9,10 +9,10 @@ namespace jobs {
 namespace {
 using Minute = std::int64_t;
 std::string edgeBound(const TaskExecution &model, const Dependency &d, const TaskSchedule &from) {
-    return model.calendar().shift(d.type[0] == 'F' ? from.finish : from.start, d.lagMinutes);
+    return model.calendar().shift(dependencyFromFinish(d.type) ? from.finish : from.start, d.lagMinutes);
 }
 bool edgeFits(const TaskExecution &model, const Dependency &d, const TaskSchedule &from, const TaskSchedule &to) {
-    return edgeBound(model, d, from) <= (d.type[1] == 'F' ? to.finish : to.remainingStart.value_or(to.start));
+    return edgeBound(model, d, from) <= (dependencyToFinish(d.type) ? to.finish : to.remainingStart.value_or(to.start));
 }
 } // namespace
 ScheduleResult calculateEffort(const Project &p, bool forecast, const std::string &priority, int horizonDays) {
@@ -89,14 +89,16 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     if (row.taskId == t.id && !row.completedActual)
                         local = std::max(local, model.required(row.remainingStart.value_or(row.start), false));
             const auto *actual = forecast ? progressAsOf(p, t.id) : nullptr;
-            const bool startConstraint = t.constraintType == "SNET" || t.constraintType == "MSO";
-            const bool finishConstraint = t.constraintType == "FNET" || t.constraintType == "MFO";
+            const bool startConstraint =
+                t.constraintType == ConstraintType::SNET || t.constraintType == ConstraintType::MSO;
+            const bool finishConstraint =
+                t.constraintType == ConstraintType::FNET || t.constraintType == ConstraintType::MFO;
             if (t.constraintAt && *t.constraintAt >= p.startDate + " 00:00" &&
                 (finishConstraint || (startConstraint && (!actual || !actual->actualStart))))
                 local = std::max(local, model.required(*t.constraintAt, finishConstraint));
             for (const auto &d : dependencies(t))
-                local = std::max(local,
-                                 model.required(edgeBound(model, d, rows[ids.at(d.predecessorId)]), d.type[1] == 'F'));
+                local = std::max(local, model.required(edgeBound(model, d, rows[ids.at(d.predecessorId)]),
+                                                       dependencyToFinish(d.type)));
             return local;
         };
         for (std::size_t count = 0; count < n; ++count) {
@@ -133,7 +135,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     for (const auto &d : dependencies(t))
                         if (model
                                 .dates(model.required(edgeBound(model, d, rows[ids.at(d.predecessorId)]),
-                                                      d.type[1] == 'F'))
+                                                      dependencyToFinish(d.type)))
                                 .start == plannedStart)
                             row.drivingPredecessors.push_back(d.predecessorId);
                     if (forecast) {
@@ -225,7 +227,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                 for (const auto &d : dependencies(t)) {
                     auto historical = row;
                     historical.remainingStart.reset();
-                    if ((d.type[1] == 'S' || actual->actualFinish) &&
+                    if ((!dependencyToFinish(d.type) || actual->actualFinish) &&
                         !edgeFits(model, d, rows[ids.at(d.predecessorId)], historical))
                         out.diagnostics.push_back(
                             {"OUT_OF_SEQUENCE",
@@ -262,7 +264,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                 return lo;
             };
             for (auto it = order.rbegin(); it != order.rend(); ++it)
-                if (p.tasks[*it].constraintType == "ALAP") {
+                if (p.tasks[*it].constraintType == ConstraintType::ALAP) {
                     const auto i = *it;
                     early[i] = latest(i, rows);
                     rows[i] = models[i]->dates(early[i]);
@@ -288,7 +290,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                 for (const auto &d : dependencies(p.tasks[i]))
                     if (models[i]
                             ->dates(models[i]->required(edgeBound(*models[i], d, rows[ids.at(d.predecessorId)]),
-                                                        d.type[1] == 'F'))
+                                                        dependencyToFinish(d.type)))
                             .start == rows[i].start)
                         rows[i].drivingPredecessors.push_back(d.predecessorId);
             }

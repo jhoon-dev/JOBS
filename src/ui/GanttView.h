@@ -71,7 +71,7 @@ private:
         std::vector<Dependency> edges = {};
         QString calendar = {};
         bool editable = false;
-        std::string constraintType = "ASAP";
+        ConstraintType constraintType = ConstraintType::ASAP;
         std::optional<std::string> constraintAt = {}, deadlineAt = {};
         std::vector<std::pair<std::string, std::string>> pieces = {};
         bool piecesReady = false;

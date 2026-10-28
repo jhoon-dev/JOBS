@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
         const auto id = doc.project()->tasks[0].id;
         const auto resource = doc.putResource({{}, "Team", "labor", 100, {}});
         doc.setAssignments(id, {{id, resource, 100}});
-        doc.setTaskEffort(0, "fixed-work", true, 480, 48000, {});
+        doc.setTaskEffort(0, jobs::TaskType::FixedWork, true, 480, 48000, {});
         doc.setPredecessors(1, {id});
         doc.saveAs(directory.filePath("Prepared.jobs").toUtf8().toStdString());
         const auto disk = bytes(doc.path());
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
         before = *doc.project();
         check(doc.applyPreparedEdit(*prepared) == EditState::Stale && *doc.project() == before,
               "same ID/revision reload accepted an old session");
-        doc.setTaskEffort(0, "fixed-units", false, 480, {}, {});
+        doc.setTaskEffort(0, jobs::TaskType::FixedUnits, false, 480, {}, {});
         prepared = prepare(doc, jobs::AssignmentEdit{id, {{id, resource, 50}}});
         check(doc.applyPreparedEdit(*prepared) == EditState::Applied && doc.project()->tasks[0].workDriven &&
                   doc.project()->tasks[0].workUnitMinutes == 96000 && doc.project()->assignments[0].units == 50,
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
         check(bytes(doc.path()) != disk, "test save failed");
         const auto saved = bytes(doc.path());
         before = *doc.project();
-        prepared = prepare(doc, jobs::EffortEdit{id, "fixed-work", true, 480, -1, {}});
+        prepared = prepare(doc, jobs::EffortEdit{id, jobs::TaskType::FixedWork, true, 480, -1, {}});
         check(prepared->state() == EditState::Failed && *doc.project() == before && bytes(doc.path()) == saved,
               "invalid prepared effort changed the source file/facts");
         auto large = performanceFixture(10000, true);

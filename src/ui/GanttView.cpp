@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "ui/GanttView.h"
 #include "calculation/Effort.h"
 #include <QGraphicsScene>
@@ -291,8 +292,8 @@ void GanttView::rebuild() {
         QString tooltip = row.name + "\n" + kind + "\n" + row.start + " → " + row.finish + "\nID: " + qs(row.id);
         tooltip += "\n작업 달력: " + row.calendar +
                    "\n막대는 시작~완료 구간입니다. 비근무 시간은 기간/자원 공수에서 제외합니다.";
-        tooltip += "\n제약: " + qs(constraintName(row.constraintType)) + " (" + qs(row.constraintType) + ")" +
-                   (row.constraintAt ? " " + qs(*row.constraintAt) : QString{}) +
+        tooltip += "\n제약: " + qs(constraintName(row.constraintType)) + " (" + qs(enumToken(row.constraintType)) +
+                   ")" + (row.constraintAt ? " " + qs(*row.constraintAt) : QString{}) +
                    "\n마감: " + (row.deadlineAt ? qs(*row.deadlineAt) : "없음");
         tooltip += row.editable
                        ? "\n드래그=날짜 이동 · 오른쪽 끝/Shift+드래그=기간 · 15분 격자 · Esc=취소 · 적용 후 자동 재계산"
@@ -344,9 +345,9 @@ void GanttView::rebuild() {
             if (found == index.end())
                 continue;
             const auto &prev = rows_[found->second];
-            auto x1 = position(edge.type[0] == 'F' ? prev.finish : prev.start);
+            auto x1 = position(dependencyFromFinish(edge.type) ? prev.finish : prev.start);
             auto y1 = HeaderHeight + int(found->second) * RowHeight + RowHeight / 2;
-            const auto target = edge.type[1] == 'F'                 ? finish
+            const auto target = dependencyToFinish(edge.type)       ? finish
                                 : isForecast_ && row.remainingStart ? position(qs(*row.remainingStart))
                                                                     : start;
             auto elbow = std::max(x1 + 8, target - 10);
@@ -364,9 +365,9 @@ void GanttView::rebuild() {
             link->setZValue(1);
             link->setData(0, qs(predecessor + "->" + row.id));
             link->setData(1, "dependency");
-            link->setToolTip(qs(edge.type) + (edge.lagMinutes >= 0 ? "+" : "") + QString::number(edge.lagMinutes) +
-                             "m · 후행 달력 근무분 · " + (historical ? "실제 날짜 고정 · " : "") + qs(predecessor) +
-                             " → " + qs(row.id));
+            link->setToolTip(qs(enumToken(edge.type)) + (edge.lagMinutes >= 0 ? "+" : "") +
+                             QString::number(edge.lagMinutes) + "m · 후행 달력 근무분 · " +
+                             (historical ? "실제 날짜 고정 · " : "") + qs(predecessor) + " → " + qs(row.id));
             QPolygonF arrow;
             arrow << QPointF(target, y) << QPointF(target - 5, y - 3) << QPointF(target - 5, y + 3);
             scene()->addPolygon(arrow, QPen(color), QBrush(color))->setZValue(1);

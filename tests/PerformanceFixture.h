@@ -27,11 +27,11 @@ inline jobs::Project performanceFixture(int n, bool effort) {
             t.predecessors.push_back("T" + std::to_string(i - 100));
         if (effort) {
             if (i % 3 == 0) {
-                t.taskType = "fixed-work";
+                t.taskType = jobs::TaskType::FixedWork;
                 t.workDriven = true;
                 t.workUnitMinutes = 6000;
             } else if (i % 3 == 1)
-                t.taskType = "fixed-units";
+                t.taskType = jobs::TaskType::FixedUnits;
             if (i % 25 == 0)
                 t.breaks = {{"2026-10-26 10:00", "2026-10-27 10:00"}};
             p.assignments.push_back({t.id, "R" + std::to_string(i % 8), 100});

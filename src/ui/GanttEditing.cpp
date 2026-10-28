@@ -1,4 +1,5 @@
 #include "ui/GanttView.h"
+#include "formatting/PlanTokens.h"
 #include "calculation/WorkCalendar.h"
 #include "calculation/Effort.h"
 #include <QApplication>
@@ -95,9 +96,10 @@ void GanttView::updateDrag(const QPoint &point) {
             }
             d.target = start;
             description = "날짜 이동 · " +
-                          QString::fromStdString(it->constraintType == "ASAP" || it->constraintType == "ALAP"
+                          QString::fromStdString(it->constraintType == ConstraintType::ASAP ||
+                                                         it->constraintType == ConstraintType::ALAP
                                                      ? "SNET 시작 이후"
-                                                     : it->constraintType) +
+                                                     : enumToken(it->constraintType)) +
                           " 제약 날짜 변경";
         }
         const auto row = std::find_if(rows_.begin(), rows_.end(), [&](const auto &r) { return r.id == d.taskId; });

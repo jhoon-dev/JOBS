@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "persistence/PrimaveraXer.h"
 #include "persistence/ExchangePackage.h"
 #include <QCryptographicHash>
@@ -349,9 +350,16 @@ QJsonObject reportFor(const Project &p, bool importing) {
                          {"jobsRecomputation", "unverified"},
                          {"externalRoundTrip", "unverified"}}}};
 }
-const std::map<QString, std::string> constraintMap{
-    {"", "ASAP"},        {"CS_ALAP", "ALAP"},     {"CS_MSOA", "SNET"},   {"CS_MSOB", "SNLT"}, {"CS_MEOA", "FNET"},
-    {"CS_MEOB", "FNLT"}, {"CS_MANDSTART", "MSO"}, {"CS_MANDFIN", "MFO"}, {"CS_MSO", "MSO"},   {"CS_MEO", "MFO"}};
+const std::map<QString, ConstraintType> constraintMap{{"", ConstraintType::ASAP},
+                                                      {"CS_ALAP", ConstraintType::ALAP},
+                                                      {"CS_MSOA", ConstraintType::SNET},
+                                                      {"CS_MSOB", ConstraintType::SNLT},
+                                                      {"CS_MEOA", ConstraintType::FNET},
+                                                      {"CS_MEOB", ConstraintType::FNLT},
+                                                      {"CS_MANDSTART", ConstraintType::MSO},
+                                                      {"CS_MANDFIN", ConstraintType::MFO},
+                                                      {"CS_MSO", ConstraintType::MSO},
+                                                      {"CS_MEO", ConstraintType::MFO}};
 } // namespace
 
 QByteArray readPrimaveraXer(const QString &path) {
@@ -591,7 +599,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             fail("미지원 제약: " + constraint);
         t.constraintType = constraintMap.at(constraint);
         auto at = get(tasks, r, "cstr_date");
-        if (t.constraintType != "ASAP" && t.constraintType != "ALAP")
+        if (t.constraintType != ConstraintType::ASAP && t.constraintType != ConstraintType::ALAP)
             t.constraintAt = str(stamp(at, path(tasks, r, "cstr_date")));
         else if (!at.isEmpty())
             diagnostic(diagnostics, path(tasks, r, "cstr_date"), "날짜 없는 제약의 원본 시각은 적용하지 않음");
@@ -620,7 +628,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         auto &t = p.tasks[taskIndex.at(taskIds.at(to))];
         t.predecessors.push_back(taskIds.at(from));
         if (type != "PR_FS" || lag)
-            t.dependencyRules.push_back({taskIds.at(from), str(type.mid(3)), lag});
+            t.dependencyRules.push_back({taskIds.at(from), dependencyTypeFromToken(str(type.mid(3))), lag});
     }
     const auto &resources = table(file, "RSRC");
     unique(resources, "rsrc_id");
@@ -839,9 +847,10 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
                     "cstr_date", "cstr_type2", "cstr_date2"});
     std::map<std::string, int> tasks;
     next = 1;
-    const std::map<std::string, QString> reverse{{"ASAP", ""},          {"ALAP", "CS_ALAP"}, {"MSO", "CS_MANDSTART"},
-                                                 {"MFO", "CS_MANDFIN"}, {"SNET", "CS_MSOA"}, {"SNLT", "CS_MSOB"},
-                                                 {"FNET", "CS_MEOA"},   {"FNLT", "CS_MEOB"}};
+    const std::map<ConstraintType, QString> reverse{
+        {ConstraintType::ASAP, ""},          {ConstraintType::ALAP, "CS_ALAP"}, {ConstraintType::MSO, "CS_MANDSTART"},
+        {ConstraintType::MFO, "CS_MANDFIN"}, {ConstraintType::SNET, "CS_MSOA"}, {ConstraintType::SNLT, "CS_MSOB"},
+        {ConstraintType::FNET, "CS_MEOA"},   {ConstraintType::FNLT, "CS_MEOB"}};
     for (const auto &t : p.tasks) {
         int uid = next++;
         tasks[t.id] = uid;
@@ -869,7 +878,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
         if (t.deadlineAt)
             diagnostic(diagnostics, "TASK/" + qs(t.id) + "/deadline",
                        "소프트 마감일을 expected finish/하드 제약으로 변환하지 않음");
-        if (t.taskType != "fixed-duration" || t.workUnitMinutes || !t.breaks.empty())
+        if (t.taskType != TaskType::FixedDuration || t.workUnitMinutes || !t.breaks.empty())
             diagnostic(diagnostics, "TASK/" + qs(t.id), "공수/작업 유형/분할 규칙 대신 명목 기간을 투영");
     }
     header("TASKPRED",
@@ -880,7 +889,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
             if (next > 10000)
                 fail("선행관계 10,000개 한도 초과");
             row({QString::number(next++), QString::number(tasks.at(t.id)), QString::number(tasks.at(d.predecessorId)),
-                 "1", "1", "PR_" + qs(d.type), hourText(d.lagMinutes)});
+                 "1", "1", "PR_" + qs(enumToken(d.type)), hourText(d.lagMinutes)});
         }
     header("RSRC", {"rsrc_id", "clndr_id", "curr_id", "rsrc_name", "rsrc_short_name", "rsrc_type", "active_flag"});
     std::map<std::string, int> resources;

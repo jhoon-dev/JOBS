@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "ui/TaskInput.h"
 #include <QRegularExpression>
 #include "domain/CalculationControl.h"
@@ -44,7 +45,9 @@ std::vector<Dependency> taskDependencyInput(const QString &value, const Project 
                 throw std::runtime_error("지연/선행은 ±5,000,000 정수 근무분 이내입니다.");
         }
         edges.push_back({predecessor.id,
-                         match.captured(2).isEmpty() ? "FS" : match.captured(2).toUpper().toUtf8().toStdString(),
+                         match.captured(2).isEmpty()
+                             ? DependencyType::FS
+                             : dependencyTypeFromToken(match.captured(2).toUpper().toUtf8().toStdString()),
                          std::int64_t(std::round(minutes))});
     }
     return edges;

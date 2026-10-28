@@ -60,21 +60,21 @@ int main(int argc, char **argv) {
     try {
         auto p = sample();
         dates(jobs::calculatePlan(p), 1, "2026-10-27 09:00", "2026-10-27 14:00");
-        p.tasks[1].dependencyRules = {{"A", "SS", 120}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::SS, 120}};
         dates(jobs::calculatePlan(p), 1, "2026-10-26 11:00", "2026-10-26 16:00");
-        p.tasks[1].dependencyRules = {{"A", "FF", 0}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FF, 0}};
         dates(jobs::calculatePlan(p), 1, "2026-10-26 14:00", "2026-10-26 18:00");
         auto mixed = sample();
-        mixed.tasks[1].dependencyRules = {{"A", "SS", 120}};
+        mixed.tasks[1].dependencyRules = {{"A", jobs::DependencyType::SS, 120}};
         mixed.tasks.push_back({"C", "C", 120, {"A", "B"}});
-        mixed.tasks[2].dependencyRules = {{"A", "FF", 0}, {"B", "SF", 480}};
+        mixed.tasks[2].dependencyRules = {{"A", jobs::DependencyType::FF, 0}, {"B", jobs::DependencyType::SF, 480}};
         auto mixedResult = jobs::calculatePlan(mixed);
         dates(mixedResult, 2, "2026-10-27 09:00", "2026-10-27 11:00");
         check(mixedResult.tasks[0].critical && mixedResult.tasks[1].critical && mixedResult.tasks[2].critical,
               "SS/SF driving chain lost criticality");
-        p.tasks[1].dependencyRules = {{"A", "SF", 480}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::SF, 480}};
         dates(jobs::calculatePlan(p), 1, "2026-10-26 14:00", "2026-10-26 18:00");
-        p.tasks[1].dependencyRules = {{"A", "FS", -120}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FS, -120}};
         dates(jobs::calculatePlan(p), 1, "2026-10-26 16:00", "2026-10-27 11:00");
         auto milestone = sample();
         milestone.tasks[1].durationMinutes = 0;
@@ -97,10 +97,10 @@ int main(int argc, char **argv) {
         horizon.tasks[1].calendarId = "24h";
         horizon.tasks[0].durationMinutes = 5000000;
         horizon.tasks[1].durationMinutes = 1;
-        horizon.tasks[1].dependencyRules = {{"A", "FS", 5000000}};
+        horizon.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FS, 5000000}};
         check(jobs::calculatePlan(horizon).status == jobs::CalculationStatus::Valid,
               "infeasible late trial invalidated feasible early schedule");
-        p.tasks[1].dependencyRules = {{"A", "FS", 180}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FS, 180}};
         p.startDate = "2026-10-30";
         p.holidays = {"2026-11-02"};
         dates(jobs::calculatePlan(p), 1, "2026-11-03 13:00", "2026-11-03 17:00");
@@ -112,14 +112,14 @@ int main(int argc, char **argv) {
         sat.periods = {{600, 840}};
         p.calendars = {sat};
         p.tasks[1].calendarId = "sat";
-        p.tasks[1].dependencyRules = {{"A", "FS", 60}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FS, 60}};
         dates(jobs::calculatePlan(p), 1, "2026-10-31 11:00", "2026-11-07 11:00");
-        p.tasks[1].dependencyRules = {{"A", "FF", 0}};
+        p.tasks[1].dependencyRules = {{"A", jobs::DependencyType::FF, 0}};
         dates(jobs::calculatePlan(p), 1, "2026-10-31 10:00", "2026-10-31 14:00");
         p.calendars[0].holidays = {"2026-10-31"};
         dates(jobs::calculatePlan(p), 1, "2026-11-07 10:00", "2026-11-07 14:00");
         auto invalid = p;
-        invalid.tasks[1].dependencyRules[0].type = "XX";
+        invalid.tasks[1].dependencyRules[0].type = static_cast<jobs::DependencyType>(-1);
         check(jobs::calculatePlan(invalid).status == jobs::CalculationStatus::Conflict, "bad relationship");
         invalid = p;
         invalid.tasks[1].calendarId = "missing";
@@ -135,25 +135,30 @@ int main(int argc, char **argv) {
         check(jobs::calculatePlan(invalid).status == jobs::CalculationStatus::Incomplete, "missing duration accepted");
         // Verify endpoints, backward feasibility and floats against a minute-grid oracle.
         std::mt19937 random(27);
-        const std::string types[] = {"FS", "SS", "FF", "SF"};
+        const jobs::DependencyType types[]{jobs::DependencyType::FS, jobs::DependencyType::SS, jobs::DependencyType::FF,
+                                           jobs::DependencyType::SF};
         for (int run = 0; run < 48; ++run) {
             auto v = sample();
             v.tasks[0].durationMinutes = 60 + random() % 300;
             v.tasks[1].durationMinutes = 60 + random() % 240;
             auto type = types[run % 4];
             auto lag = std::int64_t(random() % 241) - 120;
-            if (type != "FS" || lag)
+            if (type != jobs::DependencyType::FS || lag)
                 v.tasks[1].dependencyRules = {{"A", type, lag}};
             auto r = jobs::calculatePlan(v);
             check(r.status == jobs::CalculationStatus::Valid, "oracle schedule");
             jobs::WorkCalendar clock(v), a(v, v.tasks[0]), b(v, v.tasks[1]);
             const auto edge = jobs::dependencies(v.tasks[1])[0];
             const auto earliest = b.offset(r.tasks[1].start);
-            const auto bound = b.shift(edge.type[0] == 'F' ? r.tasks[0].finish : r.tasks[0].start, edge.lagMinutes);
+            const auto bound = b.shift((edge.type == jobs::DependencyType::FS || edge.type == jobs::DependencyType::FF)
+                                           ? r.tasks[0].finish
+                                           : r.tasks[0].start,
+                                       edge.lagMinutes);
             std::int64_t oracle = 0;
             for (;; ++oracle) {
-                const auto target = edge.type[1] == 'S' ? b.boundary(oracle, false)
-                                                        : b.boundary(oracle + *v.tasks[1].durationMinutes, true);
+                const auto target = (edge.type == jobs::DependencyType::FS || edge.type == jobs::DependencyType::SS)
+                                        ? b.boundary(oracle, false)
+                                        : b.boundary(oracle + *v.tasks[1].durationMinutes, true);
                 if (target >= bound)
                     break;
             }
@@ -185,7 +190,7 @@ int main(int argc, char **argv) {
         sat.id.clear();
         auto calendarId = doc.putCalendar(sat);
         doc.setTaskCalendar(1, calendarId);
-        doc.setDependencies(1, {{aId, "SS", 60}});
+        doc.setDependencies(1, {{aId, jobs::DependencyType::SS, 60}});
         const auto advanced = *doc.project();
         doc.undo();
         doc.redo();
@@ -206,7 +211,7 @@ int main(int argc, char **argv) {
         check(store.load(path.toStdString()).project == *doc.project(), "schema7 roundtrip");
         const auto bytes = read(path);
         check(QJsonDocument::fromJson(bytes).object()["schemaVersion"] == QJsonValue(9), "schema9 missing");
-        doc.setDependencies(1, {{aId, "FF", -30}});
+        doc.setDependencies(1, {{aId, jobs::DependencyType::FF, -30}});
         jobs::JsonRecoveryStore recovery(dir.filePath("recovery"));
         auto session = recovery.newSession();
         session->checkpoint(doc.recoverySnapshot("2026-10-26T09:02:00Z"));
@@ -299,7 +304,7 @@ int main(int argc, char **argv) {
             auto v = money;
             v.tasks[1].predecessors = {"A"};
             v.tasks[1].dependencyRules.clear();
-            if (type != "FS")
+            if (type != jobs::DependencyType::FS)
                 v.tasks[1].dependencyRules = {{"A", type, 60}};
             v.statusAt.reset();
             auto level = jobs::levelResources(v, "longest-first", 20);
@@ -308,9 +313,12 @@ int main(int argc, char **argv) {
             const auto edge = jobs::dependencies(v.tasks[1])[0];
             const auto &prev = level.leveled.tasks[0];
             const auto &after = level.leveled.tasks[1];
-            check((type[1] == 'S' ? after.start : after.finish) >=
-                      work.shift(type[0] == 'F' ? prev.finish : prev.start, edge.lagMinutes),
-                  "leveling violated endpoint relation");
+            check(
+                ((type == jobs::DependencyType::FS || type == jobs::DependencyType::SS) ? after.start : after.finish) >=
+                    work.shift((type == jobs::DependencyType::FS || type == jobs::DependencyType::FF) ? prev.finish
+                                                                                                      : prev.start,
+                               edge.lagMinutes),
+                "leveling violated endpoint relation");
             v.statusAt = "2026-10-26 12:00";
             jobs::ProgressEntry actual;
             actual.id = "actual";
@@ -329,8 +337,13 @@ int main(int argc, char **argv) {
             auto f = jobs::calculate(v);
             check(f.status == jobs::CalculationStatus::Valid && f.tasks[0].start == *actual.actualStart,
                   "forecast changed actual start");
-            check((type[1] == 'S' ? f.tasks[1].remainingStart.value() : f.tasks[1].finish) >=
-                      work.shift(type[0] == 'F' ? f.tasks[0].finish : f.tasks[0].start, edge.lagMinutes),
+            check(((type == jobs::DependencyType::FS || type == jobs::DependencyType::SS)
+                       ? f.tasks[1].remainingStart.value()
+                       : f.tasks[1].finish) >=
+                      work.shift((type == jobs::DependencyType::FS || type == jobs::DependencyType::FF)
+                                     ? f.tasks[0].finish
+                                     : f.tasks[0].start,
+                                 edge.lagMinutes),
                   "forecast ignored PDM endpoint");
         }
         jobs::ReportOptions options;

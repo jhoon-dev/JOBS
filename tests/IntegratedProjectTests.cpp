@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         doc.setDuration(0, 60);
         doc.setDuration(1, 60);
         doc.setDuration(2, 120);
-        doc.setDependencies(1, {{a, "FS", 0}});
+        doc.setDependencies(1, {{a, jobs::DependencyType::FS, 0}});
         const auto cal =
             doc.putCalendar({{}, "Weekday engineering", {1, 2, 3, 4, 5}, {{540, 720}, {780, 1080}}, {"2026-10-27"}});
         jobs::Resource resource;
@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
         const auto rid = doc.putResource(resource);
         for (const auto &id : {a, b, c})
             doc.setAssignments(id, {{id, rid, 100}});
-        doc.setTaskEffort(0, "fixed-work", true, 60, 6000, {{"2026-10-26 09:30", "2026-10-26 10:30"}});
-        doc.setTaskEffort(2, "fixed-units", false, 120, {}, {});
+        doc.setTaskEffort(0, jobs::TaskType::FixedWork, true, 60, 6000, {{"2026-10-26 09:30", "2026-10-26 10:30"}});
+        doc.setTaskEffort(2, jobs::TaskType::FixedUnits, false, 120, {}, {});
         doc.setTaskCost({a, 1000, "uniform", "physical"});
         doc.setTaskCost({b, 0, "uniform", "physical"});
         doc.setTaskCost({c, 0, "uniform", "physical"});

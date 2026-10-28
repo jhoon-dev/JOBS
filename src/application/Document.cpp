@@ -156,7 +156,7 @@ void Document::assignWbs(std::size_t row, std::string id) {
 }
 void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes) {
     requireEditable();
-    if (project_->tasks.at(row).taskType == "fixed-work") {
+    if (project_->tasks.at(row).taskType == TaskType::FixedWork) {
         auto p = *project_;
         changeDuration(p, row, minutes);
         edit(std::move(p), "작업 기간 변경");
@@ -168,7 +168,7 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
         throw std::runtime_error("기간은 0~5,000,000 근무분 또는 미정이어야 합니다.");
     auto before = project_->tasks.at(row), after = before;
     after.durationMinutes = minutes;
-    if (after.taskType == "fixed-units") {
+    if (after.taskType == TaskType::FixedUnits) {
         after.workDriven = false;
         after.workUnitMinutes.reset();
     }
@@ -188,7 +188,7 @@ void Document::setDuration(std::size_t row, std::optional<std::int64_t> minutes)
     staleCalculation();
     notify(Event::Edited);
 }
-void Document::setTaskEffort(std::size_t row, std::string type, bool workInput, std::optional<std::int64_t> duration,
+void Document::setTaskEffort(std::size_t row, TaskType type, bool workInput, std::optional<std::int64_t> duration,
                              std::optional<std::int64_t> work, std::vector<TaskBreak> breaks) {
     requireEditable();
     auto p = *project_;
@@ -199,11 +199,11 @@ void Document::setTaskEffort(std::size_t row, std::string type, bool workInput, 
     t.breaks = std::move(breaks);
     t.workDriven = false;
     t.workUnitMinutes.reset();
-    if (t.taskType == "fixed-work" || workInput) {
+    if (t.taskType == TaskType::FixedWork || workInput) {
         if (!work)
             throw std::runtime_error("공수 입력이 필요합니다.");
         changeWork(p, row, *work);
-        if (t.taskType == "fixed-work" && !workInput)
+        if (t.taskType == TaskType::FixedWork && !workInput)
             changeDuration(p, row, duration);
     }
     edit(std::move(p), "작업 유형·공수·분할 변경");
@@ -212,7 +212,7 @@ void Document::setPredecessors(std::size_t row, std::vector<std::string> ids) {
     requireEditable();
     std::vector<Dependency> edges;
     for (auto &id : ids)
-        edges.push_back({std::move(id), "FS", 0});
+        edges.push_back({std::move(id), DependencyType::FS, 0});
     setDependencies(row, std::move(edges));
 }
 void Document::setDependencies(std::size_t row, std::vector<Dependency> edges) {
@@ -223,7 +223,7 @@ void Document::setDependencies(std::size_t row, std::vector<Dependency> edges) {
     t.dependencyRules.clear();
     for (const auto &d : edges) {
         t.predecessors.push_back(d.predecessorId);
-        if (d.type != "FS" || d.lagMinutes)
+        if (d.type != DependencyType::FS || d.lagMinutes)
             t.dependencyRules.push_back(d);
     }
     if (!t.dependencyRules.empty() && !isPdm(p))
@@ -266,7 +266,7 @@ void Document::setTaskCalendar(std::size_t row, std::string id) {
         p.calculationProfile = pdmProfile;
     edit(std::move(p), "작업 달력 배정");
 }
-void Document::setTaskTiming(std::size_t row, std::string type, std::optional<std::string> at,
+void Document::setTaskTiming(std::size_t row, ConstraintType type, std::optional<std::string> at,
                              std::optional<std::string> deadline) {
     requireEditable();
     auto p = *project_;
@@ -317,9 +317,10 @@ void Document::editGantt(const std::string &id, std::uint64_t revision, const st
         const auto finish = isEffort(p) ? trial.finish
                             : !zero     ? cal.boundary(local + *it->durationMinutes, true)
                                         : start;
-        if (it->constraintType == "ASAP" || it->constraintType == "ALAP")
-            it->constraintType = "SNET";
-        it->constraintAt = it->constraintType == "FNET" || it->constraintType == "FNLT" || it->constraintType == "MFO"
+        if (it->constraintType == ConstraintType::ASAP || it->constraintType == ConstraintType::ALAP)
+            it->constraintType = ConstraintType::SNET;
+        it->constraintAt = it->constraintType == ConstraintType::FNET || it->constraintType == ConstraintType::FNLT ||
+                                   it->constraintType == ConstraintType::MFO
                                ? finish
                                : start;
     }
@@ -497,7 +498,7 @@ void Document::setAssignments(const std::string &id, std::vector<Assignment> ass
         return;
     if (isEffort(p))
         for (auto &t : p.tasks)
-            if (t.id == id && t.taskType == "fixed-units" && !t.workDriven) {
+            if (t.id == id && t.taskType == TaskType::FixedUnits && !t.workDriven) {
                 const auto plan = calculatePlan(p);
                 if (plan.status == CalculationStatus::Valid)
                     for (const auto &r : plan.tasks)

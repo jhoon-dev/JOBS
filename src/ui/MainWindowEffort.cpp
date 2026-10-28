@@ -1,3 +1,4 @@
+#include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
 #include "calculation/Effort.h"
 #include <QComboBox>
@@ -78,7 +79,7 @@ void MainWindow::editTaskEffort() {
     type->addItem("고정 기간", "fixed-duration");
     type->addItem("고정 공수", "fixed-work");
     type->addItem("고정 단위", "fixed-units");
-    type->setCurrentIndex(type->findData(QString::fromStdString(task.taskType)));
+    type->setCurrentIndex(type->findData(QString::fromStdString(enumToken(task.taskType))));
     form->addRow("작업 유형", type);
     auto *basis = new QComboBox;
     basis->setObjectName("effortBasis");
@@ -123,12 +124,12 @@ void MainWindow::editTaskEffort() {
     bool pending = false, durationChanged = false, workChanged = false, choiceChanged = false, fillingPreview = false;
     auto fields = [&] {
         const bool enabled = editable && !pending, workInput = basis->currentData() == "work";
-        const auto kind = type->currentData().toString();
+        const auto kind = taskTypeFromToken(type->currentData().toString().toStdString());
         type->setEnabled(enabled);
         basis->setEnabled(enabled);
         gaps->setReadOnly(!enabled);
-        duration->setEnabled(enabled && (!workInput || kind == "fixed-duration"));
-        work->setEnabled(enabled && (workInput || kind == "fixed-work"));
+        duration->setEnabled(enabled && (!workInput || kind == TaskType::FixedDuration));
+        work->setEnabled(enabled && (workInput || kind == TaskType::FixedWork));
         buttons->button(QDialogButtonBox::Ok)->setEnabled(enabled);
     };
     connect(type, &QComboBox::currentIndexChanged, &dialog, [&] {
@@ -228,7 +229,7 @@ void MainWindow::editTaskEffort() {
             }
             previewControl->cancel();
             submitDialogEdit(dialog, error, buttons,
-                             EffortEdit{task.id, type->currentData().toString().toStdString(),
+                             EffortEdit{task.id, taskTypeFromToken(type->currentData().toString().toStdString()),
                                         basis->currentData() == "work", minutes, hours, std::move(breaks)},
                              "공수·기간·배정 역산", [&](bool busy) {
                                  pending = busy;
