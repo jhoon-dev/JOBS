@@ -96,7 +96,12 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
     for(auto* child:window.children())if(auto* c=dynamic_cast<jobs::AsyncEditController*>(child))controller=c;
     check(controller,"controller missing");
     auto settle=[&]{QElapsedTimer timer;timer.start();while(controller->busy()&&timer.elapsed()<30000)QTest::qWait(2);check(!controller->busy(),"worker timeout");};
-    auto action=[&](const char* name){auto* command=window.findChild<QAction*>(name);check(command&&command->isEnabled(),"action missing");command->trigger();settle();};
+    auto action=[&](const char* name){
+        auto* command=window.findChild<QAction*>(name);check(command,"action missing");
+        QElapsedTimer ready;ready.start();while(!command->isEnabled()&&ready.elapsed()<10000)QTest::qWait(2);
+        if(!command->isEnabled())throw std::runtime_error(std::string("action disabled: ")+name);
+        command->trigger();settle();
+    };
     QAbstractItemModelTester tester(table->model(),QAbstractItemModelTester::FailureReportingMode::Fatal);
     int resets=0,inserts=0,removes=0;QObject::connect(table->model(),&QAbstractItemModel::modelReset,[&]{++resets;});QObject::connect(table->model(),&QAbstractItemModel::rowsInserted,[&]{++inserts;});QObject::connect(table->model(),&QAbstractItemModel::rowsRemoved,[&]{++removes;});
     QPersistentModelIndex survivor(table->model()->index(500,8));table->setCurrentCell(0,0);

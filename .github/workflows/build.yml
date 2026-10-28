@@ -46,6 +46,7 @@ jobs:
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
+          cmake -E copy tests/BulkPerformanceProbe.cpp build/editing-reference-source/tests/BulkPerformanceProbe.cpp
           cmake -S build/editing-reference-source -B build/editing-reference-build -DCMAKE_BUILD_TYPE=Release
           cmake --build build/editing-reference-build --config Release --target jobs_editing_performance_probe jobs_responsive_performance_probe jobs_bulk_performance_probe --parallel 3
       - name: Measure reference and compare paired editing observations

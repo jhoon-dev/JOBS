@@ -23,6 +23,8 @@ for tasks in (1000, 10000):
         run = subprocess.run([str(binary), "--tasks", str(tasks), "--baselines", str(baselines), "--output", str(target)],
                              cwd=build, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
         target.with_suffix(".log").write_text(run.stdout + run.stderr, encoding="utf-8")
+        if run.returncode:
+            print(run.stdout + run.stderr, file=sys.stderr, flush=True)
         run.check_returncode()
         data = json.loads(target.read_text(encoding="utf-8"))
         assert data["status"] == "success" and data["task_count"] == tasks and data["baseline_count"] == baselines

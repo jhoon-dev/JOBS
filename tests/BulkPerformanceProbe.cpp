@@ -45,14 +45,22 @@ int main(int argc, char** argv) {
         QObject::connect(table->model(), &QAbstractItemModel::rowsRemoved, [&] { ++removed; });
         QJsonArray operations; const int count = n / 10;
         auto measure = [&](const char* name, const char* action) {
+            auto* command = window.findChild<QAction*>(action);
+            check(command, "action missing");
+            // Native clipboard notifications can arrive after setText returns.
+            // Exclude setup readiness from the operation timing on both builds.
+            QElapsedTimer ready; ready.start();
+            while (!command->isEnabled() && ready.elapsed() < 10000) QTest::qWait(2);
+            if (!command->isEnabled()) throw std::runtime_error(std::string("action disabled: ") + action);
+            const double readyMs = ready.nsecsElapsed() / 1e6;
             QElapsedTimer clock, heartbeat; clock.start(); heartbeat.start(); qint64 maxGap = 0; int ticks = 0;
             QTimer pulse; pulse.setInterval(5); QObject::connect(&pulse, &QTimer::timeout, [&] { maxGap = std::max(maxGap, heartbeat.restart()); ++ticks; }); pulse.start();
             const int r = resets, i = inserted, d = removed;
-            auto* command = window.findChild<QAction*>(action); check(command && command->isEnabled(), "action disabled"); command->trigger();
+            command->trigger();
             const double trigger = clock.nsecsElapsed() / 1e6;
             while (controller->busy() && clock.elapsed() < 120000) QTest::qWait(2);
             check(!controller->busy(), "operation timeout"); app.processEvents(); maxGap = std::max(maxGap, heartbeat.elapsed());
-            operations.append(QJsonObject{{"operation", name}, {"trigger_return_ms", trigger}, {"settled_ms", clock.nsecsElapsed() / 1e6},
+            operations.append(QJsonObject{{"operation", name}, {"setup_ready_ms", readyMs}, {"trigger_return_ms", trigger}, {"settled_ms", clock.nsecsElapsed() / 1e6},
                 {"heartbeat_ticks", ticks}, {"observed_max_heartbeat_gap_ms", maxGap}, {"model_resets", resets-r}, {"row_insert_signals", inserted-i}, {"row_remove_signals", removed-d}});
         };
         table->setCurrentCell(0,0);
@@ -82,7 +90,7 @@ int main(int argc, char** argv) {
         check(doc.applyPreparedEdit(*prepared)==jobs::EditState::Applied,"phase apply failed");const double applyMs=phase.nsecsElapsed()/1e6;
         QJsonObject output{{"fixture","jobs-bulk-ui-v1"},{"status","success"},{"task_count",n},{"baseline_count",baselines},{"affected_tasks",count},
             {"batch_phases_ms",QJsonObject{{"request_gui",requestMs},{"prepare_worker",workerMs},{"apply_gui",applyMs}}},{"operations",operations},{"source_revision",JOBS_PERF_REVISION},{"built_product_source_sha256",JOBS_SOURCE_SHA256},{"platform",QApplication::platformName()},
-            {"scope","One sample per operation; trigger includes automated modal input/confirmation; settled includes worker and GUI refresh, excludes initial open/save/baselines and OS presentation"}};
+            {"scope","One sample per operation; setup_ready_ms excluded from timing; trigger includes automated modal input/confirmation; settled includes worker and GUI refresh, excludes initial open/save/baselines and OS presentation"}};
         QFile file(args.value(args.indexOf("--output")+1)); check(file.open(QIODevice::WriteOnly),"output unavailable"); file.write(QJsonDocument(output).toJson());
         std::cout << "PASS: bulk UI " << n << '/' << baselines << '\n';
     } catch(const std::exception& error) { std::cerr << "FAIL: " << error.what() << '\n'; return 1; }
