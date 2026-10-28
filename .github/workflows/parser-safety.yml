@@ -1,0 +1,54 @@
+name: Parser fuzzing and runtime checks
+on: [push, pull_request]
+jobs:
+  sanitized:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CC: clang
+      CXX: clang++
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install runtime and Clang dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libgl1-mesa-dev libxkbcommon-dev libegl1
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          arch: gcc_64
+          cache: true
+      - name: Record toolchain
+        run: |
+          mkdir -p build-sanitized
+          clang++ --version > build-sanitized/toolchain.txt
+          cmake --version >> build-sanitized/toolchain.txt
+          git rev-parse HEAD >> build-sanitized/toolchain.txt
+      - name: Configure instrumented JOBS and parser targets
+        run: cmake -S . -B build-sanitized -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DJOBS_ENABLE_SANITIZERS=ON -DJOBS_BUILD_FUZZERS=ON
+      - name: Verify instrumentation of real parser dependencies
+        run: python3 scripts/verify-parser-instrumentation.py
+      - name: Build with bounded parallelism
+        run: cmake --build build-sanitized --parallel 2
+      - name: Run all regression contracts under ASan and UBSan
+        run: |
+          set -o pipefail
+          ctest --test-dir build-sanitized --output-on-failure 2>&1 | tee build-sanitized/ctest.log
+      - name: Replay seeds and fuzz each real parser
+        run: python3 scripts/run-parser-fuzz-smoke.py
+      - name: Preserve runtime and parser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parser-safety-Linux
+          path: |
+            build-sanitized/toolchain.txt
+            build-sanitized/CMakeCache.txt
+            build-sanitized/ctest.log
+            build-sanitized/instrumentation.json
+            build-sanitized/Testing/Temporary/LastTest.log
+            build-sanitized/parser-fuzz/
+          if-no-files-found: warn
