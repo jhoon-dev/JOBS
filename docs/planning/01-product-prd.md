@@ -249,3 +249,14 @@ F08/F09의 기간 부분과 수용 범위는 [기준선·실적·비교 계약](
 | VIEWBULK-04 | 검증과 관측 | 공통 보기 계산의 full-refresh oracle, Qt 모델 검사/persistent index, 필터 출입/정렬 이동/하위 WBS/보고 이력·취소·보기 변경 경합을 검증한다. 1천/1만 작업에서 검색·정렬·WBS/결합 보기의 대량 변경과 undo를 같은 도구/컴파일러로 전후 측정하고 원시 시간·reset/layout/행 신호를 남긴다. 기존 전체 회귀와 Windows/MSVC·macOS 네이티브/독립 파일 검사를 유지한다. |
 
 일정/파일 schema/계산 정책 및 편집 의미는 바꾸지 않는다. 모든 보기 변경/새 계산/단일 셀 편집까지 비동기화하거나, 분산 변경/잘못된 캐시의 reset을 모두 없애는 증분은 아니다.
+
+## 2026-10-28 외부 파일 파서 퍼징·런타임 검사
+
+후속 개발 요청에 따라 구현 전에 PARSER-SAFE-01~04를 확정한다. 기존 검토의 퍼징/sanitizer 공백을 보완하며 [검증 계약](../parser-safety.md)을 따른다.
+
+| ID | 요구사항 | 이번 완료조건 |
+|---|---|---|
+| PARSER-SAFE-01 | 실제 파서의 메모리 입력 경계 | `.jobs` 파일 envelope/무결성 검사를 입출력 없는 함수로 분리하고 load/저장 전 검증에서 공유한다. 파일 64MiB 한도·지원 schema·알 수 없는 필드 거부·무결성·도메인 검증을 유지한다. XML/XER도 실제 import 함수를 사용하며 harness가 파일을 게시하거나 문서를 변경하지 않는다. |
+| PARSER-SAFE-02 | coverage-guided 퍼징 | opt-in Clang/libFuzzer 타깃 3개에 JOBS 파서와 도메인/계산 의존 코드까지 coverage 및 ASan/UBSan을 적용한다. `.jobs`는 원본 envelope와 schema1~9의 payload를 구분 실행하여 checksum이 깊은 검증을 가리지 않게 한다. XER UTF-8/Windows-1252, 정상·손상/잘린 seed를 재생하며 입력 크기·시간·RSS/프로세스 시간을 제한한다. 일반 파서 거부 예외만 허용하고 crash/sanitizer/timeout/OOM은 실패로 기록한다. |
+| PARSER-SAFE-03 | 재현 가능한 smoke·회귀 CI | 일반 Windows/macOS 빌드에서도 seed 재생 검사를 실행한다. 별도 Linux/Clang CI는 전체 회귀에 ASan/UBSan을 적용하고 각 타깃의 seed 재생 및 고정 seed/실행 수의 유한 퍼징을 수행한다. 도구 버전·source revision·명령/상태·로그·발견 입력과 corpus를 artifact로 보존한다. 정상 코드의 계측 누락과 취소/예외 삼키기를 검사한다. |
+| PARSER-SAFE-04 | 제품 경계·판정 | 기본 Release 빌드·배포 옵션은 유지하며 미지원 컴파일러의 opt-in은 명시 실패한다. 기존 파일/교환·독립 reader와 Windows/macOS 회귀를 유지한다. Qt 사전 빌드 내부는 계측하지 않으며 유한 퍼징 통과를 취약점 부재·상용 제품 호환·Linux 제품 지원·지속 모니터링으로 주장하지 않는다. |
