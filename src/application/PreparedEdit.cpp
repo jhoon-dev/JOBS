@@ -54,11 +54,11 @@ std::unordered_map<std::string,std::string> assignmentLabels(const PlanInput& in
     }
     return labels;
 }
-std::shared_ptr<BulkView> prepareView(const Project& before, const Project& after, std::uint64_t session) {
+std::shared_ptr<BulkView> prepareView(const Project& before, const Project& after, std::uint64_t session, bool rootView) {
     auto view = std::make_shared<BulkView>();
     view->input = after; view->before = before.revision; view->after = after.revision;
     view->documentId = after.documentId; view->session = session; view->oldSize = before.tasks.size();
-    view->rows.resize(after.tasks.size()); std::iota(view->rows.begin(), view->rows.end(), std::size_t{0});
+    if(rootView){view->rows.resize(after.tasks.size());std::iota(view->rows.begin(),view->rows.end(),std::size_t{0});}
     const auto common = std::min(before.tasks.size(), after.tasks.size());
     while (view->prefix < common && before.tasks[view->prefix].id == after.tasks[view->prefix].id) ++view->prefix;
     while (view->suffix < common - view->prefix && before.tasks[before.tasks.size()-1-view->suffix].id == after.tasks[after.tasks.size()-1-view->suffix].id) ++view->suffix;
@@ -71,13 +71,13 @@ std::shared_ptr<BulkView> prepareView(const Project& before, const Project& afte
     std::unordered_map<std::string, const Task*> old;
     for (const auto& task : before.tasks) old.emplace(task.id, &task);
     for (std::size_t i = 0; i < after.tasks.size(); ++i) {
-        calculationCheckpoint(); const auto& task = after.tasks[i]; view->numbers.emplace(task.id, int(i+1)); view->positions.emplace(i,int(i));
+        calculationCheckpoint(); const auto& task = after.tasks[i]; view->numbers.emplace(task.id, int(i+1)); if(rootView)view->positions.emplace(i,int(i));
         const auto found = old.find(task.id);
         if (found != old.end() && *found->second == task && labelAt(previousLabels,task.id)==labelAt(view->assignmentLabels,task.id)) continue;
         if (!view->changedRanges.empty() && view->changedRanges.back().second == int(i)-1) view->changedRanges.back().second = int(i);
         else view->changedRanges.emplace_back(int(i), int(i));
     }
-    view->summary = summarizeWbs(after, nullptr, {});
+    if(rootView)view->summary = summarizeWbs(after, nullptr, {});
     return view;
 }
 }
@@ -116,8 +116,11 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
         bool clearSelection = false;
         PreparationStore store(std::move(request.factId_), *request.snapshot_, !std::holds_alternative<ProgressEdit>(request.command_));
         Document trial(store);
-        // The deep source copy happens on this worker, never in request capture.
-        trial.project_ = Project(*request.snapshot_);
+        // Closed bulk methods and plan-history replay build their own proposal
+        // before writing. Share their read-only source to avoid a redundant deep
+        // copy of unchanged archives; ordinary edits retain the existing path.
+        if(bulk)trial.project_=request.snapshot_;
+        else trial.project_ = Project(*request.snapshot_);
         trial.savedState_ = request.saved_; trial.dirtyState_ = request.dirty_;
         // Gantt editing also requires the exact source plan. It is prepared here,
         // rather than reusing live UI cache pointers in a worker.
@@ -161,7 +164,7 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
             calculationCheckpoint();
             result->taskChange_ = trial.taskChange_;
             if (bulk) {
-                result->view_ = prepareView(*request.snapshot_, *result->proposal_, result->session_);
+                result->view_ = prepareView(*request.snapshot_, *result->proposal_, result->session_, !request.viewPreparation_);
                 if(request.viewPreparation_) request.viewPreparation_(*result->view_, *request.snapshot_, *result->proposal_);
                 result->view_->createdIds = std::move(created); result->view_->clearSelection = clearSelection;
             }
