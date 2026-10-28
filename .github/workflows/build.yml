@@ -42,7 +42,7 @@ jobs:
       - name: Check out pre-optimization editing reference
         uses: actions/checkout@v4
         with:
-          ref: edbea73
+          ref: edbea737a4ebe081ceca2086b2a9b249e2c559fd
           path: build/editing-reference-source
       - name: Build reference with the same Qt and compiler
         run: |
