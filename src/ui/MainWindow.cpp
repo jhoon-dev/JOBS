@@ -84,11 +84,19 @@ MainWindow::MainWindow(Document& document, JsonRecoveryStore* recoveryStore) : d
     historyListener_ = document_.subscribe([this](auto event) { if(event==Document::Event::Replaced)taskViewReset_=true; if(calculationControl_&&calculationSession_!=document_.sessionGeneration()){calculationControl_->cancel();queuedCalculation_.reset();}updateHistoryActions(); });
     add_ = tools->addAction("작업 추가"); add_->setShortcut(QKeySequence("Ctrl+Shift+Insert"));
     connect(add_, &QAction::triggered, this, [this] {
-        commitPendingCell();
-        bool ok = false;
-        auto name = QInputDialog::getText(this, "작업 추가", "작업명", QLineEdit::Normal, {}, &ok).trimmed();
-        if (!ok) return;
-        try { document_.addTask(str(name), selectedWbs_); refresh(); } catch (const std::exception& e) { report(e); }
+        runAfterEdit([this] {
+            const auto session=document_.sessionGeneration();
+            const auto revision=document_.project()?document_.project()->revision:0;
+            const auto wbs=selectedWbs_;
+            bool ok=false;
+            const auto name=QInputDialog::getText(this,"작업 추가","작업명",QLineEdit::Normal,{},&ok).trimmed();
+            if(!ok)return;
+            try {
+                if(!document_.project()||document_.sessionGeneration()!=session||document_.project()->revision!=revision)
+                    throw std::runtime_error("입력 중 프로젝트가 변경되었습니다. 다시 추가하세요.");
+                submitEdit(InsertTasksEdit{{str(name)},{},wbs},"작업 추가");
+            } catch(const std::exception& e){report(e);}
+        });
     });
     auto* projectMenu = menuBar()->addMenu("프로젝트(&P)");
     calculate_ = projectMenu->addAction("일정 계산(&C)"); calculate_->setShortcut(QKeySequence(Qt::Key_F9));

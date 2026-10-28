@@ -54,7 +54,7 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
         entered->set_value();for(;;)jobs::calculationCheckpoint();
     }});
     auto running=std::async(std::launch::async,[request=std::move(runningRequest),cancelled]()mutable{return jobs::Document::prepareEdit(std::move(request),cancelled);});
-    check(enteredFuture.wait_for(std::chrono::seconds(5))==std::future_status::ready,"decoder did not start");cancelled->cancel();
+    const bool started=enteredFuture.wait_for(std::chrono::seconds(5))==std::future_status::ready;cancelled->cancel();check(started,"decoder did not start");
     check(running.get()->state()==EditState::Cancelled&&*doc.project()==before&&doc.historyBytes()==weight,"in-flight cancellation changed source");
     result=prepare(doc,jobs::InsertTasksEdit{{"stale"},{},{}});doc.open(path);check(doc.applyPreparedEdit(*result)==EditState::Stale,"same revision reload accepted stale result");
     std::vector<jobs::TaskEdit> edits;for(int i=0;i<1000;++i){jobs::TaskEdit edit;edit.taskId="T"+std::to_string(i);edit.name="Changed "+std::to_string(i);edits.push_back(edit);}edits.back().name="";
@@ -69,7 +69,8 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
     const auto protectedSource=*doc.project();result=prepare(doc,jobs::RemoveTasksEdit{{"T0","T1"}});
     check(result->state()==EditState::Failed&&*doc.project()==protectedSource,"protected removal partially committed");doc.open(path);
     jobs::MainWindow window(doc);window.show();QTest::qWait(20);auto* table=taskTable(window);jobs::AsyncEditController* controller=nullptr;
-    for(auto* child:window.children())if(auto* c=dynamic_cast<jobs::AsyncEditController*>(child))controller=c;check(controller,"controller missing");
+    for(auto* child:window.children())if(auto* c=dynamic_cast<jobs::AsyncEditController*>(child))controller=c;
+    check(controller,"controller missing");
     auto settle=[&]{QElapsedTimer timer;timer.start();while(controller->busy()&&timer.elapsed()<30000)QTest::qWait(2);check(!controller->busy(),"worker timeout");};
     auto action=[&](const char* name){auto* command=window.findChild<QAction*>(name);check(command&&command->isEnabled(),"action missing");command->trigger();settle();};
     QAbstractItemModelTester tester(table->model(),QAbstractItemModelTester::FailureReportingMode::Fatal);
