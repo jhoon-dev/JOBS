@@ -34,6 +34,10 @@ int main(int argc, char **argv) {
         check(jobs::diagnosticMessage(injection).find("{0} <b> & path") != std::string::npos,
               "arguments were recursively interpolated");
         check(jobs::diagnosticRecommendation({"POLICY_FS", {}, {}}).empty(), "policy info suggests correction");
+        check(jobs::diagnosticRecommendation({"WORKSPACE_OVERLOAD", {}, {}}).find("공유 용량") != std::string::npos,
+              "workspace overload incorrectly suggests changing task work/duration");
+        check(jobs::diagnosticRecommendation({"WORKSPACE_CANCELLED", {}, {}}).empty(),
+              "cancellation suggests correcting valid inputs");
         jobs::JsonProjectStore files;
         jobs::Document document(files);
         try {

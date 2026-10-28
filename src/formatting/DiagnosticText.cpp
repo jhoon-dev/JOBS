@@ -50,13 +50,13 @@ std::string diagnosticRecommendation(const Diagnostic &diagnostic, DiagnosticLan
     const auto &code = diagnostic.code;
     if (code.starts_with("POLICY_") || code.ends_with("_POLICY") || code == "BASELINE_SCOPE" ||
         code == "RESOURCE_NOT_CHECKED" || code == "RESOURCE_DELAY" || code == "RESOURCE_WAIT" ||
-        code == "WORKSPACE_UNMAPPED_RESOURCES")
+        code == "WORKSPACE_UNMAPPED_RESOURCES" || code == "WORKSPACE_CANCELLED")
         return {};
     if (language == DiagnosticLanguage::English)
         return "Review the related task, resource, calendar or file and correct the indicated input before retrying.";
     if (code.find("FILE") != std::string::npos || code.find("SAVE") != std::string::npos)
         return "파일 경로·권한·열린 원본의 변경 여부를 확인하세요. 원본을 보존하려면 새 경로에 사본을 저장하세요.";
-    if (code.find("DURATION") != std::string::npos || code.find("WORK") != std::string::npos)
+    if (code.find("DURATION") != std::string::npos || code.starts_with("WORK_"))
         return "관련 작업의 기간·공수·작업 유형과 자원 배정을 확인한 뒤 다시 계산하세요.";
     if (code.find("CALENDAR") != std::string::npos || code.find("CONSTRAINT") != std::string::npos)
         return "관련 작업의 근무 달력·제약 날짜·선행관계를 확인하고 유효한 근무 구간으로 수정하세요.";
