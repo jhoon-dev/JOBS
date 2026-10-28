@@ -48,7 +48,14 @@ FunctionEnd
 
 ; A silent /D= path is subject to the same check as the directory page.
 Function VerifyInstallDirectory
-  GetFullPathName $INSTDIR "$INSTDIR"
+  ; Unlike the NSIS instruction, this Win32 API accepts not-yet-created parents.
+  System::Call 'kernel32::GetFullPathNameW(w "$INSTDIR", i ${NSIS_MAX_STRLEN}, w .r2, p 0) i .r3'
+  ${If} $3 == 0
+  ${OrIf} $3 >= ${NSIS_MAX_STRLEN}
+    SetErrorLevel 3
+    Quit
+  ${EndIf}
+  StrCpy $INSTDIR $2
   ${GetFileName} "$INSTDIR" $2
   StrCmp $2 "JOBS" valid_name
     MessageBox MB_ICONSTOP "설치 전용 JOBS 폴더를 선택해 주세요. 예: D:\Apps\JOBS" /SD IDOK
@@ -141,9 +148,13 @@ FunctionEnd
 Section "Uninstall"
   ; Fixed application-specific data roots; unrelated ToolMoa applications are kept.
   GetFullPathName $0 "$LOCALAPPDATA\ToolMoa\JOBS"
+  StrCmp $0 "" local_data_done
   RMDir /r "$0"
+  local_data_done:
   GetFullPathName $0 "$APPDATA\ToolMoa\JOBS"
+  StrCmp $0 "" roaming_data_done
   RMDir /r "$0"
+  roaming_data_done:
   RMDir "$LOCALAPPDATA\ToolMoa"
   RMDir "$APPDATA\ToolMoa"
   DeleteRegKey HKCU "Software\ToolMoa\JOBS"
