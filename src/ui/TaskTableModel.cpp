@@ -202,6 +202,7 @@ bool TaskTableModel::synchronizeBulk(BulkView &view) {
     positions_.swap(view.positions);
     numbers_.swap(view.numbers);
     auto previousAssignments = std::move(assignments_);
+    assignments_.clear();
     for (const auto &[id, label] : view.assignmentLabels)
         assignments_.emplace(id, qs(label));
     schedules_.clear();

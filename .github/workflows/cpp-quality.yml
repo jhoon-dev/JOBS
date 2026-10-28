@@ -38,7 +38,9 @@ jobs:
           arch: linux_gcc_64
           cache: true
       - name: Configure actual Qt compilation database
-        run: cmake -S . -B build-quality -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        # LLVM #62985: analyze Qt headers as ordinary includes to avoid the
+        # Clang 18 system-header custom-delete false positive; no checks disabled.
+        run: cmake -S . -B build-quality -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON
       - name: Analyze every production C++ translation unit
         run: python scripts/check-cpp-quality.py tidy --jobs 2
       - name: Preserve source lists and raw diagnostics

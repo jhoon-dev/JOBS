@@ -82,6 +82,8 @@ void AsyncEditController::start(Pending pending) {
                 EditState state = EditState::Failed;
                 QString message;
                 QPointer<AsyncEditController> guard(this);
+                if (!guard)
+                    return;
                 struct Retire {
                     std::shared_ptr<Document::PreparedEdit> result;
                     ~Retire() {
