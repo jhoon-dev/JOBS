@@ -17,75 +17,105 @@
 
 namespace jobs {
 namespace {
-QString qs(const std::string& s) { return QString::fromUtf8(s.data(), qsizetype(s.size())); }
-std::string str(const QString& s) { return s.toUtf8().toStdString(); }
-[[noreturn]] void fail(const QString& text) { throw std::runtime_error(str(text)); }
-QByteArray hash(const QByteArray& bytes) { return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex(); }
-QByteArray read(const QString& path) {
+QString qs(const std::string &s) {
+    return QString::fromUtf8(s.data(), qsizetype(s.size()));
+}
+std::string str(const QString &s) {
+    return s.toUtf8().toStdString();
+}
+[[noreturn]] void fail(const QString &text) {
+    throw std::runtime_error(str(text));
+}
+QByteArray hash(const QByteArray &bytes) {
+    return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex();
+}
+QByteArray read(const QString &path) {
     QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) fail("파일을 읽을 수 없습니다: " + f.errorString());
-    if (f.size() > projectFileLimitBytes) fail("초기 형식의 파일 한도(64 MiB)를 초과했습니다.");
+    if (!f.open(QIODevice::ReadOnly))
+        fail("파일을 읽을 수 없습니다: " + f.errorString());
+    if (f.size() > projectFileLimitBytes)
+        fail("초기 형식의 파일 한도(64 MiB)를 초과했습니다.");
     auto bytes = f.readAll();
-    if (f.error() != QFileDevice::NoError) fail("파일 읽기 실패: " + f.errorString());
+    if (f.error() != QFileDevice::NoError)
+        fail("파일 읽기 실패: " + f.errorString());
     return bytes;
 }
 class Lock final : public WriteLease {
 public:
     QLockFile file;
-    explicit Lock(const QString& path) : file(path + ".lock") {
+    explicit Lock(const QString &path) : file(path + ".lock") {
         file.setStaleLockTime(0);
-        if (!file.tryLock(0)) fail("파일 잠금을 얻지 못했습니다. 다른 앱 사용 여부와 폴더 권한을 확인하거나 읽기 전용으로 여세요.");
+        if (!file.tryLock(0))
+            fail("파일 잠금을 얻지 못했습니다. 다른 앱 사용 여부와 폴더 권한을 확인하거나 읽기 전용으로 여세요.");
     }
 };
+} // namespace
+std::string JsonProjectStore::newId() const {
+    return str(QUuid::createUuid().toString(QUuid::WithoutBraces));
 }
-std::string JsonProjectStore::newId() const { return str(QUuid::createUuid().toString(QUuid::WithoutBraces)); }
-std::string JsonProjectStore::normalizePath(const std::string& path) const {
+std::string JsonProjectStore::normalizePath(const std::string &path) const {
     QFileInfo info(qs(path));
     auto canonical = info.canonicalFilePath();
     if (canonical.isEmpty()) {
         auto parent = info.dir().canonicalPath();
-        if (parent.isEmpty()) fail("저장할 폴더가 없습니다.");
+        if (parent.isEmpty())
+            fail("저장할 폴더가 없습니다.");
         canonical = QDir(parent).filePath(info.fileName());
     }
     return str(canonical);
 }
-bool JsonProjectStore::sameFile(const std::string& left, const std::string& right) const {
-    if (left.empty() || right.empty()) return false;
-    if (left == right) return true;
+bool JsonProjectStore::sameFile(const std::string &left, const std::string &right) const {
+    if (left.empty() || right.empty())
+        return false;
+    if (left == right)
+        return true;
     std::error_code error;
     // Ask the OS about existing files, including case-sensitive NTFS directories.
-    const bool equivalent = std::filesystem::equivalent(
-        std::filesystem::path(std::u8string(left.begin(), left.end())),
-        std::filesystem::path(std::u8string(right.begin(), right.end())), error);
+    const bool equivalent =
+        std::filesystem::equivalent(std::filesystem::path(std::u8string(left.begin(), left.end())),
+                                    std::filesystem::path(std::u8string(right.begin(), right.end())), error);
     return !error && equivalent;
 }
-std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string& path) { return std::make_unique<Lock>(qs(path)); }
-StoredProject JsonProjectStore::load(const std::string& path) const {
+std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string &path) {
+    return std::make_unique<Lock>(qs(path));
+}
+StoredProject JsonProjectStore::load(const std::string &path) const {
     auto bytes = read(qs(path));
     auto project = decodeProjectFile(bytes);
     const bool legacy = QJsonDocument::fromJson(bytes).object().value("schemaVersion") != QJsonValue(9);
     return {std::move(project), hash(bytes).toStdString(), legacy};
 }
-std::string JsonProjectStore::save(const std::string& path, const Project& project, const std::string& expected) {
+std::string JsonProjectStore::save(const std::string &path, const Project &project, const std::string &expected) {
     validate(project);
     auto body = json::encodeProject(project);
-    auto bytes = QJsonDocument(QJsonObject{{"format", "JOBS"}, {"schemaVersion", 9}, {"payload", body},
-        {"sha256", QString::fromLatin1(hash(QJsonDocument(body).toJson(QJsonDocument::Compact)))}}).toJson();
-    if (decodeProjectFile(bytes) != project) fail("저장 전 검증에 실패했습니다.");
+    auto bytes =
+        QJsonDocument(
+            QJsonObject{{"format", "JOBS"},
+                        {"schemaVersion", 9},
+                        {"payload", body},
+                        {"sha256", QString::fromLatin1(hash(QJsonDocument(body).toJson(QJsonDocument::Compact)))}})
+            .toJson();
+    if (decodeProjectFile(bytes) != project)
+        fail("저장 전 검증에 실패했습니다.");
     const auto filename = qs(path);
     const auto unchanged = [&] {
         if (expected.empty()) {
-            if (QFileInfo::exists(filename)) fail("대상 파일이 이미 있습니다. 기존 정상본을 보존하려면 새 파일명을 선택하세요.");
+            if (QFileInfo::exists(filename))
+                fail("대상 파일이 이미 있습니다. 기존 정상본을 보존하려면 새 파일명을 선택하세요.");
         } else if (!QFileInfo::exists(filename) || hash(read(filename)).toStdString() != expected) {
             fail("파일이 외부에서 변경되거나 삭제되었습니다. 다른 이름으로 저장하거나 다시 여세요.");
         }
     };
     unchanged();
-    QSaveFile f(filename); f.setDirectWriteFallback(false);
-    if (!f.open(QIODevice::WriteOnly)) fail("저장 파일을 만들 수 없습니다: " + f.errorString());
-    if (f.write(bytes) != bytes.size() || !f.flush()) fail("저장 중 쓰기에 실패했습니다: " + f.errorString());
+    QSaveFile f(filename);
+    f.setDirectWriteFallback(false);
+    if (!f.open(QIODevice::WriteOnly))
+        fail("저장 파일을 만들 수 없습니다: " + f.errorString());
+    if (f.write(bytes) != bytes.size() || !f.flush())
+        fail("저장 중 쓰기에 실패했습니다: " + f.errorString());
     unchanged();
-    if (!f.commit()) fail("파일 교체에 실패했습니다: " + f.errorString());
+    if (!f.commit())
+        fail("파일 교체에 실패했습니다: " + f.errorString());
     return hash(bytes).toStdString();
 }
-}
+} // namespace jobs

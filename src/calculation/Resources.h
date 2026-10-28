@@ -21,7 +21,7 @@ struct LevelingResult {
     std::vector<Diagnostic> diagnostics;
 };
 // Forecast mode measures remaining work only; it never invents historical effort.
-ResourceLoad resourceLoad(const Project&, const ScheduleResult&);
-LevelingResult levelResources(const Project&, const std::string& priority, int horizonWorkDays);
-Project scenarioProject(const LevelingScenario&);
-}
+ResourceLoad resourceLoad(const Project &, const ScheduleResult &);
+LevelingResult levelResources(const Project &, const std::string &priority, int horizonWorkDays);
+Project scenarioProject(const LevelingScenario &);
+} // namespace jobs

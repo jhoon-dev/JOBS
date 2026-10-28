@@ -15,7 +15,9 @@
 #include <stdexcept>
 namespace jobs {
 namespace {
-QString qs(const std::string &s) { return QString::fromUtf8(s.data(), qsizetype(s.size())); }
+QString qs(const std::string &s) {
+    return QString::fromUtf8(s.data(), qsizetype(s.size()));
+}
 QString preview(QWidget *parent, const PrimaveraXerExchange &e, const QString &proposed) {
     QDialog dialog(parent);
     dialog.setObjectName("primaveraXerPreview");
@@ -36,7 +38,8 @@ QString preview(QWidget *parent, const PrimaveraXerExchange &e, const QString &p
     auto *choose = new QPushButton("상위 폴더 선택…", &dialog);
     layout->addWidget(choose);
     QObject::connect(choose, &QPushButton::clicked, &dialog, [&] {
-        auto path = QFileDialog::getExistingDirectory(&dialog, "교환 폴더를 만들 위치", QFileInfo(destination->text()).absolutePath());
+        auto path = QFileDialog::getExistingDirectory(&dialog, "교환 폴더를 만들 위치",
+                                                      QFileInfo(destination->text()).absolutePath());
         if (!path.isEmpty())
             destination->setText(QDir(path).filePath(QFileInfo(destination->text()).fileName()));
     });
@@ -63,7 +66,8 @@ std::optional<XerEncoding> encoding(QWidget *parent) {
     dialog.setWindowTitle("XER 원본 문자 인코딩");
     auto *layout = new QVBoxLayout(&dialog);
     auto *label = new QLabel(
-        "원본 인코딩을 선택하세요. 자동 추측하지 않습니다.\nCP949 등은 원본을 보관하고 UTF-8 사본으로 변환해야 합니다.", &dialog);
+        "원본 인코딩을 선택하세요. 자동 추측하지 않습니다.\nCP949 등은 원본을 보관하고 UTF-8 사본으로 변환해야 합니다.",
+        &dialog);
     label->setWordWrap(true);
     layout->addWidget(label);
     auto *choice = new QComboBox(&dialog);
@@ -87,13 +91,16 @@ void MainWindow::importXer() {
     if (!charset)
         return;
     try {
-        const auto generation = document_.sessionGeneration(), revision = document_.project() ? document_.project()->revision : 0;
+        const auto generation = document_.sessionGeneration(),
+                   revision = document_.project() ? document_.project()->revision : 0;
         auto exchange = importPrimaveraXer(readPrimaveraXer(path), QFileInfo(path).fileName(), *charset);
         auto destination =
-            preview(this, exchange, QDir(QFileInfo(path).absolutePath()).filePath(QFileInfo(path).completeBaseName() + "-xer-import"));
+            preview(this, exchange,
+                    QDir(QFileInfo(path).absolutePath()).filePath(QFileInfo(path).completeBaseName() + "-xer-import"));
         if (destination.isEmpty())
             return;
-        if (generation != document_.sessionGeneration() || revision != (document_.project() ? document_.project()->revision : 0))
+        if (generation != document_.sessionGeneration() ||
+            revision != (document_.project() ? document_.project()->revision : 0))
             throw std::runtime_error("미리보기 중 문서가 변경되었습니다. 다시 가져오세요.");
         if (!confirmChanges())
             return;

@@ -10,17 +10,19 @@
 #include <stdexcept>
 namespace jobs {
 namespace {
-[[noreturn]] void fail(const QString &text) { throw std::runtime_error(text.toUtf8().toStdString()); }
+[[noreturn]] void fail(const QString &text) {
+    throw std::runtime_error(text.toUtf8().toStdString());
+}
 } // namespace
-QString publishPlanExchange(const Project &project, const QByteArray &payload, QJsonObject report, bool importing, const QString &extension,
-                            const QString &destination) {
+QString publishPlanExchange(const Project &project, const QByteArray &payload, QJsonObject report, bool importing,
+                            const QString &extension, const QString &destination) {
     validate(project);
     if (extension != "xml" && extension != "xer")
         fail("지원하지 않는 교환 형식");
     auto target = QFileInfo(destination);
     auto parent = target.dir().canonicalPath();
-    if (parent.isEmpty() || target.fileName().isEmpty() || target.fileName() == "." || target.fileName() == ".." || target.exists() ||
-        target.isSymLink())
+    if (parent.isEmpty() || target.fileName().isEmpty() || target.fileName() == "." || target.fileName() == ".." ||
+        target.exists() || target.isSymLink())
         fail("존재하지 않는 새 교환 폴더를 지정하세요.");
     QDir directory(parent);
     auto finalPath = directory.filePath(target.fileName());
@@ -47,7 +49,8 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
         if (!f.open(QIODevice::ReadOnly))
             fail("원본 사본 읽기 실패");
         auto source = report["source"].toObject();
-        source["sha256"] = QString::fromLatin1(QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha256).toHex());
+        source["sha256"] =
+            QString::fromLatin1(QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha256).toHex());
         report["source"] = source;
     }
     write("conversion.json", QJsonDocument(report).toJson());

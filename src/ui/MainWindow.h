@@ -24,28 +24,31 @@ class AsyncEditController;
 class TaskTableModel;
 class MainWindow final : public QMainWindow {
 public:
-    explicit MainWindow(Document& document, JsonRecoveryStore* recoveryStore = nullptr);
+    explicit MainWindow(Document &document, JsonRecoveryStore *recoveryStore = nullptr);
     ~MainWindow() override;
+
 protected:
-    void closeEvent(QCloseEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
+    void closeEvent(QCloseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
-    Document& document_;
-    TaskTableView* table_;
-    TaskTableModel* taskModel_;
-    QTreeWidget* wbsTree_;
-    GanttView* gantt_;
-    QLabel* wbsSummary_;
-    QLabel* summary_;
-    QPlainTextEdit* diagnostics_=nullptr;
-    QLabel* editingHelp_=nullptr;
+    Document &document_;
+    TaskTableView *table_;
+    TaskTableModel *taskModel_;
+    QTreeWidget *wbsTree_;
+    GanttView *gantt_;
+    QLabel *wbsSummary_;
+    QLabel *summary_;
+    QPlainTextEdit *diagnostics_ = nullptr;
+    QLabel *editingHelp_ = nullptr;
     QAction *save_, *saveAs_, *add_;
-    QAction *undo_ = nullptr, *redo_ = nullptr, *recover_ = nullptr, *autosaveEnabled_ = nullptr, *autosaveNow_ = nullptr;
+    QAction *undo_ = nullptr, *redo_ = nullptr, *recover_ = nullptr, *autosaveEnabled_ = nullptr,
+            *autosaveNow_ = nullptr;
     std::uint64_t historyListener_ = 0;
     std::unique_ptr<JsonRecoveryStore> recoveryStore_;
-    AutoSaveController* autosave_ = nullptr;
-    QLabel* autosaveStatus_ = nullptr;
-    void setupRecovery(JsonRecoveryStore*);
+    AutoSaveController *autosave_ = nullptr;
+    QLabel *autosaveStatus_ = nullptr;
+    void setupRecovery(JsonRecoveryStore *);
     void showRecovery(bool startup = false);
     void updateHistoryActions();
     QAction *calculate_, *calendar_;
@@ -53,13 +56,13 @@ private:
     void manageCalendars();
     void chooseTaskCalendar();
     QAction *constraints_, *scheduleIssues_;
-    QAction* effort_;
+    QAction *effort_;
     void editTaskEffort();
     void editTaskConstraints();
     void showScheduleIssues();
     QAction *addWbs_, *renameWbs_, *moveWbs_, *removeWbs_, *assignWbs_;
     QAction *baselineSave_, *statusEdit_, *progressEdit_, *comparison_;
-    QComboBox* baselineChoice_;
+    QComboBox *baselineChoice_;
     std::string selectedBaseline_;
     bool baselinePreparing_ = false;
     QAction *resources_, *assignResources_, *resourceComparison_;
@@ -71,30 +74,33 @@ private:
     void editTaskCost();
     void reportCost();
     void showCosts();
-    QAction* reports_;
+    QAction *reports_;
     std::string selectedWbs_, selectedTask_, treeDocument_;
     std::vector<std::size_t> visibleRows_;
     std::string cachedTreeDocument_, cachedTreeName_;
     std::vector<WbsNode> cachedTreeNodes_;
     bool calculating_ = false;
-    QAction* cancelCalculation_ = nullptr;
+    QAction *cancelCalculation_ = nullptr;
     std::shared_ptr<CalculationControl> calculationControl_;
-    std::uint64_t calculationSession_=0;
-    QTimer* calculationProgressTimer_=nullptr;
-    QLabel* calculationProgressLabel_=nullptr;
+    std::uint64_t calculationSession_ = 0;
+    QTimer *calculationProgressTimer_ = nullptr;
+    QLabel *calculationProgressLabel_ = nullptr;
     std::optional<std::uint64_t> queuedCalculation_;
-    AsyncEditController* editController_ = nullptr;
-    QAction* cancelEdit_ = nullptr;
-    QLabel* editProgress_ = nullptr;
-    QTimer* editProgressTimer_ = nullptr;
+    AsyncEditController *editController_ = nullptr;
+    QAction *cancelEdit_ = nullptr;
+    QLabel *editProgress_ = nullptr;
+    QTimer *editProgressTimer_ = nullptr;
     std::function<void()> afterEdit_;
-    void setupAsyncEditing(QToolBar*);
+    void setupAsyncEditing(QToolBar *);
     void runAfterEdit(std::function<void()>);
-    std::shared_ptr<CalculationControl> submitEdit(EditCommand, const QString&, std::function<void(EditState, const QString&)> completion = {});
-    void submitDialogEdit(QDialog&, QLabel*, QDialogButtonBox*, EditCommand, const QString&, std::function<void(bool)>);
-    bool editTaskCell(std::string taskId, int column, const QString& text);
-    void applyGanttEdit(const std::string& id, std::uint64_t revision, const std::string& taskId, bool resize, const std::string& target);
-    bool hasInverseDuration(const std::string& taskId) const;
+    std::shared_ptr<CalculationControl> submitEdit(EditCommand, const QString &,
+                                                   std::function<void(EditState, const QString &)> completion = {});
+    void submitDialogEdit(QDialog &, QLabel *, QDialogButtonBox *, EditCommand, const QString &,
+                          std::function<void(bool)>);
+    bool editTaskCell(std::string taskId, int column, const QString &text);
+    void applyGanttEdit(const std::string &id, std::uint64_t revision, const std::string &taskId, bool resize,
+                        const std::string &target);
+    bool hasInverseDuration(const std::string &taskId) const;
     void undoEdit(bool redo);
     bool confirmChanges();
     void commitPendingCell();
@@ -125,13 +131,14 @@ private:
     void refreshStatus();
     void calculateSchedule();
     void editHolidays();
-    QAction *insertTasks_=nullptr,*deleteTasks_=nullptr,*duplicateTasks_=nullptr,*copyTasks_=nullptr,*pasteTasks_=nullptr;
-    QLineEdit* taskSearch_=nullptr;
-    QComboBox *taskFilter_=nullptr,*taskSort_=nullptr;
-    QLabel* taskViewStatus_=nullptr;
+    QAction *insertTasks_ = nullptr, *deleteTasks_ = nullptr, *duplicateTasks_ = nullptr, *copyTasks_ = nullptr,
+            *pasteTasks_ = nullptr;
+    QLineEdit *taskSearch_ = nullptr;
+    QComboBox *taskFilter_ = nullptr, *taskSort_ = nullptr;
+    QLabel *taskViewStatus_ = nullptr;
     std::vector<std::string> selectedTaskIds_;
-    bool taskViewReset_=true;
-    void setupTaskEditing(QMenu* menu,QVBoxLayout* layout);
+    bool taskViewReset_ = true;
+    void setupTaskEditing(QMenu *menu, QVBoxLayout *layout);
     void updateTaskActions();
     void syncTaskSelection();
     void updateCompactLayout();
@@ -152,6 +159,6 @@ private:
     void reportProgress();
     void showComparison();
     void refreshTracking();
-    void report(const std::exception& error);
+    void report(const std::exception &error);
 };
-}
+} // namespace jobs

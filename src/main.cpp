@@ -3,7 +3,7 @@
 #include "persistence/JsonRecoveryStore.h"
 #include <QApplication>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("JOBS");
     QCoreApplication::setApplicationVersion("0.1.0");

@@ -26,13 +26,13 @@ struct ScheduleResult {
     std::vector<TaskSchedule> plannedTasks;
 };
 // Pure, deterministic calculation on an immutable snapshot. No Qt, I/O or OS clock.
-ScheduleResult calculate(const Project& snapshot);
-ScheduleResult calculate(const Project& snapshot,const std::shared_ptr<CalculationControl>& control);
-ScheduleResult calculatePlan(const Project& snapshot);
+ScheduleResult calculate(const Project &snapshot);
+ScheduleResult calculate(const Project &snapshot, const std::shared_ptr<CalculationControl> &control);
+ScheduleResult calculatePlan(const Project &snapshot);
 struct WbsSummary {
     std::size_t taskCount = 0, missingDurations = 0;
     std::int64_t knownDurationMinutes = 0;
     std::optional<std::string> start, finish;
 };
-WbsSummary summarizeWbs(const Project& project, const ScheduleResult* result, const std::string& wbsId);
-}
+WbsSummary summarizeWbs(const Project &project, const ScheduleResult *result, const std::string &wbsId);
+} // namespace jobs

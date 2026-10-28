@@ -8,18 +8,19 @@
 
 namespace jobs::fuzz {
 namespace {
-template<class F> void attempt(ProbeResult& result, F&& parse) {
+template <class F> void attempt(ProbeResult &result, F &&parse) {
     try {
         parse();
         ++result.accepted;
-    } catch (const std::runtime_error&) {
+    } catch (const std::runtime_error &) {
         ++result.rejected;
     }
 }
-}
-ProbeResult probe(std::string_view parser, const QByteArray& bytes) {
+} // namespace
+ProbeResult probe(std::string_view parser, const QByteArray &bytes) {
     ProbeResult result;
-    if (std::size_t(bytes.size()) > maxInputBytes) return result;
+    if (std::size_t(bytes.size()) > maxInputBytes)
+        return result;
     if (parser == "jobs") {
         attempt(result, [&] { (void)decodeProjectFile(bytes); });
         const auto json = QJsonDocument::fromJson(bytes);
@@ -39,4 +40,4 @@ ProbeResult probe(std::string_view parser, const QByteArray& bytes) {
     }
     return result;
 }
-}
+} // namespace jobs::fuzz
