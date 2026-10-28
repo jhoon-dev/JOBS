@@ -2,6 +2,8 @@
 #include "PerformanceFixture.h"
 #include "ui/MainWindow.h"
 #include "ui/AsyncEditController.h"
+#include "ui/TaskTableModel.h"
+#include <numeric>
 #include "persistence/JsonProjectStore.h"
 #include <QAbstractItemModelTester>
 #include <QApplication>
@@ -68,6 +70,18 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
     doc.setStatusAt("2026-10-26 17:00");jobs::ProgressEntry progress;progress.taskId="T0";progress.actualStart="2026-10-26 09:00";progress.remainingMinutes=30;progress.recordedAt="2026-10-28T00:00:00Z";progress.reporter="PM";progress.reason="protected task";doc.recordProgress(progress);
     const auto protectedSource=*doc.project();result=prepare(doc,jobs::RemoveTasksEdit{{"T0","T1"}});
     check(result->state()==EditState::Failed&&*doc.project()==protectedSource,"protected removal partially committed");doc.open(path);
+    {
+        // Inverse duration can change only assignments while the nominal task
+        // value stays identical. Column 7 must still receive dataChanged.
+        auto effortFixture=performanceFixture(1000,true);effortFixture.tasks[0].durationMinutes=120;
+        const auto effortPath=dir.filePath("Effort.jobs").toStdString();store.save(effortPath,effortFixture,{});
+        jobs::Document effortDoc(store);effortDoc.open(effortPath);jobs::TaskTableModel model(effortDoc);
+        std::vector<std::size_t> rows(1000);std::iota(rows.begin(),rows.end(),std::size_t{0});model.synchronize(rows);
+        bool assignmentChanged=false;QObject::connect(&model,&QAbstractItemModel::dataChanged,[&](const QModelIndex& first,const QModelIndex& last){if(first.row()==0&&last.row()>=0&&first.column()<=7&&last.column()>=7)assignmentChanged=true;});
+        jobs::TaskEdit inverse;inverse.taskId="T0";inverse.duration.emplace(120);auto prepared=prepare(effortDoc,jobs::BatchTaskEdit{{inverse}});
+        check(effortDoc.applyPreparedEdit(*prepared)==EditState::Applied&&effortDoc.project()->tasks[0]==effortFixture.tasks[0],"assignment-only inverse setup");
+        check(model.synchronizeBulk(*effortDoc.bulkView())&&assignmentChanged&&model.index(0,7).data().toString().contains("50%"),"assignment-only inverse left stale display");
+    }
     jobs::MainWindow window(doc);window.show();QTest::qWait(20);auto* table=taskTable(window);jobs::AsyncEditController* controller=nullptr;
     for(auto* child:window.children())if(auto* c=dynamic_cast<jobs::AsyncEditController*>(child))controller=c;
     check(controller,"controller missing");

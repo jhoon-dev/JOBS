@@ -44,6 +44,16 @@ std::size_t taskRow(const Project& p, const std::string& id) {
     if (found == p.tasks.end()) throw std::runtime_error("편집할 작업이 없습니다.");
     return std::size_t(found - p.tasks.begin());
 }
+std::unordered_map<std::string,std::string> assignmentLabels(const PlanInput& input) {
+    std::unordered_map<std::string,std::string> names,labels;
+    for(const auto& resource:input.resources)names.emplace(resource.id,resource.name);
+    for(const auto& assignment:input.assignments){
+        calculationCheckpoint();auto& label=labels[assignment.taskId];
+        if(!label.empty())label+=", ";
+        label+=names.at(assignment.resourceId)+" "+std::to_string(assignment.units)+"%";
+    }
+    return labels;
+}
 std::shared_ptr<BulkView> prepareView(const Project& before, const Project& after, std::uint64_t session) {
     auto view = std::make_shared<BulkView>();
     view->input = after; view->before = before.revision; view->after = after.revision;
@@ -53,21 +63,19 @@ std::shared_ptr<BulkView> prepareView(const Project& before, const Project& afte
     while (view->prefix < common && before.tasks[view->prefix].id == after.tasks[view->prefix].id) ++view->prefix;
     while (view->suffix < common - view->prefix && before.tasks[before.tasks.size()-1-view->suffix].id == after.tasks[after.tasks.size()-1-view->suffix].id) ++view->suffix;
     view->sameOrder = before.tasks.size() == after.tasks.size() && view->prefix == common;
+    view->assignmentLabels=assignmentLabels(after);
+    const auto previousLabels=assignmentLabels(before);
+    const auto labelAt=[](const auto& labels,const std::string& id)->const std::string&{
+        static const std::string empty;const auto found=labels.find(id);return found==labels.end()?empty:found->second;
+    };
     std::unordered_map<std::string, const Task*> old;
     for (const auto& task : before.tasks) old.emplace(task.id, &task);
     for (std::size_t i = 0; i < after.tasks.size(); ++i) {
         calculationCheckpoint(); const auto& task = after.tasks[i]; view->numbers.emplace(task.id, int(i+1)); view->positions.emplace(i,int(i));
         const auto found = old.find(task.id);
-        if (found != old.end() && *found->second == task) continue;
+        if (found != old.end() && *found->second == task && labelAt(previousLabels,task.id)==labelAt(view->assignmentLabels,task.id)) continue;
         if (!view->changedRanges.empty() && view->changedRanges.back().second == int(i)-1) view->changedRanges.back().second = int(i);
         else view->changedRanges.emplace_back(int(i), int(i));
-    }
-    std::unordered_map<std::string, std::string> names;
-    for (const auto& resource : after.resources) names[resource.id] = resource.name;
-    for (const auto& assignment : after.assignments) {
-        calculationCheckpoint(); auto& label = view->assignmentLabels[assignment.taskId];
-        if (!label.empty()) label += ", ";
-        label += names.at(assignment.resourceId) + " " + std::to_string(assignment.units) + "%";
     }
     view->summary = summarizeWbs(after, nullptr, {});
     return view;
