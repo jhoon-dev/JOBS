@@ -17,7 +17,7 @@ public:
     const Project& operator*() const { return value().value(); }
     const Project* operator->() const { return &**this; }
     Project& write() {
-        if (!state_.unique()) state_ = std::make_shared<std::optional<Project>>(value());
+        if (state_.use_count() != 1) state_ = std::make_shared<std::optional<Project>>(value());
         return state_->value();
     }
     ProjectState& operator=(Project project) {
