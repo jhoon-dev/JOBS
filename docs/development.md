@@ -177,3 +177,6 @@ Primavera XER 증분은 PRD XER-01~04를 먼저 정의하고 `persistence/Primav
 
 
 구조·복합 편집 증분은 PRD BULK-01~04를 먼저 확정하고 작업 추가/삽입·삭제·복제·모든 TSV 붙여넣기와 해당 복합 undo/redo의 해석/검증/표시 준비를 worker로 연결했다. 현재 계획만 검증하는 내부 경계와 준비된 BulkView, 기본 보기의 행 추가/삭제 및 변경 범위 신호, 공유 delta·선택 범위·기준선 캐시를 사용한다. `bulk_editing_contract_ui`를 포함해 CTest 40개다. [구조·복합 편집 계약과 측정](bulk-editing.md)을 따른다.
+
+
+필터·정렬·WBS 대량 편집 증분은 PRD VIEWBULK-01~04를 선반영한 뒤 공통 TaskViewProjection/worker 준비와 ID 기반 모델 행·layout 갱신을 추가했다. 새 셀 초안은 반영 전에 확정하여 stale 결과가 덮지 않게 한다. projected_views_ui로 CTest 41개이며 [준비된 보기 계약·전후 관측](projected-task-views.md)을 따른다.

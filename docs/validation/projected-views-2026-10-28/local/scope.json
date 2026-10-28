@@ -1,0 +1,10 @@
+{
+  "implementation_revision": "a0de474eba6c6a31fde738e8d7fbc538c8aaa9c1",
+  "build_revision": "a0de474eba6c6a31fde738e8d7fbc538c8aaa9c1+dirty",
+  "dirty_scope": "Documentation/evidence only",
+  "compiler": "MinGW 13.1 Release, Qt 6.8.3",
+  "ctest": "41/41, 128.44 seconds",
+  "native_projected_views": "passed; screenshot inspected",
+  "independent_readers": "5 XLSX, 6 PDF, Project XML, XER TSV and MPXJ 16.10.0 passed",
+  "scope": "16 single unpaired local observations; not CI before/after evidence"
+}

@@ -66,3 +66,6 @@ worker는 여전히 큰 Project 사본을 만들고 dirty와 InputDelta를 비�
 명령 반환과 reset 비용이 줄어도 전체 완료 시간이 모든 경우 줄지는 않았다. 증가한 작업과 정도는 전후 표와 원시 JSON의 `settled_ms`를 함께 확인한다. worker의 사본/표시 자료 준비와 완료 이벤트·레이아웃 비용이 남는다. 원시 JSON의 모든 작업/undo 결과를 함께 보존하며, 일부 빠른 표본을 보편적인 응답 시간 보장으로 일반화하지 않는다.
 
 네이티브 구조 편집 화면: [Windows](validation/bulk-editing-2026-10-28/Windows/bulk-editing-native.png), [macOS](validation/bulk-editing-2026-10-28/macOS/bulk-editing-native.png).
+
+
+후속 VIEWBULK-01~04는 [필터·정렬·WBS 보기 투영](projected-task-views.md)으로 확장한다. 위 기록의 당시 fallback/시간은 보존하며, 해당 보기의 worker 준비·생존 ID 갱신·구간 예산과 최신 검증은 후속 문서를 따른다.

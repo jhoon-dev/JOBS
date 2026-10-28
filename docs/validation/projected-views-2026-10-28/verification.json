@@ -1,0 +1,650 @@
+{
+  "status": "success",
+  "run_id": 40632368294,
+  "source_revision": "a0de474eba6c6a31fde738e8d7fbc538c8aaa9c1",
+  "reference_product": "ae8d9edaa360388012fdb98cd79b633192919971",
+  "same_probe_overlay": true,
+  "ctest_per_os": 41,
+  "ctest_seconds": {
+    "Windows": 103.46,
+    "macOS": 67.65
+  },
+  "view_counters": {
+    "Windows": {
+      "cases": 16,
+      "operations": 128,
+      "resets_before": 120,
+      "resets_after": 8,
+      "layouts_after": 8,
+      "gui_task_visits_after": 0
+    },
+    "macOS": {
+      "cases": 16,
+      "operations": 128,
+      "resets_before": 120,
+      "resets_after": 8,
+      "layouts_after": 8,
+      "gui_task_visits_after": 0
+    }
+  },
+  "schedule_hashes": [
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    }
+  ],
+  "slower_settled_observations": [
+    {
+      "os": "Windows",
+      "case": "search-1000-0.json",
+      "operation": "insert",
+      "before_ms": 53.7607,
+      "after_ms": 56.0017
+    },
+    {
+      "os": "Windows",
+      "case": "search-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 22.7799,
+      "after_ms": 24.2754
+    },
+    {
+      "os": "Windows",
+      "case": "search-1000-0.json",
+      "operation": "undo_paste",
+      "before_ms": 20.6547,
+      "after_ms": 22.3107
+    },
+    {
+      "os": "Windows",
+      "case": "search-1000-3.json",
+      "operation": "undo_insert",
+      "before_ms": 26.1929,
+      "after_ms": 31.1821
+    },
+    {
+      "os": "Windows",
+      "case": "search-1000-3.json",
+      "operation": "paste",
+      "before_ms": 29.5419,
+      "after_ms": 31.6166
+    },
+    {
+      "os": "Windows",
+      "case": "search-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 28.4554,
+      "after_ms": 28.6524
+    },
+    {
+      "os": "Windows",
+      "case": "search-10000-0.json",
+      "operation": "paste",
+      "before_ms": 51.0262,
+      "after_ms": 54.7324
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-0.json",
+      "operation": "insert",
+      "before_ms": 60.6201,
+      "after_ms": 67.8379
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 21.3196,
+      "after_ms": 22.4199
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-0.json",
+      "operation": "paste",
+      "before_ms": 21.0928,
+      "after_ms": 26.0801
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-0.json",
+      "operation": "undo_paste",
+      "before_ms": 18.9656,
+      "after_ms": 27.4139
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-0.json",
+      "operation": "undo_delete",
+      "before_ms": 22.4279,
+      "after_ms": 25.8417
+    },
+    {
+      "os": "Windows",
+      "case": "sort-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 28.1337,
+      "after_ms": 28.5502
+    },
+    {
+      "os": "Windows",
+      "case": "sort-10000-0.json",
+      "operation": "paste",
+      "before_ms": 51.3754,
+      "after_ms": 52.6933
+    },
+    {
+      "os": "Windows",
+      "case": "wbs-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 20.4175,
+      "after_ms": 20.6127
+    },
+    {
+      "os": "Windows",
+      "case": "wbs-1000-3.json",
+      "operation": "delete",
+      "before_ms": 65.084,
+      "after_ms": 66.4501
+    },
+    {
+      "os": "Windows",
+      "case": "wbs-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 27.1055,
+      "after_ms": 27.6329
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-0.json",
+      "operation": "insert",
+      "before_ms": 53.1918,
+      "after_ms": 56.4961
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-0.json",
+      "operation": "undo_insert",
+      "before_ms": 18.9516,
+      "after_ms": 19.9692
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 20.9916,
+      "after_ms": 22.0592
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-0.json",
+      "operation": "undo_paste",
+      "before_ms": 20.6586,
+      "after_ms": 23.2732
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-3.json",
+      "operation": "insert",
+      "before_ms": 57.124,
+      "after_ms": 57.5056
+    },
+    {
+      "os": "Windows",
+      "case": "combined-1000-3.json",
+      "operation": "undo_insert",
+      "before_ms": 25.7063,
+      "after_ms": 26.2601
+    },
+    {
+      "os": "Windows",
+      "case": "combined-10000-0.json",
+      "operation": "delete",
+      "before_ms": 87.8012,
+      "after_ms": 87.9577
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "insert",
+      "before_ms": 142.669792,
+      "after_ms": 148.032583
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "duplicate",
+      "before_ms": 18.515084,
+      "after_ms": 37.38725
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 18.403709,
+      "after_ms": 20.472875
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "paste",
+      "before_ms": 24.574625,
+      "after_ms": 30.219875
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "delete",
+      "before_ms": 109.898125,
+      "after_ms": 118.155959
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-0.json",
+      "operation": "undo_delete",
+      "before_ms": 19.221625,
+      "after_ms": 26.13525
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-3.json",
+      "operation": "insert",
+      "before_ms": 113.701667,
+      "after_ms": 147.137625
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-3.json",
+      "operation": "undo_duplicate",
+      "before_ms": 17.620166,
+      "after_ms": 17.750625
+    },
+    {
+      "os": "macOS",
+      "case": "search-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 19.922833,
+      "after_ms": 21.631625
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-0.json",
+      "operation": "undo_insert",
+      "before_ms": 32.266166,
+      "after_ms": 41.076166
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-0.json",
+      "operation": "duplicate",
+      "before_ms": 42.888875,
+      "after_ms": 45.323209
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 35.17175,
+      "after_ms": 35.993583
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-0.json",
+      "operation": "delete",
+      "before_ms": 98.228042,
+      "after_ms": 101.211667
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-3.json",
+      "operation": "undo_insert",
+      "before_ms": 56.522708,
+      "after_ms": 63.663292
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-3.json",
+      "operation": "duplicate",
+      "before_ms": 58.674375,
+      "after_ms": 69.593417
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-3.json",
+      "operation": "undo_duplicate",
+      "before_ms": 48.245417,
+      "after_ms": 71.14725
+    },
+    {
+      "os": "macOS",
+      "case": "search-10000-3.json",
+      "operation": "paste",
+      "before_ms": 51.941042,
+      "after_ms": 70.043041
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "insert",
+      "before_ms": 133.260416,
+      "after_ms": 211.651958
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "undo_insert",
+      "before_ms": 21.772542,
+      "after_ms": 33.485875
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "duplicate",
+      "before_ms": 19.206,
+      "after_ms": 23.345125
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "paste",
+      "before_ms": 13.362042,
+      "after_ms": 20.6425
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "undo_paste",
+      "before_ms": 12.549042,
+      "after_ms": 33.920083
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "delete",
+      "before_ms": 95.081834,
+      "after_ms": 148.875792
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-0.json",
+      "operation": "undo_delete",
+      "before_ms": 17.32375,
+      "after_ms": 17.753208
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-3.json",
+      "operation": "insert",
+      "before_ms": 146.779084,
+      "after_ms": 198.729791
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-3.json",
+      "operation": "undo_duplicate",
+      "before_ms": 23.942958,
+      "after_ms": 35.678625
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-3.json",
+      "operation": "paste",
+      "before_ms": 21.091042,
+      "after_ms": 27.473792
+    },
+    {
+      "os": "macOS",
+      "case": "sort-1000-3.json",
+      "operation": "undo_paste",
+      "before_ms": 18.783833,
+      "after_ms": 26.273042
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-0.json",
+      "operation": "undo_paste",
+      "before_ms": 34.658625,
+      "after_ms": 46.098666
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-3.json",
+      "operation": "undo_duplicate",
+      "before_ms": 58.332,
+      "after_ms": 58.583292
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-3.json",
+      "operation": "paste",
+      "before_ms": 49.300917,
+      "after_ms": 90.61475
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-3.json",
+      "operation": "undo_paste",
+      "before_ms": 48.541583,
+      "after_ms": 71.96325
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-3.json",
+      "operation": "delete",
+      "before_ms": 103.019375,
+      "after_ms": 188.662625
+    },
+    {
+      "os": "macOS",
+      "case": "sort-10000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 44.452667,
+      "after_ms": 58.022792
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-0.json",
+      "operation": "undo_insert",
+      "before_ms": 20.725292,
+      "after_ms": 22.648125
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 19.632917,
+      "after_ms": 21.086084
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-0.json",
+      "operation": "delete",
+      "before_ms": 89.246916,
+      "after_ms": 91.415125
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-0.json",
+      "operation": "undo_delete",
+      "before_ms": 15.666042,
+      "after_ms": 17.943083
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-3.json",
+      "operation": "insert",
+      "before_ms": 163.085958,
+      "after_ms": 239.217084
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-3.json",
+      "operation": "undo_duplicate",
+      "before_ms": 21.816167,
+      "after_ms": 22.071209
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-3.json",
+      "operation": "delete",
+      "before_ms": 87.899708,
+      "after_ms": 95.917458
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 19.339916,
+      "after_ms": 19.755334
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-10000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 48.013542,
+      "after_ms": 48.821166
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-10000-0.json",
+      "operation": "delete",
+      "before_ms": 139.277083,
+      "after_ms": 167.191375
+    },
+    {
+      "os": "macOS",
+      "case": "wbs-10000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 47.448625,
+      "after_ms": 51.042375
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "insert",
+      "before_ms": 112.118125,
+      "after_ms": 118.292958
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "undo_insert",
+      "before_ms": 18.51225,
+      "after_ms": 19.914167
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "paste",
+      "before_ms": 16.651709,
+      "after_ms": 24.232042
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "undo_paste",
+      "before_ms": 17.261667,
+      "after_ms": 25.091958
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "delete",
+      "before_ms": 84.587041,
+      "after_ms": 181.882917
+    },
+    {
+      "os": "macOS",
+      "case": "combined-1000-3.json",
+      "operation": "undo_delete",
+      "before_ms": 18.9435,
+      "after_ms": 33.481167
+    },
+    {
+      "os": "macOS",
+      "case": "combined-10000-0.json",
+      "operation": "insert",
+      "before_ms": 137.082833,
+      "after_ms": 170.64125
+    },
+    {
+      "os": "macOS",
+      "case": "combined-10000-0.json",
+      "operation": "undo_insert",
+      "before_ms": 33.32925,
+      "after_ms": 57.593167
+    },
+    {
+      "os": "macOS",
+      "case": "combined-10000-0.json",
+      "operation": "duplicate",
+      "before_ms": 43.394416,
+      "after_ms": 50.550625
+    },
+    {
+      "os": "macOS",
+      "case": "combined-10000-0.json",
+      "operation": "undo_duplicate",
+      "before_ms": 34.423625,
+      "after_ms": 37.097709
+    },
+    {
+      "os": "macOS",
+      "case": "combined-10000-0.json",
+      "operation": "delete",
+      "before_ms": 112.173,
+      "after_ms": 115.144959
+    }
+  ]
+}
