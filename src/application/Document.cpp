@@ -388,6 +388,7 @@ void Document::applyHistory(const HistoryStep& step, bool forward) {
         updateTaskDirty(value->row, before);
         taskChange_ = TaskChange{p.revision - 1, p.revision, value->row, false};
     } else {
+        if (project_->revision >= 9007199254740991ULL) throw std::runtime_error("프로젝트 ID 또는 revision이 잘못되었습니다.");
         auto p = *project_;
         std::get<std::shared_ptr<const InputDelta>>(step.change)->apply(p, forward);
         ++p.revision;

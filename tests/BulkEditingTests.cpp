@@ -82,6 +82,16 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
         check(effortDoc.applyPreparedEdit(*prepared)==EditState::Applied&&effortDoc.project()->tasks[0]==effortFixture.tasks[0],"assignment-only inverse setup");
         check(model.synchronizeBulk(*effortDoc.bulkView())&&assignmentChanged&&model.index(0,7).data().toString().contains("50%"),"assignment-only inverse left stale display");
     }
+    {
+        auto limitFixture=performanceFixture(2,false);limitFixture.revision=9007199254740990ULL;
+        const auto limitPath=dir.filePath("Limit.jobs").toStdString();store.save(limitPath,limitFixture,{});
+        jobs::Document limitDoc(store);limitDoc.open(limitPath);limitDoc.insertTasks({"last revision"});
+        const auto atLimit=*limitDoc.project();const auto limitWeight=limitDoc.historyBytes();
+        auto rejected=prepare(limitDoc,jobs::HistoryEdit{false});
+        check(rejected->state()==EditState::Failed&&*limitDoc.project()==atLimit&&limitDoc.historyBytes()==limitWeight&&limitDoc.canUndo(),"revision limit bypassed in prepared undo");
+        bool failed=false;try{limitDoc.undo();}catch(const std::exception&){failed=true;}
+        check(failed&&*limitDoc.project()==atLimit&&limitDoc.canUndo(),"revision limit bypassed in direct undo");
+    }
     jobs::MainWindow window(doc);window.show();QTest::qWait(20);auto* table=taskTable(window);jobs::AsyncEditController* controller=nullptr;
     for(auto* child:window.children())if(auto* c=dynamic_cast<jobs::AsyncEditController*>(child))controller=c;
     check(controller,"controller missing");
