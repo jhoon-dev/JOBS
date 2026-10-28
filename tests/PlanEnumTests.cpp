@@ -110,7 +110,7 @@ void invalidValues(const Project &project) {
     rejects([&] { validate(p); }, "domain accepted invalid relationship enum");
     const auto original = json::encodeProject(project);
     for (const auto &key : {"constraintType", "taskType"}) {
-        for (const QJsonValue value : {QJsonValue("unknown"), QJsonValue(0), QJsonValue(QJsonValue::Null)}) {
+        for (const QJsonValue &value : {QJsonValue("unknown"), QJsonValue(0), QJsonValue(QJsonValue::Null)}) {
             auto body = original;
             auto tasks = body["tasks"].toArray();
             auto task = tasks[0].toObject();
@@ -120,7 +120,7 @@ void invalidValues(const Project &project) {
             rejects([&] { json::decodeProject(body, 9); }, "native decoder accepted bad enum field");
         }
     }
-    for (const QJsonValue value : {QJsonValue("ss"), QJsonValue(1), QJsonValue(QJsonValue::Null)}) {
+    for (const QJsonValue &value : {QJsonValue("ss"), QJsonValue(1), QJsonValue(QJsonValue::Null)}) {
         auto body = original;
         auto tasks = body["tasks"].toArray();
         auto task = tasks[1].toObject();
