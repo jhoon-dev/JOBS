@@ -65,8 +65,13 @@ Document::ViewPreparation MainWindow::captureTaskView() const {
 }
 bool MainWindow::refreshProjected() {
     const auto view=document_.bulkView();const auto& p=document_.project();
+    // A search debounce may still be pending at capture. The proposal uses the
+    // actual rendered rows and the desired query; its token rejects later edits
+    // to that query. All other rendered context must still match exactly.
+    auto expectedView=renderedView_;
+    std::get<2>(expectedView)=taskSearch_->text();
     if(!rendered_||!p||!view||!view->projected||!view->contextValid||view->viewToken!=taskViewToken()||
-        renderedSession_!=view->session||renderedRevision_!=view->before||renderedCalculation_!=view->sourceCalculationGeneration||renderedView_!=viewKey())return false;
+        renderedSession_!=view->session||renderedRevision_!=view->before||renderedCalculation_!=view->sourceCalculationGeneration||expectedView!=viewKey())return false;
     const QSignalBlocker blocker(table_->selectionModel());const auto column=table_->currentColumn();
     const auto x=table_->horizontalScrollBar()->value(),y=table_->verticalScrollBar()->value();
     auto rows=view->rows;
@@ -81,7 +86,7 @@ bool MainWindow::refreshProjected() {
     const auto& result=document_.calculation();
     gantt_->setPlan(&*p,result?&*result:nullptr,visibleRows_,false);gantt_->setSelectedTask(selectedTask_);refreshBaseline();
     if(result&&result->status==CalculationStatus::Stale)diagnostics_->setPlainText("오래된 계산 · F9로 다시 계산");
-    renderedRevision_=p->revision;renderedCalculation_=document_.calculationGeneration();setWindowModified(document_.dirty());
+    renderedRevision_=p->revision;renderedCalculation_=document_.calculationGeneration();renderedView_=viewKey();setWindowModified(document_.dirty());
     return true;
 }
 bool MainWindow::refreshBulk() {

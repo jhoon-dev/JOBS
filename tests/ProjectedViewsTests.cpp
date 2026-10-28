@@ -84,7 +84,8 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
         table->setCurrentCell(0,mode==3?1:0);selectCellRange(table,0,0,9,0);
         QStringList lines;for(int i=0;i<10;++i)lines<<(mode==3?QString("1"):QString("Z edited %1").arg(i));
         QApplication::clipboard()->setText(lines.join('\n'));action(window,"pasteTaskCells");oracle(window,doc,spec);
-        check(resets==0&&survivor.isValid()&&survivor.data()==survivorId,"paste reset/lost survivor ID");
+        if(resets!=0||!survivor.isValid()||survivor.data()!=survivorId)
+            throw std::runtime_error("paste reset/lost survivor ID in mode "+std::to_string(mode)+" reset="+std::to_string(resets));
         if(spec.sort==1&&spec.query.isEmpty())check(layouts>0,"name sorting did not use layout change");
         if(!spec.query.isEmpty()||mode==3)check(!table->selectionModel()->hasSelection(),"filtered-out edits remained selected");
         else check(table->selectionModel()->selectedRows().size()==10,"visible edited selection was lost during publication");
@@ -98,6 +99,19 @@ int main(int argc,char** argv){QApplication app(argc,argv);try{
         check(static_cast<const jobs::PlanInput&>(*doc.project())==static_cast<const jobs::PlanInput&>(original)&&!doc.dirty(),"view editing changed wrong input");
         if(app.arguments().contains("--native")&&mode==4)check(window.grab().save("projected-views-native.png"),"native capture failed");
         window.hide();
+    }
+    {
+        doc.open(path);jobs::MainWindow window(doc);window.show();QTest::qWait(10);auto* table=taskTable(window);
+        QAbstractItemModelTester tester(table->model(),QAbstractItemModelTester::FailureReportingMode::Fatal);
+        int resets=0;QObject::connect(table->model(),&QAbstractItemModel::modelReset,[&]{++resets;});
+        QPersistentModelIndex survivor(table->model()->index(5,8));
+        table->setCurrentCell(0,0);
+        window.findChild<QLineEdit*>("taskSearch")->setText("Task 1000");
+        // Publish before the search debounce fires, using the actually rendered rows.
+        QApplication::clipboard()->setText("Z left query");action(window,"pasteTaskCells");
+        oracle(window,doc,{{},"Task 1000",0,0});
+        check(resets==0&&survivor.isValid()&&survivor.data()=="T5","pending search forced a reset/lost survivor");
+        QTest::qWait(210);check(resets==0,"late search debounce reset prepared view");window.hide();
     }
     {
         doc.open(path);jobs::MainWindow window(doc);window.show();QTest::qWait(10);auto* table=taskTable(window);
