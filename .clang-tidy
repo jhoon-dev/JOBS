@@ -1,0 +1,10 @@
+Checks: >-
+  -*,
+  clang-analyzer-*,
+  bugprone-infinite-loop,
+  bugprone-suspicious-semicolon,
+  bugprone-use-after-move,
+  misc-throw-by-value-catch-by-reference
+WarningsAsErrors: '*'
+HeaderFilterRegex: '(^|.*[/\])src[/\]'
+FormatStyle: file

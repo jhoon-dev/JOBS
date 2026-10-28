@@ -1,0 +1,5 @@
+# Progressive enrollment; changed/new src/tests C++ files are also checked.
+src/application/Document.h
+src/application/Document.cpp
+src/application/TaskEditing.cpp
+src/application/PreparedEdit.cpp
