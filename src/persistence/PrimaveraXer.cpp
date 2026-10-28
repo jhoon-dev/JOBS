@@ -17,17 +17,28 @@
 namespace jobs {
 namespace {
 constexpr qsizetype byteLimit = 16 * 1024 * 1024;
-QString qs(const std::string &s) { return QString::fromUtf8(s.data(), qsizetype(s.size())); }
-std::string str(const QString &s) { return s.toUtf8().toStdString(); }
-[[noreturn]] void fail(const QString &s) { throw std::runtime_error(str(s)); }
-QString hash(const QByteArray &b) { return QString::fromLatin1(QCryptographicHash::hash(b, QCryptographicHash::Sha256).toHex()); }
+QString qs(const std::string &s) {
+    return QString::fromUtf8(s.data(), qsizetype(s.size()));
+}
+std::string str(const QString &s) {
+    return s.toUtf8().toStdString();
+}
+[[noreturn]] void fail(const QString &s) {
+    throw std::runtime_error(str(s));
+}
+QString hash(const QByteArray &b) {
+    return QString::fromLatin1(QCryptographicHash::hash(b, QCryptographicHash::Sha256).toHex());
+}
 void diagnostic(QJsonArray &out, const QString &path, const QString &message) {
     out.append(QJsonObject{{"path", path}, {"message", message}});
 }
-QString encodingName(XerEncoding e) { return e == XerEncoding::Utf8 ? "UTF-8" : "Windows-1252"; }
+QString encodingName(XerEncoding e) {
+    return e == XerEncoding::Utf8 ? "UTF-8" : "Windows-1252";
+}
 bool forbiddenTextCharacter(QChar c) {
     const auto category = c.category();
-    return category == QChar::Other_Control || category == QChar::Separator_Line || category == QChar::Separator_Paragraph;
+    return category == QChar::Other_Control || category == QChar::Separator_Line ||
+           category == QChar::Separator_Paragraph;
 }
 QString decode(const QByteArray &bytes, XerEncoding encoding) {
     if (bytes.size() > byteLimit)
@@ -43,9 +54,10 @@ QString decode(const QByteArray &bytes, XerEncoding encoding) {
     }
     if (bytes.startsWith("\xef\xbb\xbf"))
         fail("UTF-8 BOM 파일은 UTF-8을 선택하세요.");
-    static constexpr char16_t cp[32] = {0x20ac, 0,      0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021, 0x02c6, 0x2030, 0x0160,
-                                        0x2039, 0x0152, 0,      0x017d, 0,      0,      0x2018, 0x2019, 0x201c, 0x201d, 0x2022,
-                                        0x2013, 0x2014, 0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0,      0x017e, 0x0178};
+    static constexpr char16_t cp[32] = {0x20ac, 0,      0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+                                        0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0,      0x017d, 0,
+                                        0,      0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+                                        0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0,      0x017e, 0x0178};
     QString out;
     out.reserve(bytes.size());
     for (unsigned char c : bytes) {
@@ -109,13 +121,17 @@ struct File {
     QStringList header;
     std::map<QString, Table> tables;
 };
-QString path(const Table &t, const Row &r, const QString &field) { return t.name + "/line-" + QString::number(r.line) + "/" + field; }
+QString path(const Table &t, const Row &r, const QString &field) {
+    return t.name + "/line-" + QString::number(r.line) + "/" + field;
+}
 QString get(const Table &t, const Row &r, const QString &field) {
     t.used.insert(field);
     auto i = t.fields.indexOf(field);
     return i < 0 ? QString{} : r.cells.at(i);
 }
-QString id(const Table &t, const Row &r, const QString &field) { return QString::number(integer(get(t, r, field), path(t, r, field))); }
+QString id(const Table &t, const Row &r, const QString &field) {
+    return QString::number(integer(get(t, r, field), path(t, r, field)));
+}
 File parse(const QString &text) {
     File file;
     Table *current = nullptr;
@@ -147,7 +163,8 @@ File parse(const QString &text) {
             if (c.size() > 1024 * 1024)
                 fail("XER 셀 1 Mi자 한도 초과");
         if (!header) {
-            if (cells.size() != 9 || cells[0] != "ERMHDR" || !QRegularExpression("^[0-9]+(?:\\.[0-9]+){1,2}$").match(cells[1]).hasMatch())
+            if (cells.size() != 9 || cells[0] != "ERMHDR" ||
+                !QRegularExpression("^[0-9]+(?:\\.[0-9]+){1,2}$").match(cells[1]).hasMatch())
                 fail("유효한 ERMHDR 헤더가 필요합니다.");
             file.header = cells;
             header = true;
@@ -206,7 +223,7 @@ struct Record {
     std::vector<Record> children;
 };
 class CalendarParser {
-  public:
+public:
     explicit CalendarParser(const QString &s, int &count) : s_(s), count_(count) {}
     Record parse() {
         auto r = node(1);
@@ -216,7 +233,7 @@ class CalendarParser {
         return r;
     }
 
-  private:
+private:
     const QString &s_;
     qsizetype pos_ = 0;
     int &count_;
@@ -326,14 +343,15 @@ QJsonObject reportFor(const Project &p, bool importing) {
             {"targetPolicy", QJsonObject{{"calculationProfile", effortProfile},
                                          {"projectStartAnchor", "09:00"},
                                          {"lagCalendar", "successor-working-calendar"}}},
-            {"compatibility", QJsonObject{{"import", importing ? "mapped-subset" : "not-applicable"},
-                                          {"originalPreservation", importing ? "exact-xer-bytes" : "exact-native-input-snapshot"},
-                                          {"jobsRecomputation", "unverified"},
-                                          {"externalRoundTrip", "unverified"}}}};
+            {"compatibility",
+             QJsonObject{{"import", importing ? "mapped-subset" : "not-applicable"},
+                         {"originalPreservation", importing ? "exact-xer-bytes" : "exact-native-input-snapshot"},
+                         {"jobsRecomputation", "unverified"},
+                         {"externalRoundTrip", "unverified"}}}};
 }
-const std::map<QString, std::string> constraintMap{{"", "ASAP"},        {"CS_ALAP", "ALAP"}, {"CS_MSOA", "SNET"},     {"CS_MSOB", "SNLT"},
-                                                   {"CS_MEOA", "FNET"}, {"CS_MEOB", "FNLT"}, {"CS_MANDSTART", "MSO"}, {"CS_MANDFIN", "MFO"},
-                                                   {"CS_MSO", "MSO"},   {"CS_MEO", "MFO"}};
+const std::map<QString, std::string> constraintMap{
+    {"", "ASAP"},        {"CS_ALAP", "ALAP"},     {"CS_MSOA", "SNET"},   {"CS_MSOB", "SNLT"}, {"CS_MEOA", "FNET"},
+    {"CS_MEOB", "FNLT"}, {"CS_MANDSTART", "MSO"}, {"CS_MANDFIN", "MFO"}, {"CS_MSO", "MSO"},   {"CS_MEO", "MFO"}};
 } // namespace
 
 QByteArray readPrimaveraXer(const QString &path) {
@@ -364,14 +382,17 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     auto start = stamp(get(projects, pr, "plan_start_date"), path(projects, pr, "plan_start_date"));
     p.startDate = str(start.left(10));
     QJsonArray diagnostics, mapping;
-    diagnostic(diagnostics, "PROJECT", "기간 기반 고정 기간 투영 · 공수/자원 종속 일정·실적/원가/P6 재계산 호환은 미검증입니다.");
-    diagnostic(
-        diagnostics, "CALENDAR",
-        "수입 작업/자원에 달력을 명시 배정합니다. 새 native 작업은 JOBS 기본 달력을 사용합니다. 기간 기반 일정은 작업 달력을 사용합니다.");
+    diagnostic(diagnostics, "PROJECT",
+               "기간 기반 고정 기간 투영 · 공수/자원 종속 일정·실적/원가/P6 재계산 호환은 미검증입니다.");
+    diagnostic(diagnostics, "CALENDAR",
+               "수입 작업/자원에 달력을 명시 배정합니다. 새 native 작업은 JOBS 기본 달력을 사용합니다. 기간 기반 "
+               "일정은 작업 달력을 사용합니다.");
     if (start.mid(11) != "09:00")
         diagnostic(diagnostics, "PROJECT/plan_start_date", "시작 날짜는 유지 · native 시작 기준은 09:00");
-    auto map = [&](const QString &kind, const QString &source, const std::string &target, const QString &activityCode = QString{}) {
-        mapping.append(QJsonObject{{"kind", kind}, {"xerId", source}, {"jobsId", qs(target)}, {"activityCode", activityCode}});
+    auto map = [&](const QString &kind, const QString &source, const std::string &target,
+                   const QString &activityCode = QString{}) {
+        mapping.append(
+            QJsonObject{{"kind", kind}, {"xerId", source}, {"jobsId", qs(target)}, {"activityCode", activityCode}});
     };
     const auto &options = table(file, "SCHEDOPTIONS");
     if (options.rows.size() > 1)
@@ -438,7 +459,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
                 fail("요일 중복/미지원 속성");
             std::vector<WorkPeriod> periods;
             for (const auto &hours : day.children) {
-                if (hours.attrs.size() != 2 || !hours.attrs.contains("s") || !hours.attrs.contains("f") || !hours.children.empty())
+                if (hours.attrs.size() != 2 || !hours.attrs.contains("s") || !hours.attrs.contains("f") ||
+                    !hours.children.empty())
                     fail("근무 시간 구조 오류");
                 auto end = clockMinute(hours.attrs.at("f"));
                 periods.push_back({clockMinute(hours.attrs.at("s")), end == 0 ? 1440 : end});
@@ -459,7 +481,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             for (const auto &exception : exceptions->children) {
                 if (exception.attrs.size() != 1 || !exception.attrs.contains("d") || !exception.children.empty())
                     fail("전일 휴일 이외의 달력 예외는 지원하지 않습니다.");
-                auto day = QDate(1899, 12, 30).addDays(integer(exception.attrs.at("d"), "CALENDAR/exception", -693593, 2958465));
+                auto day = QDate(1899, 12, 30)
+                               .addDays(integer(exception.attrs.at("d"), "CALENDAR/exception", -693593, 2958465));
                 auto date = str(day.toString(Qt::ISODate));
                 if (!validDate(date) || !ownDates.insert(date).second)
                     fail("휴일 날짜 중복/범위 오류");
@@ -513,7 +536,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             wbsIds[wid] = "";
             map("project-root", wid, "");
             if (!get(wbs, r, "parent_wbs_id").isEmpty())
-                diagnostic(diagnostics, path(wbs, r, "parent_wbs_id"), "프로젝트 루트의 외부 EPS 부모는 native 계층에 포함하지 않음");
+                diagnostic(diagnostics, path(wbs, r, "parent_wbs_id"),
+                           "프로젝트 루트의 외부 EPS 부모는 native 계층에 포함하지 않음");
         } else {
             wbsIds[wid] = "xer-wbs-" + str(wid);
             parents[wid] = get(wbs, r, "parent_wbs_id");
@@ -558,7 +582,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
             diagnostic(diagnostics, path(tasks, r, "task_type"), "자원 종속 작업을 기간 기반 작업으로 투영");
         auto durationType = get(tasks, r, "duration_type");
         if (durationType != "DT_FixedDrtn")
-            diagnostic(diagnostics, path(tasks, r, "duration_type"), "작업 유형/공수 유지 규칙은 기간 기반 고정 기간으로 투영");
+            diagnostic(diagnostics, path(tasks, r, "duration_type"),
+                       "작업 유형/공수 유지 규칙은 기간 기반 고정 기간으로 투영");
         if (!get(tasks, r, "cstr_type2").isEmpty() || !get(tasks, r, "cstr_date2").isEmpty())
             fail("보조 제약은 지원하지 않습니다.");
         auto constraint = get(tasks, r, "cstr_type");
@@ -571,7 +596,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         else if (!at.isEmpty())
             diagnostic(diagnostics, path(tasks, r, "cstr_date"), "날짜 없는 제약의 원본 시각은 적용하지 않음");
         if (constraint == "CS_MSO" || constraint == "CS_MEO")
-            diagnostic(diagnostics, path(tasks, r, "cstr_type"), "Start/Finish On을 native 하드 고정 날짜로 투영 · 의미 차이 있음");
+            diagnostic(diagnostics, path(tasks, r, "cstr_type"),
+                       "Start/Finish On을 native 하드 고정 날짜로 투영 · 의미 차이 있음");
         taskIds[tid] = t.id;
         map("task", tid, t.id, get(tasks, r, "task_code"));
         p.tasks.push_back(std::move(t));
@@ -625,7 +651,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
                 resource.maxUnits = units(capacity, path(rates, rate, "max_qty_per_hr"), true);
         }
         if (!resource.maxUnits)
-            diagnostic(diagnostics, path(resources, r, "rsrc_id"), "가용량 미정 · 단일 유효 기본 가용량 이외 곡선을 변환하지 않음");
+            diagnostic(diagnostics, path(resources, r, "rsrc_id"),
+                       "가용량 미정 · 단일 유효 기본 가용량 이외 곡선을 변환하지 않음");
         resourceIds[rid] = resource.id;
         map("resource", rid, resource.id);
         p.resources.push_back(std::move(resource));
@@ -645,8 +672,9 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
         auto curve = get(assignments, r, "curv_id");
         if (!curve.isEmpty() && curve != "0")
             fail("곡선 배정은 지원하지 않습니다.");
-        p.assignments.push_back({taskIds.at(tid), resourceIds.at(rid),
-                                 units(get(assignments, r, "target_qty_per_hr"), path(assignments, r, "target_qty_per_hr"), false)});
+        p.assignments.push_back(
+            {taskIds.at(tid), resourceIds.at(rid),
+             units(get(assignments, r, "target_qty_per_hr"), path(assignments, r, "target_qty_per_hr"), false)});
         map("assignment", id(assignments, r, "taskrsrc_id"), taskIds.at(tid) + "/" + resourceIds.at(rid));
     }
     for (const auto &[name, t] : file.tables) {
@@ -677,7 +705,9 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
 }
 
 namespace {
-QString timeText(int minutes) { return QString("%1:%2").arg(minutes / 60, 2, 10, QChar('0')).arg(minutes % 60, 2, 10, QChar('0')); }
+QString timeText(int minutes) {
+    return QString("%1:%2").arg(minutes / 60, 2, 10, QChar('0')).arg(minutes % 60, 2, 10, QChar('0'));
+}
 QString record(const QString &name, const QString &attrs, const QStringList &children = {}) {
     return "(0||" + name + "(" + attrs + ")(" + children.join("") + "))";
 }
@@ -695,11 +725,14 @@ QString calendarData(const TaskCalendar &c) {
     }
     int i = 0;
     for (const auto &holiday : c.holidays)
-        exceptions << record(QString::number(i++),
-                             "d|" + QString::number(QDate(1899, 12, 30).daysTo(QDate::fromString(qs(holiday), Qt::ISODate))));
+        exceptions << record(
+            QString::number(i++),
+            "d|" + QString::number(QDate(1899, 12, 30).daysTo(QDate::fromString(qs(holiday), Qt::ISODate))));
     return record("CalendarData", {}, {record("DaysOfWeek", {}, days), record("Exceptions", {}, exceptions)});
 }
-QString unitText(int units) { return QString::number(units / 100) + "." + QString::number(units % 100).rightJustified(2, '0'); }
+QString unitText(int units) {
+    return QString::number(units / 100) + "." + QString::number(units % 100).rightJustified(2, '0');
+}
 QString hourText(std::int64_t minutes) {
     const auto sign = minutes < 0 ? "-" : "";
     auto n = std::abs(minutes);
@@ -710,8 +743,8 @@ QString hourText(std::int64_t minutes) {
 PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     validate(p);
     graph(p);
-    if (p.tasks.size() > 10000 || p.wbsNodes.size() >= 10000 || p.resources.size() > 10000 || p.assignments.size() > 10000 ||
-        p.calendars.size() >= 10000)
+    if (p.tasks.size() > 10000 || p.wbsNodes.size() >= 10000 || p.resources.size() > 10000 ||
+        p.assignments.size() > 10000 || p.calendars.size() >= 10000)
         fail("XER 주요 테이블 10,000행 한도 초과");
     QByteArray bytes("\xef\xbb\xbf");
     auto line = [&](const QStringList &cells) {
@@ -745,20 +778,22 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
                                    {"activityCode", kind == "task" ? "J" + QString::number(id) : QString{}}});
     };
     const auto projectCode = "JOBS-" + hash(qs(p.documentId).toUtf8()).left(12);
-    line({"ERMHDR", "20.12", qs(p.startDate), "Project", "JOBS", "JOBS", "dbxDatabaseNoName", "Project Management", qs(p.currency)});
+    line({"ERMHDR", "20.12", qs(p.startDate), "Project", "JOBS", "JOBS", "dbxDatabaseNoName", "Project Management",
+          qs(p.currency)});
     diagnostic(diagnostics, "PROJECT",
                "기간 기반 계획 투영 · P6 계산/재저장 호환은 미검증. 전체 현재 입력/승인·실적/원가는 source.jobs 참조.");
-    header("CURRTYPE", {"curr_id", "decimal_digit_cnt", "curr_symbol", "decimal_symbol", "digit_group_symbol", "pos_curr_fmt_type",
-                        "neg_curr_fmt_type", "curr_type", "curr_short_name", "group_digit_cnt", "base_exch_rate"});
-    row({"1", QString::number(currencyDecimals(p.currency)), qs(p.currency), ".", ",", "#1.1", "(#1.1)", qs(p.currency), qs(p.currency),
-         "3", "1"});
-    header("PROJECT", {"proj_id", "proj_short_name", "clndr_id", "plan_start_date", "def_task_type", "def_duration_type",
-                       "task_code_prefix", "task_code_base", "task_code_step"});
+    header("CURRTYPE",
+           {"curr_id", "decimal_digit_cnt", "curr_symbol", "decimal_symbol", "digit_group_symbol", "pos_curr_fmt_type",
+            "neg_curr_fmt_type", "curr_type", "curr_short_name", "group_digit_cnt", "base_exch_rate"});
+    row({"1", QString::number(currencyDecimals(p.currency)), qs(p.currency), ".", ",", "#1.1", "(#1.1)", qs(p.currency),
+         qs(p.currency), "3", "1"});
+    header("PROJECT", {"proj_id", "proj_short_name", "clndr_id", "plan_start_date", "def_task_type",
+                       "def_duration_type", "task_code_prefix", "task_code_base", "task_code_step"});
     row({"1", projectCode, "1", qs(p.startDate) + " 09:00", "TT_Task", "DT_FixedDrtn", "J", "1", "1"});
     header("SCHEDOPTIONS", {"schedoptions_id", "proj_id", "sched_calendar_on_relationship_lag"});
     row({"1", "1", "rcal_Successor"});
-    header("CALENDAR", {"clndr_id", "default_flag", "clndr_name", "proj_id", "base_clndr_id", "clndr_type", "day_hr_cnt", "week_hr_cnt",
-                        "rsrc_private", "clndr_data"});
+    header("CALENDAR", {"clndr_id", "default_flag", "clndr_name", "proj_id", "base_clndr_id", "clndr_type",
+                        "day_hr_cnt", "week_hr_cnt", "rsrc_private", "clndr_data"});
     std::map<std::string, int> calendars{{"", 1}};
     TaskCalendar standard;
     standard.name = "JOBS standard";
@@ -786,7 +821,8 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
              "N",
              calendarData(c)});
     }
-    header("PROJWBS", {"wbs_id", "proj_id", "seq_num", "proj_node_flag", "wbs_short_name", "wbs_name", "parent_wbs_id"});
+    header("PROJWBS",
+           {"wbs_id", "proj_id", "seq_num", "proj_node_flag", "wbs_short_name", "wbs_name", "parent_wbs_id"});
     row({"1", "1", "0", "Y", projectCode, qs(p.name), {}});
     map("project-root", 1, "");
     std::map<std::string, int> wbs{{"", 1}};
@@ -796,14 +832,16 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
         map("wbs", next++, g.id);
     }
     for (const auto &g : p.wbsNodes)
-        row({QString::number(wbs.at(g.id)), "1", QString::number(wbs.at(g.id)), "N", "W" + QString::number(wbs.at(g.id)), qs(g.name),
-             QString::number(wbs.at(g.parentId))});
-    header("TASK", {"task_id", "proj_id", "wbs_id", "clndr_id", "task_code", "task_name", "task_type", "duration_type", "status_code",
-                    "complete_pct_type", "target_drtn_hr_cnt", "remain_drtn_hr_cnt", "cstr_type", "cstr_date", "cstr_type2", "cstr_date2"});
+        row({QString::number(wbs.at(g.id)), "1", QString::number(wbs.at(g.id)), "N",
+             "W" + QString::number(wbs.at(g.id)), qs(g.name), QString::number(wbs.at(g.parentId))});
+    header("TASK", {"task_id", "proj_id", "wbs_id", "clndr_id", "task_code", "task_name", "task_type", "duration_type",
+                    "status_code", "complete_pct_type", "target_drtn_hr_cnt", "remain_drtn_hr_cnt", "cstr_type",
+                    "cstr_date", "cstr_type2", "cstr_date2"});
     std::map<std::string, int> tasks;
     next = 1;
-    const std::map<std::string, QString> reverse{{"ASAP", ""},        {"ALAP", "CS_ALAP"}, {"MSO", "CS_MANDSTART"}, {"MFO", "CS_MANDFIN"},
-                                                 {"SNET", "CS_MSOA"}, {"SNLT", "CS_MSOB"}, {"FNET", "CS_MEOA"},     {"FNLT", "CS_MEOB"}};
+    const std::map<std::string, QString> reverse{{"ASAP", ""},          {"ALAP", "CS_ALAP"}, {"MSO", "CS_MANDSTART"},
+                                                 {"MFO", "CS_MANDFIN"}, {"SNET", "CS_MSOA"}, {"SNLT", "CS_MSOB"},
+                                                 {"FNET", "CS_MEOA"},   {"FNLT", "CS_MEOB"}};
     for (const auto &t : p.tasks) {
         int uid = next++;
         tasks[t.id] = uid;
@@ -826,20 +864,23 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
              {},
              {}});
         if (!t.durationMinutes)
-            diagnostic(diagnostics, "TASK/" + qs(t.id) + "/target_drtn_hr_cnt", "미정 기간 공백 · 외부 앱 기본값 해석 가능");
+            diagnostic(diagnostics, "TASK/" + qs(t.id) + "/target_drtn_hr_cnt",
+                       "미정 기간 공백 · 외부 앱 기본값 해석 가능");
         if (t.deadlineAt)
-            diagnostic(diagnostics, "TASK/" + qs(t.id) + "/deadline", "소프트 마감일을 expected finish/하드 제약으로 변환하지 않음");
+            diagnostic(diagnostics, "TASK/" + qs(t.id) + "/deadline",
+                       "소프트 마감일을 expected finish/하드 제약으로 변환하지 않음");
         if (t.taskType != "fixed-duration" || t.workUnitMinutes || !t.breaks.empty())
             diagnostic(diagnostics, "TASK/" + qs(t.id), "공수/작업 유형/분할 규칙 대신 명목 기간을 투영");
     }
-    header("TASKPRED", {"task_pred_id", "task_id", "pred_task_id", "proj_id", "pred_proj_id", "pred_type", "lag_hr_cnt"});
+    header("TASKPRED",
+           {"task_pred_id", "task_id", "pred_task_id", "proj_id", "pred_proj_id", "pred_type", "lag_hr_cnt"});
     next = 1;
     for (const auto &t : p.tasks)
         for (const auto &d : dependencies(t)) {
             if (next > 10000)
                 fail("선행관계 10,000개 한도 초과");
-            row({QString::number(next++), QString::number(tasks.at(t.id)), QString::number(tasks.at(d.predecessorId)), "1", "1",
-                 "PR_" + qs(d.type), hourText(d.lagMinutes)});
+            row({QString::number(next++), QString::number(tasks.at(t.id)), QString::number(tasks.at(d.predecessorId)),
+                 "1", "1", "PR_" + qs(d.type), hourText(d.lagMinutes)});
         }
     header("RSRC", {"rsrc_id", "clndr_id", "curr_id", "rsrc_name", "rsrc_short_name", "rsrc_type", "active_flag"});
     std::map<std::string, int> resources;
@@ -848,8 +889,8 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
         int uid = next++;
         resources[r.id] = uid;
         map("resource", uid, r.id);
-        row({QString::number(uid), QString::number(calendars.at(r.calendarId)), "1", qs(r.name), "R" + QString::number(uid),
-             r.type == "equipment" ? "RT_Equip" : "RT_Labor", "Y"});
+        row({QString::number(uid), QString::number(calendars.at(r.calendarId)), "1", qs(r.name),
+             "R" + QString::number(uid), r.type == "equipment" ? "RT_Equip" : "RT_Labor", "Y"});
         if (!r.rates.empty() || !r.exceptions.empty())
             diagnostic(diagnostics, "RSRC/" + qs(r.id), "단가/날짜별 가용량 예외는 source.jobs에만 보존");
         if (!r.maxUnits)
@@ -859,20 +900,23 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     next = 1;
     for (const auto &r : p.resources)
         if (r.maxUnits)
-            row({QString::number(next++), QString::number(resources.at(r.id)), qs(p.startDate) + " 00:00", unitText(*r.maxUnits)});
-    header("TASKRSRC",
-           {"taskrsrc_id", "task_id", "proj_id", "rsrc_id", "target_qty_per_hr", "remain_qty_per_hr", "target_qty", "remain_qty"});
+            row({QString::number(next++), QString::number(resources.at(r.id)), qs(p.startDate) + " 00:00",
+                 unitText(*r.maxUnits)});
+    header("TASKRSRC", {"taskrsrc_id", "task_id", "proj_id", "rsrc_id", "target_qty_per_hr", "remain_qty_per_hr",
+                        "target_qty", "remain_qty"});
     next = 1;
     for (const auto &a : p.assignments) {
         map("assignment", next, a.taskId + "/" + a.resourceId);
         const auto &task = p.tasks[std::size_t(tasks.at(a.taskId) - 1)];
-        auto quantity = task.durationMinutes ? QString::number(double(*task.durationMinutes) * a.units / 6000.0, 'f', 6) : QString{};
-        row({QString::number(next++), QString::number(tasks.at(a.taskId)), "1", QString::number(resources.at(a.resourceId)),
-             unitText(a.units), unitText(a.units), quantity, quantity});
+        auto quantity = task.durationMinutes ? QString::number(double(*task.durationMinutes) * a.units / 6000.0, 'f', 6)
+                                             : QString{};
+        row({QString::number(next++), QString::number(tasks.at(a.taskId)), "1",
+             QString::number(resources.at(a.resourceId)), unitText(a.units), unitText(a.units), quantity, quantity});
     }
     line({"%E"});
     importPrimaveraXer(bytes, "project.xer");
-    if (!p.baselines.empty() || !p.progress.empty() || !p.costEntries.empty() || !p.scenarios.empty() || p.statusAt || !p.taskCosts.empty())
+    if (!p.baselines.empty() || !p.progress.empty() || !p.costEntries.empty() || !p.scenarios.empty() || p.statusAt ||
+        !p.taskCosts.empty())
         diagnostic(diagnostics, "PROJECT/history-costs", "기준선·실적·원가·상태일·시나리오는 source.jobs에만 보존");
     diagnostic(diagnostics, "PROJECT/IDs",
                "새 XER ID/Activity Code를 생성합니다. P6의 기존 프로젝트/활동 업데이트 동일성은 보장하지 않습니다.");
@@ -890,8 +934,10 @@ QString publishPrimaveraXer(const PrimaveraXerExchange &e, const QString &destin
     return publishPlanExchange(e.project, e.xer, e.report, e.importing, "xer", destination);
 }
 QString primaveraXerPreview(const PrimaveraXerExchange &e) {
-    auto text = QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n기간 기반 계획 변환 · P6 재계산/왕복 호환: 미검증\nJOBS "
-                        "지연 정책: 후행 작업 달력 · 시작일 기준 09:00\n원본 보존: %7\n\n원본/진단은 교환 폴더에 보관합니다. .jobs만 사본 "
+    auto text = QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n기간 기반 계획 변환 · P6 재계산/왕복 "
+                        "호환: 미검증\nJOBS "
+                        "지연 정책: 후행 작업 달력 · 시작일 기준 09:00\n원본 보존: %7\n\n원본/진단은 교환 폴더에 "
+                        "보관합니다. .jobs만 사본 "
                         "저장/이동하면 동반 파일은 자동 복제되지 않습니다.\n\n")
                     .arg(qs(e.project.name))
                     .arg(e.project.tasks.size())

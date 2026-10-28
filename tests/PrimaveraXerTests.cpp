@@ -32,7 +32,8 @@ QByteArray read(const QString &p) {
     check(f.open(QIODevice::ReadOnly), "file read failed");
     return f.readAll();
 }
-QByteArray modify(const QByteArray &source, const QString &table, const QString &column, int row, const QString &value) {
+QByteArray modify(const QByteArray &source, const QString &table, const QString &column, int row,
+                  const QString &value) {
     auto lines = QString::fromUtf8(source).split('\n', Qt::KeepEmptyParts);
     bool inside = false;
     QStringList fields;
@@ -91,16 +92,19 @@ int main(int argc, char **argv) {
         check(p.resources[0].maxUnits == 150 && p.resources[1].maxUnits == 0 && p.resources[1].type == "equipment" &&
                   p.assignments[0].units == 50 && p.assignments[1].units == 125,
               "units/capacity zero/equipment");
-        check(p.tasks[1].constraintType == "SNET" && p.tasks[1].constraintAt == "2026-10-28 10:00" && p.tasks[5].durationMinutes == 0,
+        check(p.tasks[1].constraintType == "SNET" && p.tasks[1].constraintAt == "2026-10-28 10:00" &&
+                  p.tasks[5].durationMinutes == 0,
               "constraint/milestone");
         for (std::size_t i = 1; i < 5; ++i) {
             auto edges = jobs::dependencies(p.tasks[i]);
             const std::vector<std::string> types{"FS", "SS", "FF", "SF"};
-            check(edges.size() == 1 && edges[0].type == types[i - 1] && edges[0].lagMinutes == ((i == 2 || i == 3) ? -60 : 60),
+            check(edges.size() == 1 && edges[0].type == types[i - 1] &&
+                      edges[0].lagMinutes == ((i == 2 || i == 3) ? -60 : 60),
                   "four links/negative hours lag");
         }
-        check(p.progress.empty() && p.costEntries.empty() && p.taskCosts.empty() && diagnostic(imported, "act_start_date") &&
-                  diagnostic(imported, "cost_per_qty") && diagnostic(imported, "NOTEBOOK"),
+        check(p.progress.empty() && p.costEntries.empty() && p.taskCosts.empty() &&
+                  diagnostic(imported, "act_start_date") && diagnostic(imported, "cost_per_qty") &&
+                  diagnostic(imported, "NOTEBOOK"),
               "facts not invented/loss report");
         auto schedule = jobs::calculate(p);
         check(schedule.status == jobs::CalculationStatus::Valid, "schedule valid");
@@ -120,8 +124,8 @@ int main(int argc, char **argv) {
         check(report["source"].toObject()["sha256"].toString().toLatin1() ==
                   QCryptographicHash::hash(source, QCryptographicHash::Sha256).toHex(),
               "original hash");
-        check(report["source"].toObject()["projectCode"] == "SITE-01" && report["source"].toObject()["encoding"] == "UTF-8" &&
-                  report["mapping"].toArray().size() == 15,
+        check(report["source"].toObject()["projectCode"] == "SITE-01" &&
+                  report["source"].toObject()["encoding"] == "UTF-8" && report["mapping"].toArray().size() == 15,
               "source code/encoding/mapping");
         jobs::JsonProjectStore store;
         jobs::Document doc(store);
@@ -135,8 +139,8 @@ int main(int argc, char **argv) {
         auto generation = doc.sessionGeneration();
         auto exported = jobs::exportPrimaveraXer(p);
         auto back = jobs::importPrimaveraXer(exported.xer, "roundtrip.xer");
-        check(back.project.tasks.size() == 6 && back.project.wbsNodes.size() == 2 && back.project.resources.size() == 2 &&
-                  back.project.assignments.size() == 2,
+        check(back.project.tasks.size() == 6 && back.project.wbsNodes.size() == 2 &&
+                  back.project.resources.size() == 2 && back.project.assignments.size() == 2,
               "roundtrip counts");
         auto again = jobs::calculate(back.project);
         check(again.status == jobs::CalculationStatus::Valid, "roundtrip schedule");
@@ -148,25 +152,28 @@ int main(int argc, char **argv) {
                   "roundtrip input");
             const auto &x = scheduled(schedule, a.id);
             const auto &y = scheduled(again, b.id);
-            check(x.start == y.start && x.finish == y.finish && x.totalFloatMinutes == y.totalFloatMinutes, "roundtrip schedule semantics");
+            check(x.start == y.start && x.finish == y.finish && x.totalFloatMinutes == y.totalFloatMinutes,
+                  "roundtrip schedule semantics");
         }
         auto output = jobs::publishPrimaveraXer(exported, dir.filePath("export"));
-        check(store.load(QDir(output).filePath("source.jobs").toStdString()).project == p && *doc.project() == snapshot &&
-                  doc.sessionGeneration() == generation && !doc.dirty() && !doc.canUndo(),
+        check(store.load(QDir(output).filePath("source.jobs").toStdString()).project == p &&
+                  *doc.project() == snapshot && doc.sessionGeneration() == generation && !doc.dirty() && !doc.canUndo(),
               "export source snapshot/document isolation");
         auto un = p;
         un.tasks[0].durationMinutes.reset();
         un.resources[0].maxUnits.reset();
         auto unExport = jobs::exportPrimaveraXer(un);
         auto unBack = jobs::importPrimaveraXer(unExport.xer, "unknown.xer");
-        check(!unBack.project.tasks[0].durationMinutes && !unBack.project.resources[0].maxUnits && diagnostic(unExport, "capacity"),
+        check(!unBack.project.tasks[0].durationMinutes && !unBack.project.resources[0].maxUnits &&
+                  diagnostic(unExport, "capacity"),
               "unknown not zero");
         auto one = p;
         one.tasks[0].durationMinutes = 1;
         one.tasks[2].dependencyRules[0].lagMinutes = -1;
         auto oneExport = jobs::exportPrimaveraXer(one);
         auto oneBack = jobs::importPrimaveraXer(oneExport.xer, "one-minute.xer");
-        check(oneBack.project.tasks[0].durationMinutes == 1 && oneBack.project.tasks[2].dependencyRules[0].lagMinutes == -1 &&
+        check(oneBack.project.tasks[0].durationMinutes == 1 &&
+                  oneBack.project.tasks[2].dependencyRules[0].lagMinutes == -1 &&
                   diagnostic(oneBack, "target_drtn_hr_cnt"),
               "one minute decimal quantization");
         jobs::Project around;
@@ -238,8 +245,9 @@ int main(int argc, char **argv) {
         bad("CALENDAR", "base_clndr_id", 0, "2");
         bad("CALENDAR", "clndr_data", 0, "(0||CalendarData()())");
         bad("PROJECT", "clndr_id", 0, "999");
-        auto calData = QString("(0||CalendarData()((0||DaysOfWeek()((0||1()())(0||2()((0||0(s|10:00|f|11:00)())))(0||3()((0||0(s|09:00|f|"
-                               "12:00)())))(0||4()())(0||5()())(0||6()())(0||7()())))))");
+        auto calData = QString(
+            "(0||CalendarData()((0||DaysOfWeek()((0||1()())(0||2()((0||0(s|10:00|f|11:00)())))(0||3()((0||0(s|09:00|f|"
+            "12:00)())))(0||4()())(0||5()())(0||6()())(0||7()())))))");
         bad("CALENDAR", "clndr_data", 0, calData);
         auto workingException = source;
         const auto holiday = QByteArray::number(QDate(1899, 12, 30).daysTo(QDate(2026, 10, 27)));
@@ -280,7 +288,8 @@ int main(int argc, char **argv) {
         cells.replace("%R\t1\t원본에만 보존", "%R\t1\t" + QByteArray(1024 * 1024 + 1, 'X'));
         rejects([&] { jobs::importPrimaveraXer(cells, "cell-limit.xer"); });
         auto budget = source;
-        budget.replace("%T\tNOTEBOOK", "%T\tCELL_BUDGET\r\n%F\ta\tb\tc\r\n" + QByteArray("%R\t\t\t\r\n").repeated(250001) + "%T\tNOTEBOOK");
+        budget.replace("%T\tNOTEBOOK", "%T\tCELL_BUDGET\r\n%F\ta\tb\tc\r\n" +
+                                           QByteArray("%R\t\t\t\r\n").repeated(250001) + "%T\tNOTEBOOK");
         rejects([&] { jobs::importPrimaveraXer(budget, "cell-budget.xer"); });
         QString nested = "(0||CalendarData()())";
         for (int i = 0; i < 33; ++i)
@@ -291,7 +300,8 @@ int main(int argc, char **argv) {
         check(!futureImport.project.resources[0].maxUnits, "future capacity not treated as current");
         auto changedPolicy = jobs::importPrimaveraXer(
             modify(source, "SCHEDOPTIONS", "sched_calendar_on_relationship_lag", 0, "rcal_Predecessor"), "policy.xer");
-        check(diagnostic(changedPolicy, "sched_calendar_on_relationship_lag"), "lag calendar policy difference not reported");
+        check(diagnostic(changedPolicy, "sched_calendar_on_relationship_lag"),
+              "lag calendar policy difference not reported");
         jobs::Document tracked(store);
         tracked.create("승인·실적 보존", "2026-10-26", {"보고"});
         tracked.setDuration(0, 60);
@@ -319,16 +329,20 @@ int main(int argc, char **argv) {
         auto historyExport = jobs::exportPrimaveraXer(history);
         auto historyFolder = jobs::publishPrimaveraXer(historyExport, dir.filePath("history"));
         check(diagnostic(historyExport, "history-costs") &&
-                  store.load(QDir(historyFolder).filePath("source.jobs").toStdString()).project == history && *tracked.project() == history,
+                  store.load(QDir(historyFolder).filePath("source.jobs").toStdString()).project == history &&
+                  *tracked.project() == history,
               "approved/actual/cost preservation");
         QFile outputFile("primavera-export.xer");
-        check(outputFile.open(QIODevice::WriteOnly) && outputFile.write(exported.xer) == exported.xer.size(), "write independent fixture");
+        check(outputFile.open(QIODevice::WriteOnly) && outputFile.write(exported.xer) == exported.xer.size(),
+              "write independent fixture");
         QFile reportFile("primavera-export.json");
         check(reportFile.open(QIODevice::WriteOnly), "write independent report");
         reportFile.write(QJsonDocument(exported.report).toJson());
         QFile aroundFile("primavera-24h.xer");
-        check(aroundFile.open(QIODevice::WriteOnly) && aroundFile.write(aroundExport.xer) == aroundExport.xer.size(), "write 24h fixture");
-        std::cout << "Primavera XER planning contract, independent dates, roundtrip, encodings, preservation and rejections passed\n";
+        check(aroundFile.open(QIODevice::WriteOnly) && aroundFile.write(aroundExport.xer) == aroundExport.xer.size(),
+              "write 24h fixture");
+        std::cout << "Primavera XER planning contract, independent dates, roundtrip, encodings, preservation and "
+                     "rejections passed\n";
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         return 1;
