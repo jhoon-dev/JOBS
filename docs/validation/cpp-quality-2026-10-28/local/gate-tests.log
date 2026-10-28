@@ -1,0 +1,50 @@
+test_changed_committed_staged_and_new_sources_are_selected (__main__.GateTests.test_changed_committed_staged_and_new_sources_are_selected) ... warning: in the working copy of '.clang-format', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.clang-tidy', LF will be replaced by CRLF the next time Git touches it
+ok
+test_format_failure_is_read_only_then_explicit_fix_is_idempotent (__main__.GateTests.test_format_failure_is_read_only_then_explicit_fix_is_idempotent) ... warning: in the working copy of '.clang-format', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.clang-tidy', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Example.cpp', LF will be replaced by CRLF the next time Git touches it
+ok
+test_outside_or_missing_enrollment_fails_closed (__main__.GateTests.test_outside_or_missing_enrollment_fails_closed) ... warning: in the working copy of '.clang-format', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.clang-tidy', LF will be replaced by CRLF the next time Git touches it
+ok
+{
+  "status": "failed",
+  "tool": "clang-format version 18.1.8",
+  "base": null,
+  "files": [
+    "src/Example.cpp"
+  ],
+  "format_changes": [
+    "src/Example.cpp"
+  ],
+  "fix": false
+}
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": null,
+  "files": [
+    "src/Example.cpp"
+  ],
+  "format_changes": [
+    "src/Example.cpp"
+  ],
+  "fix": true
+}
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": null,
+  "files": [
+    "src/Example.cpp"
+  ],
+  "format_changes": [],
+test_real_analyzer_rejects_null_dereference_and_accepts_repair (__main__.GateTests.test_real_analyzer_rejects_null_dereference_and_accepts_repair) ... skipped 'real clang-tidy smoke runs in Linux CI'
+
+----------------------------------------------------------------------
+Ran 4 tests in 13.309s
+
+OK (skipped=1)
+  "fix": false
+}

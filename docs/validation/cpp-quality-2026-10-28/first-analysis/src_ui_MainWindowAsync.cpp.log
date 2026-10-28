@@ -1,0 +1,51 @@
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: error: Use of memory after it is freed [clang-analyzer-cplusplus.NewDelete,-warnings-as-errors]
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:72:9: note: Assuming 'cancel' is non-null
+   72 |     if (!cancel) {
+      |         ^~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:72:5: note: Taking false branch
+   72 |     if (!cancel) {
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:79:63: note: Calling implicit copy constructor for 'QPointer<QDialog>'
+   79 |         auto control = submitEdit(std::move(command), label, [guard, error, cancel, setPending](EditState state, const QString& message) {
+      |                                                               ^~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:79:63: note: Calling copy constructor for 'QWeakPointer<QObject>'
+   79 |         auto control = submitEdit(std::move(command), label, [guard, error, cancel, setPending](EditState state, const QString& message) {
+      |                                                               ^~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:582:11: note: Assuming field 'd' is non-null
+  582 |     { if (d) d->weakref.ref(); }
+      |           ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:582:7: note: Taking true branch
+  582 |     { if (d) d->weakref.ref(); }
+      |       ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:79:63: note: Returning from copy constructor for 'QWeakPointer<QObject>'
+   79 |         auto control = submitEdit(std::move(command), label, [guard, error, cancel, setPending](EditState state, const QString& message) {
+      |                                                               ^~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:79:63: note: Returning from copy constructor for 'QPointer<QDialog>'
+   79 |         auto control = submitEdit(std::move(command), label, [guard, error, cancel, setPending](EditState state, const QString& message) {
+      |                                                               ^~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:90:1: note: Calling implicit destructor for 'QPointer<QDialog>'
+   90 | }
+      | ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp:90:1: note: Calling '~QWeakPointer'
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Field 'd' is non-null
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                  ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Left side of '&&' is true
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:39: note: Assuming the condition is true
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                       ^~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:30: note: Taking true branch
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                              ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Memory is released
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Calling 'ExternalRefCountData::operator delete'
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: note: Use of memory after it is freed
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^                 ~~~
+17 warnings generated.

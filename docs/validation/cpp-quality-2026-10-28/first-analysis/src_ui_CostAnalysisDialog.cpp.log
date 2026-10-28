@@ -1,0 +1,13 @@
+/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp:94:1: error: Potential leak of memory pointed to by 'watcher' [clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors]
+   94 | }
+      | ^
+/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp:83:157: note: Calling 'CostAnalysisDialog::recalculate'
+   83 |     connect(baseline_, &QComboBox::currentIndexChanged, this, [this] { recalculate(); }); connect(formula_, &QComboBox::currentIndexChanged, this, [this] { recalculate(); }); recalculate();
+      |                                                                                                                                                             ^~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp:88:21: note: Memory is allocated
+   88 |     auto* watcher = new QFutureWatcher<Computed>(this);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp:94:1: note: Potential leak of memory pointed to by 'watcher'
+   94 | }
+      | ^
+21 warnings generated.

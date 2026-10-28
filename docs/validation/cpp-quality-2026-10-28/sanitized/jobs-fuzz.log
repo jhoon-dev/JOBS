@@ -1,0 +1,111 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 20261028
+INFO: Loaded 1 modules   (42366 inline 8-bit counters): 42366 [0x55f2a4621d60, 0x55f2a462c2de), 
+INFO: Loaded 1 PC tables (42366 PCs): 42366 [0x55f2a462c2e0,0x55f2a46d1ac0), 
+INFO:       45 files found in /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs
+INFO: seed corpus: files: 45 min: 4b max: 3257b total: 28662b rss: 44Mb
+#46	INITED cov: 1005 ft: 2643 corp: 21/16Kb exec/s: 0 rss: 59Mb
+#47	NEW    cov: 1005 ft: 2644 corp: 22/17Kb lim: 3257 exec/s: 0 rss: 60Mb L: 518/3257 MS: 1 InsertByte-
+#73	NEW    cov: 1008 ft: 2654 corp: 23/17Kb lim: 3257 exec/s: 0 rss: 62Mb L: 482/3257 MS: 1 InsertByte-
+#74	NEW    cov: 1008 ft: 2664 corp: 24/18Kb lim: 3257 exec/s: 0 rss: 62Mb L: 470/3257 MS: 1 ChangeBit-
+#96	NEW    cov: 1009 ft: 2665 corp: 25/18Kb lim: 3257 exec/s: 0 rss: 66Mb L: 621/3257 MS: 2 ChangeASCIIInt-InsertByte-
+#107	NEW    cov: 1009 ft: 2666 corp: 26/19Kb lim: 3257 exec/s: 0 rss: 66Mb L: 608/3257 MS: 1 ShuffleBytes-
+#108	NEW    cov: 1011 ft: 2669 corp: 27/20Kb lim: 3257 exec/s: 0 rss: 67Mb L: 608/3257 MS: 1 ChangeASCIIInt-
+#149	NEW    cov: 1011 ft: 2670 corp: 28/20Kb lim: 3257 exec/s: 0 rss: 68Mb L: 608/3257 MS: 1 ChangeByte-
+#166	NEW    cov: 1011 ft: 2671 corp: 29/21Kb lim: 3257 exec/s: 0 rss: 69Mb L: 698/3257 MS: 2 InsertByte-InsertRepeatedBytes-
+#179	REDUCE cov: 1011 ft: 2671 corp: 29/21Kb lim: 3257 exec/s: 0 rss: 69Mb L: 3/3257 MS: 3 ChangeBit-ChangeByte-EraseBytes-
+#185	NEW    cov: 1014 ft: 2783 corp: 30/24Kb lim: 3257 exec/s: 0 rss: 69Mb L: 2743/3257 MS: 1 ChangeBinInt-
+#263	NEW    cov: 1016 ft: 2785 corp: 31/24Kb lim: 3257 exec/s: 0 rss: 71Mb L: 608/3257 MS: 3 ChangeASCIIInt-ChangeBit-ChangeASCIIInt-
+#264	NEW    cov: 1017 ft: 2787 corp: 32/25Kb lim: 3257 exec/s: 0 rss: 71Mb L: 431/3257 MS: 1 ChangeByte-
+#345	NEW    cov: 1021 ft: 2817 corp: 33/27Kb lim: 3257 exec/s: 0 rss: 74Mb L: 2339/3257 MS: 1 ChangeBit-
+#356	NEW    cov: 1022 ft: 2820 corp: 34/27Kb lim: 3257 exec/s: 0 rss: 74Mb L: 518/3257 MS: 1 ChangeByte-
+#392	NEW    cov: 1022 ft: 2821 corp: 35/28Kb lim: 3257 exec/s: 0 rss: 75Mb L: 608/3257 MS: 1 ShuffleBytes-
+#423	NEW    cov: 1022 ft: 2837 corp: 36/30Kb lim: 3257 exec/s: 0 rss: 76Mb L: 2339/3257 MS: 1 ChangeByte-
+#424	NEW    cov: 1025 ft: 3315 corp: 37/33Kb lim: 3257 exec/s: 0 rss: 76Mb L: 3257/3257 MS: 1 ChangeASCIIInt-
+#525	NEW    cov: 1027 ft: 3322 corp: 38/34Kb lim: 3257 exec/s: 0 rss: 80Mb L: 400/3257 MS: 1 ChangeASCIIInt-
+#566	NEW    cov: 1027 ft: 3323 corp: 39/34Kb lim: 3257 exec/s: 0 rss: 81Mb L: 400/3257 MS: 1 ChangeBinInt-
+#592	NEW    cov: 1027 ft: 3325 corp: 40/35Kb lim: 3257 exec/s: 0 rss: 82Mb L: 431/3257 MS: 1 ChangeASCIIInt-
+#609	REDUCE cov: 1027 ft: 3325 corp: 40/35Kb lim: 3257 exec/s: 0 rss: 82Mb L: 2/3257 MS: 2 CopyPart-EraseBytes-
+#640	NEW    cov: 1027 ft: 3336 corp: 41/37Kb lim: 3257 exec/s: 0 rss: 83Mb L: 2341/3257 MS: 1 CMP- DE: "\001\020"-
+#711	NEW    cov: 1027 ft: 3337 corp: 42/37Kb lim: 3257 exec/s: 0 rss: 84Mb L: 425/3257 MS: 1 ChangeBinInt-
+#797	NEW    cov: 1028 ft: 3365 corp: 43/40Kb lim: 3257 exec/s: 0 rss: 86Mb L: 3257/3257 MS: 1 ChangeBinInt-
+#909	NEW    cov: 1028 ft: 3368 corp: 44/43Kb lim: 3257 exec/s: 0 rss: 90Mb L: 2340/3257 MS: 2 ChangeByte-InsertByte-
+#930	NEW    cov: 1028 ft: 3372 corp: 45/45Kb lim: 3257 exec/s: 0 rss: 92Mb L: 2743/3257 MS: 1 ChangeBinInt-
+#1037	NEW    cov: 1028 ft: 3373 corp: 46/46Kb lim: 3257 exec/s: 0 rss: 94Mb L: 616/3257 MS: 2 CMP-ChangeByte- DE: "\001\000\000\000\000\000\000\000"-
+#1103	NEW    cov: 1028 ft: 3381 corp: 47/49Kb lim: 3257 exec/s: 0 rss: 96Mb L: 2743/3257 MS: 1 ChangeBit-
+	NEW_FUNC[1/1]: 0x55f2a430bc50 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>::~basic_string() /usr/bin/../lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/basic_string.h:809
+#1144	NEW    cov: 1033 ft: 3419 corp: 48/51Kb lim: 3257 exec/s: 0 rss: 98Mb L: 2743/3257 MS: 1 ChangeBit-
+#1275	NEW    cov: 1033 ft: 3457 corp: 49/55Kb lim: 3257 exec/s: 0 rss: 103Mb L: 3257/3257 MS: 1 ChangeBit-
+#1476	NEW    cov: 1033 ft: 3462 corp: 50/57Kb lim: 3257 exec/s: 0 rss: 108Mb L: 2342/3257 MS: 1 InsertByte-
+#1523	NEW    cov: 1034 ft: 3469 corp: 51/60Kb lim: 3257 exec/s: 0 rss: 110Mb L: 2768/3257 MS: 2 ChangeASCIIInt-CMP- DE: "native-fs0-workminutes-v1"-
+#1569	NEW    cov: 1034 ft: 3523 corp: 52/63Kb lim: 3257 exec/s: 0 rss: 112Mb L: 3257/3257 MS: 1 ChangeByte-
+#1655	NEW    cov: 1034 ft: 3538 corp: 53/66Kb lim: 3257 exec/s: 0 rss: 114Mb L: 3257/3257 MS: 1 ChangeBit-
+#1661	NEW    cov: 1034 ft: 3539 corp: 54/69Kb lim: 3257 exec/s: 0 rss: 115Mb L: 2743/3257 MS: 1 ShuffleBytes-
+#1687	NEW    cov: 1036 ft: 3542 corp: 55/69Kb lim: 3257 exec/s: 0 rss: 116Mb L: 438/3257 MS: 1 EraseBytes-
+#1753	NEW    cov: 1036 ft: 3544 corp: 56/70Kb lim: 3257 exec/s: 0 rss: 119Mb L: 563/3257 MS: 1 InsertRepeatedBytes-
+#1894	NEW    cov: 1036 ft: 3547 corp: 57/72Kb lim: 3257 exec/s: 0 rss: 123Mb L: 2347/3257 MS: 1 CMP- DE: "\001\000\000\000\000\000\000\000"-
+#1967	NEW    cov: 1036 ft: 3556 corp: 58/75Kb lim: 3257 exec/s: 0 rss: 126Mb L: 2743/3257 MS: 3 ChangeASCIIInt-ChangeBit-CMP- DE: "\001\000\000\000\000\000\000\000"-
+#2103	NEW    cov: 1036 ft: 3558 corp: 59/75Kb lim: 3257 exec/s: 0 rss: 133Mb L: 608/3257 MS: 1 ChangeASCIIInt-
+#2124	NEW    cov: 1037 ft: 3561 corp: 60/76Kb lim: 3257 exec/s: 0 rss: 133Mb L: 604/3257 MS: 1 InsertRepeatedBytes-
+#2125	NEW    cov: 1037 ft: 3562 corp: 61/78Kb lim: 3257 exec/s: 0 rss: 134Mb L: 2339/3257 MS: 1 CMP- DE: "\000\011"-
+#2136	NEW    cov: 1037 ft: 3633 corp: 62/81Kb lim: 3257 exec/s: 0 rss: 135Mb L: 3257/3257 MS: 1 ChangeBit-
+#2422	REDUCE cov: 1037 ft: 3633 corp: 62/81Kb lim: 3257 exec/s: 0 rss: 148Mb L: 1/3257 MS: 1 EraseBytes-
+#2673	NEW    cov: 1038 ft: 3634 corp: 63/83Kb lim: 3257 exec/s: 0 rss: 158Mb L: 2343/3257 MS: 1 CMP- DE: "name"-
+#2684	REDUCE cov: 1038 ft: 3634 corp: 63/83Kb lim: 3257 exec/s: 0 rss: 159Mb L: 601/3257 MS: 1 EraseBytes-
+#2760	NEW    cov: 1038 ft: 3635 corp: 64/86Kb lim: 3257 exec/s: 0 rss: 161Mb L: 2340/3257 MS: 1 CMP- DE: "d=rivedF"-
+#2791	NEW    cov: 1040 ft: 3638 corp: 65/88Kb lim: 3257 exec/s: 0 rss: 162Mb L: 2747/3257 MS: 1 PersAutoDict- DE: "name"-
+#2803	NEW    cov: 1042 ft: 3641 corp: 66/89Kb lim: 3257 exec/s: 0 rss: 164Mb L: 608/3257 MS: 2 ChangeASCIIInt-CMP- DE: "native-pdm-constraints-v1"-
+#2939	NEW    cov: 1044 ft: 3646 corp: 67/92Kb lim: 3257 exec/s: 0 rss: 169Mb L: 2841/3257 MS: 1 InsertRepeatedBytes-
+	NEW_FUNC[1/1]: 0x55f2a4325240 in jobs::TaskCalendar::~TaskCalendar() /home/runner/work/JOBS/JOBS/src/domain/Project.h:26
+#3050	NEW    cov: 1051 ft: 3700 corp: 68/95Kb lim: 3257 exec/s: 0 rss: 175Mb L: 3257/3257 MS: 1 ChangeByte-
+#3091	NEW    cov: 1054 ft: 3703 corp: 69/95Kb lim: 3257 exec/s: 0 rss: 177Mb L: 501/3257 MS: 1 InsertRepeatedBytes-
+#3112	NEW    cov: 1057 ft: 3706 corp: 70/96Kb lim: 3257 exec/s: 0 rss: 178Mb L: 431/3257 MS: 1 CMP- DE: "\001\000\000\000\000\000\000\000"-
+#3138	NEW    cov: 1058 ft: 3710 corp: 71/99Kb lim: 3257 exec/s: 0 rss: 179Mb L: 2743/3257 MS: 1 ShuffleBytes-
+#3154	NEW    cov: 1058 ft: 3732 corp: 72/101Kb lim: 3257 exec/s: 0 rss: 179Mb L: 2342/3257 MS: 1 ChangeBit-
+#3395	NEW    cov: 1058 ft: 3763 corp: 73/103Kb lim: 3257 exec/s: 0 rss: 187Mb L: 2339/3257 MS: 1 ChangeASCIIInt-
+#3586	NEW    cov: 1059 ft: 3764 corp: 74/104Kb lim: 3257 exec/s: 0 rss: 194Mb L: 517/3257 MS: 1 ChangeBinInt-
+#3602	NEW    cov: 1059 ft: 3769 corp: 75/104Kb lim: 3257 exec/s: 0 rss: 195Mb L: 608/3257 MS: 1 ChangeBit-
+#3637	NEW    cov: 1061 ft: 3772 corp: 76/107Kb lim: 3257 exec/s: 0 rss: 197Mb L: 2771/3257 MS: 5 PersAutoDict-InsertByte-ChangeBit-ChangeByte-ChangeASCIIInt- DE: "\001\020"-
+#3643	NEW    cov: 1061 ft: 3773 corp: 77/110Kb lim: 3257 exec/s: 0 rss: 198Mb L: 2743/3257 MS: 1 ChangeASCIIInt-
+#3664	NEW    cov: 1062 ft: 3774 corp: 78/110Kb lim: 3257 exec/s: 0 rss: 200Mb L: 404/3257 MS: 1 PersAutoDict- DE: "name"-
+#3680	NEW    cov: 1063 ft: 3792 corp: 79/112Kb lim: 3257 exec/s: 0 rss: 200Mb L: 2348/3257 MS: 1 InsertByte-
+#3702	NEW    cov: 1063 ft: 3796 corp: 80/115Kb lim: 3257 exec/s: 0 rss: 201Mb L: 2370/3257 MS: 2 CMP-PersAutoDict- DE: "schema"-"native-pdm-constraints-v1"-
+#3733	NEW    cov: 1063 ft: 3798 corp: 81/117Kb lim: 3257 exec/s: 0 rss: 203Mb L: 2339/3257 MS: 1 ChangeBit-
+#3829	NEW    cov: 1064 ft: 3801 corp: 82/118Kb lim: 3257 exec/s: 0 rss: 208Mb L: 1647/3257 MS: 1 EraseBytes-
+#3835	NEW    cov: 1064 ft: 3811 corp: 83/121Kb lim: 3257 exec/s: 0 rss: 209Mb L: 2743/3257 MS: 1 ShuffleBytes-
+#3876	NEW    cov: 1065 ft: 3812 corp: 84/122Kb lim: 3257 exec/s: 0 rss: 210Mb L: 408/3257 MS: 1 CMP- DE: "\035\000\000\000\000\000\000\000"-
+#3927	NEW    cov: 1065 ft: 3826 corp: 85/125Kb lim: 3257 exec/s: 0 rss: 212Mb L: 3257/3257 MS: 1 ChangeBit-
+#3944	NEW    cov: 1065 ft: 3827 corp: 86/126Kb lim: 3257 exec/s: 0 rss: 214Mb L: 1782/3257 MS: 2 EraseBytes-InsertRepeatedBytes-
+#4030	NEW    cov: 1066 ft: 3829 corp: 87/127Kb lim: 3257 exec/s: 0 rss: 217Mb L: 385/3257 MS: 1 EraseBytes-
+#4151	REDUCE cov: 1066 ft: 3829 corp: 87/127Kb lim: 3257 exec/s: 0 rss: 225Mb L: 562/3257 MS: 1 EraseBytes-
+#4169	NEW    cov: 1066 ft: 3831 corp: 88/129Kb lim: 3257 exec/s: 0 rss: 226Mb L: 2314/3257 MS: 3 ChangeByte-CMP-EraseBytes- DE: "\001\000\000\000\000\000\000\031"-
+#4170	REDUCE cov: 1066 ft: 3831 corp: 88/128Kb lim: 3257 exec/s: 0 rss: 226Mb L: 1632/3257 MS: 1 EraseBytes-
+#4221	NEW    cov: 1066 ft: 3832 corp: 89/131Kb lim: 3257 exec/s: 0 rss: 228Mb L: 2866/3257 MS: 1 PersAutoDict- DE: "native-pdm-constraints-v1"-
+#4252	NEW    cov: 1066 ft: 3834 corp: 90/133Kb lim: 3257 exec/s: 0 rss: 229Mb L: 2348/3257 MS: 1 PersAutoDict- DE: "\001\000\000\000\000\000\000\031"-
+#4274	NEW    cov: 1067 ft: 3835 corp: 91/136Kb lim: 3257 exec/s: 0 rss: 231Mb L: 2743/3257 MS: 2 ChangeByte-ChangeASCIIInt-
+#4680	NEW    cov: 1067 ft: 3854 corp: 92/138Kb lim: 3257 exec/s: 0 rss: 247Mb L: 2743/3257 MS: 1 CMP- DE: "\007\000\000\000"-
+#4776	NEW    cov: 1069 ft: 3856 corp: 93/141Kb lim: 3257 exec/s: 0 rss: 250Mb L: 2341/3257 MS: 1 InsertByte-
+#4797	NEW    cov: 1069 ft: 3863 corp: 94/143Kb lim: 3257 exec/s: 0 rss: 251Mb L: 2744/3257 MS: 1 InsertByte-
+#4858	NEW    cov: 1072 ft: 3866 corp: 95/144Kb lim: 3257 exec/s: 0 rss: 252Mb L: 633/3257 MS: 1 PersAutoDict- DE: "native-fs0-workminutes-v1"-
+#4869	NEW    cov: 1073 ft: 3867 corp: 96/145Kb lim: 3257 exec/s: 0 rss: 252Mb L: 604/3257 MS: 1 ChangeBinInt-
+#4976	NEW    cov: 1075 ft: 3869 corp: 97/146Kb lim: 3257 exec/s: 0 rss: 258Mb L: 1489/3257 MS: 2 EraseBytes-PersAutoDict- DE: "d=rivedF"-
+#5000	DONE   cov: 1075 ft: 3869 corp: 97/146Kb lim: 3257 exec/s: 0 rss: 259Mb
+###### Recommended dictionary. ######
+"\001\020" # Uses: 112
+"\001\000\000\000\000\000\000\000" # Uses: 60
+"native-fs0-workminutes-v1" # Uses: 55
+"\000\011" # Uses: 34
+"name" # Uses: 24
+"d=rivedF" # Uses: 19
+"native-pdm-constraints-v1" # Uses: 20
+"schema" # Uses: 13
+"\035\000\000\000\000\000\000\000" # Uses: 10
+"\001\000\000\000\000\000\000\031" # Uses: 11
+"\007\000\000\000" # Uses: 2
+###### End of recommended dictionary. ######
+Done 5000 runs in 0 second(s)
+stat::number_of_executed_units: 5000
+stat::average_exec_per_sec:     0
+stat::new_units_added:          82
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              259

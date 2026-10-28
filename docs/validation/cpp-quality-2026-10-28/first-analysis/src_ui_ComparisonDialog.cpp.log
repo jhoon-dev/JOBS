@@ -1,0 +1,13 @@
+/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp:62:1: error: Potential leak of memory pointed to by 'watcher' [clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors]
+   62 | }
+      | ^
+/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp:49:72: note: Calling 'ComparisonDialog::recalculate'
+   49 |     connect(baseline_, &QComboBox::currentIndexChanged, this, [this] { recalculate(); }); recalculate();
+      |                                                                        ^~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp:54:21: note: Memory is allocated
+   54 |     auto* watcher = new QFutureWatcher<ComparisonReport>(this);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp:62:1: note: Potential leak of memory pointed to by 'watcher'
+   62 | }
+      | ^
+20 warnings generated.

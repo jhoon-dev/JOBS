@@ -1,0 +1,63 @@
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:58: error: Access to field 'cancelState_' results in a dereference of a null pointer [clang-analyzer-core.NullDereference,-warnings-as-errors]
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |                                                          ^~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:17: note: Assuming the condition is true
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:13: note: Taking true branch
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |             ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:58: note: Access to field 'cancelState_' results in a dereference of a null pointer
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |                                                          ^~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:76:20: error: Called C++ object pointer is null [clang-analyzer-core.CallAndMessage,-warnings-as-errors]
+   76 |                 if(beforeApply)beforeApply();
+      |                    ^~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:17: note: Assuming the condition is false
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:13: note: Taking false branch
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |             ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:76:20: note: Called C++ object pointer is null
+   76 |                 if(beforeApply)beforeApply();
+      |                    ^~~~~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: error: Use of memory after it is freed [clang-analyzer-cplusplus.NewDelete,-warnings-as-errors]
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:17: note: Assuming the condition is false
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:13: note: Taking false branch
+   74 |             if (control->cancelRequested.load()) state = cancelState_;
+      |             ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:76:17: note: Taking true branch
+   76 |                 if(beforeApply)beforeApply();
+      |                 ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:77:17: note: Taking true branch
+   77 |                 if(!guard)return;
+      |                 ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:77:27: note: Calling implicit destructor for 'QPointer<jobs::AsyncEditController>'
+   77 |                 if(!guard)return;
+      |                           ^
+/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:77:27: note: Calling '~QWeakPointer'
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Field 'd' is non-null
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                  ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Left side of '&&' is true
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:39: note: Assuming the condition is true
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                       ^~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:30: note: Taking true branch
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                              ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Memory is released
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Calling 'ExternalRefCountData::operator delete'
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: note: Use of memory after it is freed
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^                 ~~~
+21 warnings generated.

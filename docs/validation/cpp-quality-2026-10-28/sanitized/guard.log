@@ -1,0 +1,18 @@
+Start testing: Oct 28 06:43 UTC
+----------------------------------------------------------
+1/43 Testing: document_edit_guards
+1/43 Test: document_edit_guards
+Command: "/home/runner/work/JOBS/JOBS/build-sanitized/jobs_document_guard_tests"
+Directory: /home/runner/work/JOBS/JOBS/build-sanitized
+"document_edit_guards" start time: Oct 28 06:43 UTC
+Output:
+----------------------------------------------------------
+PASS: 70 closed/read-only guard cases, special messages, no input/history/snapshot/IO/ID effects, stale preparation, writable undo/redo and independent copy
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"document_edit_guards" end time: Oct 28 06:43 UTC
+"document_edit_guards" time elapsed: 00:00:00
+----------------------------------------------------------
+

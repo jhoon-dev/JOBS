@@ -1,0 +1,9 @@
+2026-10-28T06:37:26.4970020Z ##[group]GITHUB_TOKEN Permissions
+2026-10-28T06:37:43.1898225Z test_changed_committed_staged_and_new_sources_are_selected (__main__.GateTests.test_changed_committed_staged_and_new_sources_are_selected) ... ok
+2026-10-28T06:37:43.3103234Z test_format_failure_is_read_only_then_explicit_fix_is_idempotent (__main__.GateTests.test_format_failure_is_read_only_then_explicit_fix_is_idempotent) ... ok
+2026-10-28T06:37:43.3269078Z test_outside_or_missing_enrollment_fails_closed (__main__.GateTests.test_outside_or_missing_enrollment_fails_closed) ... ok
+2026-10-28T06:37:44.5588169Z FAIL: src/Example.cpp
+2026-10-28T06:37:44.5935893Z PASS: src/Example.cpp
+2026-10-28T06:37:44.6181711Z test_real_analyzer_rejects_null_dereference_and_accepts_repair (__main__.GateTests.test_real_analyzer_rejects_null_dereference_and_accepts_repair) ... ok
+2026-10-28T06:37:44.6182658Z Ran 4 tests in 1.454s
+2026-10-28T06:37:44.6182851Z OK

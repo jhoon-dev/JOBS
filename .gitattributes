@@ -7,3 +7,6 @@
 *.ps1 text eol=crlf
 # XER is a byte-preserved tabular interchange fixture; trailing empty cells are data.
 *.xer -text -whitespace
+# Generated validation evidence retains tool-emitted spacing and blank EOF lines.
+docs/validation/**/*.log text eol=lf -whitespace
+docs/validation/**/CMakeCache.txt text eol=lf -whitespace

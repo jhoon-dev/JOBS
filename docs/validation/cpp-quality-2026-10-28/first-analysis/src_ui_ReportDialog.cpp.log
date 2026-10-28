@@ -1,0 +1,31 @@
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:109:1: error: Potential leak of memory pointed to by 'watcher' [clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors]
+  109 | }
+      | ^
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:84:110: note: Calling 'ReportDialog::prepare'
+   84 |     for (auto* c : {scope_, baseline_, formula_}) connect(c, &QComboBox::currentIndexChanged, this, [this] { prepare(); });
+      |                                                                                                              ^~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:95:9: note: Assuming field 'exporting_' is false
+   95 |     if (exporting_) return;
+      |         ^~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:95:5: note: Taking false branch
+   95 |     if (exporting_) return;
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:96:57: note: Assuming the condition is false
+   96 |     const auto generation = ++generation_; clear(); if (!document_.project()) return;
+      |                                                         ^~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:96:53: note: Taking false branch
+   96 |     const auto generation = ++generation_; clear(); if (!document_.project()) return;
+      |                                                     ^
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:99:9: note: Assuming the condition is true
+   99 |     if (period_->isChecked()) { options.fromDate = from_->date().toString(Qt::ISODate).toStdString(); options.toDate = to_->date().toString(Qt::ISODate).toStdString(); }
+      |         ^~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:99:5: note: Taking true branch
+   99 |     if (period_->isChecked()) { options.fromDate = from_->date().toString(Qt::ISODate).toStdString(); options.toDate = to_->date().toString(Qt::ISODate).toStdString(); }
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:101:21: note: Memory is allocated
+  101 |     auto* watcher = new QFutureWatcher<Prepared>(this);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:109:1: note: Potential leak of memory pointed to by 'watcher'
+  109 | }
+      | ^
+21 warnings generated.

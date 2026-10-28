@@ -1,0 +1,106 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3545366613
+INFO: Loaded 1 modules   (42366 inline 8-bit counters): 42366 [0x55e59a679d60, 0x55e59a6842de), 
+INFO: Loaded 1 PC tables (42366 PCs): 42366 [0x55e59a6842e0,0x55e59a729ac0), 
+/home/runner/work/JOBS/JOBS/build-sanitized/jobs_fuzz_jobs: Running 46 inputs 1 time(s) each.
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/binary
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/binary in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/checksum.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/checksum.jobs in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/empty
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/empty in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs in 2 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-effort-split-v1.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-constraints-v1.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs in 1 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/native-pdm-taskcal-v1.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-1.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-2.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-3.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-4.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-5.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-6.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-7.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-8.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/payload-9.json.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-1.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-2.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-3.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-4.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-5.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-6.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-7.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-8.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs.truncated
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/schema-9.jobs.truncated in 0 ms
+Running: /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/unknown.jobs
+Executed /home/runner/work/JOBS/JOBS/build-sanitized/parser-fuzz/corpus/jobs/unknown.jobs in 0 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***
+stat::number_of_executed_units: 46
+stat::average_exec_per_sec:     0
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              57

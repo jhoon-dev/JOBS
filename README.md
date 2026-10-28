@@ -66,3 +66,5 @@ PM Canvas는 별도 개인용 프로토타입이다. 그 코드·아키텍처·�
 [필터·정렬·WBS 대량 편집](docs/projected-task-views.md)에서도 표시 자료를 비동기로 준비하고 생존 작업 ID를 유지하며 갱신한다. 많이 흩어진 변경은 준비된 자료로 한 번 reset하고, 준비 중 보기/입력이 바뀌면 안전한 경합 처리를 사용한다.
 
 [외부 파일 파서 검증](docs/parser-safety.md): `.jobs`·Project XML·Primavera XER seed 재생과 선택적 Clang/libFuzzer·ASan/UBSan 검사를 제공한다. 기본 앱 실행에는 퍼징 도구가 필요 없다.
+
+[C++ 품질 검사](docs/cpp-quality.md): 고정 clang-format·점진적 포맷 적용과 실제 Qt 컴파일 설정을 사용하는 clang-tidy CI를 제공한다. 편집 권한 가드는 공통화하며 상태일·간트·저장/복구·읽기 전용 사본의 기존 정책을 유지한다.

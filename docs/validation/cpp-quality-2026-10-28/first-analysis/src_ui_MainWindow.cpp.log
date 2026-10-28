@@ -1,0 +1,35 @@
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:334:1: error: Potential leak of memory pointed to by 'watcher' [clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors]
+  334 | }
+      | ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:321:77: note: Calling 'MainWindow::calculateSchedule'
+  321 |     if (editController_ && editController_->busy()) { runAfterEdit([this] { calculateSchedule(); }); return; }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:321:9: note: Assuming field 'editController_' is non-null
+  321 |     if (editController_ && editController_->busy()) { runAfterEdit([this] { calculateSchedule(); }); return; }
+      |         ^~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:321:9: note: Left side of '&&' is true
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:321:28: note: Assuming the condition is false
+  321 |     if (editController_ && editController_->busy()) { runAfterEdit([this] { calculateSchedule(); }); return; }
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:321:5: note: Taking false branch
+  321 |     if (editController_ && editController_->busy()) { runAfterEdit([this] { calculateSchedule(); }); return; }
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:322:9: note: Assuming the condition is false
+  322 |     if (!document_.project()) return;
+      |         ^~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:322:5: note: Taking false branch
+  322 |     if (!document_.project()) return;
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:323:8: note: Assuming field 'calculating_' is false
+  323 |     if(calculating_){queuedCalculation_=document_.sessionGeneration();return;}
+      |        ^~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:323:5: note: Taking false branch
+  323 |     if(calculating_){queuedCalculation_=document_.sessionGeneration();return;}
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:325:21: note: Memory is allocated
+  325 |     auto* watcher = new QFutureWatcher<ScheduleResult>(this);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:334:1: note: Potential leak of memory pointed to by 'watcher'
+  334 | }
+      | ^
+19 warnings generated.

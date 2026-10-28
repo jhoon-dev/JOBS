@@ -1,0 +1,79 @@
+{
+  "run_id": 40643042856,
+  "diagnostics": [
+    {
+      "translation_unit": "src/ui/AsyncEditController.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:74:58",
+      "message": "Access to field 'cancelState_' results in a dereference of a null pointer",
+      "check": "clang-analyzer-core.NullDereference,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/AsyncEditController.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp:76:20",
+      "message": "Called C++ object pointer is null",
+      "check": "clang-analyzer-core.CallAndMessage,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/AsyncEditController.cpp",
+      "location": "/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50",
+      "message": "Use of memory after it is freed",
+      "check": "clang-analyzer-cplusplus.NewDelete,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/ComparisonDialog.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp:62:1",
+      "message": "Potential leak of memory pointed to by 'watcher'",
+      "check": "clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/CostAnalysisDialog.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp:94:1",
+      "message": "Potential leak of memory pointed to by 'watcher'",
+      "check": "clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/MainWindow.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp:334:1",
+      "message": "Potential leak of memory pointed to by 'watcher'",
+      "check": "clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/MainWindowAsync.cpp",
+      "location": "/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50",
+      "message": "Use of memory after it is freed",
+      "check": "clang-analyzer-cplusplus.NewDelete,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/ReportDialog.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp:109:1",
+      "message": "Potential leak of memory pointed to by 'watcher'",
+      "check": "clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/ResourceComparisonDialog.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/ResourceComparisonDialog.cpp:178:1",
+      "message": "Potential leak of memory pointed to by 'watcher'",
+      "check": "clang-analyzer-cplusplus.NewDeleteLeaks,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/TaskTableModel.cpp",
+      "location": "/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:138:55",
+      "message": "Method called on moved-from object 'assignments_' of type 'std::unordered_map'",
+      "check": "clang-analyzer-cplusplus.Move,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/TaskTableModel.cpp",
+      "location": "/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50",
+      "message": "Use of memory after it is freed",
+      "check": "clang-analyzer-cplusplus.NewDelete,-warnings-as-errors"
+    },
+    {
+      "translation_unit": "src/ui/TaskTableView.cpp",
+      "location": "/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50",
+      "message": "Use of memory after it is freed",
+      "check": "clang-analyzer-cplusplus.NewDelete,-warnings-as-errors"
+    }
+  ],
+  "review": "Qt ownership/system-header model reports plus explicit callback/cache state improvements; no checker or warnings-as-errors changes, no suppression list",
+  "upstream_issue": "https://github.com/llvm/llvm-project/issues/62985"
+}

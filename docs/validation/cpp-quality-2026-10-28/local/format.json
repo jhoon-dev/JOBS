@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": "e381e0f",
+  "files": [
+    "src/application/Document.cpp",
+    "src/application/Document.h",
+    "src/application/PreparedEdit.cpp",
+    "src/application/TaskEditing.cpp",
+    "src/ui/AsyncEditController.cpp",
+    "src/ui/TaskTableModel.cpp",
+    "tests/DocumentGuardTests.cpp"
+  ],
+  "format_changes": [],
+  "fix": false
+}

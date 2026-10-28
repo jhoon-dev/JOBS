@@ -1,0 +1,87 @@
+{
+  "status": "success",
+  "source_revision": "f3316f100cee78f9db866e5f7c689f2b0ffa77a7",
+  "prd_revision": "a999d59",
+  "format_only_revisions": [
+    "c231170",
+    "e2106f2"
+  ],
+  "semantic_revisions": [
+    "746a448",
+    "3250ad7"
+  ],
+  "desktop_run_id": 40644964939,
+  "quality_run_id": 40644974152,
+  "sanitized_run_id": 40644969279,
+  "static_translation_units": 59,
+  "static_all_returncodes_zero": true,
+  "tool_gate_tests": 4,
+  "ctest_per_platform": 43,
+  "ctest_seconds": {
+    "Windows": 84.5,
+    "macOS": 66.29,
+    "Linux-ASan-UBSan": 137.41,
+    "local-MinGW": 144.48
+  },
+  "ordinary_guards_consolidated": 30,
+  "guard_rejection_cases": 70,
+  "fuzz_executions": 15000,
+  "schedule_hashes": [
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "Windows",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "legacy",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_previous_golden": true
+    },
+    {
+      "os": "macOS",
+      "profile": "effort",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_previous_golden": true
+    }
+  ]
+}

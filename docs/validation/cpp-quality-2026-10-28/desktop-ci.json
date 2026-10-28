@@ -1,0 +1,654 @@
+{
+  "conclusion": "success",
+  "headSha": "f3316f100cee78f9db866e5f7c689f2b0ffa77a7",
+  "jobs": [
+    {
+      "completedAt": "2026-10-28T06:47:56Z",
+      "conclusion": "success",
+      "databaseId": 122671531032,
+      "name": "build (macos-15, clang_64)",
+      "startedAt": "2026-10-28T06:37:22Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T06:37:30Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T06:37:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:37:32Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-28T06:37:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:37:32Z",
+          "conclusion": "success",
+          "name": "Select Qt 6.8 compatible macOS SDK",
+          "number": 3,
+          "startedAt": "2026-10-28T06:37:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:38:30Z",
+          "conclusion": "success",
+          "name": "Run jurplel/install-qt-action@v4",
+          "number": 4,
+          "startedAt": "2026-10-28T06:37:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:38:36Z",
+          "conclusion": "success",
+          "name": "Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+          "number": 5,
+          "startedAt": "2026-10-28T06:38:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:40:53Z",
+          "conclusion": "success",
+          "name": "Run cmake --build build --config Release --parallel 3",
+          "number": 6,
+          "startedAt": "2026-10-28T06:38:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:41:59Z",
+          "conclusion": "success",
+          "name": "Run ctest --test-dir build -C Release --output-on-failure",
+          "number": 7,
+          "startedAt": "2026-10-28T06:40:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:41:59Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 8,
+          "startedAt": "2026-10-28T06:41:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:42:04Z",
+          "conclusion": "success",
+          "name": "Verify exported XLSX and PDF with independent readers",
+          "number": 9,
+          "startedAt": "2026-10-28T06:41:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:42:21Z",
+          "conclusion": "success",
+          "name": "Measure deterministic 1k and 10k schedules and UI",
+          "number": 10,
+          "startedAt": "2026-10-28T06:42:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:42:35Z",
+          "conclusion": "success",
+          "name": "Measure cell edits and retained undo at 1k and 10k tasks",
+          "number": 11,
+          "startedAt": "2026-10-28T06:42:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:42:55Z",
+          "conclusion": "success",
+          "name": "Measure request worker and GUI commit phases",
+          "number": 12,
+          "startedAt": "2026-10-28T06:42:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:42:56Z",
+          "conclusion": "success",
+          "name": "Check out pre-optimization editing reference",
+          "number": 13,
+          "startedAt": "2026-10-28T06:42:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:44:29Z",
+          "conclusion": "success",
+          "name": "Build reference with the same Qt and compiler",
+          "number": 14,
+          "startedAt": "2026-10-28T06:42:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:45:01Z",
+          "conclusion": "success",
+          "name": "Measure reference and compare paired editing observations",
+          "number": 15,
+          "startedAt": "2026-10-28T06:44:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:45:22Z",
+          "conclusion": "success",
+          "name": "Measure paired bulk UI operations",
+          "number": 16,
+          "startedAt": "2026-10-28T06:45:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:46:49Z",
+          "conclusion": "success",
+          "name": "Measure paired filtered sorted and WBS view operations",
+          "number": 17,
+          "startedAt": "2026-10-28T06:45:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:46:58Z",
+          "conclusion": "success",
+          "name": "Exercise native projected views and publication races",
+          "number": 18,
+          "startedAt": "2026-10-28T06:46:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:00Z",
+          "conclusion": "success",
+          "name": "Preserve projected view evidence",
+          "number": 19,
+          "startedAt": "2026-10-28T06:46:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:02Z",
+          "conclusion": "success",
+          "name": "Exercise native structural editing and row notifications",
+          "number": 20,
+          "startedAt": "2026-10-28T06:47:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:04Z",
+          "conclusion": "success",
+          "name": "Preserve native structural editing evidence",
+          "number": 21,
+          "startedAt": "2026-10-28T06:47:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:04Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@v4",
+          "number": 22,
+          "startedAt": "2026-10-28T06:47:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:08Z",
+          "conclusion": "success",
+          "name": "Verify XER with independent TSV and MPXJ readers",
+          "number": 23,
+          "startedAt": "2026-10-28T06:47:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:08Z",
+          "conclusion": "success",
+          "name": "Capture native task editing screen",
+          "number": 24,
+          "startedAt": "2026-10-28T06:47:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:28Z",
+          "conclusion": "success",
+          "name": "Exercise native model and cancellable editing",
+          "number": 25,
+          "startedAt": "2026-10-28T06:47:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:33Z",
+          "conclusion": "success",
+          "name": "Exercise native incremental refresh and WBS fallbacks",
+          "number": 26,
+          "startedAt": "2026-10-28T06:47:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:35Z",
+          "conclusion": "success",
+          "name": "Preserve model and async editing evidence",
+          "number": 27,
+          "startedAt": "2026-10-28T06:47:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:39Z",
+          "conclusion": "success",
+          "name": "Exercise native Project XML dialogs",
+          "number": 28,
+          "startedAt": "2026-10-28T06:47:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:42Z",
+          "conclusion": "success",
+          "name": "Exercise native Primavera XER dialogs",
+          "number": 29,
+          "startedAt": "2026-10-28T06:47:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:44Z",
+          "conclusion": "success",
+          "name": "Preserve Primavera XER evidence",
+          "number": 30,
+          "startedAt": "2026-10-28T06:47:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:46Z",
+          "conclusion": "success",
+          "name": "Preserve Project XML evidence",
+          "number": 31,
+          "startedAt": "2026-10-28T06:47:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:47Z",
+          "conclusion": "success",
+          "name": "Preserve native UI evidence",
+          "number": 32,
+          "startedAt": "2026-10-28T06:47:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:49Z",
+          "conclusion": "success",
+          "name": "Preserve performance evidence",
+          "number": 33,
+          "startedAt": "2026-10-28T06:47:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@v4",
+          "number": 62,
+          "startedAt": "2026-10-28T06:47:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:50Z",
+          "conclusion": "success",
+          "name": "Post Check out pre-optimization editing reference",
+          "number": 63,
+          "startedAt": "2026-10-28T06:47:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 64,
+          "startedAt": "2026-10-28T06:47:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:50Z",
+          "conclusion": "success",
+          "name": "Post Run jurplel/install-qt-action@v4",
+          "number": 65,
+          "startedAt": "2026-10-28T06:47:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:51Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 66,
+          "startedAt": "2026-10-28T06:47:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:52Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 67,
+          "startedAt": "2026-10-28T06:47:51Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40644964939/job/122671531032"
+    },
+    {
+      "completedAt": "2026-10-28T06:54:21Z",
+      "conclusion": "success",
+      "databaseId": 122671531392,
+      "name": "build (windows-latest, win64_msvc2022_64)",
+      "startedAt": "2026-10-28T06:37:20Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T06:37:27Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T06:37:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:37:34Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-28T06:37:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:37:34Z",
+          "conclusion": "skipped",
+          "name": "Select Qt 6.8 compatible macOS SDK",
+          "number": 3,
+          "startedAt": "2026-10-28T06:37:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:38:48Z",
+          "conclusion": "success",
+          "name": "Run jurplel/install-qt-action@v4",
+          "number": 4,
+          "startedAt": "2026-10-28T06:37:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:39:29Z",
+          "conclusion": "success",
+          "name": "Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+          "number": 5,
+          "startedAt": "2026-10-28T06:38:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:45:26Z",
+          "conclusion": "success",
+          "name": "Run cmake --build build --config Release --parallel 3",
+          "number": 6,
+          "startedAt": "2026-10-28T06:39:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:46:52Z",
+          "conclusion": "success",
+          "name": "Run ctest --test-dir build -C Release --output-on-failure",
+          "number": 7,
+          "startedAt": "2026-10-28T06:45:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:46:52Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 8,
+          "startedAt": "2026-10-28T06:46:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:08Z",
+          "conclusion": "success",
+          "name": "Verify exported XLSX and PDF with independent readers",
+          "number": 9,
+          "startedAt": "2026-10-28T06:46:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:19Z",
+          "conclusion": "success",
+          "name": "Measure deterministic 1k and 10k schedules and UI",
+          "number": 10,
+          "startedAt": "2026-10-28T06:47:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:28Z",
+          "conclusion": "success",
+          "name": "Measure cell edits and retained undo at 1k and 10k tasks",
+          "number": 11,
+          "startedAt": "2026-10-28T06:47:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:46Z",
+          "conclusion": "success",
+          "name": "Measure request worker and GUI commit phases",
+          "number": 12,
+          "startedAt": "2026-10-28T06:47:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:47:50Z",
+          "conclusion": "success",
+          "name": "Check out pre-optimization editing reference",
+          "number": 13,
+          "startedAt": "2026-10-28T06:47:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:51:48Z",
+          "conclusion": "success",
+          "name": "Build reference with the same Qt and compiler",
+          "number": 14,
+          "startedAt": "2026-10-28T06:47:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:52:13Z",
+          "conclusion": "success",
+          "name": "Measure reference and compare paired editing observations",
+          "number": 15,
+          "startedAt": "2026-10-28T06:51:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:52:27Z",
+          "conclusion": "success",
+          "name": "Measure paired bulk UI operations",
+          "number": 16,
+          "startedAt": "2026-10-28T06:52:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:22Z",
+          "conclusion": "success",
+          "name": "Measure paired filtered sorted and WBS view operations",
+          "number": 17,
+          "startedAt": "2026-10-28T06:52:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:27Z",
+          "conclusion": "success",
+          "name": "Exercise native projected views and publication races",
+          "number": 18,
+          "startedAt": "2026-10-28T06:53:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:29Z",
+          "conclusion": "success",
+          "name": "Preserve projected view evidence",
+          "number": 19,
+          "startedAt": "2026-10-28T06:53:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:31Z",
+          "conclusion": "success",
+          "name": "Exercise native structural editing and row notifications",
+          "number": 20,
+          "startedAt": "2026-10-28T06:53:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:32Z",
+          "conclusion": "success",
+          "name": "Preserve native structural editing evidence",
+          "number": 21,
+          "startedAt": "2026-10-28T06:53:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:32Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@v4",
+          "number": 22,
+          "startedAt": "2026-10-28T06:53:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:45Z",
+          "conclusion": "success",
+          "name": "Verify XER with independent TSV and MPXJ readers",
+          "number": 23,
+          "startedAt": "2026-10-28T06:53:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:45Z",
+          "conclusion": "success",
+          "name": "Capture native task editing screen",
+          "number": 24,
+          "startedAt": "2026-10-28T06:53:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:53:59Z",
+          "conclusion": "success",
+          "name": "Exercise native model and cancellable editing",
+          "number": 25,
+          "startedAt": "2026-10-28T06:53:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:04Z",
+          "conclusion": "success",
+          "name": "Exercise native incremental refresh and WBS fallbacks",
+          "number": 26,
+          "startedAt": "2026-10-28T06:53:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:05Z",
+          "conclusion": "success",
+          "name": "Preserve model and async editing evidence",
+          "number": 27,
+          "startedAt": "2026-10-28T06:54:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:07Z",
+          "conclusion": "success",
+          "name": "Exercise native Project XML dialogs",
+          "number": 28,
+          "startedAt": "2026-10-28T06:54:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:09Z",
+          "conclusion": "success",
+          "name": "Exercise native Primavera XER dialogs",
+          "number": 29,
+          "startedAt": "2026-10-28T06:54:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:11Z",
+          "conclusion": "success",
+          "name": "Preserve Primavera XER evidence",
+          "number": 30,
+          "startedAt": "2026-10-28T06:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:12Z",
+          "conclusion": "success",
+          "name": "Preserve Project XML evidence",
+          "number": 31,
+          "startedAt": "2026-10-28T06:54:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:13Z",
+          "conclusion": "success",
+          "name": "Preserve native UI evidence",
+          "number": 32,
+          "startedAt": "2026-10-28T06:54:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:15Z",
+          "conclusion": "success",
+          "name": "Preserve performance evidence",
+          "number": 33,
+          "startedAt": "2026-10-28T06:54:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:15Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@v4",
+          "number": 62,
+          "startedAt": "2026-10-28T06:54:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:17Z",
+          "conclusion": "success",
+          "name": "Post Check out pre-optimization editing reference",
+          "number": 63,
+          "startedAt": "2026-10-28T06:54:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:17Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 64,
+          "startedAt": "2026-10-28T06:54:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:17Z",
+          "conclusion": "success",
+          "name": "Post Run jurplel/install-qt-action@v4",
+          "number": 65,
+          "startedAt": "2026-10-28T06:54:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:19Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 66,
+          "startedAt": "2026-10-28T06:54:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T06:54:19Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 67,
+          "startedAt": "2026-10-28T06:54:19Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40644964939/job/122671531392"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40644964939"
+}

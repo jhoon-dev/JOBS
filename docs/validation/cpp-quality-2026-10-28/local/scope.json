@@ -1,0 +1,9 @@
+{
+  "build_revision": "3250ad70bd9d00b074338f16a1d070085c8ab856+dirty",
+  "compiler": "MinGW 13.1, Qt 6.8.3, Release",
+  "ctest": "43/43, 144.48 seconds",
+  "same_product_and_test_sources_as_final": true,
+  "format": "7 files, read-only, no changes",
+  "gate_tests": "3 passed, real clang-tidy case skipped locally and tested in Linux CI",
+  "independent_readers": "5 XLSX, 6 PDF, Project XML, XER TSV/MPXJ"
+}

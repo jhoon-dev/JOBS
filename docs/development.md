@@ -182,3 +182,5 @@ Primavera XER 증분은 PRD XER-01~04를 먼저 정의하고 `persistence/Primav
 필터·정렬·WBS 대량 편집 증분은 PRD VIEWBULK-01~04를 선반영한 뒤 공통 TaskViewProjection/worker 준비와 ID 기반 모델 행·layout 갱신을 추가했다. 새 셀 초안은 반영 전에 확정하여 stale 결과가 덮지 않게 한다. projected_views_ui로 CTest 41개이며 [준비된 보기 계약·전후 관측](projected-task-views.md)을 따른다.
 
 외부 파일 검증 증분은 PRD PARSER-SAFE-01~04를 먼저 확정하고 실제 native 메모리 decoder와 XML/XER import에 공유 harness를 추가했다. `parser_seed_replay`를 포함해 CTest 42개이며, 기본 빌드에서는 56개 정상/손상 seed를 재생한다. 별도 Linux/Clang CI는 선택적 ASan/UBSan 전체 회귀와 libFuzzer 세 타깃의 유한 실행을 수행한다. [명령·경계·검증 결과](parser-safety.md)를 따른다.
+
+유지보수 증분은 PRD MAINT-01~04를 먼저 확정하고 편집 핵심의 점진 포맷, 전체 제품 src의 clang-tidy, private 편집 권한 가드를 도입했다. `document_edit_guards`를 포함해 CTest 43개다. 기본 빌드에는 formatter/analyzer가 필요하지 않으며 [도구 명령·가드 계약·검증](cpp-quality.md)을 따른다.

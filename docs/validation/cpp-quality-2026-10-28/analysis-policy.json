@@ -1,0 +1,7 @@
+{
+  "unchanged_check_configuration": true,
+  "clang_tidy_config_sha256": "a9b32dd1dd71a68c9e6e2b51ef9a9e0b8a9ce79b4a4bff4ff7a9cab27bd00b12",
+  "post_diagnostic_suppression": false,
+  "new_NOLINT_annotations": false,
+  "qt_workaround": "CMAKE_NO_SYSTEM_FROM_IMPORTED=ON, LLVM #62985"
+}

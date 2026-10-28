@@ -1,0 +1,178 @@
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:138:55: error: Method called on moved-from object 'assignments_' of type 'std::unordered_map' [clang-analyzer-cplusplus.Move,-warnings-as-errors]
+  138 |     for(const auto& [id,label]:view.assignmentLabels) assignments_.emplace(id,qs(label));
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Assuming field 'initialized_' is true
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:26: note: Assuming the condition is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |                          ^~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:38: note: Assuming field 'before' is equal to field 'revision_'
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:66: note: Assuming field 'after' is equal to field 'revision'
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |                                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:124:9: note: Assuming field 'session' is equal to field 'session_'
+  124 |         view.session != session_ || session_ != document_.sessionGeneration() || view.documentId != documentId_ ||
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:124:37: note: Assuming the condition is false
+  124 |         view.session != session_ || session_ != document_.sessionGeneration() || view.documentId != documentId_ ||
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:124:82: note: Assuming the condition is false
+  124 |         view.session != session_ || session_ != document_.sessionGeneration() || view.documentId != documentId_ ||
+      |                                                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:125:9: note: Assuming the condition is false
+  125 |         readOnly_ != document_.readOnly() || view.input.tasks.size() != project->tasks.size() || rows_.size() != plan_.tasks.size()) return false;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:125:46: note: Assuming the condition is false
+  125 |         readOnly_ != document_.readOnly() || view.input.tasks.size() != project->tasks.size() || rows_.size() != plan_.tasks.size()) return false;
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:9: note: Left side of '||' is false
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:125:98: note: Assuming the condition is false
+  125 |         readOnly_ != document_.readOnly() || view.input.tasks.size() != project->tasks.size() || rows_.size() != plan_.tasks.size()) return false;
+      |                                                                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:123:5: note: Taking false branch
+  123 |     if (!initialized_ || !project || view.before != revision_ || view.after != project->revision ||
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:126:27: note: Assuming the condition is false
+  126 |     for (std::size_t i=0; i<rows_.size(); ++i) if(rows_[i]!=i) return false;
+      |                           ^~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:126:5: note: Loop condition is false. Execution continues on line 127
+  126 |     for (std::size_t i=0; i<rows_.size(); ++i) if(rows_[i]!=i) return false;
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:127:9: note: Assuming the condition is false
+  127 |     if (document_.calculation() && document_.calculation()->status == CalculationStatus::Valid) return false;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:127:33: note: Left side of '&&' is false
+  127 |     if (document_.calculation() && document_.calculation()->status == CalculationStatus::Valid) return false;
+      |                                 ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:129:25: note: Assuming 'newSize' is <= 'oldSize'
+  129 |     const bool insert = newSize>oldSize && view.prefix+view.suffix==oldSize;
+      |                         ^~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:129:41: note: Left side of '&&' is false
+  129 |     const bool insert = newSize>oldSize && view.prefix+view.suffix==oldSize;
+      |                                         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:130:25: note: Assuming 'newSize' is >= 'oldSize'
+  130 |     const bool remove = newSize<oldSize && view.prefix+view.suffix==newSize;
+      |                         ^~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:130:41: note: Left side of '&&' is false
+  130 |     const bool remove = newSize<oldSize && view.prefix+view.suffix==newSize;
+      |                                         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:131:24: note: Assuming field 'sameOrder' is true
+  131 |     const bool reset = !view.sameOrder && !insert && !remove;
+      |                        ^~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:131:40: note: Left side of '&&' is false
+  131 |     const bool reset = !view.sameOrder && !insert && !remove;
+      |                                        ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:132:24: note: Assuming the condition is false
+  132 |     const bool dates = calculationGeneration_ != document_.calculationGeneration();
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:133:8: note: 'reset' is false
+  133 |     if(reset)beginResetModel();
+      |        ^~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:133:5: note: Taking false branch
+  133 |     if(reset)beginResetModel();
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:134:13: note: 'insert' is false
+  134 |     else if(insert)beginInsertRows({},int(view.prefix),int(view.prefix+newSize-oldSize-1));
+      |             ^~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:134:10: note: Taking false branch
+  134 |     else if(insert)beginInsertRows({},int(view.prefix),int(view.prefix+newSize-oldSize-1));
+      |          ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:135:13: note: 'remove' is false
+  135 |     else if(remove)beginRemoveRows({},int(view.prefix),int(view.prefix+oldSize-newSize-1));
+      |             ^~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:135:10: note: Taking false branch
+  135 |     else if(remove)beginRemoveRows({},int(view.prefix),int(view.prefix+oldSize-newSize-1));
+      |          ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:137:30: note: Object 'assignments_' of type 'std::unordered_map' is left in a valid but unspecified state after move
+  137 |     auto previousAssignments=std::move(assignments_);
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:138:55: note: Method called on moved-from object 'assignments_' of type 'std::unordered_map'
+  138 |     for(const auto& [id,label]:view.assignmentLabels) assignments_.emplace(id,qs(label));
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: error: Use of memory after it is freed [clang-analyzer-cplusplus.NewDelete,-warnings-as-errors]
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Assuming 'role' is equal to EditRole
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |         ^~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:91: note: Assuming the condition is false
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:94:9: note: Assuming the condition is false
+   94 |         document_.project()->documentId != documentId_ || document_.project()->revision != revision_ || document_.sessionGeneration() != session_)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:94:59: note: Assuming field 'revision' is equal to field 'revision_'
+   94 |         document_.project()->documentId != documentId_ || document_.project()->revision != revision_ || document_.sessionGeneration() != session_)
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:9: note: Left side of '||' is false
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |         ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:94:105: note: Assuming the condition is false
+   94 |         document_.project()->documentId != documentId_ || document_.project()->revision != revision_ || document_.sessionGeneration() != session_)
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:93:5: note: Taking false branch
+   93 |     if (role != Qt::EditRole || !(flags(index) & Qt::ItemIsEditable) || !editRequested || !document_.project() ||
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:100:5: note: Taking true branch
+  100 |     if (!guard) return accepted;
+      |     ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:100:24: note: Calling implicit destructor for 'QPointer<jobs::TaskTableModel>'
+  100 |     if (!guard) return accepted;
+      |                        ^
+/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp:100:24: note: Calling '~QWeakPointer'
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Field 'd' is non-null
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                  ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:34: note: Left side of '&&' is true
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:39: note: Assuming the condition is true
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                       ^~~~~~~~~~~~~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:30: note: Taking true branch
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                              ^
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Memory is released
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:578:60: note: Calling 'ExternalRefCountData::operator delete'
+  578 |     inline ~QWeakPointer() { if (d && !d->weakref.deref()) delete d; }
+      |                                                            ^~~~~~~~
+/home/runner/work/JOBS/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h:133:50: note: Use of memory after it is freed
+  133 |         inline void operator delete(void *ptr) { ::operator delete(ptr); }
+      |                                                  ^                 ~~~
+21 warnings generated.
