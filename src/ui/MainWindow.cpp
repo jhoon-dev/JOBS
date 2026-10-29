@@ -84,8 +84,8 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
         tools->addAction(a);
         return a;
     };
-    action("새로 만들기(&N)", QKeySequence::New, [this] { create(); });
-    action("열기(&O)…", QKeySequence::Open, [this] { open(); });
+    action("새로 만들기(&N)", QKeySequence::New, [this] { create(); })->setObjectName("newProject");
+    action("열기(&O)…", QKeySequence::Open, [this] { open(); })->setObjectName("openProject");
     save_ = action("저장(&S)", QKeySequence::Save, [this] { save(false); });
     saveAs_ = action("다른 이름으로 저장(&A)…", QKeySequence::SaveAs, [this] { save(true); });
     menu->addSeparator();
@@ -167,7 +167,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     });
     calculationProgressLabel_ = new QLabel;
     calculationProgressLabel_->setObjectName("scheduleProgress");
-    tools->addWidget(calculationProgressLabel_);
+    statusBar()->addPermanentWidget(calculationProgressLabel_);
     calculationProgressTimer_ = new QTimer(this);
     calculationProgressTimer_->setInterval(100);
     connect(calculationProgressTimer_, &QTimer::timeout, this, [this] {
@@ -200,12 +200,8 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     scheduleIssues_->setObjectName("scheduleIssues");
     connect(scheduleIssues_, &QAction::triggered, this, [this] { runAfterEdit([this] { showScheduleIssues(); }); });
     auto *wbsMenu = menuBar()->addMenu("WBS(&W)");
-    addToolBarBreak();
-    auto *wbsTools = addToolBar("WBS 편집");
-    wbsTools->setMovable(false);
     auto wbsAction = [&](const QString &label, std::function<void()> callback) {
         auto *a = wbsMenu->addAction(label);
-        wbsTools->addAction(a);
         connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { runAfterEdit(callback); });
         return a;
     };
@@ -222,21 +218,16 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
         }
     });
     assignWbs_ = wbsAction("선택 작업의 WBS 변경", [this] { chooseWbs(false); });
-    wbsTools->addSeparator();
-    wbsTools->addWidget(new QLabel("간트 배율 ", this));
     auto *zoom = new QComboBox(this);
     zoom->setAccessibleName("간트 배율");
     zoom->setObjectName("ganttZoom");
     zoom->addItems({"일", "주"});
-    wbsTools->addWidget(zoom);
     auto *trackingMenu = menuBar()->addMenu("추적(&T)");
     auto trackingAction = [&](const QString &label, std::function<void()> callback) {
         auto *a = trackingMenu->addAction(label);
-        wbsTools->addAction(a);
         connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { runAfterEdit(callback); });
         return a;
     };
-    wbsTools->addSeparator();
     baselineSave_ = trackingAction("기준선 저장", [this] { saveBaseline(); });
     statusEdit_ = trackingAction("상태일 설정", [this] { editStatusAt(); });
     progressEdit_ = trackingAction("선택 작업 실적", [this] { reportProgress(); });
@@ -245,19 +236,14 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     baselineChoice_->setObjectName("baselineChoice");
     baselineChoice_->setAccessibleName("간트 비교 기준선");
     baselineChoice_->setMaximumWidth(190);
-    wbsTools->addWidget(baselineChoice_);
     connect(baselineChoice_, &QComboBox::currentIndexChanged, this, [this] {
         selectedBaseline_ = str(baselineChoice_->currentData().toString());
         refresh(false);
     });
     auto *resourceMenu = menuBar()->addMenu("자원(&R)");
-    addToolBarBreak();
-    auto *resourceTools = addToolBar("자원 및 평준화");
-    resourceTools->setMovable(false);
     auto resourceAction = [&](const QString &label, const char *object, std::function<void()> callback) {
         auto *a = resourceMenu->addAction(label);
         a->setObjectName(object);
-        resourceTools->addAction(a);
         connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { runAfterEdit(callback); });
         return a;
     };
@@ -268,11 +254,9 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     auto costAction = [&](const QString &label, const char *object, std::function<void()> callback) {
         auto *a = costMenu->addAction(label);
         a->setObjectName(object);
-        resourceTools->addAction(a);
         connect(a, &QAction::triggered, this, [this, callback = std::move(callback)] { runAfterEdit(callback); });
         return a;
     };
-    resourceTools->addSeparator();
     rates_ = costAction("통화·자원 단가", "resourceRates", [this] { editRates(); });
     taskCost_ = costAction("선택 작업 예산", "taskCost", [this] { editTaskCost(); });
     costReport_ = costAction("원가·물리 진척 보고", "costReport", [this] { reportCost(); });
@@ -280,8 +264,6 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     auto *reportsMenu = menuBar()->addMenu("보고서(&B)");
     reports_ = reportsMenu->addAction("프로젝트 대시보드·보고서…");
     reports_->setObjectName("projectReports");
-    resourceTools->addSeparator();
-    resourceTools->addAction(reports_);
     connect(reports_, &QAction::triggered, this, [this] {
         runAfterEdit([this] {
             if (document_.project()) {
@@ -292,8 +274,13 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     });
     auto *central = new QWidget(this);
     auto *layout = new QVBoxLayout(central);
-    auto *heading = new QLabel("<h1>JOBS</h1>프로젝트 일정 · 로컬 프로젝트 파일", central);
-    layout->addWidget(heading);
+    central->setObjectName("planningWorkspace");
+    layout->setContentsMargins(16, 12, 16, 8);
+    layout->setSpacing(8);
+    projectTitle_ = new QLabel("프로젝트를 시작하세요", central);
+    projectTitle_->setObjectName("projectTitle");
+    projectTitle_->setTextFormat(Qt::PlainText);
+    layout->addWidget(projectTitle_);
     summary_ = new QLabel(central);
     summary_->setTextFormat(Qt::PlainText);
     summary_->setWordWrap(true);
@@ -304,7 +291,16 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     wbsSummary_->setObjectName("wbsSummary");
     wbsSummary_->setWordWrap(true);
     layout->addWidget(wbsSummary_);
+    documentNotice_ = new QLabel(central);
+    documentNotice_->setObjectName("documentNotice");
+    documentNotice_->setTextFormat(Qt::PlainText);
+    documentNotice_->setWordWrap(true);
+    documentNotice_->hide();
+    layout->addWidget(documentNotice_);
     auto *split = new QSplitter(Qt::Horizontal, central);
+    workspaceSplit_ = split;
+    split->setObjectName("planningSplit");
+    split->setChildrenCollapsible(false);
     layout->addWidget(split, 1);
     wbsTree_ = new QTreeWidget(split);
     wbsTree_->setObjectName("wbsTree");
@@ -315,11 +311,16 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     taskModel_ = new TaskTableModel(document_, table_);
     table_->setModel(taskModel_);
     table_->setAccessibleName("프로젝트 작업 목록");
-    table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    table_->setColumnWidth(0, 160);
     // Content sizing must scale with the viewport, not scan 1,000 rows per edit.
     table_->horizontalHeader()->setResizeContentsPrecision(0);
-    for (int column = 1; column < 14; ++column)
+    for (int column = 5; column < 14; ++column)
         table_->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
+    table_->setColumnWidth(1, 74);
+    table_->setColumnWidth(2, 112);
+    table_->setColumnWidth(3, 120);
+    table_->setColumnWidth(4, 120);
     table_->setColumnHidden(8,
                             true); // Stable ID remains on the task tooltip; relations persist IDs, never row numbers.
     table_->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -333,7 +334,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     table_->verticalHeader()->setMinimumSectionSize(GanttView::RowHeight);
     gantt_ = new GanttView(split);
     gantt_->setMinimumWidth(300);
-    split->setSizes({200, 750, 600});
+    split->setSizes({180, 690, 650});
     connect(zoom, &QComboBox::currentIndexChanged, this, [this](int i) { gantt_->setDayWidth(i == 0 ? 64 : 16); });
     connect(table_->verticalScrollBar(), &QScrollBar::valueChanged, gantt_->verticalScrollBar(), &QScrollBar::setValue);
     connect(gantt_->verticalScrollBar(), &QScrollBar::valueChanged, table_->verticalScrollBar(), &QScrollBar::setValue);
@@ -358,7 +359,6 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
                                 const std::string &target) { applyGanttEdit(id, revision, taskId, resize, target); };
     diagnostics_->setObjectName("calculationDiagnostics");
     diagnostics_->setAccessibleName("계산 상태 및 진단");
-    layout->addWidget(diagnostics_);
     auto *note = new QLabel(
         "기본 월–금 09–12 / 13–18 · 프로젝트 메뉴에서 작업 달력 등록/배정 · 기간: 시간(8, 1.5) 또는 분(1m), 빈칸=미정, "
         "0=마일스톤\n선행: 프로젝트 행 번호 1, 2SS+2h, 3FF-30m, 4SF+1d · d=480 근무분 · 지연/선행=후행 달력 기준 · "
@@ -369,7 +369,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     note->setObjectName("taskInputHelp");
     editingHelp_ = note;
     note->setWordWrap(true);
-    layout->addWidget(note);
+    note->hide();
     setCentralWidget(central);
     taskModel_->editRequested = [this](std::string id, int column, const QString &text) {
         return editTaskCell(std::move(id), column, text);
@@ -379,6 +379,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     setupAsyncEditing(tools);
     editMenu->addAction(cancelEdit_);
     setupRecovery(recoveryStore);
+    setupWorkspaceUi(tools, zoom);
     refresh();
     updateCompactLayout();
 }
@@ -435,6 +436,7 @@ void MainWindow::report(const std::exception &error) {
         selectTaskById(task);
 }
 void MainWindow::refresh(bool rebuildTree) {
+    refreshWorkspaceUi();
     updateHistoryActions();
     if (refreshIncremental() || refreshProjected() || refreshBulk())
         return;
@@ -502,7 +504,9 @@ void MainWindow::refresh(bool rebuildTree) {
     costReport_->setEnabled(p.has_value() && !document_.readOnly() && !selectedTask_.empty() &&
                             p->statusAt.has_value());
     if (!p) {
-        summary_->setText("새로 만들기(Ctrl+N) 또는 열기(Ctrl+O)로 시작하세요.");
+        summary_->setText(QString("새로 만들기(%1) 또는 열기(%2)로 시작하세요.")
+                              .arg(QKeySequence(QKeySequence::New).toString(QKeySequence::NativeText),
+                                   QKeySequence(QKeySequence::Open).toString(QKeySequence::NativeText)));
         diagnostics_->clear();
         wbsSummary_->clear();
         gantt_->setPlan(nullptr, nullptr, {});

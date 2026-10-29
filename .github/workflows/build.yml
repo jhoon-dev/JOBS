@@ -25,6 +25,15 @@ jobs:
       # Bound compiler memory for the Qt translation units on hosted runners.
       - run: cmake --build build --config Release --parallel 3
       - run: ctest --test-dir build -C Release --output-on-failure
+      - name: Capture task and Gantt workspace presentation
+        run: python scripts/capture-workspace-ui.py build
+      - name: Preserve task and Gantt workspace screens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-presentation-${{ runner.os }}
+          path: build/workspace-ui/
+          if-no-files-found: error
       - name: Exercise native multi-project windows and shared resource load
         run: python scripts/check-workspace-native.py build
       - name: Preserve workspace screen and acceptance log

@@ -16,6 +16,8 @@ class QVBoxLayout;
 class QToolBar;
 class QDialog;
 class QDialogButtonBox;
+class QToolButton;
+class QSplitter;
 namespace jobs {
 class GanttView;
 class JsonRecoveryStore;
@@ -44,6 +46,12 @@ private:
     GanttView *gantt_;
     QLabel *wbsSummary_;
     QLabel *summary_;
+    QLabel *projectTitle_ = nullptr;
+    QLabel *documentNotice_ = nullptr;
+    QToolButton *diagnosticsToggle_ = nullptr;
+    QSplitter *workspaceSplit_ = nullptr;
+    void setupWorkspaceUi(QToolBar *, QComboBox *);
+    void refreshWorkspaceUi();
     QPlainTextEdit *diagnostics_ = nullptr;
     QLabel *editingHelp_ = nullptr;
     QAction *save_, *saveAs_, *add_;

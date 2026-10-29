@@ -190,8 +190,8 @@ void GanttView::rebuild() {
     cancelDrag();
     scene()->clear();
     if (dayCount_ == 0) {
-        auto *message = scene()->addText(
-            "F9로 최신 유효한 일정을 계산하세요.\n오래됨·누락·충돌·취소 상태에서는 막대를 표시하지 않습니다.");
+        auto *message =
+            scene()->addText("일정 계산 후 간트가 표시됩니다.\n기간과 선행관계를 입력하고 F9로 계산하세요.");
         message->setDefaultTextColor(palette().color(QPalette::Text));
         message->setPos(12, 16);
         scene()->setSceneRect(0, 0, 380, std::max(120, HeaderHeight + int(displayRowCount_) * RowHeight));
@@ -385,11 +385,11 @@ void GanttView::drawBackground(QPainter *painter, const QRectF &rect) {
         const auto d = firstDay_.addDays(i);
         const auto x = i * dayWidth_;
         if (d.dayOfWeek() > 5 || holidays_.contains(d))
-            painter->fillRect(QRectF(x, rect.top(), dayWidth_, rect.height()), QColor(128, 128, 128, 40));
-        painter->setPen(QPen(palette().color(QPalette::Mid), 0));
+            painter->fillRect(QRectF(x, rect.top(), dayWidth_, rect.height()), QColor(128, 128, 128, 25));
+        painter->setPen(QPen(palette().color(QPalette::Midlight), 0));
         painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
     }
-    painter->setPen(QPen(palette().color(QPalette::Mid), 0));
+    painter->setPen(QPen(palette().color(QPalette::Midlight), 0));
     for (int y = HeaderHeight + std::max(0, int((rect.top() - HeaderHeight) / RowHeight)) * RowHeight;
          y <= rect.bottom(); y += RowHeight)
         painter->drawLine(QPointF(rect.left(), y), QPointF(rect.right(), y));

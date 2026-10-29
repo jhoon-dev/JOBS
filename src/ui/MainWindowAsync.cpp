@@ -24,7 +24,7 @@ void MainWindow::setupAsyncEditing(QToolBar *tools) {
     tools->addAction(cancelEdit_);
     editProgress_ = new QLabel;
     editProgress_->setObjectName("editProgress");
-    tools->addWidget(editProgress_);
+    statusBar()->addPermanentWidget(editProgress_);
     editProgressTimer_ = new QTimer(this);
     editProgressTimer_->setInterval(100);
     connect(cancelEdit_, &QAction::triggered, this, [this] {

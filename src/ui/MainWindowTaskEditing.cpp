@@ -77,29 +77,35 @@ void MainWindow::setupTaskEditing(QMenu *menu, QVBoxLayout *layout) {
     taskSearch_->setPlaceholderText("작업 이름·ID 검색 (" +
                                     QKeySequence(QKeySequence::Find).toString(QKeySequence::NativeText) + ")");
     taskSearch_->setClearButtonEnabled(true);
-    taskSearch_->setMinimumWidth(260);
-    taskSearch_->setMaximumWidth(280);
+    taskSearch_->setMinimumWidth(180);
+    taskSearch_->setMaximumWidth(360);
     taskSearch_->setToolTip(
         "검색은 표·간트 보기만 바꿉니다. 일정은 전체 프로젝트를 계산하고 보고서는 선택 WBS 범위를 사용합니다.");
-    strip->addWidget(taskSearch_);
+    strip->addWidget(taskSearch_, 1);
     taskFilter_ = new QComboBox;
     taskFilter_->setObjectName("taskFilter");
     taskFilter_->setAccessibleName("작업 필터");
     taskFilter_->addItems({"전체 작업", "계획 임계", "마일스톤", "미배정"});
+    taskFilter_->setMaximumWidth(140);
     strip->addWidget(taskFilter_);
     taskSort_ = new QComboBox;
     taskSort_->setObjectName("taskSort");
     taskSort_->setAccessibleName("작업 정렬");
     taskSort_->addItems({"프로젝트 원본 순서", "이름 ↑", "이름 ↓", "기간 ↑", "기간 ↓", "시작일 ↑", "시작일 ↓"});
+    taskSort_->setMaximumWidth(190);
     strip->addWidget(taskSort_);
     auto *reset = new QPushButton("보기 초기화");
     reset->setObjectName("resetTaskView");
+    reset->setMaximumWidth(100);
     strip->addWidget(reset);
     taskViewStatus_ = new QLabel;
     taskViewStatus_->setObjectName("taskViewStatus");
     taskViewStatus_->setTextFormat(Qt::PlainText);
-    taskViewStatus_->setWordWrap(true);
-    strip->addWidget(taskViewStatus_, 1);
+    taskViewStatus_->setWordWrap(false);
+    taskViewStatus_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    taskViewStatus_->setMinimumWidth(160);
+    taskViewStatus_->setToolTip("선행 번호는 프로젝트 원본 행 번호입니다. 검색·필터는 표와 간트 보기만 바꿉니다.");
+    strip->addWidget(taskViewStatus_);
     layout->insertLayout(3, strip);
     auto *find = menu->addAction("작업 검색");
     find->setShortcut(QKeySequence::Find);
@@ -150,8 +156,8 @@ void MainWindow::updateCompactLayout() {
     if (!editingHelp_ || !diagnostics_)
         return;
     const bool compact = height() < 760;
-    editingHelp_->setVisible(!compact);
-    diagnostics_->setMaximumHeight(compact ? 80 : 160);
+    editingHelp_->hide();
+    diagnostics_->setMaximumHeight(compact ? 80 : 140);
 }
 void MainWindow::syncTaskSelection() {
 
@@ -263,9 +269,8 @@ void MainWindow::applyTaskView() {
                                                                  : 3,
                                                      sort % 2 ? Qt::AscendingOrder : Qt::DescendingOrder);
     const bool plan = result && result->status == CalculationStatus::Valid && !result->isForecast;
-    taskViewStatus_->setText(
-        QString("표시 %1 / WBS 범위 %2 · 선행 번호=프로젝트 원본 행").arg(visibleRows_.size()).arg(view.scopeCount) +
-        (filter == 1 && !plan ? " · 최신 계획 계산 필요" : QString{}));
+    taskViewStatus_->setText(QString("표시 %1 / 범위 %2").arg(visibleRows_.size()).arg(view.scopeCount) +
+                             (filter == 1 && !plan ? " · 최신 계획 계산 필요" : QString{}));
 }
 void MainWindow::insertSelectedTasks() {
     if (!document_.project() || document_.readOnly())
