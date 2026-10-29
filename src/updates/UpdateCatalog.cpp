@@ -10,6 +10,13 @@
 #include <QVersionNumber>
 #include <stdexcept>
 #include <algorithm>
+#ifdef Q_OS_WIN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <vector>
+#endif
 
 namespace jobs {
 namespace {
@@ -47,10 +54,21 @@ UpdateConfig updateConfig() {
     else {
         QSettings marker(QDir(QCoreApplication::applicationDirPath()).filePath("install-info.ini"),
                          QSettings::IniFormat);
-        QSettings registration(
-            "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ToolMoa.JOBS",
-            QSettings::Registry64Format);
-        const auto registered = QFileInfo(registration.value("InstallLocation").toString()).canonicalFilePath();
+        // QSettings registry reads may create their root key. Detection must remain read-only.
+        constexpr wchar_t registration[] = L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ToolMoa.JOBS";
+        constexpr DWORD flags = RRF_RT_REG_SZ | RRF_SUBKEY_WOW6464KEY;
+        DWORD bytes = 0;
+        QString location;
+        if (RegGetValueW(HKEY_CURRENT_USER, registration, L"InstallLocation", flags, nullptr, nullptr, &bytes) ==
+                ERROR_SUCCESS &&
+            bytes >= sizeof(wchar_t) && bytes <= 65536) {
+            std::vector<wchar_t> value(bytes / sizeof(wchar_t) + 1, 0);
+            DWORD capacity = DWORD(value.size() * sizeof(wchar_t));
+            if (RegGetValueW(HKEY_CURRENT_USER, registration, L"InstallLocation", flags, nullptr, value.data(),
+                             &capacity) == ERROR_SUCCESS)
+                location = QString::fromWCharArray(value.data());
+        }
+        const auto registered = QFileInfo(location).canonicalFilePath();
         const auto executableDirectory = QFileInfo(QCoreApplication::applicationDirPath()).canonicalFilePath();
         config.installedWindows = marker.value("JOBS/ProductId").toString() == "ToolMoa.JOBS" &&
                                   !registered.isEmpty() &&

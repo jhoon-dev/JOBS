@@ -20,6 +20,12 @@
 #include <QTest>
 #include <cstring>
 #include <deque>
+#ifdef Q_OS_WIN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 using namespace jobs;
 namespace {
@@ -144,6 +150,25 @@ void answer(QMessageBox::StandardButton button) {
 class UpdatesTests final : public QObject {
     Q_OBJECT
 private slots:
+    void detectionDoesNotRegisterInstallation() {
+#ifdef Q_OS_WIN
+        const auto exists = [] {
+            HKEY key = nullptr;
+            const auto result = RegOpenKeyExW(HKEY_CURRENT_USER,
+                                              L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ToolMoa.JOBS",
+                                              0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &key);
+            if (key)
+                RegCloseKey(key);
+            return result == ERROR_SUCCESS;
+        };
+        const bool before = exists();
+        const auto options = updateConfig();
+        QCOMPARE(exists(), before);
+        QVERIFY(!options.installedWindows);
+#else
+        QVERIFY(!updateConfig().installedWindows);
+#endif
+    }
     void versions() {
         QVERIFY(newerVersion("0.10.0", "0.2.9"));
         QVERIFY(!newerVersion("0.2.0", "0.2.0"));
