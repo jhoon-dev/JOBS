@@ -1,0 +1,42 @@
+{
+    "status":  "success",
+    "source_revision":  "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+    "os":  "Microsoft Windows NT 10.0.26100.0",
+    "initial_sha256":  "6f49c88a96d3da0f634cf94d11372131fde129ccd5e218a59083dd76926438df",
+    "upgrade_sha256":  "3744ea5bf4861d400308d8b4228b815f491f13c8115293ec4c2d743b42becdd7",
+    "checks":  [
+                   "production JOBS application entry point opened a native window and closed normally",
+                   "installed and activated under actual package identity; create/save/open/calculate/undo/workspace/checkpoint",
+                   "version upgrade preserved settings; checkpoint recovered; external project/workspace reopened and calculated",
+                   "uninstall removed package settings/recovery; outside documents and standalone state preserved"
+               ],
+    "store_submission":  false,
+    "wack":  "not run",
+    "package_family":  "ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8",
+    "initial":  {
+                    "nonce":  "b43d4cd5499641fdb3bc48004a6fcc86",
+                    "package_family":  "ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8",
+                    "packaged":  true,
+                    "phase":  "initial",
+                    "project":  "D:/a/JOBS/JOBS/build/msix-acceptance/msix-smoke-b43d4cd5499641fdb3bc48004a6fcc86/Project.jobs",
+                    "recovery_directory":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS/recovery",
+                    "settings_file":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS/settings.ini",
+                    "source_revision":  "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+                    "state_directory":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS",
+                    "status":  "success",
+                    "workspace":  "D:/a/JOBS/JOBS/build/msix-acceptance/msix-smoke-b43d4cd5499641fdb3bc48004a6fcc86/Projects.jobsworkspace"
+                },
+    "upgrade":  {
+                    "nonce":  "b43d4cd5499641fdb3bc48004a6fcc86",
+                    "package_family":  "ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8",
+                    "packaged":  true,
+                    "phase":  "verify",
+                    "project":  "D:/a/JOBS/JOBS/build/msix-acceptance/msix-smoke-b43d4cd5499641fdb3bc48004a6fcc86/Project.jobs",
+                    "recovery_directory":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS/recovery",
+                    "settings_file":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS/settings.ini",
+                    "source_revision":  "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+                    "state_directory":  "C:/Users/runneradmin/AppData/Local/Packages/ToolMoa.JOBS.MsixDevelopment_ndcysebgwkhs8/LocalState/ToolMoa/JOBS",
+                    "status":  "success",
+                    "workspace":  "D:/a/JOBS/JOBS/build/msix-acceptance/msix-smoke-b43d4cd5499641fdb3bc48004a6fcc86/Projects.jobsworkspace"
+                }
+}

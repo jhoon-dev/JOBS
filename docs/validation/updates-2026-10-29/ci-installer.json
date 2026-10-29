@@ -1,0 +1,10 @@
+{
+  "installer": "D:\\a\\JOBS\\JOBS\\dist\\JOBS-0.2.0-Setup-win64-a0c97697.exe",
+  "bytes": 18443860,
+  "sha256": "6f21a93f7f0c2336b901cebd3230e374a4a699573b701bc7a9a13892bc1e32a7",
+  "source_revision": "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+  "version": "0.2.0",
+  "stage": "D:\\a\\JOBS\\JOBS\\build\\packages\\a0c97697-e9c831d8\\payload",
+  "logs": "D:\\a\\JOBS\\JOBS\\build\\packages\\a0c97697-e9c831d8",
+  "signed": false
+}

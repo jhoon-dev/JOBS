@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "source_revision": "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+  "scope": "same-build reinstall exercises updater handoff",
+  "running_instance_rejected": true,
+  "wait_pid_seconds": 7.475099200000045,
+  "custom_install_directory_preserved": true,
+  "outside_project_preserved": true,
+  "app_state_preserved_during_update": true,
+  "full_uninstall_passed": true
+}

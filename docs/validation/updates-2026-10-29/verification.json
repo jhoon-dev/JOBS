@@ -1,0 +1,51 @@
+{
+  "status": "success",
+  "source_revision": "a0c97697a9e48fd73474d7ff2d9f20622ddbc17f",
+  "prd_revision": "a9047f3",
+  "application_version": "0.2.0",
+  "development_package_version": "1.0.2.0",
+  "local_ctest": {
+    "passed": 51,
+    "seconds": 136.22
+  },
+  "update_qtest_including_init_cleanup": 18,
+  "windows_msvc_ctest": 51,
+  "macos_ctest": 51,
+  "linux_asan_ubsan_ctest": 51,
+  "production_tidy_units": 73,
+  "ci": {
+    "desktop": 40855129597,
+    "msix": 40855129616,
+    "quality": 40855129704,
+    "parser_safety": 40855129590
+  },
+  "packages": [
+    {
+      "path": "dist\\JOBS-0.2.0-Setup-win64-a0c97697.exe",
+      "bytes": 13069495,
+      "sha256": "1320761d8e778da84852e895a1343065f6d602ccbe0e91bfb32bbedfc100e3ae"
+    },
+    {
+      "path": "dist\\msix\\JOBS-development-1.0.2.0-x64-a0c97697.msix",
+      "bytes": 18059995,
+      "sha256": "ee9d987ff86e9d4a1202b4b789a1cd5b399b0b71de7e3a3d0585e26d36b3cb5e"
+    },
+    {
+      "path": "dist\\msix\\store-preparation-updates.zip",
+      "bytes": 87917,
+      "sha256": "f84ded05f781ef74c029185ee84cd4aa0ad96e991d6d561c06c61b3907a513f1"
+    }
+  ],
+  "fuzz": {
+    "parsers": 4,
+    "runs_each": 5000,
+    "scope": "finite smoke"
+  },
+  "standalone_handoff_scope": "same-build reinstall; PID wait and running-instance guard",
+  "msix_scope": "actual development identity; 1.0.2.0 to 1.0.3.0 fixture upgrade",
+  "live_github_release_published": false,
+  "real_store_update_e2e": "pending real identity and publication",
+  "store_submission": false,
+  "wack": "not run",
+  "installer_signed": false
+}
