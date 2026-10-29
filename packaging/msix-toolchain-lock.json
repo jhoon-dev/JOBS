@@ -1,0 +1,10 @@
+{
+  "package": "Microsoft.Windows.SDK.BuildTools",
+  "version": "10.0.26100.7463",
+  "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.sdk.buildtools/10.0.26100.7463/microsoft.windows.sdk.buildtools.10.0.26100.7463.nupkg",
+  "catalog_url": "https://api.nuget.org/v3/catalog0/data/2026.01.08.22.58.15/microsoft.windows.sdk.buildtools.10.0.26100.7463.json",
+  "sha512_base64": "/ngJ1mEbMqHRhC2y1kLeAsQdqw5PP4vwDVUKREqMtSztC/IsmszTcjy7zMh1R4zpzT3fmcYkua/CHuiHPLkMpw==",
+  "max_archive_bytes": 314572800,
+  "max_unpacked_bytes": 1258291200,
+  "makeappx_sha256": "95a02b8f42fc4597b160392d843dadfead086a90984e556c96cde1c36b3c8a39"
+}

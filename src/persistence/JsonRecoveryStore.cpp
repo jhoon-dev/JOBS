@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "persistence/JsonRecoveryStore.h"
+#include "persistence/ApplicationStorage.h"
 #include "persistence/ProjectJson.h"
 #include "persistence/JsonProjectStore.h"
 #include <QCryptographicHash>
@@ -353,7 +354,7 @@ JsonRecoveryStore::JsonRecoveryStore(QString root, std::function<void()> hook)
         throw AppError(ErrorCode::FILE_JSONRECOVERYSTORE_034, {});
 }
 QString JsonRecoveryStore::defaultDirectory() {
-    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("recovery");
+    return applicationStorage().recoveryDirectory;
 }
 std::shared_ptr<RecoverySession> JsonRecoveryStore::newSession() const {
     return std::shared_ptr<RecoverySession>(

@@ -1,0 +1,52 @@
+name: MSIX package and installed lifecycle
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  msix:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          arch: win64_mingw
+          tools: tools_mingw1310
+          dir: ${{ github.workspace }}/.deps
+          cache: true
+      - name: Configure Release MinGW
+        shell: pwsh
+        run: |
+          $compiler = "$env:GITHUB_WORKSPACE/.deps/Qt/Tools/mingw1310_64/bin"
+          $compiler | Out-File -FilePath $env:GITHUB_PATH -Append
+          $env:PATH = "$compiler;$env:PATH"
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_CXX_COMPILER=$compiler/g++.exe" "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR"
+      - name: Verify packaging contracts and pinned Microsoft SDK
+        run: |
+          python -m unittest discover -s tests -p test_msix_packaging.py -v
+          python scripts/setup-msix-tools.py
+      - name: Build development packages and upgrade fixture
+        run: |
+          python scripts/package-msix.py --version 1.0.0.0
+          python scripts/package-msix.py --version 1.0.0.0 --include-probe
+          python scripts/package-msix.py --version 1.0.1.0 --include-probe
+      - name: Install activate update recover and uninstall with package identity
+        shell: powershell
+        run: |
+          $initial = (Get-Item dist/msix/JOBS-development-1.0.0.0-x64-*-probe.msix).FullName
+          $upgrade = (Get-Item dist/msix/JOBS-development-1.0.1.0-x64-*-probe.msix).FullName
+          ./scripts/check-msix-lifecycle.ps1 -InitialPackage $initial -UpgradePackage $upgrade
+      - name: Preserve MSIX and actual packaged UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msix-windows-x64
+          path: |
+            dist/msix/
+            build/msix-acceptance/
+            build/packages/**/makeappx.log
+            build/packages/**/windeployqt.log
+          if-no-files-found: error

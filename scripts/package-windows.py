@@ -1,6 +1,5 @@
 """Build a per-user NSIS installer from a Release JOBS executable (Windows only)."""
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,12 +9,9 @@ import struct
 import subprocess
 import sys
 import uuid
+from windows_payload import deploy, inventory, sha256
 
 ROOT = Path(__file__).resolve().parent.parent
-
-
-def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def run(command, **kwargs):
@@ -63,33 +59,17 @@ def main():
         raise RuntimeError('The application must be a Windows x64 executable')
     workspace = build / 'packages' / (revision[:8] + '-' + uuid.uuid4().hex[:8])
     stage = workspace / 'payload'
-    stage.mkdir(parents=True)
     output.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(exe, stage / 'JOBS.exe')
-    with (workspace / 'windeployqt.log').open('w', encoding='utf-8') as log:
-        run([qt / 'bin/windeployqt.exe', '--release', '--compiler-runtime', '--no-translations',
-             '--dir', stage, stage / 'JOBS.exe'], env=environment, stdout=log, stderr=subprocess.STDOUT)
-    required = ['JOBS.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll',
-                'platforms/qwindows.dll', 'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll']
-    for name in required:
-        if not (stage / name).is_file():
-            raise RuntimeError('Required runtime missing: ' + name)
-    (stage / 'qt.conf').write_text('[Paths]\nPrefix=.\nPlugins=.\n', encoding='utf-8')
-    for name in ('NOTICE.txt', 'INSTALL-README.txt'):
-        shutil.copyfile(ROOT / 'packaging' / name, stage / name)
-    shutil.copytree(ROOT / 'packaging/licenses/qtbase', stage / 'licenses/qtbase')
-    shutil.copyfile(qt / 'sbom/qtbase-6.8.3.spdx.json', stage / 'licenses/qtbase/qtbase-6.8.3.spdx.json')
-    for name in ('gcc', 'mingw-w64', 'winpthreads'):
-        shutil.copytree(compiler.parent / 'licenses' / name, stage / 'licenses/runtime' / name)
+    deploy(ROOT, stage, exe, qt, compiler, environment, workspace / 'windeployqt.log')
+    shutil.copyfile(ROOT / 'packaging/INSTALL-README.txt', stage / 'INSTALL-README.txt')
     (stage / 'licenses/nsis').mkdir(parents=True)
     shutil.copyfile(nsis / 'COPYING', stage / 'licenses/nsis/COPYING.txt')
     (stage / 'install-info.ini').write_text(
         f'[JOBS]\nProductId=ToolMoa.JOBS\nVersion={version}\nSourceRevision={revision}\n', encoding='ascii')
-    inventory = [{'path': p.relative_to(stage).as_posix(), 'bytes': p.stat().st_size, 'sha256': sha256(p)}
-                 for p in sorted(stage.rglob('*')) if p.is_file()]
+    files = inventory(stage)
     manifest = {'product': 'JOBS', 'version': version, 'channel': 'preview', 'architecture': 'x64',
                 'source_revision': revision, 'signed': False, 'qt': '6.8.3', 'nsis': tool_version,
-                'application_sha256': sha256(stage / 'JOBS.exe'), 'files': inventory,
+                'application_sha256': sha256(stage / 'JOBS.exe'), 'files': files,
                 'inventory_excludes': ['package-manifest.json', 'Uninstall.exe (generated at install time)']}
     (stage / 'package-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     source = workspace / 'installer.nsi'

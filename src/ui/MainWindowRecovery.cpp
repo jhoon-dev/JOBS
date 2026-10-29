@@ -3,6 +3,7 @@
 #include "ui/AutoSaveController.h"
 #include "ui/AsyncEditController.h"
 #include "ui/RecoveryDialog.h"
+#include "persistence/ApplicationStorage.h"
 #include <QApplication>
 #include <QAction>
 #include <QMenuBar>
@@ -54,7 +55,7 @@ void MainWindow::setupRecovery(JsonRecoveryStore *store) {
         return;
     }
     recoveryStore_ = std::make_unique<JsonRecoveryStore>(*store);
-    QSettings settings;
+    auto settings = applicationSettings();
     const auto seconds = std::clamp(settings.value("recovery/intervalSeconds", 30).toInt(), 5, 300);
     autosave_ = new AutoSaveController(document_, *store, this, seconds * 1000);
     const bool enabled = settings.value("recovery/enabled", true).toBool();
@@ -68,7 +69,7 @@ void MainWindow::setupRecovery(JsonRecoveryStore *store) {
     autosaveStatus_->setText(autosave_->status());
     connect(autosaveEnabled_, &QAction::toggled, this, [this](bool enabled) {
         autosave_->setEnabled(enabled);
-        QSettings().setValue("recovery/enabled", enabled);
+        applicationSettings().setValue("recovery/enabled", enabled);
     });
     connect(autosaveNow_, &QAction::triggered, this, [this] { runAfterEdit([this] { autosave_->checkpointNow(); }); });
     connect(interval, &QAction::triggered, this, [this] {
@@ -78,7 +79,7 @@ void MainWindow::setupRecovery(JsonRecoveryStore *store) {
                                  autosave_->intervalMs() / 1000, 5, 300, 5, &ok);
         if (ok) {
             autosave_->setIntervalMs(value * 1000);
-            QSettings().setValue("recovery/intervalSeconds", value);
+            applicationSettings().setValue("recovery/intervalSeconds", value);
         }
     });
     connect(recover_, &QAction::triggered, this, [this] { runAfterEdit([this] { showRecovery(); }); });

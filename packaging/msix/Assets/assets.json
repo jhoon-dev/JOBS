@@ -1,0 +1,26 @@
+{
+  "source": "JOBS.svg",
+  "generator": "Pillow 11.3.0",
+  "files": {
+    "Square44x44Logo.png": {
+      "width": 44,
+      "height": 44,
+      "sha256": "b9843bfa32057047b5624c16187c9b12e682a0be6b7209e98f8d8f3d1f306da3"
+    },
+    "Square150x150Logo.png": {
+      "width": 150,
+      "height": 150,
+      "sha256": "078f9cf3f904f4ff6b0b91744f3236174115697e9765ff7b13203d4349267326"
+    },
+    "StoreLogo.png": {
+      "width": 50,
+      "height": 50,
+      "sha256": "4bafca23f8260d33a26c578be53aa9d6fa2ec1705c9b10c04b1247c0ba216f2b"
+    },
+    "StoreListing300.png": {
+      "width": 300,
+      "height": 300,
+      "sha256": "cbbf7aba3a1f8ec1fc202fb548cd876e0c71da9a8a1c979b9c29638c415f8463"
+    }
+  }
+}
