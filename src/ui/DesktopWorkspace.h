@@ -10,11 +10,17 @@ class QWidget;
 namespace jobs {
 class MainWindow;
 class JsonRecoveryStore;
+class UpdateController;
 class DesktopWorkspace final : public QObject {
 public:
     explicit DesktopWorkspace(std::shared_ptr<JsonProjectStore>, std::shared_ptr<JsonRecoveryStore>,
                               QObject *parent = nullptr);
     ~DesktopWorkspace() override;
+    void setUpdates(UpdateController *updates) {
+        updates_ = updates;
+    }
+    bool prepareForUpdate();
+    void finishUpdate();
     MainWindow *newWindow();
     MainWindow *openProject(const std::string &path, bool readOnly = false);
     void createProject();
@@ -57,6 +63,7 @@ private:
     std::unique_ptr<WriteLease> lease_;
     std::uint64_t generation_ = 0, serial_ = 0, catalogGeneration_ = 0;
     bool engaged_ = false, shuttingDown_ = false;
+    UpdateController *updates_ = nullptr;
     MainWindow *adopt(std::unique_ptr<Document>);
     void synchronize(Session &);
 };

@@ -76,3 +76,5 @@ Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklis
 [외부 파일 파서 검증](docs/parser-safety.md): `.jobs`·Project XML·Primavera XER seed 재생과 선택적 Clang/libFuzzer·ASan/UBSan 검사를 제공한다. 기본 앱 실행에는 퍼징 도구가 필요 없다.
 
 [C++ 품질 검사](docs/cpp-quality.md): 고정 clang-format·점진적 포맷 적용과 실제 Qt 컴파일 설정을 사용하는 clang-tidy CI를 제공한다. 편집 권한 가드는 공통화하며 상태일·간트·저장/복구·읽기 전용 사본의 기존 정책을 유지한다.
+
+설정 → 업데이트에서 시작 시 새 버전 확인을 켜고 끄며 지금 확인·취소·업데이트를 진행한다. Store판은 Microsoft Store, 일반 설치판은 GitHub 정식 Release를 사용한다. 새 버전은 비차단 배너로 알리고 설치기 다운로드의 크기/SHA-256과 문서 저장 확인을 거친다. [업데이트 동작·배포 운영](docs/application-updates.md)을 따른다.

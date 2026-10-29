@@ -3,6 +3,10 @@
 #include "ui/WorkspaceDialog.h"
 #include "persistence/JsonRecoveryStore.h"
 #include "formatting/QtDiagnosticText.h"
+#include "ui/UpdateUi.h"
+#include "ui/AsyncEditController.h"
+#include "ui/AutoSaveController.h"
+#include <QApplication>
 #include <QDialog>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -84,7 +88,43 @@ MainWindow *DesktopWorkspace::adopt(std::unique_ptr<Document> document) {
     sessions_.push_back(std::move(session));
     synchronize(*pointer);
     window->show();
+    if (updates_)
+        attachUpdateUi(*window, *updates_, {[this] { return prepareForUpdate(); }, [this] { finishUpdate(); }, {}, {}});
     return window;
+}
+bool DesktopWorkspace::prepareForUpdate() {
+    const auto busy = [this] {
+        return std::any_of(sessions_.begin(), sessions_.end(), [](const auto &session) {
+            auto *window = session->window.data();
+            return window && (window->calculating_ || window->queuedCalculation_ || window->baselinePreparing_ ||
+                              (window->editController_ && window->editController_->busy()));
+        });
+    };
+    if (busy()) {
+        QMessageBox::information(QApplication::activeWindow(), "업데이트 대기",
+                                 "일정 계산과 편집을 마치거나 취소한 뒤 다시 설치해 주세요.");
+        return false;
+    }
+    for (const auto &session : sessions_)
+        if (session->window && !session->window->confirmChanges())
+            return false;
+    if (busy())
+        return false;
+    if (engaged_ && dirty()) {
+        const auto answer = QMessageBox::question(
+            QApplication::activeWindow(), "작업공간 변경 저장", "업데이트 전에 작업공간의 변경을 저장하시겠습니까?",
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+        if (answer == QMessageBox::Cancel ||
+            (answer == QMessageBox::Save && !saveWorkspace(QApplication::activeWindow())))
+            return false;
+    }
+    return !busy();
+}
+void DesktopWorkspace::finishUpdate() {
+    for (const auto &session : sessions_)
+        if (session->window && session->window->autosave_)
+            session->window->autosave_->finishDocument();
+    QApplication::quit();
 }
 MainWindow *DesktopWorkspace::newWindow() {
     return adopt(std::make_unique<Document>(*files_));

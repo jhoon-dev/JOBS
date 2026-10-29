@@ -16,7 +16,7 @@ def deploy(root, stage, executable, qt, compiler, environment, log):
         subprocess.run([str(qt / 'bin/windeployqt.exe'), '--release', '--compiler-runtime', '--no-translations',
                         '--dir', str(stage), str(stage / 'JOBS.exe')], env=environment,
                        stdout=output, stderr=subprocess.STDOUT, check=True)
-    for name in ['JOBS.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'platforms/qwindows.dll',
+    for name in ['JOBS.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'Qt6Network.dll', 'platforms/qwindows.dll',
                  'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll']:
         if not (stage / name).is_file():
             raise RuntimeError('Required MinGW runtime missing: ' + name)

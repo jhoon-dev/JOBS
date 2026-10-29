@@ -13,3 +13,7 @@ Store판의 업데이트 진실 원본은 Windows.Services.Store.StoreContext다
 운영자는 향후 더 높은 app version으로 빌드한 설치기를 같은 tag의 정식 GitHub Release에 올린다. GitHub가 제공하는 SHA-256 digest가 있어야 앱 내 검증 설치가 가능하다. 작성 중/프리뷰 Release는 자동 업데이트 대상이 아니다. Store판은 실제 identity를 유지하고 더 높은 패키지 버전으로 Store에 게시한다.
 
 근거: [Store 앱 업데이트](https://learn.microsoft.com/en-us/windows/msix/store-developer-package-update), [Store URI](https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-store-app), [GitHub 최신 Release/asset](https://docs.github.com/en/rest/releases/releases#get-the-latest-release), [Qt 네트워크](https://doc.qt.io/qt-6.8/qnetworkaccessmanager.html).
+
+앱 버전은 0.2.0, 이번 개발용 Windows 패키지는 1.0.2.0을 사용한다. 일반 Windows 설치판은 인터넷 출처(Zone.Identifier)를 남기고 Windows Shell로 설치기를 실행해 OS 보안 판정을 유지한다. GitHub SHA 검증은 공인 코드 서명 검증과 별개이며, 기존 미서명 preview의 서명 상태를 바꾸지 않는다. 다른 설치본 프로세스가 남아 있으면 파일 교체 전에 거부한다.
+
+운영 절차: CMake의 제품 버전을 올려 커밋한 뒤 `python scripts/package-windows.py`로 설치기를 만든다. GitHub Releases에서 같은 버전의 `v<app-version>` tag를 선택하고 해당 EXE와 checksum을 첨부한 draft를 준비한다. 검증 후 운영자가 정식 Release로 게시하고 Latest로 지정한다. 앱의 확인은 공개된 정식 Release부터 동작하며 draft/prerelease는 대상이 아니다. 이 작업은 공개 게시를 실행하지 않는다.

@@ -30,7 +30,7 @@ def main():
     config = identity(args.mode, json.loads(args.identity.read_text(encoding='utf-8-sig')) if args.identity else None)
     if args.include_probe and args.mode != 'development':
         parser.error('--include-probe is allowed only in development packages')
-    package_version = version(args.version or '1.0.0.0')
+    package_version = version(args.version or '1.0.2.0')
     if args.mode == 'store' and int(package_version.split('.')[0]) == 0:
         parser.error('Store package major version must be positive')
     if sys.platform != 'win32':

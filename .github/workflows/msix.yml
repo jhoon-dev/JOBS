@@ -30,23 +30,36 @@ jobs:
           python scripts/setup-msix-tools.py
       - name: Build development packages and upgrade fixture
         run: |
-          python scripts/package-msix.py --version 1.0.0.0
-          python scripts/package-msix.py --version 1.0.0.0 --include-probe
-          python scripts/package-msix.py --version 1.0.1.0 --include-probe
+          python scripts/package-msix.py --version 1.0.2.0
+          python scripts/package-msix.py --version 1.0.2.0 --include-probe
+          python scripts/package-msix.py --version 1.0.3.0 --include-probe
       - name: Install activate update recover and uninstall with package identity
         shell: powershell
         run: |
-          $initial = (Get-Item dist/msix/JOBS-development-1.0.0.0-x64-*-probe.msix).FullName
-          $upgrade = (Get-Item dist/msix/JOBS-development-1.0.1.0-x64-*-probe.msix).FullName
+          $initial = (Get-Item dist/msix/JOBS-development-1.0.2.0-x64-*-probe.msix).FullName
+          $upgrade = (Get-Item dist/msix/JOBS-development-1.0.3.0-x64-*-probe.msix).FullName
           ./scripts/check-msix-lifecycle.ps1 -InitialPackage $initial -UpgradePackage $upgrade
+      - name: Verify update service and native widgets
+        run: |
+          cmake --build build --target jobs_update_tests --parallel 3
+          ctest --test-dir build -R "^application_updates$" --output-on-failure
+      - name: Package standalone updater and verify installation handoff
+        shell: pwsh
+        run: |
+          python scripts/setup-nsis-tools.py
+          python scripts/package-windows.py
+          $installer = (Get-Item dist/JOBS-0.2.0-Setup-win64-*.exe).FullName
+          python scripts/check-update-install.py --installer $installer
       - name: Preserve MSIX and actual packaged UI evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: msix-windows-x64
           path: |
-            dist/msix/
+            dist/
             build/msix-acceptance/
+            build/update-install*.json
+            build/updates-ctest.txt
             build/packages/**/makeappx.log
             build/packages/**/windeployqt.log
           if-no-files-found: error

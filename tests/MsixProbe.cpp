@@ -9,6 +9,7 @@
 #include "ui/DesktopWorkspace.h"
 #include "ui/MainWindow.h"
 #include "ui/WorkspaceDialog.h"
+#include "updates/UpdateController.h"
 #include <QAction>
 #include <QApplication>
 #include <QDir>
@@ -144,8 +145,19 @@ int main(int argc, char **argv) {
             check(recovered.project()->tasks[0].name == "복구 확인 · 기획 검토", "checkpoint recovery content changed");
         }
         {
+            auto updateOptions = jobs::updateConfig();
+            if (local)
+                updateOptions.settingsFile = QDir(root).filePath("updater-contract.ini");
+            jobs::UpdateController updates(updateOptions);
+            updates.setAutomatic(false);
             jobs::DesktopWorkspace workspace(files, {});
+            workspace.setUpdates(&updates);
             auto *window = workspace.openProject(str(project));
+            check(window->findChild<QAction *>("applicationUpdates"), "update settings entry missing");
+            if (!local) {
+                updates.check(quintptr(window->winId()));
+                check(updates.state() == jobs::UpdateState::Unsupported, "development package attempted Store update");
+            }
             workspace.openProject(str(other));
             for (auto *action : window->findChildren<QAction *>())
                 if (action->text().startsWith("일정 계산(")) {

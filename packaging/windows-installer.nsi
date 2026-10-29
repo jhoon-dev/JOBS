@@ -8,6 +8,7 @@ Unicode true
 Name "JOBS ${AppVersion} Preview"
 OutFile "${InstallerPath}"
 InstallDir "$LOCALAPPDATA\Programs\JOBS"
+InstallDirRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS" "InstallLocation"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 VIProductVersion "${AppVersion}.0"
@@ -43,6 +44,52 @@ Function .onInit
     MessageBox MB_ICONSTOP "Windows 10 이상이 필요합니다." /SD IDOK
     SetErrorLevel 2
     Abort
+  ${EndIf}
+  ; Updater handoff waits before any files can be replaced. A finished PID needs no wait.
+  ${GetParameters} $0
+  ClearErrors
+  ${GetOptions} $0 "/WAITPID=" $1
+  ${IfNot} ${Errors}
+    ReadRegStr $4 HKCU "${RegistryKey}" "InstallLocation"
+    ${If} $4 != ""
+      StrCpy $INSTDIR $4
+    ${EndIf}
+    IntOp $1 $1 + 0
+    ${If} $1 <= 0
+      SetErrorLevel 4
+      Quit
+    ${EndIf}
+    System::Call 'kernel32::OpenProcess(i 0x100000, i 0, i r1) p .r2 ?e'
+    Pop $3
+    ${If} $2 != 0
+      System::Call 'kernel32::WaitForSingleObject(p r2, i 30000) i .r3'
+      System::Call 'kernel32::CloseHandle(p r2)'
+      ${If} $3 != 0
+        MessageBox MB_ICONSTOP "JOBS 종료를 확인하지 못했습니다. 앱을 닫고 설치기를 다시 실행해 주세요." /SD IDOK
+        SetErrorLevel 4
+        Quit
+      ${EndIf}
+    ${Else}
+      ${If} $3 != 87
+        MessageBox MB_ICONSTOP "실행 중인 JOBS 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
+        SetErrorLevel 4
+        Quit
+      ${EndIf}
+    ${EndIf}
+  ${EndIf}
+  System::Call 'kernel32::OpenMutexW(i 0x100000, i 0, w "Local\ToolMoa.JOBS.Standalone.Running") p .r2 ?e'
+  Pop $3
+  ${If} $2 != 0
+    System::Call 'kernel32::CloseHandle(p r2)'
+    MessageBox MB_ICONSTOP "실행 중인 다른 JOBS가 있습니다. 모든 JOBS 창을 닫고 다시 설치해 주세요." /SD IDOK
+    SetErrorLevel 4
+    Quit
+  ${Else}
+    ${If} $3 != 2
+      MessageBox MB_ICONSTOP "JOBS 실행 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
+      SetErrorLevel 4
+      Quit
+    ${EndIf}
   ${EndIf}
 FunctionEnd
 

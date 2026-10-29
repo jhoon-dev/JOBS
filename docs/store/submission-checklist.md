@@ -4,12 +4,12 @@
 
 ## 1. 지금 준비한 파일
 
-- `dist/msix/JOBS-development-1.0.0.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
+- `dist/msix/JOBS-development-1.0.2.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
 - `scripts/package-msix.py`: 실제 Partner Center identity를 받아 unsigned Store MSIX를 생성한다. Store에서는 심사 후 Microsoft가 다시 서명하므로 별도 공인 인증서 구매를 요구하지 않는다.
 - `packaging/msix/store-identity.template.json`: 실제 ID 입력용 서식. 빈 값으로는 Store 패키지를 만들 수 없다.
 - `docs/store/listing.ko.md`, `privacy-policy.ko.md`, 벡터 아이콘과 PNG 자산, 실제 앱 화면, 검증 결과.
 
-Microsoft Store는 단일 아키텍처 `.msix` 제출을 지원한다. 이 파이프라인은 x64 패키지이며 UWP 전용 업로드/심볼 묶음으로 가장하는 빈 `.msixupload`를 만들지 않는다. 앱 표시 버전 0.1.0과 Windows 패키지 버전 1.0.0.0은 별개다.
+Microsoft Store는 단일 아키텍처 `.msix` 제출을 지원한다. 이 파이프라인은 x64 패키지이며 UWP 전용 업로드/심볼 묶음으로 가장하는 빈 `.msixupload`를 만들지 않는다. 앱 표시 버전 0.2.0과 Windows 패키지 버전 1.0.2.0은 별개다.
 
 ## 2. 계정 소유자가 확정할 항목
 
@@ -26,7 +26,7 @@ Windows x64에서 Qt 6.8.3 MinGW와 CMake/Ninja Release 빌드를 준비한다. 
 ```powershell
 python scripts/setup-msix-tools.py
 # 템플릿을 build/store-identity.json으로 복사하고 실제 네 값을 입력한다.
-python scripts/package-msix.py --mode store --identity build/store-identity.json --version 1.0.0.0
+python scripts/package-msix.py --mode store --identity build/store-identity.json --version 1.0.2.0
 ```
 
 출력의 `.json`에서 `mode=store`, `store_identity_supplied=true`, `test_probe_included=false`, 원본 커밋과 SHA-256을 확인한다. 생성된 manifest의 identity가 Partner Center와 정확히 일치하는지도 확인한다. SDK/ZIP 검증 성공은 Store 심사 통과와 별개다. 다음 업데이트에는 앞선 버전보다 큰 패키지 버전을 사용하고 네 번째 숫자는 0으로 둔다. 동일한 Name/Publisher를 유지해야 같은 앱으로 업데이트된다.
@@ -50,7 +50,7 @@ python scripts/package-msix.py --mode store --identity build/store-identity.json
 Windows 11 이상 관리자 PowerShell에서만 다음 경로를 사용한다. 개발 OID는 별도 인증서/신뢰 저장소/개발자 모드 변경 없이 unsigned 테스트를 허용한다. 일반 사용자 배포용으로 안내하지 않는다.
 
 ```powershell
-Add-AppxPackage -Path "C:\path\JOBS-development-1.0.0.0-x64-REV.msix" -AllowUnsigned
+Add-AppxPackage -Path "C:\path\JOBS-development-1.0.2.0-x64-REV.msix" -AllowUnsigned
 # 시작 메뉴: JOBS MSIX Development
 Get-AppxPackage -Name ToolMoa.JOBS.MsixDevelopment | Remove-AppxPackage
 ```
