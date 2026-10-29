@@ -1,0 +1,104 @@
+{
+  "status": "success",
+  "source_revision": "4c3ae444d1d92f75720835e42d2066891a963c80",
+  "prd_revision": "308c664",
+  "materials_tool_revision": "28e6770",
+  "ctest": {
+    "local_MinGW": {
+      "passed": 50,
+      "seconds": 159.58
+    },
+    "Windows_MSVC": {
+      "passed": 50,
+      "seconds": 89.62
+    },
+    "macOS": {
+      "passed": 50,
+      "seconds": 76.57
+    },
+    "Linux_ASan_UBSan": {
+      "passed": 50,
+      "seconds": 194.54
+    }
+  },
+  "production_tidy_units": 68,
+  "python_packaging_contracts": 7,
+  "fuzz": {
+    "parsers": 4,
+    "runs_each": 5000,
+    "total": 20000
+  },
+  "ci": {
+    "desktop": 40797592682,
+    "msix": 40797592680,
+    "quality": 40797592946,
+    "parser_safety": 40797592857
+  },
+  "schedule_hashes": [
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "Windows",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 1000,
+      "schedule_sha256": "98015f053bc59a7e9fc386c8e819c05d4c81bc52cef561f2454f1ea1d43debfe",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-effort-split-v1",
+      "tasks": 10000,
+      "schedule_sha256": "4b7f6282cfddc0867ed0e54c5dc1e77ab8cff922f779c603db4830a85561e613",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 1000,
+      "schedule_sha256": "38274fbd24fd7979b8e58f0d5d7a16815c47c2150f79447ace8af8de2e9f0433",
+      "matches_pre_change": true
+    },
+    {
+      "platform": "macOS",
+      "profile": "native-fs0-workminutes-v1",
+      "tasks": 10000,
+      "schedule_sha256": "2154a211947a54a7dad1a0d3e81a2f5533c75ab3dc643a05f8d42eded3984540",
+      "matches_pre_change": true
+    }
+  ],
+  "delivered_msix": {
+    "name": "JOBS-development-1.0.0.0-x64-4c3ae444-ci.msix",
+    "bytes": 25800106,
+    "sha256": "fef9b7301e26609792d32efa6c05dbfbe5d8ce345719e165d1a96e701f1201f6"
+  },
+  "store_identity_supplied": false,
+  "wack": "not run",
+  "submitted": false,
+  "store_approved": false
+}

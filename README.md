@@ -50,7 +50,7 @@ PM Canvas는 별도 개인용 프로토타입이다. 그 코드·아키텍처·�
 
 Windows x64 설치 파일과 재현 방법은 [설치·완전 제거 안내](docs/windows-installer.md)를 따른다. 설치 파일은 로컬 `dist`에 생성한다. 제거하면 JOBS 설치 폴더와 설정·캐시·자동 복구 데이터를 모두 지우며 별도 위치에 저장한 프로젝트는 보존한다.
 
-Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklist.md)와 [패키지 계약](docs/msix-store.md)을 따른다. 앱 이름 예약 전에는 별도의 unsigned 개발 패키지를 제공하며, 실제 Partner Center ID를 넣은 Store 모드 생성기와 한국어 소개·아이콘·개인정보 처리방침을 준비한다. MSIX판 설정·복구는 패키지 LocalState에 저장하고 일반 제거 시 함께 제거한다. Store 등록·WACK·제출/승인은 아직 완료되지 않았다.
+Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklist.md)와 [패키지 계약](docs/msix-store.md)을 따른다. 앱 이름 예약 전에는 별도의 unsigned 개발 패키지를 제공하며, 실제 Partner Center ID를 넣은 Store 모드 생성기와 한국어 소개·아이콘·개인정보 처리방침을 준비한다. MSIX판 설정·복구는 패키지 LocalState에 저장하고 일반 제거 시 함께 제거한다. [검증 기록과 실제 화면](docs/validation/msix-2026-10-29/README.md)에 패키지 identity의 설치·업데이트·복구·제거 및 파일 해시를 보관한다. Store 등록·WACK·제출/승인은 아직 완료되지 않았다.
 
 초기 개발 기준은 C++20, CMake 3.24+, Qt 6.8.3 Core/Widgets/Concurrent다. 서버·계정 없이 WBS·기간·FS 선행·휴일을 입력하고 F9로 일정 계산한다. 추적 메뉴에서 기준선을 저장하고 상태일·실적을 보고한 뒤 계획 대비 비교를 연다. 자원 메뉴에서 가용량·배정을 입력하고 부하와 평준화 시나리오를 비교한다. `.jobs` 단일 파일에 계획·자원·기준선·실적·시나리오 입력을 저장한다. 원가 메뉴에서 유효일 단가·고정비·누적 실제원가·물리 진척을 입력하고 기준선 EVM을 분석한다. 보고서 메뉴에서 대시보드/XLSX/PDF, 자동 저장·복구 메뉴에서 체크포인트/사본 복구, 편집 메뉴에서 실행 취소/다시 실행을 사용한다. 고급 평준화·회계/환율 연계는 후속 구현이다.
 

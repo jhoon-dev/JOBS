@@ -1,0 +1,105 @@
+Test project C:/Users/dow/Development/ToolMoa/JOBS/build
+      Start  1: application_storage_contract
+ 1/50 Test  #1: application_storage_contract .....   Passed    0.32 sec
+      Start  2: msix_workflow_unpacked
+ 2/50 Test  #2: msix_workflow_unpacked ...........   Passed    1.88 sec
+      Start  3: structured_diagnostics
+ 3/50 Test  #3: structured_diagnostics ...........   Passed    0.78 sec
+      Start  4: shared_resource_intervals
+ 4/50 Test  #4: shared_resource_intervals ........   Passed    0.70 sec
+      Start  5: workspace_file_contract
+ 5/50 Test  #5: workspace_file_contract ..........   Passed    0.58 sec
+      Start  6: multi_project_workspace_ui
+ 6/50 Test  #6: multi_project_workspace_ui .......   Passed    2.64 sec
+      Start  7: document_edit_guards
+ 7/50 Test  #7: document_edit_guards .............   Passed    0.48 sec
+      Start  8: parser_seed_replay
+ 8/50 Test  #8: parser_seed_replay ...............   Passed    0.59 sec
+      Start  9: responsive_document_contract
+ 9/50 Test  #9: responsive_document_contract .....   Passed   22.94 sec
+      Start 10: responsive_editing_ui
+10/50 Test #10: responsive_editing_ui ............   Passed    5.05 sec
+      Start 11: prepared_edit_contract
+11/50 Test #11: prepared_edit_contract ...........   Passed    2.09 sec
+      Start 12: task_table_model_contract
+12/50 Test #12: task_table_model_contract ........   Passed    0.56 sec
+      Start 13: async_editing_ui
+13/50 Test #13: async_editing_ui .................   Passed   22.97 sec
+      Start 14: primavera_xer_contract
+14/50 Test #14: primavera_xer_contract ...........   Passed    2.41 sec
+      Start 15: primavera_xer_ui
+15/50 Test #15: primavera_xer_ui .................   Passed    4.30 sec
+      Start 16: project_xml_contract
+16/50 Test #16: project_xml_contract .............   Passed    1.61 sec
+      Start 17: project_xml_ui
+17/50 Test #17: project_xml_ui ...................   Passed    3.81 sec
+      Start 18: bulk_editing_contract_ui
+18/50 Test #18: bulk_editing_contract_ui .........   Passed    3.61 sec
+      Start 19: projected_views_ui
+19/50 Test #19: projected_views_ui ...............   Passed   10.11 sec
+      Start 20: task_editing_contract
+20/50 Test #20: task_editing_contract ............   Passed    1.35 sec
+      Start 21: task_editing_ui
+21/50 Test #21: task_editing_ui ..................   Passed    3.69 sec
+      Start 22: calculation_cancellation
+22/50 Test #22: calculation_cancellation .........   Passed    3.51 sec
+      Start 23: integrated_project_workflow
+23/50 Test #23: integrated_project_workflow ......   Passed    2.89 sec
+      Start 24: performance_cancellation_ui
+24/50 Test #24: performance_cancellation_ui ......   Passed    2.13 sec
+      Start 25: effort_work_calendar_split
+25/50 Test #25: effort_work_calendar_split .......   Passed    3.66 sec
+      Start 26: effort_ui
+26/50 Test #26: effort_ui ........................   Passed    2.29 sec
+      Start 27: constraint_contract
+27/50 Test #27: constraint_contract ..............   Passed    0.87 sec
+      Start 28: constraint_gantt_ui
+28/50 Test #28: constraint_gantt_ui ..............   Passed    2.41 sec
+      Start 29: pdm_calendar_contract
+29/50 Test #29: pdm_calendar_contract ............   Passed    2.05 sec
+      Start 30: pdm_calendar_ui
+30/50 Test #30: pdm_calendar_ui ..................   Passed    1.61 sec
+      Start 31: undo_contract
+31/50 Test #31: undo_contract ....................   Passed    7.59 sec
+      Start 32: plan_enum_compatibility
+32/50 Test #32: plan_enum_compatibility ..........   Passed    2.45 sec
+      Start 33: input_delta_contract
+33/50 Test #33: input_delta_contract .............   Passed    0.33 sec
+      Start 34: editing_performance_ui
+34/50 Test #34: editing_performance_ui ...........   Passed    2.26 sec
+      Start 35: recovery_crash_file
+35/50 Test #35: recovery_crash_file ..............   Passed    3.51 sec
+      Start 36: recovery_ui
+36/50 Test #36: recovery_ui ......................   Passed    4.93 sec
+      Start 37: reports_export
+37/50 Test #37: reports_export ...................   Passed    2.01 sec
+      Start 38: reports_ui
+38/50 Test #38: reports_ui .......................   Passed    4.52 sec
+      Start 39: cost_contract_file
+39/50 Test #39: cost_contract_file ...............   Passed    1.07 sec
+      Start 40: cost_ui
+40/50 Test #40: cost_ui ..........................   Passed    2.21 sec
+      Start 41: resource_contract_file
+41/50 Test #41: resource_contract_file ...........   Passed    1.30 sec
+      Start 42: resource_ui
+42/50 Test #42: resource_ui ......................   Passed    3.03 sec
+      Start 43: tracking_contract
+43/50 Test #43: tracking_contract ................   Passed    0.18 sec
+      Start 44: tracking_file
+44/50 Test #44: tracking_file ....................   Passed    0.60 sec
+      Start 45: wbs_contract
+45/50 Test #45: wbs_contract .....................   Passed    0.15 sec
+      Start 46: schedule_contract
+46/50 Test #46: schedule_contract ................   Passed    0.12 sec
+      Start 47: file_lifecycle
+47/50 Test #47: file_lifecycle ...................   Passed    1.19 sec
+      Start 48: ui_lifecycle
+48/50 Test #48: ui_lifecycle .....................   Passed    2.68 sec
+      Start 49: wbs_gantt_ui
+49/50 Test #49: wbs_gantt_ui .....................   Passed    1.74 sec
+      Start 50: tracking_ui
+50/50 Test #50: tracking_ui ......................   Passed    2.72 sec
+
+100% tests passed out of 50
+
+Total Test time (real) = 159.58 sec

@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Users\dow\Development\ToolMoa\JOBS\scripts\package-msix.py", line 102, in <module>
+    main()
+  File "C:\Users\dow\Development\ToolMoa\JOBS\scripts\package-msix.py", line 30, in main
+    config = identity(args.mode, json.loads(args.identity.read_text(encoding='utf-8-sig')) if args.identity else None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dow\Development\ToolMoa\JOBS\scripts\msix_package.py", line 37, in identity
+    raise ValueError('Missing or invalid Store identity field: ' + key)
+ValueError: Missing or invalid Store identity field: IdentityName

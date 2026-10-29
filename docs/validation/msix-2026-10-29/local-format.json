@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": "1f09cd7",
+  "files": [
+    "src/application/Document.cpp",
+    "src/application/Document.h",
+    "src/application/PreparedEdit.cpp",
+    "src/application/TaskEditing.cpp",
+    "src/persistence/ApplicationStorage.cpp",
+    "src/persistence/ApplicationStorage.h",
+    "src/persistence/JsonRecoveryStore.cpp",
+    "src/ui/AsyncEditController.cpp",
+    "src/ui/MainWindowRecovery.cpp",
+    "src/ui/TaskTableModel.cpp",
+    "tests/ApplicationStorageTests.cpp",
+    "tests/MsixProbe.cpp"
+  ],
+  "format_changes": [],
+  "fix": false
+}

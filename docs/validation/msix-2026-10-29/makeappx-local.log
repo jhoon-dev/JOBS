@@ -1,0 +1,168 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\dow\Development\ToolMoa\JOBS\dist\msix\JOBS-development-1.0.0.0-x64-4c3ae444.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload"
+Enumerating files from directory "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload"
+Packing 79 file(s) in "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload" (content directory) to "\\?\C:\Users\dow\Development\ToolMoa\JOBS\dist\msix\JOBS-development-1.0.0.0-x64-4c3ae444.msix" (output file name).
+Memory limit defaulting to 34349473792 bytes.
+Using "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\AppxManifest.xml" as the manifest for the package.
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\libwinpthread-1.dll" as a payload file.  Its path in the package will be "libwinpthread-1.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\libgcc_s_seh-1.dll" as a payload file.  Its path in the package will be "libgcc_s_seh-1.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\libstdc++-6.dll" as a payload file.  Its path in the package will be "libstdc++-6.dll".
+Settings for extension (null): Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\DISCLAIMER" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\DISCLAIMER".
+Settings for extension (null): Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\gcc\COPYING" as a payload file.  Its path in the package will be "licenses\runtime\gcc\COPYING".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\direct-x-readme.txt" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\direct-x-readme.txt".
+Settings for extension PD: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\DISCLAIMER.PD" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\DISCLAIMER.PD".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\ddk-readme.txt" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\ddk-readme.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\COPYING.MinGW-w64.txt" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\COPYING.MinGW-w64.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\COPYING.MinGW-w64-runtime.txt" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\COPYING.MinGW-w64-runtime.txt".
+Settings for extension (null): Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\COPYING" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\COPYING".
+Settings for extension (null): Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\winpthreads\COPYING" as a payload file.  Its path in the package will be "licenses\runtime\winpthreads\COPYING".
+Settings for extension lib: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\mingw-w64\direct-x-COPYING.lib" as a payload file.  Its path in the package will be "licenses\runtime\mingw-w64\direct-x-COPYING.lib".
+Settings for extension LIB: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\gcc\COPYING.LIB" as a payload file.  Its path in the package will be "licenses\runtime\gcc\COPYING.LIB".
+Settings for extension RUNTIME: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\gcc\COPYING.RUNTIME" as a payload file.  Its path in the package will be "licenses\runtime\gcc\COPYING.RUNTIME".
+Settings for extension (null): Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\gcc\COPYING3" as a payload file.  Its path in the package will be "licenses\runtime\gcc\COPYING3".
+Settings for extension LIB: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\runtime\gcc\COPYING3.LIB" as a payload file.  Its path in the package will be "licenses\runtime\gcc\COPYING3.LIB".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Qt6Core.dll" as a payload file.  Its path in the package will be "Qt6Core.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Qt6Gui.dll" as a payload file.  Its path in the package will be "Qt6Gui.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Qt6Network.dll" as a payload file.  Its path in the package will be "Qt6Network.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Qt6Widgets.dll" as a payload file.  Its path in the package will be "Qt6Widgets.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\generic\qtuiotouchplugin.dll" as a payload file.  Its path in the package will be "generic\qtuiotouchplugin.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\imageformats\qgif.dll" as a payload file.  Its path in the package will be "imageformats\qgif.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\imageformats\qico.dll" as a payload file.  Its path in the package will be "imageformats\qico.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\imageformats\qjpeg.dll" as a payload file.  Its path in the package will be "imageformats\qjpeg.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\networkinformation\qnetworklistmanager.dll" as a payload file.  Its path in the package will be "networkinformation\qnetworklistmanager.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\platforms\qwindows.dll" as a payload file.  Its path in the package will be "platforms\qwindows.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\styles\qmodernwindowsstyle.dll" as a payload file.  Its path in the package will be "styles\qmodernwindowsstyle.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\tls\qcertonlybackend.dll" as a payload file.  Its path in the package will be "tls\qcertonlybackend.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\tls\qschannelbackend.dll" as a payload file.  Its path in the package will be "tls\qschannelbackend.dll".
+Settings for extension dll: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\D3Dcompiler_47.dll" as a payload file.  Its path in the package will be "D3Dcompiler_47.dll".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\AFL-2.1.txt" as a payload file.  Its path in the package will be "licenses\qtbase\AFL-2.1.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\BSD-2-Clause.txt" as a payload file.  Its path in the package will be "licenses\qtbase\BSD-2-Clause.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\BSD-3-Clause.txt" as a payload file.  Its path in the package will be "licenses\qtbase\BSD-3-Clause.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\BSD-4-Clause.txt" as a payload file.  Its path in the package will be "licenses\qtbase\BSD-4-Clause.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Apache-2.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Apache-2.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Bitstream-Vera.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Bitstream-Vera.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\BSL-1.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\BSL-1.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\CC0-1.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\CC0-1.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\GFDL-1.3-no-invariants-only.txt" as a payload file.  Its path in the package will be "licenses\qtbase\GFDL-1.3-no-invariants-only.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\FTL.txt" as a payload file.  Its path in the package will be "licenses\qtbase\FTL.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\GPL-2.0-or-later.txt" as a payload file.  Its path in the package will be "licenses\qtbase\GPL-2.0-or-later.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\GPL-3.0-only.txt" as a payload file.  Its path in the package will be "licenses\qtbase\GPL-3.0-only.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\IJG.txt" as a payload file.  Its path in the package will be "licenses\qtbase\IJG.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\HPND.txt" as a payload file.  Its path in the package will be "licenses\qtbase\HPND.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\GPL-2.0-only.txt" as a payload file.  Its path in the package will be "licenses\qtbase\GPL-2.0-only.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\IPL-1.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\IPL-1.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LGPL-3.0-only.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LGPL-3.0-only.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Imlib2.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Imlib2.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Libpng.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Libpng.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LicenseRef-BSD-3-Clause-with-PCRE2-Binary-Like-Packages-Exception.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LicenseRef-BSD-3-Clause-with-PCRE2-Binary-Like-Packages-Exception.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LicenseRef-ICC-License.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LicenseRef-ICC-License.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LicenseRef-Qt-Commercial.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LicenseRef-Qt-Commercial.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LicenseRef-Lcs-Telegraphics.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LicenseRef-Lcs-Telegraphics.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\LicenseRef-SHA1-Public-Domain.txt" as a payload file.  Its path in the package will be "licenses\qtbase\LicenseRef-SHA1-Public-Domain.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Linux-syscall-note.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Linux-syscall-note.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\MIT-open-group.txt" as a payload file.  Its path in the package will be "licenses\qtbase\MIT-open-group.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\MIT-Khronos-old.txt" as a payload file.  Its path in the package will be "licenses\qtbase\MIT-Khronos-old.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\MIT.txt" as a payload file.  Its path in the package will be "licenses\qtbase\MIT.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\MPL-2.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\MPL-2.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Qt-GPL-exception-1.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Qt-GPL-exception-1.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Unicode-3.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Unicode-3.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\SPL-1.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\SPL-1.0.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\X11.txt" as a payload file.  Its path in the package will be "licenses\qtbase\X11.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Zlib.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Zlib.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\Xerox.txt" as a payload file.  Its path in the package will be "licenses\qtbase\Xerox.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\blessing.txt" as a payload file.  Its path in the package will be "licenses\qtbase\blessing.txt".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\libpng-2.0.txt" as a payload file.  Its path in the package will be "licenses\qtbase\libpng-2.0.txt".
+Settings for extension json: Type = application/json, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\sources.json" as a payload file.  Its path in the package will be "licenses\qtbase\sources.json".
+Settings for extension exe: Type = application/x-msdownload, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\JOBS.exe" as a payload file.  Its path in the package will be "JOBS.exe".
+Settings for extension conf: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\qt.conf" as a payload file.  Its path in the package will be "qt.conf".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\NOTICE.txt" as a payload file.  Its path in the package will be "NOTICE.txt".
+Settings for extension json: Type = application/json, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\licenses\qtbase\qtbase-6.8.3.spdx.json" as a payload file.  Its path in the package will be "licenses\qtbase\qtbase-6.8.3.spdx.json".
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\INSTALL-README.txt" as a payload file.  Its path in the package will be "INSTALL-README.txt".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Assets\Square44x44Logo.png" as a payload file.  Its path in the package will be "Assets\Square44x44Logo.png".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Assets\Square150x150Logo.png" as a payload file.  Its path in the package will be "Assets\Square150x150Logo.png".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Assets\StoreLogo.png" as a payload file.  Its path in the package will be "Assets\StoreLogo.png".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\dow\Development\ToolMoa\JOBS\build\packages\msix-4c3ae444-736b630a\payload\Assets\StoreListing300.png" as a payload file.  Its path in the package will be "Assets\StoreListing300.png".
+Package creation succeeded.

@@ -37,4 +37,6 @@ JOBS 고유 PRD-08/FILE-01~10은 사용자 확정 파일 제품 요구와 설계
 ## 검토 보완: 기능행과 확인과제 다대다 연결
 09 JSON 각 proposed_mapping에 open_question_id, question_links(blocking_scope·resolution_evidence_status·mapping_basis), question_mapping_status를 추가했다. 과제에는 역방향 linked_source_row_ids와 mapping_status·resolution_evidence_status를 둔다. 연결은 같은 제품·주제에 따른 제안이며 해결 근거가 아니다. 실제 의미 연결이 확인되지 않은 개별 필드/추가 관계는 후속 검토 대상이다. 어떤 연결도 없으면 UNMAPPED로 남기고 '과제 없음/차단 없음'으로 해석하지 않는다. 모든39과제는 OPEN, 해결증거는 NOT_PROVIDED다.
 제품/버전/라이선스 공통 과제는 해당 제품 전행의 Parity 판정을 차단하지만 독립 native 설계 전체를 차단하지 않는다. 세부 계산·교환·운영 과제는 question_links의 차단 범위를 따른다.
+
+2026-10-29 사용자 확정 MSIX-01~06은 J-16/PRD-08의 배포·파일 안전성과 연결하는 JOBS 고유 요구다. 기존 PACK-01~04를 유지하며 [MSIX 계약](../msix-store.md), [제출 절차](../store/submission-checklist.md), [실제 검증](../validation/msix-2026-10-29/README.md)으로 추적한다. Store 등록·WACK·최종 identity 제출/승인은 별도 미완료 항목으로 보존한다.
 REQ-ORA-098은 J-03+J-11, PRD-03+PRD-07로 연결한다. B는 확정 비근무 예외·중복 처리의 결정론적 달력 기반일 뿐이다. 확률 날씨·분포·상관·seed·완료일 영향은 D-E에서 별도 검증한다. B 완료를 확률 기능 완료로 간주하지 않는다.

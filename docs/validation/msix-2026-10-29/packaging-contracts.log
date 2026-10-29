@@ -1,0 +1,9 @@
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1853403Z test_archive_roundtrip_detects_corruption_and_unexpected_content (test_msix_packaging.PackagingContract.test_archive_roundtrip_detects_corruption_and_unexpected_content) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1858584Z test_assets_match_vector_inventory (test_msix_packaging.PackagingContract.test_assets_match_vector_inventory) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1859265Z test_development_identity_separate_and_fixed (test_msix_packaging.PackagingContract.test_development_identity_separate_and_fixed) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1867877Z test_manifest_identity_xml_and_capability (test_msix_packaging.PackagingContract.test_manifest_identity_xml_and_capability) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1948189Z test_payload_rejects_secrets_installer_and_store_probe (test_msix_packaging.PackagingContract.test_payload_rejects_secrets_installer_and_store_probe) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1951171Z test_store_requires_exact_nonempty_identity (test_msix_packaging.PackagingContract.test_store_requires_exact_nonempty_identity) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1952156Z test_version_bounds (test_msix_packaging.PackagingContract.test_version_bounds) ... ok
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:46.1953407Z Ran 7 tests in 0.024s
+msix	Verify packaging contracts and pinned Microsoft SDK	2026-10-29T01:00:49.0958496Z D:\a\JOBS\JOBS\.deps\msix-sdk\10.0.26100.7463\bin\10.0.26100.0\x64\makeappx.exe

@@ -1,0 +1,30 @@
+build (windows-latest, win64_msvc2022_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-29T01:11:58.0701158Z 100% tests passed out of 50
+build (windows-latest, win64_msvc2022_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-29T01:11:58.0701630Z Total Test time (real) =  89.62 sec
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2958275Z PASS: reports-smoke.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2959309Z PASS: reports-resources.xlsx: 7 sheets, ZIP/OOXML/types/unknown/provenance
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2960150Z PASS: reports-pdm.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2960976Z PASS: reports-constraints.xlsx: 15 sheets, ZIP/OOXML/types/unknown/provenance
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2961826Z PASS: reports-effort.xlsx: 19 sheets, ZIP/OOXML/types/unknown/provenance
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2962626Z PASS: reports-smoke.pdf: 9 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2963413Z PASS: reports-long-portrait.pdf: 3 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2964168Z PASS: reports-a3.pdf: 4 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2964845Z PASS: reports-pdm.pdf: 6 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2966124Z PASS: reports-constraints.pdf: 6 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:12:15.2966927Z PASS: reports-effort.pdf: 10 pages, size/text/provenance/continuation
+build (windows-latest, win64_msvc2022_64)	Verify XER with independent TSV and MPXJ readers	2026-10-29T01:20:29.0578320Z PASS: independent TSV reader, XER tables/fields/references/values/encoding/hash/verdicts
+build (windows-latest, win64_msvc2022_64)	Verify XER with independent TSV and MPXJ readers	2026-10-29T01:20:29.0579560Z PASS: MPXJ 16.10.0 strict read, names/durations/relations/calendars/exceptions/resources/assignments
+build (macos-15, clang_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-29T01:03:55.7091480Z 100% tests passed out of 50
+build (macos-15, clang_64)	Run ctest --test-dir build -C Release --output-on-failure	2026-10-29T01:03:55.7100180Z Total Test time (real) =  76.57 sec
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:08.9784330Z PASS: reports-smoke.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:08.9885780Z PASS: reports-resources.xlsx: 7 sheets, ZIP/OOXML/types/unknown/provenance
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:08.9987500Z PASS: reports-pdm.xlsx: 14 sheets, ZIP/OOXML/types/unknown/provenance
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0090710Z PASS: reports-constraints.xlsx: 15 sheets, ZIP/OOXML/types/unknown/provenance
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0195040Z PASS: reports-effort.xlsx: 19 sheets, ZIP/OOXML/types/unknown/provenance
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0296580Z PASS: reports-smoke.pdf: 8 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0399820Z PASS: reports-long-portrait.pdf: 3 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0509740Z PASS: reports-a3.pdf: 3 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0611020Z PASS: reports-pdm.pdf: 5 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0715690Z PASS: reports-constraints.pdf: 6 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify exported XLSX and PDF with independent readers	2026-10-29T01:04:09.0819690Z PASS: reports-effort.pdf: 10 pages, size/text/provenance/continuation
+build (macos-15, clang_64)	Verify XER with independent TSV and MPXJ readers	2026-10-29T01:08:56.3651930Z PASS: independent TSV reader, XER tables/fields/references/values/encoding/hash/verdicts
+build (macos-15, clang_64)	Verify XER with independent TSV and MPXJ readers	2026-10-29T01:08:56.3652610Z PASS: MPXJ 16.10.0 strict read, names/durations/relations/calendars/exceptions/resources/assignments
