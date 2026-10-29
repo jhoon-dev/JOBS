@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--evidence', type=Path, required=True, help='Directory containing lifecycle.json and probe screenshots')
+    parser.add_argument('--screenshot', action='append', choices=('01-schedule.png', '02-shared-resources.png'),
+                        help='Select desktop-size real screenshots; default: 01-schedule.png')
     parser.add_argument('--output-dir', type=Path, default=ROOT / 'dist/msix/store-preparation')
     args = parser.parse_args()
     evidence = args.evidence.resolve()
@@ -25,7 +27,7 @@ def main():
         shutil.copyfile(ROOT / 'docs/store' / name, output / name)
     shutil.copyfile(ROOT / 'packaging/msix/store-identity.template.json', output / 'store-identity.template.json')
     shutil.copytree(ROOT / 'packaging/msix/Assets', output / 'Assets')
-    for name in ('01-schedule.png', '02-shared-resources.png'):
+    for name in args.screenshot or ['01-schedule.png']:
         matches = list(evidence.rglob(name))
         if len(matches) != 1:
             raise ValueError('Expected one real packaged screenshot: ' + name)
