@@ -80,6 +80,13 @@ try {
     $package = Get-AppxPackage -Name $expectedName
     if (-not $package -or [version]$package.Version -ne [version]$initial.version) { throw 'Initial package not registered' }
     $script:installedFamily = $package.PackageFamilyName
+    $mainId = [JobsActivation]::Run(($package.PackageFamilyName + '!JOBS'), '')
+    $script:ownedProcesses += $mainId
+    $main = Get-Process -Id $mainId
+    if (-not $main.WaitForInputIdle(30000)) { throw 'Packaged JOBS did not initialize' }
+    $main.Refresh()
+    if ($main.MainWindowHandle -eq 0 -or -not $main.CloseMainWindow() -or -not $main.WaitForExit(15000)) { throw 'Packaged JOBS window did not open and close normally' }
+    $report.checks += 'production JOBS application entry point opened a native window and closed normally'
     $first = Invoke-Probe $package 'initial'
     $report.checks += 'installed and activated under actual package identity; create/save/open/calculate/undo/workspace/checkpoint'
     $privateRoot = Join-Path $env:LOCALAPPDATA ('Packages/' + $package.PackageFamilyName + '/LocalState')
@@ -110,7 +117,7 @@ try {
 } finally {
     foreach ($processId in $script:ownedProcesses) {
         $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
-        if ($process -and $process.Path -and $process.Path -like '*\ToolMoa.JOBS.MsixDevelopment_*\jobs_msix_probe.exe') { Stop-Process -Id $processId -Force }
+        if ($process -and $process.Path -and $process.Path -like '*\ToolMoa.JOBS.MsixDevelopment_*\*' -and $process.ProcessName -in @('JOBS','jobs_msix_probe')) { Stop-Process -Id $processId -Force }
     }
     $remaining = Get-AppxPackage -Name $expectedName
     if ($remaining -and $script:installedFamily -eq $remaining.PackageFamilyName) { Remove-AppxPackage -Package $remaining.PackageFullName }

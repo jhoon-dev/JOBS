@@ -4,6 +4,7 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import struct
+from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -113,7 +114,7 @@ def validate_payload(stage, mode, probe=False):
             raise ValueError('Development or executable helper file in payload: ' + relative)
         if 'uninstall' in file.name.lower() or file.name.lower().endswith('setup.exe'):
             raise ValueError('MSIX must not embed an installer/uninstaller')
-        if mode == 'store' and ('probe' in file.name.lower() or file.name.lower().startswith('jobs_')):
+        if mode == 'store' and ('probe' in file.name.lower() or file.name.lower().startswith('jobs_') or file.name.lower() == 'qt6test.dll'):
             raise ValueError('Test artifact in Store payload')
         total += file.stat().st_size
         if len(names) > 2000 or total > 300 * 1024 * 1024:
@@ -127,20 +128,24 @@ def verify_archive(package, expected_files, expected_manifest):
     with zipfile.ZipFile(package) as archive:
         members = archive.infolist()
         seen = set()
+        decoded = {}
         for member in members:
-            path = PurePosixPath(member.filename.replace('\\', '/'))
-            if path.is_absolute() or '..' in path.parts or ':' in member.filename:
+            # OPC ZIP part names escape '+', spaces, etc.; never use unquote_plus.
+            name = unquote(member.filename, errors='strict').replace('\\', '/')
+            path = PurePosixPath(name)
+            if path.is_absolute() or '..' in path.parts or ':' in name:
                 raise ValueError('Unsafe MSIX archive path')
-            if member.filename.casefold() in seen:
+            if name.casefold() in seen:
                 raise ValueError('Duplicate MSIX archive path')
-            seen.add(member.filename.casefold())
-        if archive.read('AppxManifest.xml') != expected_manifest:
+            seen.add(name.casefold())
+            decoded[name] = member
+        if archive.read(decoded['AppxManifest.xml']) != expected_manifest:
             raise ValueError('Packaged manifest differs from the checked input')
         for item in expected_files:
-            content = archive.read(item['path'])
+            content = archive.read(decoded[item['path']])
             if len(content) != item['bytes'] or hashlib.sha256(content).hexdigest() != item['sha256']:
                 raise ValueError('Packaged file differs from payload inventory: ' + item['path'])
         footprint = {'[Content_Types].xml', 'AppxBlockMap.xml', 'AppxSignature.p7x', 'AppxMetadata/CodeIntegrity.cat'}
-        extras = set(archive.namelist()) - {f['path'] for f in expected_files} - footprint
+        extras = set(decoded) - {f['path'] for f in expected_files} - footprint
         if extras:
             raise ValueError('Unexpected files in MSIX: ' + str(sorted(extras)))

@@ -62,7 +62,7 @@ class PackagingContract(unittest.TestCase):
             (folder / 'JOBS.exe').write_bytes(b'executable')
             (folder / 'AppxManifest.xml').write_bytes(b'manifest')
             validate_payload(folder, 'store')
-            for name in ('key.pfx', 'Uninstall.exe', 'app-Setup.exe', 'jobs_msix_probe.exe', 'run.ps1'):
+            for name in ('key.pfx', 'Uninstall.exe', 'app-Setup.exe', 'jobs_msix_probe.exe', 'Qt6Test.dll', 'run.ps1'):
                 with self.subTest(name=name):
                     path = folder / name
                     path.write_bytes(b'bad')
@@ -81,12 +81,15 @@ class PackagingContract(unittest.TestCase):
             (payload / 'JOBS.exe').write_bytes(b'executable')
             (payload / 'AppxManifest.xml').write_bytes(xml)
             files = inventory(payload)
-            for modification in ('none', 'corrupt', 'extra', 'traversal', 'duplicate'):
+            (payload / 'libstdc++-6.dll').write_bytes(b'runtime')
+            files = inventory(payload)
+            for modification in ('none', 'corrupt', 'extra', 'traversal', 'duplicate', 'encoded-traversal', 'encoded-alias'):
                 with self.subTest(modification=modification):
                     package = folder / (modification + '.msix')
                     with zipfile.ZipFile(package, 'w') as archive:
                         archive.writestr('AppxManifest.xml', xml)
                         archive.writestr('JOBS.exe', b'bad' if modification == 'corrupt' else b'executable')
+                        archive.writestr('libstdc%2B%2B-6.dll', b'runtime')
                         archive.writestr('AppxBlockMap.xml', b'footprint')
                         if modification == 'extra':
                             archive.writestr('unlisted.dll', b'bad')
@@ -94,6 +97,10 @@ class PackagingContract(unittest.TestCase):
                             archive.writestr('../outside', b'bad')
                         if modification == 'duplicate':
                             archive.writestr('jobs.exe', b'bad')
+                        if modification == 'encoded-traversal':
+                            archive.writestr('%2e%2e/outside', b'bad')
+                        if modification == 'encoded-alias':
+                            archive.writestr('libstdc++-6.dll', b'bad')
                     if modification == 'none':
                         verify_archive(package, files, xml)
                     else:
