@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDialog>
@@ -22,6 +23,25 @@
 #include <QVBoxLayout>
 
 namespace jobs {
+namespace {
+class InstallBarrier final : public QDialog {
+public:
+    explicit InstallBarrier(QWidget *parent) : QDialog(parent) {
+        setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+        setWindowTitle("업데이트 설치 준비");
+        setWindowModality(Qt::ApplicationModal);
+        auto *layout = new QVBoxLayout(this);
+        layout->addWidget(new QLabel("문서 저장과 Windows 설치 실행을 확인하고 있습니다…", this));
+        show();
+    }
+    void reject() override {}
+
+protected:
+    void closeEvent(QCloseEvent *event) override {
+        event->ignore();
+    }
+};
+} // namespace
 void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiHooks hooks) {
     if (!hooks.openUrl)
         hooks.openUrl = [](const QUrl &url) { return QDesktopServices::openUrl(url); };
@@ -142,7 +162,8 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
                     status->setText("설치된 JOBS의 프로젝트 창에서 업데이트를 진행해 주세요.");
                     return;
                 }
-                if (QMessageBox::question(dialog, "업데이트 설치",
+                InstallBarrier barrier(dialog);
+                if (QMessageBox::question(&barrier, "업데이트 설치",
                                           "열린 문서의 저장 여부를 확인한 뒤 JOBS를 종료하고 설치기를 실행합니다.",
                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
                     return;

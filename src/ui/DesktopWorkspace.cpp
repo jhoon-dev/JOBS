@@ -93,6 +93,9 @@ MainWindow *DesktopWorkspace::adopt(std::unique_ptr<Document> document) {
     return window;
 }
 bool DesktopWorkspace::prepareForUpdate() {
+    for (const auto &session : sessions_)
+        if (session->window)
+            session->window->commitPendingCell();
     const auto busy = [this] {
         return std::any_of(sessions_.begin(), sessions_.end(), [](const auto &session) {
             auto *window = session->window.data();

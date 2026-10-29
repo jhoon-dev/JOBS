@@ -406,11 +406,14 @@ private slots:
         QTRY_COMPARE(controller.state(), UpdateState::Ready);
         bool prepare = false, succeed = false;
         int launched = 0, finished = 0;
+        bool barrierActive = true;
         QMainWindow window;
         attachUpdateUi(window, controller,
                        {[&] { return prepare; },
                         [&] { ++finished; },
                         [&](const QString &) {
+                            auto *modal = QApplication::activeModalWidget();
+                            barrierActive = barrierActive && modal && modal->windowModality() == Qt::ApplicationModal;
                             ++launched;
                             return succeed;
                         },
@@ -432,6 +435,7 @@ private slots:
         window.findChild<QPushButton *>("installApplicationUpdate")->click();
         QCOMPARE(launched, 2);
         QCOMPARE(finished, 1);
+        QVERIFY(barrierActive);
     }
     void documentCancelKeepsAllWindows() {
         QTemporaryDir dir;
