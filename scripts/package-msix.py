@@ -45,8 +45,9 @@ def main():
     if tools['archive_sha512_base64'] != lock['sha512_base64']:
         raise RuntimeError('SDK archive identity differs from lock')
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT):
-        raise RuntimeError('Commit source before producing a package')
+    dirty = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT)
+    if dirty:
+        raise RuntimeError('Commit source before producing a package: ' + dirty.decode('utf-8', errors='replace'))
     environment = os.environ.copy()
     environment['PATH'] = os.pathsep.join((str(qt / 'bin'), str(compiler), environment['PATH']))
     target = ['JOBS'] + (['jobs_msix_probe'] if args.include_probe else [])

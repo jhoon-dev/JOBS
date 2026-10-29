@@ -30,6 +30,7 @@ jobs:
           python scripts/setup-msix-tools.py
       - name: Build development packages and upgrade fixture
         run: |
+          git status --short
           python scripts/package-msix.py --version 1.0.2.0
           python scripts/package-msix.py --version 1.0.2.0 --include-probe
           python scripts/package-msix.py --version 1.0.3.0 --include-probe
