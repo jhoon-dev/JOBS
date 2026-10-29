@@ -1,0 +1,18 @@
+********* Start testing of WorkspacePresentationTests *********
+Config: Using QtTest library 6.8.3, Qt 6.8.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11
+PASS   : WorkspacePresentationTests::initTestCase()
+QWARN  : WorkspacePresentationTests::compactWindowKeepsCommandsAndRows() QFontDatabase: Cannot find font directory C:/Users/dow/Development/ToolMoa/JOBS/.deps/Qt/6.8.3/mingw_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QWARN  : WorkspacePresentationTests::compactWindowKeepsCommandsAndRows() This plugin does not support propagateSizeHints()
+PASS   : WorkspacePresentationTests::compactWindowKeepsCommandsAndRows()
+QWARN  : WorkspacePresentationTests::cancellationCommandStaysAvailableWhenPresentationChanges() This plugin does not support propagateSizeHints()
+PASS   : WorkspacePresentationTests::cancellationCommandStaysAvailableWhenPresentationChanges()
+QWARN  : WorkspacePresentationTests::wbsTogglePreservesScopeAndSelection() This plugin does not support propagateSizeHints()
+PASS   : WorkspacePresentationTests::wbsTogglePreservesScopeAndSelection()
+QWARN  : WorkspacePresentationTests::diagnosticsRevealNewProblemsAndRespectCollapse() This plugin does not support propagateSizeHints()
+PASS   : WorkspacePresentationTests::diagnosticsRevealNewProblemsAndRespectCollapse()
+QWARN  : WorkspacePresentationTests::calculatedWorkspaceAndNativeCapture() This plugin does not support propagateSizeHints()
+PASS   : WorkspacePresentationTests::calculatedWorkspaceAndNativeCapture()
+PASS   : WorkspacePresentationTests::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 754ms
+********* Finished testing of WorkspacePresentationTests *********

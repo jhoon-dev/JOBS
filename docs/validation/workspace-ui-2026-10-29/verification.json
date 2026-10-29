@@ -1,0 +1,61 @@
+{
+  "status": "local acceptance passed",
+  "source_revision": "585328e8fb6e3418f551ab438891ca53d9fc4e66",
+  "production_cpp_revision": "8c108d99cd6a4af5fd4caf9ded8421b3092f7737",
+  "prd_revision": "0bca077",
+  "local_ctest": {
+    "passed": 52,
+    "seconds": 164.89
+  },
+  "native_qt_capture_sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      1024,
+      650
+    ]
+  ],
+  "installer": {
+    "path": "dist\\JOBS-0.2.0-Setup-win64-585328e8.exe",
+    "bytes": 13077183,
+    "sha256": "389cf87fd13d29de7b4db15b59ccfeaddf9ff84f86e1c4910fb510eb4ba4099b",
+    "signed": false
+  },
+  "ci_snapshot": [
+    {
+      "conclusion": "",
+      "databaseId": 40879810251,
+      "headSha": "585328e8fb6e3418f551ab438891ca53d9fc4e66",
+      "name": "Parser fuzzing and runtime checks",
+      "status": "in_progress",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40879810251"
+    },
+    {
+      "conclusion": "",
+      "databaseId": 40879810245,
+      "headSha": "585328e8fb6e3418f551ab438891ca53d9fc4e66",
+      "name": "MSIX package and installed lifecycle",
+      "status": "in_progress",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40879810245"
+    },
+    {
+      "conclusion": "",
+      "databaseId": 40879810145,
+      "headSha": "585328e8fb6e3418f551ab438891ca53d9fc4e66",
+      "name": "C++ format and static analysis",
+      "status": "in_progress",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40879810145"
+    },
+    {
+      "conclusion": "",
+      "databaseId": 40879810104,
+      "headSha": "585328e8fb6e3418f551ab438891ca53d9fc4e66",
+      "name": "Desktop build and file lifecycle",
+      "status": "in_progress",
+      "url": "https://github.com/jhoon-dev/JOBS/actions/runs/40879810104"
+    }
+  ],
+  "store_submission": false
+}
