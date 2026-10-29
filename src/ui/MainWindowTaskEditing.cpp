@@ -269,7 +269,7 @@ void MainWindow::applyTaskView() {
                                                                  : 3,
                                                      sort % 2 ? Qt::AscendingOrder : Qt::DescendingOrder);
     const bool plan = result && result->status == CalculationStatus::Valid && !result->isForecast;
-    taskViewStatus_->setText(QString("표시 %1 / 범위 %2").arg(visibleRows_.size()).arg(view.scopeCount) +
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %2").arg(visibleRows_.size()).arg(view.scopeCount) +
                              (filter == 1 && !plan ? " · 최신 계획 계산 필요" : QString{}));
 }
 void MainWindow::insertSelectedTasks() {

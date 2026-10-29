@@ -128,7 +128,7 @@ bool MainWindow::refreshProjected() {
     refreshDocumentSummary();
     refreshTracking();
     refreshStatus();
-    taskViewStatus_->setText(QString("표시 %1 / 범위 %2").arg(visibleRows_.size()).arg(view->scopeTaskCount) +
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %2").arg(visibleRows_.size()).arg(view->scopeTaskCount) +
                              (taskFilter_->currentIndex() == 1 ? " · 최신 계획 계산 필요" : QString{}));
     const auto &result = document_.calculation();
     gantt_->setPlan(&*p, result ? &*result : nullptr, visibleRows_, false);
@@ -164,7 +164,7 @@ bool MainWindow::refreshBulk() {
     refreshDocumentSummary();
     refreshStatus();
     refreshTracking();
-    taskViewStatus_->setText(QString("표시 %1 / 범위 %1").arg(visibleRows_.size()));
+    taskViewStatus_->setText(QString("표시 %1 / WBS 범위 %1").arg(visibleRows_.size()));
     const auto &calculation = document_.calculation();
     gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_, false);
     gantt_->setSelectedTask(selectedTask_);
@@ -225,7 +225,7 @@ void MainWindow::refreshWbsSummary() {
                          QString::number(rollup.missingDurations) + "개 (합계는 WBS 경과기간과 다름)" +
                          (rollup.start ? "\n계산 구간: " + qs(*rollup.start) + " → " + qs(*rollup.finish)
                                        : "\n계산 구간: 최신 유효한 결과 없음");
-    wbsSummary_->setText("범위: " + wbsTree_->currentItem()->text(0) + " · " + QString::number(rollup.taskCount) +
+    wbsSummary_->setText("범위: " + wbsTree_->currentItem()->text(0) + " · 작업 " + QString::number(rollup.taskCount) +
                          "개 · 기간 합계 " + QString::number(double(rollup.knownDurationMinutes) / 60, 'g', 10) +
                          "h · 기간 미정 " + QString::number(rollup.missingDurations) + "개");
     wbsSummary_->setToolTip(details);

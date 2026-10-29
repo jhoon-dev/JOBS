@@ -57,11 +57,9 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     add(calculate_, "일정 계산 · F9", QStyle::SP_MediaPlay);
     for (auto *action : {cancelCalculation_, cancelEdit_}) {
         tools->addAction(action);
-        action->setVisible(action->isEnabled());
-        connect(action, &QAction::changed, this, [action] {
-            if (action->isVisible() != action->isEnabled())
-                action->setVisible(action->isEnabled());
-        });
+        auto *button = tools->widgetForAction(action);
+        button->setVisible(action->isEnabled());
+        connect(action, &QAction::changed, button, [action, button] { button->setVisible(action->isEnabled()); });
     }
     auto *analysis = new QToolButton(tools);
     analysis->setObjectName("analysisMenu");
