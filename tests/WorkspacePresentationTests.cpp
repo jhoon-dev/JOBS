@@ -59,7 +59,11 @@ private slots:
         QVERIFY(calculate && cancel && button);
         QVERIFY(!button->isVisible() && cancel->isVisible());
         calculate->trigger();
-        QVERIFY(cancel->isEnabled() && button->isVisible());
+        QVERIFY(cancel->isEnabled());
+        // Toolbar presentation is laid out by the GUI's queued layout request.
+        // Deliver layout requests without delivering the worker's completion yet.
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
+        QVERIFY(button->isVisible());
         cancel->trigger();
         QTRY_VERIFY(calculate->isEnabled());
         QCOMPARE(document.calculation()->status, jobs::CalculationStatus::Cancelled);
