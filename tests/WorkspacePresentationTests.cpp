@@ -40,6 +40,30 @@ private slots:
         QVERIFY(zoom->isVisible() && zoom->mapTo(&window, zoom->rect().bottomRight()).x() < window.width());
         QVERIFY(!window.findChild<QLabel *>("taskInputHelp")->isVisible());
         QVERIFY(!window.findChild<QPlainTextEdit *>("calculationDiagnostics")->isVisible());
+        QVERIFY(!window.findChild<QToolButton *>("cancelCalculationButton")->isVisible());
+        QVERIFY(!window.findChild<QToolButton *>("cancelEditButton")->isVisible());
+    }
+    void cancellationCommandStaysAvailableWhenPresentationChanges() {
+        jobs::JsonProjectStore store;
+        jobs::Document document(store);
+        document.create("취소 명령", "2026-10-26", {"일정 계산"});
+        document.setDuration(0, 480);
+        jobs::MainWindow window(document);
+        window.show();
+        auto *cancel = window.findChild<QAction *>("cancelCalculation");
+        auto *button = window.findChild<QToolButton *>("cancelCalculationButton");
+        QAction *calculate = nullptr;
+        for (auto *action : window.findChildren<QAction *>())
+            if (action->shortcut() == QKeySequence(Qt::Key_F9))
+                calculate = action;
+        QVERIFY(calculate && cancel && button);
+        QVERIFY(!button->isVisible() && cancel->isVisible());
+        calculate->trigger();
+        QVERIFY(cancel->isEnabled() && button->isVisible());
+        cancel->trigger();
+        QTRY_VERIFY(calculate->isEnabled());
+        QCOMPARE(document.calculation()->status, jobs::CalculationStatus::Cancelled);
+        QVERIFY(!button->isVisible() && cancel->isVisible());
     }
     void wbsTogglePreservesScopeAndSelection() {
         jobs::JsonProjectStore store;
