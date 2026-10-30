@@ -1,6 +1,7 @@
 #include "formatting/QtDiagnosticText.h"
 #include "persistence/PrimaveraXer.h"
 #include "ui/MainWindow.h"
+#include "ui/ExchangeOperation.h"
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -94,7 +95,13 @@ void MainWindow::importXer() {
     try {
         const auto generation = document_.sessionGeneration(),
                    revision = document_.project() ? document_.project()->revision : 0;
-        auto exchange = importPrimaveraXer(readPrimaveraXer(path), QFileInfo(path).fileName(), *charset);
+        auto prepared =
+            prepareExchange<PrimaveraXerExchange>(this, document_, "XER 읽기·변환·검증 중…", [path, charset] {
+                return importPrimaveraXer(readPrimaveraXer(path), QFileInfo(path).fileName(), *charset);
+            });
+        if (!prepared)
+            return;
+        auto exchange = std::move(*prepared);
         auto destination =
             preview(this, exchange,
                     QDir(QFileInfo(path).absolutePath()).filePath(QFileInfo(path).completeBaseName() + "-xer-import"));
@@ -105,7 +112,16 @@ void MainWindow::importXer() {
             throw AppError(ErrorCode::MAINWINDOWXER_001, {});
         if (!confirmChanges())
             return;
-        auto folder = publishPrimaveraXer(exchange, destination);
+        const auto publishSession = document_.sessionGeneration();
+        const auto publishRevision = document_.project() ? document_.project()->revision : 0;
+        QString folder;
+        if (!runExchangeOperation(
+                this, document_, "XER 사본 게시·검증 중…", [&] { folder = publishPrimaveraXer(exchange, destination); },
+                true))
+            return;
+        if (document_.sessionGeneration() != publishSession ||
+            (document_.project() ? document_.project()->revision : 0) != publishRevision)
+            throw AppError(ErrorCode::EXCHANGE_SOURCE_CHANGED);
         document_.open(QDir(folder).filePath("project.jobs").toUtf8().toStdString());
         refresh();
         statusBar()->showMessage("XER 계획 변환 완료 · 원본/진단: " + folder);
@@ -117,14 +133,26 @@ void MainWindow::exportXer() {
     if (!document_.project())
         return;
     try {
-        auto exchange = exportPrimaveraXer(*document_.project());
+        const auto generation = document_.sessionGeneration(), revision = document_.project()->revision;
+        auto snapshot = document_.snapshot();
+        auto prepared = prepareExchange<PrimaveraXerExchange>(this, document_, "XER 내보내기 준비·검증 중…",
+                                                              [snapshot] { return exportPrimaveraXer(*snapshot); });
+        snapshot.reset();
+        if (!prepared)
+            return;
+        auto exchange = std::move(*prepared);
         auto parent = document_.path().empty() ? QDir::homePath() : QFileInfo(qs(document_.path())).absolutePath();
         auto destination = preview(this, exchange, QDir(parent).filePath("jobs-xer-export"));
         if (destination.isEmpty())
             return;
-        if (!document_.project() || *document_.project() != exchange.project)
+        if (document_.sessionGeneration() != generation || !document_.project() ||
+            document_.project()->revision != revision)
             throw AppError(ErrorCode::MAINWINDOWXER_002, {});
-        auto folder = publishPrimaveraXer(exchange, destination);
+        QString folder;
+        if (!runExchangeOperation(
+                this, document_, "XER 게시·기준선 검증 중…",
+                [&] { folder = publishPrimaveraXer(exchange, destination); }, true))
+            return;
         statusBar()->showMessage("XER 내보내기 완료 · 원본/진단: " + folder);
     } catch (const std::exception &e) {
         report(e);

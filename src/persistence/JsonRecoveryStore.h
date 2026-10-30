@@ -12,16 +12,21 @@ struct RecoveryCandidate {
     std::optional<std::uint64_t> lastSavedRevision;
     std::size_t tasks = 0, baselines = 0, progress = 0, costs = 0;
     bool valid = false;
+    std::optional<Diagnostic> failure;
 };
-struct RecoveryScan { std::vector<RecoveryCandidate> candidates; int activeSessions = 0; };
+struct RecoveryScan {
+    std::vector<RecoveryCandidate> candidates;
+    int activeSessions = 0;
+};
 class RecoverySession {
 public:
     ~RecoverySession();
     QString id() const;
-    std::uint64_t checkpoint(const RecoverySnapshot&);
+    std::uint64_t checkpoint(const RecoverySnapshot &);
     void retire() noexcept;
     bool retired() const noexcept;
     void cleanup();
+
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
@@ -37,13 +42,16 @@ public:
     // Optional durability-stage observer enables deterministic interruption tests.
     explicit JsonRecoveryStore(QString root, std::function<void()> beforePublish = {});
     static QString defaultDirectory();
-    const QString& directory() const { return root_; }
+    const QString &directory() const {
+        return root_;
+    }
     std::shared_ptr<RecoverySession> newSession() const;
     RecoveryScan scan() const;
-    std::unique_ptr<RecoveryClaim> claim(const RecoveryCandidate&) const;
-    void discardSession(const QString& sessionId) const;
+    std::unique_ptr<RecoveryClaim> claim(const RecoveryCandidate &) const;
+    void discardSession(const QString &sessionId) const;
+
 private:
     QString root_;
     std::function<void()> beforePublish_;
 };
-}
+} // namespace jobs

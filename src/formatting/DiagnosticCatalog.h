@@ -5,6 +5,8 @@ struct Entry {
     std::string_view key, korean, english;
 };
 inline constexpr Entry entries[]{
+    {"EXCHANGE_SOURCE_CHANGED", "파일 교환 중 문서가 변경되었습니다. 최신 입력으로 다시 실행하세요.",
+     "The document changed during file exchange. Retry with the current input."},
     {"ASSIGNMENT_INPUT_INVALID", "배정할 작업·자원이 없거나 배정률 중복/범위 오류입니다. 1~100,000%를 사용하세요.",
      "The operation could not be completed. Review the related inputs."},
     {"ASSIGNMENT_TASK_MISMATCH", "다른 작업의 배정이 포함되었습니다.",

@@ -1,6 +1,7 @@
 #include "formatting/QtDiagnosticText.h"
 #include "persistence/ExchangePackage.h"
 #include "persistence/JsonProjectStore.h"
+#include "domain/CalculationControl.h"
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -12,7 +13,8 @@
 namespace jobs {
 namespace {} // namespace
 QString publishPlanExchange(const Project &project, const QByteArray &payload, QJsonObject report, bool importing,
-                            const QString &extension, const QString &destination) {
+                            const QString &extension, const QString &destination, std::function<void()> beforePublish) {
+    calculationCheckpoint();
     validate(project);
     if (extension != "xml" && extension != "xer")
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_001, {});
@@ -27,6 +29,7 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
     if (!stage.isValid())
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_003, {});
     auto write = [&](const QString &name, const QByteArray &bytes) {
+        calculationCheckpoint();
         QSaveFile f(stage.filePath(name));
         f.setDirectWriteFallback(false);
         if (!f.open(QIODevice::WriteOnly) || f.write(bytes) != bytes.size() || !f.commit())
@@ -38,6 +41,7 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
     JsonProjectStore store;
     auto jobsName = importing ? "project.jobs" : "source.jobs";
     store.save(stage.filePath(jobsName).toUtf8().toStdString(), project, {});
+    calculationCheckpoint();
     if (store.load(stage.filePath(jobsName).toUtf8().toStdString()).project != project)
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_006, {});
     write((importing ? "original." : "project.") + extension, payload);
@@ -51,6 +55,10 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
         report["source"] = source;
     }
     write("conversion.json", QJsonDocument(report).toJson());
+    if (beforePublish)
+        beforePublish();
+    // This is the final cancellation boundary. A completed rename is a published result.
+    calculationCheckpoint();
     if (QFileInfo::exists(finalPath) || !directory.rename(QFileInfo(stage.path()).fileName(), target.fileName()))
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_008, {});
     stage.setAutoRemove(false);

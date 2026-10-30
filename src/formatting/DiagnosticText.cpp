@@ -54,6 +54,10 @@ std::string diagnosticRecommendation(const Diagnostic &diagnostic, DiagnosticLan
         return {};
     if (language == DiagnosticLanguage::English)
         return "Review the related task, resource, calendar or file and correct the indicated input before retrying.";
+    if (code == "FILE_JSONRECOVERYSTORE_015" || code == "FILE_JSONRECOVERYSTORE_016" ||
+        code == "FILE_JSONRECOVERYSTORE_017" || code == "FILE_JSONRECOVERYSTORE_018" ||
+        code == "FILE_JSONRECOVERYSTORE_019")
+        return "다른 검증된 복구 세대를 선택하거나 명시 저장본을 여세요. 손상된 복구본은 원인 확인 전까지 보존하세요.";
     if (code.find("FILE") != std::string::npos || code.find("SAVE") != std::string::npos)
         return "파일 경로·권한·열린 원본의 변경 여부를 확인하세요. 원본을 보존하려면 새 경로에 사본을 저장하세요.";
     if (code.find("DURATION") != std::string::npos || code.starts_with("WORK_"))

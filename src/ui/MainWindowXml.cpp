@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/ExchangeOperation.h"
 #include "persistence/ProjectXml.h"
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -69,7 +70,12 @@ void MainWindow::importXml() {
     try {
         const auto generation = document_.sessionGeneration();
         const auto revision = document_.project() ? document_.project()->revision : 0;
-        auto exchange = importProjectXml(readProjectXml(path), QFileInfo(path).fileName());
+        auto prepared = prepareExchange<ProjectXmlExchange>(this, document_, "XML 읽기·변환·검증 중…", [path] {
+            return importProjectXml(readProjectXml(path), QFileInfo(path).fileName());
+        });
+        if (!prepared)
+            return;
+        auto exchange = std::move(*prepared);
         auto proposed =
             QDir(QFileInfo(path).absolutePath()).filePath(QFileInfo(path).completeBaseName() + "-jobs-import");
         auto destination = preview(this, exchange, proposed);
@@ -80,7 +86,16 @@ void MainWindow::importXml() {
             throw AppError(ErrorCode::MAINWINDOWXER_001, {});
         if (!confirmChanges())
             return;
-        auto folder = publishProjectXml(exchange, destination);
+        const auto publishSession = document_.sessionGeneration();
+        const auto publishRevision = document_.project() ? document_.project()->revision : 0;
+        QString folder;
+        if (!runExchangeOperation(
+                this, document_, "XML 사본 게시·검증 중…", [&] { folder = publishProjectXml(exchange, destination); },
+                true))
+            return;
+        if (document_.sessionGeneration() != publishSession ||
+            (document_.project() ? document_.project()->revision : 0) != publishRevision)
+            throw AppError(ErrorCode::EXCHANGE_SOURCE_CHANGED);
         document_.open(QDir(folder).filePath("project.jobs").toUtf8().toStdString());
         refresh();
         statusBar()->showMessage("XML 계획 변환 완료 · 원본/진단: " + folder);
@@ -92,14 +107,26 @@ void MainWindow::exportXml() {
     if (!document_.project())
         return;
     try {
-        auto exchange = exportProjectXml(*document_.project());
+        const auto generation = document_.sessionGeneration(), revision = document_.project()->revision;
+        auto snapshot = document_.snapshot();
+        auto prepared = prepareExchange<ProjectXmlExchange>(this, document_, "XML 내보내기 준비·검증 중…",
+                                                            [snapshot] { return exportProjectXml(*snapshot); });
+        snapshot.reset();
+        if (!prepared)
+            return;
+        auto exchange = std::move(*prepared);
         auto parent = document_.path().empty() ? QDir::homePath() : QFileInfo(qs(document_.path())).absolutePath();
         auto destination = preview(this, exchange, QDir(parent).filePath("jobs-xml-export"));
         if (destination.isEmpty())
             return;
-        if (!document_.project() || *document_.project() != exchange.project)
+        if (document_.sessionGeneration() != generation || !document_.project() ||
+            document_.project()->revision != revision)
             throw AppError(ErrorCode::MAINWINDOWXER_002, {});
-        auto folder = publishProjectXml(exchange, destination);
+        QString folder;
+        if (!runExchangeOperation(
+                this, document_, "XML 게시·기준선 검증 중…", [&] { folder = publishProjectXml(exchange, destination); },
+                true))
+            return;
         statusBar()->showMessage("XML 내보내기 완료 · 원본/진단: " + folder);
     } catch (const std::exception &e) {
         report(e);

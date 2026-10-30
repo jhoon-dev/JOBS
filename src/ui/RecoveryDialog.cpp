@@ -15,6 +15,9 @@ namespace {
 QString q(const std::string &s) {
     return QString::fromStdString(s);
 }
+QString recoveryError(const RecoveryCandidate &candidate) {
+    return candidate.failure ? qDiagnosticText(*candidate.failure) : candidate.error;
+}
 struct Scanned {
     RecoveryScan scan;
     QString error;
@@ -151,7 +154,7 @@ void RecoveryDialog::select() {
                            .arg(c.costs) +
                        c.differences +
                        "\n복구 revision은 마지막 완료 체크포인트입니다. 그 이후 입력은 포함되지 않을 수 있습니다."
-                 : "\n" + c.error));
+                 : "\n" + recoveryError(c)));
 }
 void RecoveryDialog::reload() {
     if (busy_)

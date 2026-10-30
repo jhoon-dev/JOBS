@@ -404,7 +404,10 @@ RecoveryScan JsonRecoveryStore::scan() const {
                         c.sourceState = std::move(original.state);
                         c.differences = std::move(original.differences);
                     } catch (const std::exception &e) {
-                        c.error = QString::fromUtf8(e.what());
+                        c.failure = diagnosticFromException(e);
+                        if (c.failure->path.empty())
+                            c.failure->path = file.absoluteFilePath().toStdString();
+                        c.error = qDiagnosticText(*c.failure);
                     }
                     result.candidates.push_back(std::move(c));
                 }
@@ -413,7 +416,10 @@ RecoveryScan JsonRecoveryStore::scan() const {
         } catch (const std::exception &e) {
             RecoveryCandidate c;
             c.sessionId = dir.fileName();
-            c.error = QString::fromUtf8(e.what());
+            c.failure = diagnosticFromException(e);
+            if (c.failure->path.empty())
+                c.failure->path = dir.absoluteFilePath().toStdString();
+            c.error = qDiagnosticText(*c.failure);
             result.candidates.push_back(std::move(c));
         }
     }

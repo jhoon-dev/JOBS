@@ -1,5 +1,9 @@
 # Microsoft Project XML 교환 계약
 
+2026-10-30 응답성 보완: 읽기/변환과 내보내기 준비, 교환 사본 저장·재열기·기준선 검증은 공통 worker에서 수행한다. 진행 창의 취소와 창 닫기는 취소 요청이며 worker의 임시 파일 정리가 끝난 후 창을 닫는다. 최종 새 폴더 rename 직전에 취소를 검사한다. rename이 이미 끝난 후에는 완성된 산출물을 보존하고 완료로 처리한다. 처리 중 문서 revision/session 변경은 오래된 요청을 취소하며, 가져오기 완료 후에도 문서 출처를 다시 확인해 최신 문서를 교체하지 않는다. 일반 저장은 같은 입력이면 허용한다. 명시 저장 확인, 변환 미리보기 및 새 사본 열기 정책은 유지한다.
+
+`exchange_async_recovery_diagnostics`는 실제 XML/XER 메뉴의 worker 실행과 GUI 계산 checkpoint 0개, 1만 작업/기준선의 heartbeat, 게시 직전/완료 후 취소, 임시 폴더 정리·기존 목적지/원본 보존, 편집·같은 ID/revision 재열기·일반 저장 경합을 검사한다. 전체 파일 사본과 기준선 재검산을 생략하지 않는다.
+
 2026-10-27 · J-15 / XML-01~04 · 첫 구현 범위. PRD 확정 후 개발한다.
 
 공식 근거: Microsoft의 [Project XML schema](https://github.com/MicrosoftDocs/office-developer-msproject-xml-docs/blob/main/project-xml-data-interchange/xml-schema-for-the-project-element.md), [작업 schema](https://github.com/MicrosoftDocs/office-developer-msproject-xml-docs/blob/main/project-xml-data-interchange/xml-schema-for-the-tasks-element.md), [달력 schema](https://github.com/MicrosoftDocs/office-developer-msproject-xml-docs/blob/main/project-xml-data-interchange/xml-schema-for-the-calendars-element.md), [LinkLag](https://github.com/MicrosoftDocs/office-developer-msproject-xml-docs/blob/main/project-xml-data-interchange/linklag-element.md). LinkLag는 분의 1/10이며 Type은 0=FF, 1=FS, 2=SF, 3=SS다. 수입 대상 namespace는 `http://schemas.microsoft.com/project`, 내보내기는 SaveVersion 12의 MSPDI 지원 부분이다. 형식이 같아도 제품/빌드별 계산 동등성은 미검증이다.

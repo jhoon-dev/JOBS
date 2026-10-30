@@ -1,5 +1,9 @@
 # Primavera XER 교환 계약
 
+2026-10-30 응답성 보완: XER 읽기/변환·내보내기 준비와 사본 게시/기준선 검증은 XML과 같은 worker·진행/취소 경로를 사용한다. 최종 rename 전 취소는 임시 폴더를 정리하고 현재 문서·원본·기존 목적지를 보존하며, 이미 게시한 완성 폴더는 늦은 취소로 삭제하지 않는다. 문서 revision/session 변경을 감지하고 가져오기 적용 전에도 출처를 확인한다. 세부 경계와 회귀는 [XML 교환 응답성 계약](project-xml.md)을 따른다. `jobs_exchange_recovery_tests --xer <1만 작업 XER 경로> -platform offscreen`으로 실제 파일/기준선의 GUI heartbeat와 검증 비용을 측정할 수 있다. 시간 표본은 환경별 관측이며 고정 지연 상한은 아니다.
+
+로컬 Windows / Qt 6.8.3 / MinGW Release / offscreen 단일 표본: 기존 합성 1만 작업 XER(SHA-256 `8f6236ad4f6c90b6e35f47179ac451f05ced3cc913f72c31f8ae235abc19ee6c`)에 기준선 1개를 넣고 실제 내보내기 메뉴를 실행했다. 준비·미리보기 승인·게시까지 8,624ms, 5ms heartbeat 1,721회·최대 간격 10ms, GUI 계산 checkpoint 0개를 기록했다. 이전 동기 게시 관측 7,067ms와 전체 실행 시간을 직접 비교하지 않는다. 사본·기준선 검증은 worker에서 유지하며 사용자는 진행을 확인하고 취소할 수 있다. 같은 테스트의 합성 1만 작업 XML은 3,956ms·heartbeat 최대 7ms, XER 게시 취소는 원본/목적지 보존과 임시 폴더 정리를 통과했다. OS 캐시와 실행 순서를 통제한 성능 보장이 아니다.
+
 2026-10-27 · J-15 / XER-01~04. 이 계약을 개발 전에 확정한다. .jobs schema 9와 기존 계산 의미는 유지한다.
 
 근거: Oracle [TASK](https://docs.oracle.com/cd/G48897_01/English/Mapping_and_Schema/xer_import_export_data_map_project/97906.htm), [CALENDAR](https://docs.oracle.com/cd/F88966_01/English/Mapping_and_Schema/xer_import_export_data_map_project/97869.htm), [TASKPRED](https://docs.oracle.com/en/industries/construction-engineering/primavera-p6-project/26/p6-xer-proj/taskpred-activityrelationships-97914a.html), [PROJECT](https://docs.oracle.com/en/industries/construction-engineering/primavera-p6-project/26/p6-xer-proj/project-projects-97885a.html)의 공식 필드 매핑을 따른다. 세부 직렬화와 독립 reader는 [MPXJ](https://www.mpxj.org/howto-read-xer/)와 구현 소스 `71d78a9b64f5de3bbeb7b667a480ab0888d011e8`의 StructuredText/Primavera reader/writer를 참고한다. Oracle이 공개한 필드 표를 모든 버전의 완전 문법 명세로 간주하지 않는다. 연구용 원본/외부 코드를 앱에 포함하지 않는다.
