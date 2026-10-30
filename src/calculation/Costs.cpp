@@ -12,9 +12,25 @@
 #include <stdexcept>
 #include <limits>
 #include <memory>
+#include <chrono>
+#include <cstdio>
 namespace jobs {
 namespace {
 using Minute = std::int64_t;
+std::string dayEnd(const std::string &date) {
+    // No supported timestamp follows the final minute of year 9999.
+    if (date == "9999-12-31")
+        return date + " 23:59";
+    using namespace std::chrono;
+    const auto next =
+        year_month_day{sys_days{year{std::stoi(date.substr(0, 4))} / unsigned(std::stoi(date.substr(5, 2))) /
+                                unsigned(std::stoi(date.substr(8, 2)))} +
+                       days{1}};
+    char out[32];
+    std::snprintf(out, sizeof(out), "%04d-%02u-%02u 00:00", int(next.year()), unsigned(next.month()),
+                  unsigned(next.day()));
+    return out;
+}
 Money add(Money a, Money b) {
     if (!a || !b || *a > maxMoney - *b)
         return {};
@@ -108,7 +124,7 @@ struct Budget {
             f = fixed;
         return add(resource, f);
     }
-    Money at(const std::string &stamp, const WorkCalendar &calendar) const {
+    Money at(const std::string &stamp, const WorkCalendar &calendar, bool inclusive = true) const {
         if (!valid)
             return {};
         if (stamp < startStamp)
@@ -134,7 +150,8 @@ struct Budget {
             }
         }
         Money f = 0;
-        const bool earned = accrual == "start" ? stamp >= startStamp : stamp >= finishStamp;
+        const auto &event = accrual == "start" ? startStamp : finishStamp;
+        const bool earned = inclusive ? stamp >= event : stamp > event;
         if (accrual == "uniform" && finish > start) {
             if (elapsedWork > 0)
                 f = fixed ? fraction(*fixed, elapsedWork, elapsed(finishStamp, calendar)) : Money{};
@@ -456,6 +473,7 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
     }
     for (const auto &date : days) {
         const auto end = date + " 23:59";
+        const auto boundary = dayEnd(date);
         CostDay d;
         d.date = date;
         d.plan = 0;
@@ -467,7 +485,7 @@ CostAnalysis analyzeCosts(const Project &p, const std::string &baselineId, const
         for (const auto &[id, b] : frozen) {
             (void)id;
             d.budget = add(d.budget, b.on(date, *baselineCalendar));
-            d.pv = add(d.pv, b.at(end, *baselineCalendar));
+            d.pv = add(d.pv, b.at(boundary, *baselineCalendar, date == "9999-12-31"));
         }
         if (p.statusAt && date <= p.statusAt->substr(0, 10)) {
             d.currentActual = 0;

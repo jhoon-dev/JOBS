@@ -1,4 +1,5 @@
 #include "application/Document.h"
+#include "formatting/DiagnosticText.h"
 #include "persistence/JsonProjectStore.h"
 #include "PerformanceFixture.h"
 #include <QCoreApplication>
@@ -102,6 +103,67 @@ int main(int argc, char **argv) {
         check(doc.applyPreparedEdit(*prepared) == EditState::Applied && doc.project()->tasks[0].workDriven &&
                   doc.project()->tasks[0].workUnitMinutes == 96000 && doc.project()->assignments[0].units == 50,
               "fixed-units assignment did not capture source planned work");
+        {
+            jobs::Document incomplete(store);
+            incomplete.create("fixed units with incomplete plan", "2026-10-26", {"A", "Unrelated B"});
+            const auto aid = incomplete.project()->tasks[0].id;
+            const auto rid = incomplete.putResource({{}, "R", "labor", 100, {}});
+            incomplete.setTaskEffort(0, jobs::TaskType::FixedUnits, false, 480, {}, {});
+            incomplete.setAssignments(aid, {{aid, rid, 100}});
+            incomplete.saveAs(directory.filePath("Incomplete.jobs").toUtf8().toStdString());
+            incomplete.renameTask(1, "Temporary name");
+            incomplete.undo();
+            const auto source = *incomplete.project();
+            const auto sourceHistory = incomplete.historyBytes();
+            const auto sourceRedo = incomplete.redoLabel();
+            const auto sourceDirty = incomplete.dirty();
+            const auto sourceBytes = bytes(incomplete.path());
+            bool rejected = false;
+            try {
+                incomplete.setAssignments(aid, {{aid, rid, 50}});
+            } catch (const jobs::AppError &error) {
+                rejected = error.code() == "FIXED_UNITS_PLAN_REQUIRED" && !error.diagnostic().causes.empty();
+                check(jobs::diagnosticMessage(error.diagnostic()).find("기존 공수") != std::string::npos,
+                      "work preservation failure has no localized guidance");
+            }
+            check(rejected && *incomplete.project() == source && incomplete.historyBytes() == sourceHistory &&
+                      incomplete.redoLabel() == sourceRedo && incomplete.dirty() == sourceDirty,
+                  "incomplete source silently lost work or changed document/history");
+            for (const auto &replacement :
+                 {std::vector<jobs::Assignment>{{aid, rid, 50}}, std::vector<jobs::Assignment>{}}) {
+                auto failed = prepare(incomplete, jobs::AssignmentEdit{aid, replacement});
+                check(failed->state() == EditState::Failed && failed->failure() &&
+                          failed->failure()->code == "FIXED_UNITS_PLAN_REQUIRED" &&
+                          incomplete.applyPreparedEdit(*failed) == EditState::Failed &&
+                          *incomplete.project() == source && incomplete.historyBytes() == sourceHistory &&
+                          incomplete.redoLabel() == sourceRedo && incomplete.dirty() == sourceDirty &&
+                          bytes(incomplete.path()) == sourceBytes,
+                      "worker assignment failure/deletion changed source work or persisted state");
+            }
+            auto same = prepare(incomplete, jobs::AssignmentEdit{aid, source.assignments});
+            check(same->state() == EditState::NoChange && *incomplete.project() == source &&
+                      incomplete.redoLabel() == sourceRedo,
+                  "identical assignment required a complete plan");
+            incomplete.setDuration(1, 60);
+            auto fixed = prepare(incomplete, jobs::AssignmentEdit{aid, {{aid, rid, 50}}});
+            check(incomplete.applyPreparedEdit(*fixed) == EditState::Applied &&
+                      incomplete.project()->tasks[0].workUnitMinutes == 48000 &&
+                      incomplete.project()->tasks[0].workDriven &&
+                      jobs::calculatePlan(*incomplete.project()).tasks[0].finish == "2026-10-27 18:00",
+                  "completed source did not preserve eight resource-hours at 50 percent");
+            incomplete.undo();
+            check(incomplete.project()->assignments[0].units == 100 && !incomplete.project()->tasks[0].workDriven,
+                  "assignment undo did not restore duration basis");
+            incomplete.redo();
+            check(incomplete.project()->assignments[0].units == 50 &&
+                      incomplete.project()->tasks[0].workUnitMinutes == 48000,
+                  "assignment redo lost preserved work");
+            incomplete.setDuration(0, 0);
+            incomplete.setDuration(1, {});
+            incomplete.setAssignments(aid, {{aid, rid, 100}});
+            check(!incomplete.project()->tasks[0].workDriven,
+                  "zero-duration assignment required unrelated task duration");
+        }
         doc.setStatusAt("2026-10-26 18:00");
         jobs::ProgressEntry entry;
         entry.taskId = id;

@@ -287,6 +287,7 @@ enum class ErrorCode {
     FILE_UNKNOWN_FIELD,
     FILE_VERSION_UNSUPPORTED,
     FIXED_DURATION_REQUIRED,
+    FIXED_UNITS_PLAN_REQUIRED,
     FIXED_WORK_DURATION_REQUIRED,
     GANTTEDITING_001,
     GANTTEDITING_002,
@@ -1033,6 +1034,8 @@ constexpr std::string_view errorCodeToken(ErrorCode code) {
         return "FILE_VERSION_UNSUPPORTED";
     case ErrorCode::FIXED_DURATION_REQUIRED:
         return "FIXED_DURATION_REQUIRED";
+    case ErrorCode::FIXED_UNITS_PLAN_REQUIRED:
+        return "FIXED_UNITS_PLAN_REQUIRED";
     case ErrorCode::FIXED_WORK_DURATION_REQUIRED:
         return "FIXED_WORK_DURATION_REQUIRED";
     case ErrorCode::GANTTEDITING_001:

@@ -578,6 +578,10 @@ inline constexpr Entry entries[]{
      "This file version is not supported."},
     {"FIXED_DURATION_REQUIRED", "고정 기간 작업의 기간을 먼저 입력하세요.",
      "The operation could not be completed. Review the related inputs."},
+    {"FIXED_UNITS_PLAN_REQUIRED",
+     "기존 공수를 보존하려면 배정 변경 전 전체 계획이 유효해야 합니다. 미정 기간·선행관계·날짜 제약을 확인하세요.",
+     "A valid source plan is required to preserve fixed-units work. Check durations, dependencies and date "
+     "constraints."},
     {"FIXED_WORK_DURATION_REQUIRED", "고정 공수의 기간 편집에는 양수 기간이 필요합니다.",
      "The operation could not be completed. Review the related inputs."},
     {"FORECAST_HORIZON", "{0}", "The operation could not be completed. Review the related inputs."},

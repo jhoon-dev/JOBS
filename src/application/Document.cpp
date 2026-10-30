@@ -496,18 +496,23 @@ void Document::setAssignments(const std::string &id, std::vector<Assignment> ass
         return;
     if (isEffort(p))
         for (auto &t : p.tasks)
-            if (t.id == id && t.taskType == TaskType::FixedUnits && !t.workDriven) {
+            if (t.id == id && t.taskType == TaskType::FixedUnits && !t.workDriven && !previous.empty() &&
+                t.durationMinutes != 0) {
                 const auto plan = calculatePlan(p);
-                if (plan.status == CalculationStatus::Valid)
-                    for (const auto &r : plan.tasks)
-                        if (r.taskId == id) {
-                            TaskExecution model(p, t);
-                            const auto work = model.work(r);
-                            if (work > 0) {
-                                t.workUnitMinutes = work;
-                                t.workDriven = true;
-                            }
+                if (plan.status != CalculationStatus::Valid) {
+                    Diagnostic issue{std::string(errorCodeToken(ErrorCode::FIXED_UNITS_PLAN_REQUIRED)), {}, {id}};
+                    issue.causes = plan.diagnostics;
+                    throw AppError(std::move(issue));
+                }
+                for (const auto &r : plan.tasks)
+                    if (r.taskId == id) {
+                        TaskExecution model(p, t);
+                        const auto work = model.work(r);
+                        if (work > 0) {
+                            t.workUnitMinutes = work;
+                            t.workDriven = true;
                         }
+                    }
             }
     std::erase_if(p.assignments, [&](const auto &a) { return a.taskId == id; });
     p.assignments.insert(p.assignments.end(), assignments.begin(), assignments.end());
