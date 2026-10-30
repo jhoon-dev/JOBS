@@ -21,10 +21,53 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPaintEvent>
+#include <QScrollBar>
+
+namespace {
+class PaintCoverage : public QObject {
+public:
+    QRegion painted;
+    bool eventFilter(QObject *, QEvent *event) override {
+        if (event->type() == QEvent::Paint)
+            painted += static_cast<QPaintEvent *>(event)->region();
+        return false;
+    }
+};
+} // namespace
 
 class WorkspacePresentationTests : public QObject {
     Q_OBJECT
 private slots:
+    void frozenGanttHeaderIsRepaintedAfterMixedScroll() {
+        jobs::JsonProjectStore store;
+        jobs::Document document(store);
+        document.create("고정 헤더", "2026-11-02", std::vector<std::string>(240, "작업"));
+        for (std::size_t row = 0; row < 240; ++row)
+            document.setDuration(row, 480);
+        document.setDuration(0, 48000);
+        document.applyCalculation(jobs::calculate(*document.project()));
+        jobs::MainWindow window(document);
+        window.resize(1024, 650);
+        window.show();
+        QTest::qWait(30);
+        auto *gantt = window.findChild<QGraphicsView *>("ganttView");
+        auto *table = taskTable(window);
+        table->verticalScrollBar()->setValue(2000);
+        QTest::qWait(30);
+        PaintCoverage coverage;
+        gantt->viewport()->installEventFilter(&coverage);
+        table->verticalScrollBar()->setValue(2028);
+        QTest::qWait(30);
+        QVERIFY(coverage.painted.contains(QRect(0, 0, gantt->viewport()->width(), jobs::GanttView::HeaderHeight)));
+        coverage.painted = {};
+        QVERIFY(gantt->horizontalScrollBar()->maximum() > 100);
+        gantt->horizontalScrollBar()->setValue(100);
+        QTest::qWait(30);
+        // A scene bit-blit can otherwise leave overscan task labels in the frozen date header.
+        QVERIFY(coverage.painted.contains(QRect(0, 0, gantt->viewport()->width(), jobs::GanttView::HeaderHeight)));
+        QCOMPARE(table->verticalScrollBar()->value(), gantt->verticalScrollBar()->value());
+    }
     void componentHeightsAndApplicationIcon() {
         jobs::JsonProjectStore store;
         jobs::Document document(store);

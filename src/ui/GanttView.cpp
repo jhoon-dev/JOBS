@@ -31,6 +31,9 @@ GanttView::GanttView(QWidget *parent) : QGraphicsView(parent) {
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::NoDrag);
+    // The date header is painted in viewport coordinates. Scene scroll blits must
+    // not move cached task pixels into that fixed header.
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, [this] { ensureVisibleRows(); });
