@@ -4,6 +4,7 @@
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
 #include "calculation/Effort.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -13,6 +14,12 @@
 #include <stdexcept>
 
 namespace jobs {
+ScheduleResult calculatePlan(const Project &p, const std::string &engine) {
+    if (!supportsEngine(p, engine))
+        throw AppError(ErrorCode::BASELINE_RESULT_MISMATCH, {});
+    EnginePolicyScope policy(isPdm(p) && engine == legacyEngineFor(p));
+    return calculatePlan(p);
+}
 ScheduleResult calculatePlan(const Project &p) {
     EvaluationScope evaluation;
     calculationCheckpoint();
@@ -20,7 +27,7 @@ ScheduleResult calculatePlan(const Project &p) {
     result.documentId = p.documentId;
     result.inputRevision = p.revision;
     result.profile = p.calculationProfile;
-    result.engineVersion = engineFor(p);
+    result.engineVersion = calculationEngineFor(p);
     try {
         validate(p);
     } catch (const std::exception &e) {

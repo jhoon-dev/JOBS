@@ -1,6 +1,7 @@
 #include "domain/Diagnostics.h"
 #include "calculation/Constraints.h"
 #include "formatting/PlanTokens.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <map>
 #include <unordered_map>
@@ -18,6 +19,26 @@ ConstraintWindow constraintWindow(const PlanInput &p, const Task &t, const WorkC
     if (at < p.startDate + " 00:00") {
         if (fixed || upper)
             w.upper = -1;
+        return w;
+    }
+    if (duration == 0 && !legacyMilestones()) {
+        try {
+            if (upper)
+                w.upper = cal.pointEndAtMost(at);
+            else {
+                w.lower = cal.pointStartAtLeast(at);
+                if (fixed) {
+                    if (cal.pointBoundary(w.lower) != at)
+                        throw AppError(ErrorCode::CONSTRAINT_BOUNDARY_INVALID, {at});
+                    w.upper = w.lower;
+                }
+            }
+        } catch (const AppError &error) {
+            if (upper && error.code() == "CALENDAR_TIMESTAMP_RANGE")
+                w.upper = cal.maxPointOffset();
+            else
+                throw;
+        }
         return w;
     }
     std::int64_t value;
@@ -92,7 +113,7 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
     out.documentId = p.documentId;
     out.inputRevision = p.revision;
     out.profile = p.calculationProfile;
-    out.engineVersion = engineFor(p);
+    out.engineVersion = calculationEngineFor(p);
     out.calculationPolicy = "constrained-asap-alap-v1";
     std::string currentTask;
     try {
@@ -151,7 +172,7 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
             currentTask = p.tasks[i].id;
             const auto &t = p.tasks[i];
             const auto &cal = calendars.at(t.calendarId);
-            auto cap = cal.offset(finish) - *t.durationMinutes;
+            auto cap = pdmLatestStart(cal, finish, *t.durationMinutes);
             if (bounds[i].upper)
                 cap = std::min(cap, *bounds[i].upper);
             auto lo = early[i], hi = std::max(early[i], cap);
@@ -193,8 +214,9 @@ ScheduleResult calculateConstrainedPlan(const Project &p, const std::vector<std:
             pdmDates(clock, calendars.at(p.tasks[i].calendarId), trial, late[i], *p.tasks[i].durationMinutes);
             row.lateStartMinutes = trial.earlyStartMinutes;
             row.lateFinishMinutes = trial.earlyFinishMinutes;
-            row.totalFloatMinutes = late[i] - early[i];
-            row.freeFloatMinutes = latest(i, early) - early[i];
+            const auto &cal = calendars.at(p.tasks[i].calendarId);
+            row.totalFloatMinutes = pdmFloat(cal, early[i], late[i], *p.tasks[i].durationMinutes);
+            row.freeFloatMinutes = pdmFloat(cal, early[i], latest(i, early), *p.tasks[i].durationMinutes);
             row.critical = row.totalFloatMinutes == 0;
             row.drivingPredecessors.clear();
             for (const auto &edge : dependencies(p.tasks[i]))

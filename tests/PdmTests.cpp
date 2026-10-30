@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
         doc.captureBaseline("PDM 승인", "PM", "교대 달력", "2026-10-26T09:01:00Z");
         doc.saveScenario("달력 대안", "task-order", 20, "2026-10-26T09:01:01Z", doc.project()->documentId,
                          doc.project()->revision);
-        check(doc.project()->scenarios.back().policy == "serial-no-split-pdm-v1" &&
+        check(doc.project()->scenarios.back().policy == "serial-no-split-pdm-v2" &&
                   jobs::levelResources(jobs::scenarioProject(doc.project()->scenarios.back()), "task-order", 20)
                           .leveled.status == jobs::CalculationStatus::Valid,
               "PDM scenario provenance/replay");

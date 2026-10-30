@@ -308,9 +308,9 @@ void Document::editGantt(const std::string &id, std::uint64_t revision, const st
         changeDuration(p, std::size_t(it - p.tasks.begin()), duration);
     } else {
         const bool zero = usesWork(*it) ? it->workUnitMinutes.value_or(0) == 0 : it->durationMinutes.value_or(0) == 0;
-        const auto local = zero ? cal.finishAtLeast(target) : cal.startAtLeast(target);
+        const auto local = zero ? cal.pointStartAtLeast(target) : cal.startAtLeast(target);
         const auto trial = isEffort(p) ? TaskExecution(p, *it).dates(local) : TaskSchedule{};
-        const auto start = isEffort(p) ? trial.start : cal.boundary(local, zero);
+        const auto start = isEffort(p) ? trial.start : zero ? cal.pointBoundary(local) : cal.boundary(local, false);
         if (start == row->start)
             return;
         const auto finish = isEffort(p) ? trial.finish

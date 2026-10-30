@@ -1,6 +1,7 @@
 #include "domain/Diagnostics.h"
 #include "calculation/Effort.h"
 #include "calculation/Constraints.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <map>
 #include <memory>
@@ -21,11 +22,11 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
     out.documentId = p.documentId;
     out.inputRevision = p.revision;
     out.profile = p.calculationProfile;
-    out.engineVersion = engineFor(p);
+    out.engineVersion = calculationEngineFor(p);
     out.isForecast = forecast;
     out.statusAt = forecast ? p.statusAt : std::nullopt;
     out.calculationPolicy = priority.empty() ? (forecast ? "retained-remaining-effort-v1" : "effort-constrained-v1")
-                                             : levelingPolicyFor(p) + "/" + priority;
+                                             : calculationLevelingPolicyFor(p) + "/" + priority;
     std::string current;
     EvaluationScope evaluation;
     try {
@@ -205,7 +206,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                     }
                     local = next;
                 }
-                early[i] = cal.offset(row.remainingStart.value_or(row.start));
+                early[i] = model.offset(row.remainingStart.value_or(row.start));
                 if (!priority.empty())
                     for (const auto &before : source.tasks)
                         if (before.taskId == t.id &&
@@ -233,8 +234,7 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
             auto latest = [&](std::size_t i, const std::vector<TaskSchedule> &targets) {
                 calculationCheckpoint();
                 const auto &model = *models[i];
-                const auto &cal = model.calendar();
-                auto lo = early[i], hi = std::max(lo, cal.offset(finish));
+                auto lo = early[i], hi = std::max(lo, model.offset(finish));
                 while (lo < hi) {
                     const auto mid = lo + (hi - lo + 1) / 2;
                     bool fits = false;
@@ -272,10 +272,11 @@ ScheduleResult calculateEffort(const Project &p, bool forecast, const std::strin
                 auto &r = rows[i];
                 r.lateStartMinutes = late[i].earlyStartMinutes;
                 r.lateFinishMinutes = late[i].earlyFinishMinutes;
-                r.totalFloatMinutes = std::max(Minute{0}, models[i]->calendar().offset(late[i].start) - early[i]);
+                const auto earlyWork = legacyMilestones() ? early[i] : models[i]->calendar().offset(r.start);
+                r.totalFloatMinutes = std::max(Minute{0}, models[i]->calendar().offset(late[i].start) - earlyWork);
                 const auto free = latest(i, rows);
                 r.freeFloatMinutes =
-                    std::max(Minute{0}, models[i]->calendar().offset(models[i]->dates(free).start) - early[i]);
+                    std::max(Minute{0}, models[i]->calendar().offset(models[i]->dates(free).start) - earlyWork);
                 r.critical = r.totalFloatMinutes == 0;
             }
             for (std::size_t i = 0; i < n; ++i) {

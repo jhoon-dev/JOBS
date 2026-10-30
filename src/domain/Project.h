@@ -172,5 +172,9 @@ bool hasConstraints(const PlanInput &);
 bool isEffort(const PlanInput &);
 bool usesWork(const Task &);
 std::string engineFor(const PlanInput &);
+std::string legacyEngineFor(const PlanInput &);
+bool supportsEngine(const PlanInput &, const std::string &);
 std::string levelingPolicyFor(const PlanInput &);
+std::string legacyLevelingPolicyFor(const PlanInput &);
+bool supportsLevelingPolicy(const PlanInput &, const std::string &);
 } // namespace jobs

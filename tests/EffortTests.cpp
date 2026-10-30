@@ -268,7 +268,7 @@ int main(int argc, char **argv) {
         doc.saveScenario("공수 대안", "shortest-first", 20, "2026-10-26T09:00:00Z", doc.project()->documentId,
                          doc.project()->revision);
         const auto &scenario = doc.project()->scenarios.back();
-        check(scenario.policy == "serial-effort-split-v1" &&
+        check(scenario.policy == "serial-effort-split-v2" &&
                   jobs::levelResources(jobs::scenarioProject(scenario), scenario.priority, scenario.horizonWorkDays)
                           .leveled.status == jobs::CalculationStatus::Valid,
               "effort scenario replay failed");
@@ -331,8 +331,8 @@ int main(int argc, char **argv) {
         const auto oldBytes = read(oldFile);
         jobs::Document migrate(store);
         migrate.open(oldFile.toStdString(), true);
-        check(migrate.requiresSaveAs() && jobs::calculatePlan(*migrate.project()).engineVersion == "jobs-pdm-1.1",
-              "schema8 engine was reinterpreted");
+        check(migrate.requiresSaveAs() && jobs::calculatePlan(*migrate.project()).engineVersion == "jobs-pdm-1.2",
+              "migrated plan did not select the current constraint engine");
         migrate.saveAs(dir.filePath("v9.jobs").toStdString());
         check(read(oldFile) == oldBytes, "schema8 migration overwrote original");
         jobs::ReportOptions options;

@@ -34,7 +34,7 @@ void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::i
         source = &scheduled;
     }
     TaskExecution model(p, t);
-    const auto local = model.calendar().offset(source->start);
+    const auto local = model.offset(source->start);
     const auto work = model.work(model.dates(local));
     if (target && work == 0)
         throw AppError(ErrorCode::INVERSE_CAPACITY_REQUIRED, {});

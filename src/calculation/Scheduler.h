@@ -24,6 +24,7 @@ struct ScheduleResult {
 ScheduleResult calculate(const Project &snapshot);
 ScheduleResult calculate(const Project &snapshot, const std::shared_ptr<CalculationControl> &control);
 ScheduleResult calculatePlan(const Project &snapshot);
+ScheduleResult calculatePlan(const Project &snapshot, const std::string &engineVersion);
 struct WbsSummary {
     std::size_t taskCount = 0, missingDurations = 0;
     std::int64_t knownDurationMinutes = 0;

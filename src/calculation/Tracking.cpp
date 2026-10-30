@@ -77,7 +77,7 @@ Baseline prepareBaseline(const Project &p, std::string name, std::string author,
     return b;
 }
 void verifyBaseline(const Baseline &b) {
-    auto expected = calculatePlan(baselineProject(b));
+    auto expected = calculatePlan(baselineProject(b), b.engineVersion);
     if (expected.status != CalculationStatus::Valid || expected.tasks != b.schedule ||
         expected.projectFinish != b.projectFinish || expected.engineVersion != b.engineVersion)
         throw AppError(ErrorCode::BASELINE_RESULT_MISMATCH, {});
@@ -233,6 +233,10 @@ ComparisonReport compareToBaseline(const Project &p, const std::string &baseline
                 row.baselineWbsPath = wbsPath(baseline->input, old.wbsId);
                 row.baselineAssignments = assignments(baseline->input, old.id, true);
                 row.baselineFinish = baselineDates.at(old.id)->finish;
+                if (isEffort(baseline->input) && usesWork(old)) {
+                    WorkCalendar cal(baseline->input, old);
+                    row.baselineDuration = cal.offset(*row.baselineFinish) - cal.offset(*row.baselineStart);
+                }
                 row.changes.push_back("현재 계획에서 삭제된 작업");
                 report.tasks.push_back(std::move(row));
             }

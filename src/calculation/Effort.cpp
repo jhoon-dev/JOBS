@@ -106,7 +106,7 @@ TaskSchedule TaskExecution::dates(Minute local) const {
     TaskSchedule row;
     row.taskId = task_.id;
     const auto amount = usesWork(task_) ? task_.workUnitMinutes.value() : task_.durationMinutes.value();
-    row.start = calendar_.boundary(local, amount == 0);
+    row.start = amount == 0 ? calendar_.pointBoundary(local) : calendar_.boundary(local, false);
     row.finish = row.start;
     if (amount > 0 && usesWork(task_)) {
         const auto first = clock_.offset(row.start);
@@ -130,10 +130,10 @@ TaskSchedule TaskExecution::dates(Minute local) const {
     return row;
 }
 Minute TaskExecution::required(const std::string &bound, bool finish) const {
+    if (usesWork(task_) ? task_.workUnitMinutes.value() == 0 : task_.durationMinutes.value() == 0)
+        return calendar_.pointStartAtLeast(bound);
     if (!finish)
-        return (usesWork(task_) ? task_.workUnitMinutes.value() == 0 : task_.durationMinutes.value() == 0)
-                   ? calendar_.finishAtLeast(bound)
-                   : calendar_.startAtLeast(bound);
+        return calendar_.startAtLeast(bound);
     // Finish-driven edges need an inverse of the work integral, not F - nominal D.
     Minute lo = 0, hi = calendar_.maxOffset();
     while (lo < hi) {
@@ -149,6 +149,10 @@ Minute TaskExecution::required(const std::string &bound, bool finish) const {
             lo = mid + 1;
     }
     return lo;
+}
+Minute TaskExecution::offset(const std::string &stamp) const {
+    const bool zero = usesWork(task_) ? task_.workUnitMinutes.value() == 0 : task_.durationMinutes.value() == 0;
+    return zero ? calendar_.pointOffset(stamp) : calendar_.offset(stamp);
 }
 std::vector<WorkSpan> TaskExecution::spans(const TaskSchedule &row) const {
     if (row.completedActual)

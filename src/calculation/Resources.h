@@ -23,7 +23,8 @@ struct LevelingResult {
 };
 // Forecast mode measures remaining work only; it never invents historical effort.
 ResourceLoad resourceLoad(const Project &, const ScheduleResult &);
-LevelingResult levelResources(const Project &, const std::string &priority, int horizonWorkDays);
+LevelingResult levelResources(const Project &, const std::string &priority, int horizonWorkDays,
+                              const std::string &policy = {});
 Project scenarioProject(const LevelingScenario &);
 struct ResourceOccupancy {
     std::string resourceId, taskId, start, finish;

@@ -226,9 +226,11 @@ void ResourceComparisonDialog::recalculate() {
     const auto selected = str(sourceChoice_->currentData().toString()),
                otherId = str(otherChoice_->currentData().toString());
     std::optional<LevelingScenario> secondary;
+    std::string replayPolicy;
     for (const auto &s : current.scenarios) {
         if (s.id == selected) {
             snapshot = scenarioProject(s);
+            replayPolicy = s.policy;
             QSignalBlocker b1(priority_), b2(horizon_);
             priority_->setCurrentIndex(priority_->findData(qs(s.priority)));
             horizon_->setValue(s.horizonWorkDays);
@@ -362,13 +364,14 @@ void ResourceComparisonDialog::recalculate() {
                     append("B 평준화", computed.other->diagnostics);
                 diagnostics_->setPlainText(messages.join('\n'));
             });
-    watcher->setFuture(QtConcurrent::run([snapshot, priority, horizon, secondary] {
+    watcher->setFuture(QtConcurrent::run([snapshot, priority, horizon, secondary, replayPolicy] {
         Computed c;
         try {
-            c.main = levelResources(snapshot, priority, horizon);
+            c.main = levelResources(snapshot, priority, horizon, replayPolicy);
             if (secondary) {
                 c.otherProject = scenarioProject(*secondary);
-                c.other = levelResources(*c.otherProject, secondary->priority, secondary->horizonWorkDays);
+                c.other =
+                    levelResources(*c.otherProject, secondary->priority, secondary->horizonWorkDays, secondary->policy);
             }
         } catch (const std::exception &e) {
             c.error = qErrorText(e);

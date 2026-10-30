@@ -1,6 +1,7 @@
 #include "domain/Diagnostics.h"
 #include "calculation/WorkCalendar.h"
 #include "domain/CalculationControl.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <cstdio>
 #include <stdexcept>
@@ -170,6 +171,44 @@ std::int64_t WorkCalendar::finishAtLeast(const std::string &s) const {
     if (boundary(n, true) < s)
         ++n;
     return n;
+}
+std::int64_t WorkCalendar::pointOffset(const std::string &s) const {
+    const auto n = offset(s);
+    return legacyMilestones()
+               ? n
+               : (date(s) - anchor_).count() * 1440 + std::stoi(s.substr(11, 2)) * 60 + std::stoi(s.substr(14, 2));
+}
+std::string WorkCalendar::pointBoundary(std::int64_t n) const {
+    if (legacyMilestones())
+        return boundary(n, true);
+    if (n < 0)
+        throw AppError(ErrorCode::CALENDAR_RANGE_INVALID, {});
+    const auto at = stamp(anchor_, n);
+    const auto work = offset(at);
+    const auto before = boundary(work, true);
+    return before >= at ? before : boundary(work, false);
+}
+std::int64_t WorkCalendar::pointStartAtLeast(const std::string &s) const {
+    return legacyMilestones() ? finishAtLeast(s) : pointOffset(pointBoundary(pointOffset(s)));
+}
+std::int64_t WorkCalendar::pointEndAtMost(const std::string &s) const {
+    const auto work = offset(s);
+    if (legacyMilestones())
+        return work;
+    const auto before = boundary(work, true);
+    if (work < maxOffset()) {
+        const auto after = boundary(work, false);
+        if (after <= s)
+            return pointOffset(after);
+    }
+    return before <= s ? pointOffset(before) : -1;
+}
+std::int64_t WorkCalendar::maxPointOffset() const {
+    if (legacyMilestones())
+        return maxOffset();
+    if (intervals_->empty())
+        return -1;
+    return std::min(intervals_->back().end, std::int64_t((horizon_ - anchor_).count()) * 1440 - 1);
 }
 std::string WorkCalendar::shift(const std::string &s, std::int64_t minutes) const {
     if (!minutes)

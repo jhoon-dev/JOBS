@@ -89,13 +89,13 @@ void GanttView::updateDrag(const QPoint &point) {
         } else {
             const bool zero =
                 usesWork(*it) ? it->workUnitMinutes.value_or(0) == 0 : it->durationMinutes.value_or(0) == 0;
-            const auto local = zero ? cal.finishAtLeast(raw.toStdString()) : cal.startAtLeast(raw.toStdString());
+            const auto local = zero ? cal.pointStartAtLeast(raw.toStdString()) : cal.startAtLeast(raw.toStdString());
             if (isEffort(*input_)) {
                 const auto trial = TaskExecution(*input_, *it).dates(local);
                 start = QString::fromStdString(trial.start);
                 finish = QString::fromStdString(trial.finish);
             } else {
-                start = QString::fromStdString(cal.boundary(local, zero));
+                start = QString::fromStdString(zero ? cal.pointBoundary(local) : cal.boundary(local, false));
                 finish = !zero ? QString::fromStdString(cal.boundary(local + *it->durationMinutes, true)) : start;
             }
             d.target = start;

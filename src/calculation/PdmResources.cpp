@@ -2,6 +2,7 @@
 #include "calculation/PdmResources.h"
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <map>
 #include <unordered_map>
@@ -13,7 +14,7 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
     out.original = calculate(p);
     out.before = resourceLoad(p, out.original);
     out.leveled = out.original;
-    out.leveled.calculationPolicy = levelingPolicyFor(p) + "/" + priority;
+    out.leveled.calculationPolicy = calculationLevelingPolicyFor(p) + "/" + priority;
     if (out.original.status != CalculationStatus::Valid)
         return out;
     try {
@@ -57,7 +58,7 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
             const auto &cal = calendars.at(task.calendarId);
             const auto duration = remaining(i);
             const auto originalStart = row.remainingStart.value_or(row.start);
-            auto local = duration ? cal.startAtLeast(originalStart) : cal.finishAtLeast(originalStart);
+            auto local = duration ? cal.startAtLeast(originalStart) : cal.pointStartAtLeast(originalStart);
             if (p.calculationProfile == constraintProfile) {
                 auto pending = task;
                 const auto *actual = out.original.isForecast ? progressAsOf(p, task.id) : nullptr;
@@ -159,7 +160,7 @@ LevelingResult levelPdmResources(const Project &p, const std::string &priority, 
             }
             trial.taskId = task.id;
             if (out.original.isForecast)
-                trial.remainingStart = cal.boundary(local, duration == 0);
+                trial.remainingStart = duration == 0 ? cal.pointBoundary(local) : cal.boundary(local, false);
             row = trial;
             if (row.remainingStart.value_or(row.start) != originalStart)
                 out.diagnostics.push_back({"RESOURCE_DELAY", {}, {task.id}, "RESOURCE_DELAY_2"});

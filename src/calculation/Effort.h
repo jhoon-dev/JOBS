@@ -33,6 +33,7 @@ public:
     const WorkCalendar &calendar() const {
         return calendar_;
     }
+    std::int64_t offset(const std::string &) const;
     TaskSchedule dates(std::int64_t localStart) const;
     std::int64_t required(const std::string &bound, bool targetFinish) const;
     std::vector<WorkSpan> spans(const TaskSchedule &) const;

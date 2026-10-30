@@ -1,6 +1,7 @@
 #include "domain/Diagnostics.h"
 #include "calculation/Pdm.h"
 #include "calculation/Constraints.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <map>
 #include <deque>
@@ -11,17 +12,25 @@ std::int64_t pdmRequiredStart(const WorkCalendar &cal, const Dependency &edge, c
     const auto source = dependencyFromFinish(edge.type) ? predecessor.finish : predecessor.start;
     const auto bound = cal.shift(source, edge.lagMinutes);
     if (duration == 0)
-        return cal.finishAtLeast(bound);
+        return cal.pointStartAtLeast(bound);
     if (!dependencyToFinish(edge.type))
         return cal.startAtLeast(bound);
     return std::max(std::int64_t{0}, cal.finishAtLeast(bound) - duration);
 }
 void pdmDates(const WorkCalendar &clock, const WorkCalendar &cal, TaskSchedule &row, std::int64_t local,
               std::int64_t duration) {
-    row.start = cal.boundary(local, duration == 0);
+    row.start = duration == 0 ? cal.pointBoundary(local) : cal.boundary(local, false);
     row.finish = duration ? cal.boundary(local + duration, true) : row.start;
     row.earlyStartMinutes = clock.offset(row.start);
     row.earlyFinishMinutes = clock.offset(row.finish);
+}
+std::int64_t pdmLatestStart(const WorkCalendar &cal, const std::string &finish, std::int64_t duration) {
+    return duration == 0 ? cal.pointEndAtMost(finish) : cal.offset(finish) - duration;
+}
+std::int64_t pdmFloat(const WorkCalendar &cal, std::int64_t from, std::int64_t to, std::int64_t duration) {
+    return duration == 0 && !legacyMilestones()
+               ? cal.offset(cal.pointBoundary(to)) - cal.offset(cal.pointBoundary(from))
+               : to - from;
 }
 namespace {
 struct Calendars {
@@ -41,7 +50,7 @@ ScheduleResult calculatePdmPlan(const Project &p, const std::vector<std::size_t>
     out.documentId = p.documentId;
     out.inputRevision = p.revision;
     out.profile = p.calculationProfile;
-    out.engineVersion = "jobs-pdm-1.0";
+    out.engineVersion = calculationEngineFor(p);
     try {
         WorkCalendar clock(p);
         Calendars calendars(p);
@@ -79,7 +88,7 @@ ScheduleResult calculatePdmPlan(const Project &p, const std::vector<std::size_t>
             const auto &task = p.tasks[i];
             const auto &cal = calendars.at(task);
             const auto duration = *task.durationMinutes;
-            auto cap = std::max(early[i], cal.offset(finish) - duration);
+            auto cap = std::max(early[i], pdmLatestStart(cal, finish, duration));
             auto latest = [&](bool useLate) {
                 auto lo = early[i], hi = cap;
                 while (lo < hi) {
@@ -110,8 +119,8 @@ ScheduleResult calculatePdmPlan(const Project &p, const std::vector<std::size_t>
             pdmDates(clock, cal, dates, late[i], duration);
             row.lateStartMinutes = dates.earlyStartMinutes;
             row.lateFinishMinutes = dates.earlyFinishMinutes;
-            row.totalFloatMinutes = late[i] - early[i];
-            row.freeFloatMinutes = latest(false) - early[i];
+            row.totalFloatMinutes = pdmFloat(cal, early[i], late[i], duration);
+            row.freeFloatMinutes = pdmFloat(cal, early[i], latest(false), duration);
             row.critical = row.totalFloatMinutes == 0;
         }
         out.tasks = std::move(rows);
@@ -171,7 +180,7 @@ ScheduleResult calculatePdmForecast(const Project &p, ScheduleResult out) {
                 row.earlyFinishMinutes = clock.offset(row.finish);
             } else {
                 const auto duration = e ? e->remainingMinutes : *t.durationMinutes;
-                auto local = duration ? cal.startAtLeast(*p.statusAt) : cal.finishAtLeast(*p.statusAt);
+                auto local = duration ? cal.startAtLeast(*p.statusAt) : cal.pointStartAtLeast(*p.statusAt);
                 if (p.calculationProfile == constraintProfile) {
                     auto remainingTask = t;
                     if (e && e->actualStart &&

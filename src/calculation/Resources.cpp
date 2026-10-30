@@ -3,6 +3,7 @@
 #include "calculation/WorkCalendar.h"
 #include "calculation/PdmResources.h"
 #include "calculation/Effort.h"
+#include "calculation/EnginePolicy.h"
 #include <algorithm>
 #include <map>
 #include <set>
@@ -208,7 +209,14 @@ ResourceLoad resourceLoad(const Project &p, const ScheduleResult &result) {
         load.diagnostics.push_back({"UNASSIGNED_TASKS", {}, {}, "UNASSIGNED_TASKS"});
     return load;
 }
-LevelingResult levelResources(const Project &p, const std::string &priority, int horizonWorkDays) {
+LevelingResult levelResources(const Project &p, const std::string &priority, int horizonWorkDays,
+                              const std::string &policy) {
+    if (!policy.empty()) {
+        if (!supportsLevelingPolicy(p, policy))
+            throw AppError(ErrorCode::SCENARIO_METADATA_INVALID, {});
+        EnginePolicyScope scope(isPdm(p) && policy == legacyLevelingPolicyFor(p));
+        return levelResources(p, priority, horizonWorkDays);
+    }
     if ((priority != "task-order" && priority != "shortest-first" && priority != "longest-first") ||
         horizonWorkDays < 1 || horizonWorkDays > 5200)
         throw AppError(ErrorCode::LEVEL_OPTIONS_INVALID, {});

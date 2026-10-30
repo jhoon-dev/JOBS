@@ -242,8 +242,8 @@ int main(int argc, char **argv) {
         auto oldBytes = read(original);
         jobs::Document migrated(store);
         migrated.open(original.toStdString(), true);
-        check(migrated.requiresSaveAs() && jobs::calculatePlan(*migrated.project()).engineVersion == "jobs-pdm-1.0",
-              "legacy engine reinterpreted");
+        check(migrated.requiresSaveAs() && jobs::calculatePlan(*migrated.project()).engineVersion == "jobs-pdm-1.2",
+              "migrated plan did not select the current PDM engine");
         migrated.saveAs(dir.filePath("v8.jobs").toStdString());
         check(read(original) == oldBytes, "migration overwrote original");
         jobs::ReportOptions options;

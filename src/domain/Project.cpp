@@ -22,16 +22,31 @@ bool usesWork(const Task &t) {
 }
 
 std::string engineFor(const PlanInput &p) {
+    return isEffort(p) ? "jobs-effort-1.1" : isPdm(p) ? "jobs-pdm-1.2" : "jobs-cpm-0.2";
+}
+std::string legacyEngineFor(const PlanInput &p) {
     return isEffort(p)         ? "jobs-effort-1.0"
            : hasConstraints(p) ? "jobs-pdm-1.1"
            : isPdm(p)          ? "jobs-pdm-1.0"
                                : "jobs-cpm-0.2";
 }
+bool supportsEngine(const PlanInput &p, const std::string &engine) {
+    return engine == engineFor(p) || engine == legacyEngineFor(p);
+}
 std::string levelingPolicyFor(const PlanInput &p) {
+    return isEffort(p)         ? "serial-effort-split-v2"
+           : hasConstraints(p) ? "serial-no-split-constrained-v2"
+           : isPdm(p)          ? "serial-no-split-pdm-v2"
+                               : "serial-no-split-v1";
+}
+std::string legacyLevelingPolicyFor(const PlanInput &p) {
     return isEffort(p)         ? "serial-effort-split-v1"
            : hasConstraints(p) ? "serial-no-split-constrained-v1"
            : isPdm(p)          ? "serial-no-split-pdm-v1"
                                : "serial-no-split-v1";
+}
+bool supportsLevelingPolicy(const PlanInput &p, const std::string &policy) {
+    return policy == levelingPolicyFor(p) || policy == legacyLevelingPolicyFor(p);
 }
 
 std::vector<Dependency> dependencies(const Task &task) {
@@ -250,7 +265,7 @@ void validate(const Project &p) {
         validatePlan(b.input);
         if (blank(b.id) || !baselineIds.insert(b.id).second || blank(b.name) || blank(b.approvedBy) ||
             blank(b.reason) || !validUtcStamp(b.createdAt) || blank(b.sourceDocumentId) || b.inputRevision == 0 ||
-            b.inputRevision >= p.revision || b.version != i + 1 || b.engineVersion != engineFor(b.input) ||
+            b.inputRevision >= p.revision || b.version != i + 1 || !supportsEngine(b.input, b.engineVersion) ||
             !validStamp(b.projectFinish) || b.schedule.size() != b.input.tasks.size())
             throw AppError(ErrorCode::BASELINE_METADATA_INVALID, {});
         std::unordered_set<std::string> taskIds;
@@ -301,7 +316,7 @@ void validate(const Project &p) {
         calculationCheckpoint();
         if (blank(s.id) || !scenarios.insert(s.id).second || blank(s.name) || !validUtcStamp(s.createdAt) ||
             blank(s.sourceDocumentId) || !s.inputRevision || s.inputRevision >= p.revision ||
-            s.policy != levelingPolicyFor(s.input) ||
+            !supportsLevelingPolicy(s.input, s.policy) ||
             (s.priority != "task-order" && s.priority != "shortest-first" && s.priority != "longest-first") ||
             s.horizonWorkDays < 1 || s.horizonWorkDays > 5200)
             throw AppError(ErrorCode::SCENARIO_METADATA_INVALID, {});
