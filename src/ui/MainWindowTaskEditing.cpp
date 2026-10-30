@@ -155,19 +155,21 @@ void MainWindow::setupTaskEditing(QMenu *menu, QVBoxLayout *layout) {
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
     updateCompactLayout();
-    QTimer::singleShot(0, this, [this] { updateCompactLayout(); });
 }
 void MainWindow::updateCompactLayout() {
     if (!editingHelp_ || !diagnostics_ || !projectTitle_ || !summary_ || !diagnosticsToggle_ || !centralWidget())
         return;
-    const bool compact = height() < 760;
-    editingHelp_->hide();
-    diagnostics_->setMaximumHeight(compact ? 80 : 140);
     // Cocoa can constrain a top-level native frame after the QWidget resize
-    // callback. Include the actual screen budget rather than only that callback's
-    // requested widget height, then reconcile once native events have settled.
+    // callback. Include the screen budget rather than only the requested height.
     const int visibleHeight = screen() ? std::min(height(), screen()->availableGeometry().height()) : height();
     const bool shortWindow = visibleHeight < 520;
+    const bool compact = visibleHeight < 760;
+    const int mode = shortWindow ? 1 : compact ? 2 : 3;
+    if (property("workspaceLayoutMode").toInt() == mode)
+        return;
+    setProperty("workspaceLayoutMode", mode);
+    editingHelp_->hide();
+    diagnostics_->setMaximumHeight(compact ? 80 : 140);
     projectTitle_->setVisible(!shortWindow);
     summary_->setVisible(!shortWindow);
     if (auto *layout = qobject_cast<QVBoxLayout *>(centralWidget()->layout())) {
