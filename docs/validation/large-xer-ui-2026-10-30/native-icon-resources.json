@@ -1,0 +1,22 @@
+[
+  {
+    "path": "build\\JOBS.exe",
+    "icon_groups": [
+      {
+        "id": 101,
+        "images": 10
+      }
+    ],
+    "status": "passed"
+  },
+  {
+    "path": "dist\\JOBS-0.2.0-Setup-win64-ab251153.exe",
+    "icon_groups": [
+      {
+        "id": 103,
+        "images": 10
+      }
+    ],
+    "status": "passed"
+  }
+]

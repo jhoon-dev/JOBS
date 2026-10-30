@@ -1,0 +1,24 @@
+{
+  "source_revision": "ab2511537441cf2094c823d80aaac6299a3d592a",
+  "last_product_change": "aec2899",
+  "prd_first": [
+    "c84b211",
+    "818d35f"
+  ],
+  "local_ctest": {
+    "passed": 52,
+    "failed": 0,
+    "seconds": 87.72
+  },
+  "presentation_qttest_cases_including_setup_cleanup": 9,
+  "native_scale_size_combinations": 12,
+  "live_app": "build/large-xer-app-final-20261030/JOBS.exe",
+  "live_binary_matches_packaged_binary": true,
+  "project_file": "build\\xer-10000-2026-10-30\\industrial-campus-10000-xer-import\\project.jobs",
+  "original_xer_copy_sha256": "8f6236ad4f6c90b6e35f47179ac451f05ced3cc913f72c31f8ae235abc19ee6c",
+  "installer_sha256": "f5089bee8d853fa46251bd1a8c6a1a2fe6cb232240772d1c2d8669ec0688242f",
+  "native_last_row_selected": 10000,
+  "mixed_horizontal_vertical_scroll_header_checked": true,
+  "ci_at_snapshot": "in_progress; not claimed complete",
+  "signed": false
+}

@@ -1,0 +1,10 @@
+{
+  "source": "packaging/msix/Assets/JOBS.svg",
+  "source_sha256": "efb7134f6d7e8829dd30cc0535557f2fcbc73e4fba48849a27e68920de98242e",
+  "generator": "Pillow 11.3.0",
+  "files": {
+    "JOBS.icns": "63c783f55499040d1131d1f8f06d87890367e738be6c3b67a5bb91cab34deb81",
+    "JOBS.ico": "57bd5ac6aa6e54ea442f14385feecf5c6fd92c5a20f435d626e1c98c3d0b1486",
+    "JOBS.png": "149289b9cec026312f1e671140f0a688263b1e453e033617b9aed63b227f4319"
+  }
+}

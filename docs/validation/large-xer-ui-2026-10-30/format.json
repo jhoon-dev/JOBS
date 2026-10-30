@@ -1,0 +1,26 @@
+{
+  "status": "success",
+  "tool": "clang-format version 18.1.8",
+  "base": "558b141",
+  "files": [
+    "src/application/Document.cpp",
+    "src/application/Document.h",
+    "src/application/PreparedEdit.cpp",
+    "src/application/TaskEditing.cpp",
+    "src/formatting/DiagnosticCatalog.h",
+    "src/main.cpp",
+    "src/persistence/PrimaveraXer.cpp",
+    "src/ui/ApplicationIcon.cpp",
+    "src/ui/ApplicationIcon.h",
+    "src/ui/AsyncEditController.cpp",
+    "src/ui/GanttView.cpp",
+    "src/ui/MainWindow.cpp",
+    "src/ui/MainWindowWorkspaceUi.cpp",
+    "src/ui/TaskTableModel.cpp",
+    "tests/LargeXerUiProbe.cpp",
+    "tests/PrimaveraXerTests.cpp",
+    "tests/WorkspacePresentationTests.cpp"
+  ],
+  "format_changes": [],
+  "fix": false
+}

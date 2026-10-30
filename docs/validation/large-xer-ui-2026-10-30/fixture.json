@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "source": "deterministic JOBS demo generator; no customer data",
+  "tasks": 10000,
+  "wbs_nodes_excluding_project_root": 1220,
+  "milestones": 1000,
+  "relationships": 10999,
+  "relationship_types": {
+    "PR_FS": 7800,
+    "PR_SS": 2199,
+    "PR_FF": 1000
+  },
+  "calendars": 3,
+  "resources": 50,
+  "assignments": 12000,
+  "start": "2026-11-02",
+  "bytes": 1906375,
+  "sha256": "8f6236ad4f6c90b6e35f47179ac451f05ced3cc913f72c31f8ae235abc19ee6c"
+}

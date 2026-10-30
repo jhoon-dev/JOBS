@@ -1,0 +1,29 @@
+[
+    {
+        "control_height": 32,
+        "dpr": 2,
+        "height": 650,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 290,
+        "width": 1024
+    },
+    {
+        "control_height": 32,
+        "dpr": 2,
+        "height": 720,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 360,
+        "width": 1280
+    },
+    {
+        "control_height": 32,
+        "dpr": 2,
+        "height": 900,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 540,
+        "width": 1440
+    }
+]
