@@ -113,10 +113,7 @@ struct Budget {
         Money f = 0;
         if (accrual == "uniform" && finish > start) {
             const auto before = elapsed(date + " 00:00", calendar);
-            const auto after =
-                elapsed(work ? calendar.boundary((offset / calendar.dayMinutes() + 1) * calendar.dayMinutes(), true)
-                             : date + " 23:59",
-                        calendar);
+            const auto after = elapsed(dayEnd(date), calendar);
             const auto total = elapsed(finishStamp, calendar);
             if (after > before && total > 0)
                 f = fixed ? subtract(fraction(*fixed, after, total), fraction(*fixed, before, total)) : Money{};

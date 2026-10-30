@@ -92,13 +92,42 @@ int main(int argc, char **argv) {
         midnightEvent(store, "start", false);
         midnightEvent(store, "finish", false);
         midnightEvent(store, "uniform", true);
-        jobs::Document last(store);
-        last.create("Last supported date", "9999-12-31", {"A"});
-        last.setDuration(0, 1);
-        last.setTaskCost({last.project()->tasks[0].id, 100, "uniform", "physical"});
-        const auto baseline = last.captureBaseline("B", "PM", "Approved", "2026-10-30T00:00:00Z");
-        check(day(jobs::analyzeCosts(*last.project(), baseline), "9999-12-31").pv == 100,
-              "day-end PV exceeded the supported date range");
+        for (int profile : {0, 1, 2})
+            for (bool late : {false, true}) {
+                if (profile == 0 && late)
+                    continue;
+                jobs::Document last(store);
+                last.create("Last supported date", "9999-12-31", {"A"});
+                last.setDuration(0, late ? 1 : 60);
+                const auto id = last.project()->tasks[0].id;
+                std::string calendar;
+                if (profile) {
+                    calendar = last.putCalendar({"all", "All day", {1, 2, 3, 4, 5, 6, 7}, {{0, 1440}}, {}});
+                    last.setTaskCalendar(0, calendar);
+                    last.setTaskTiming(0, jobs::ConstraintType::SNET, late ? "9999-12-31 23:58" : "9999-12-31 09:00",
+                                       {});
+                }
+                jobs::Resource resource{{}, "R", "labor", 100, {}, {{"9999-12-31", 6000}}};
+                resource.calendarId = profile == 2 ? calendar : "";
+                const auto rid = last.putResource(resource);
+                last.setAssignments(id, {{id, rid, 100}});
+                if (profile == 2)
+                    last.setTaskEffort(0, jobs::TaskType::FixedWork, true, late ? 1 : 60, late ? 100 : 6000, {});
+                last.setTaskCost({id, 100, "uniform", "physical"});
+                const auto baseline = last.captureBaseline("B", "PM", "Approved", "2026-10-30T00:00:00Z");
+                const auto total = late ? 200 : 6100;
+                auto costs = jobs::analyzeCosts(*last.project(), baseline);
+                check(costs.evm.bac == total && day(costs, "9999-12-31").plan == total &&
+                          day(costs, "9999-12-31").budget == total && day(costs, "9999-12-31").pv == total,
+                      "calendar/effort/resource day-end cost exceeded supported date range");
+                last.setStatusAt(late ? "9999-12-31 23:58" : "9999-12-31 09:30");
+                costs = jobs::analyzeCosts(*last.project(), baseline);
+                check(costs.evm.pv == (late ? 0 : 3050) && day(costs, "9999-12-31").pv == costs.evm.pv,
+                      "final-date partial status PV included future work");
+                last.setStatusAt("9999-12-31 23:59");
+                check(jobs::analyzeCosts(*last.project(), baseline).evm.pv == total,
+                      "last supported minute lost cumulative work or resource cost");
+            }
         std::cout << "PASS: last-minute uniform/resource cost, exclusive midnight events/reports, exact status, "
                      "month/year/leap-day and final supported date boundaries\n";
     } catch (const std::exception &error) {

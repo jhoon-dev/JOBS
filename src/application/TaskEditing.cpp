@@ -214,20 +214,12 @@ void Document::editTasks(const std::vector<TaskEdit> &changes) {
     if (graphChanged)
         validateGraph(p);
     EvaluationScope evaluation;
+    std::vector<std::size_t> inverse;
     for (const auto &[i, e] : ordered)
-        if (e->duration && p.tasks[i].taskType == TaskType::FixedWork) {
-            try {
-                changeDuration(p, i, *e->duration, true);
-            } catch (const std::exception &error) {
-                auto diagnostic = diagnosticFromException(error, "TASK_EDIT_FAILED", {p.tasks[i].id});
-                diagnostic.arguments = {p.tasks[i].name};
-                throw AppError(std::move(diagnostic));
-            }
-        }
-    const bool inverse = std::any_of(ordered.begin(), ordered.end(), [&](const auto &item) {
-        return item.second->duration && p.tasks[item.first].taskType == TaskType::FixedWork;
-    });
-    editPlan(std::move(p), "표 일괄 붙여넣기", !inverse);
+        if (e->duration && p.tasks[i].taskType == TaskType::FixedWork)
+            inverse.push_back(i);
+    changeFixedWorkDurations(p, inverse);
+    editPlan(std::move(p), "표 일괄 붙여넣기", inverse.empty());
 }
 void Document::editPlan(Project p, std::string label, bool validated) {
     // Only the closed task-editing methods call this path. Historical records,

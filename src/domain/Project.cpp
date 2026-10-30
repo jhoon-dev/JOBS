@@ -288,7 +288,8 @@ void validate(const Project &p) {
             (!e.actualStart && e.actualDurationMinutes != 0) || (e.actualFinish && e.remainingMinutes != 0) ||
             (e.actualStart && !e.actualFinish && e.remainingMinutes == 0 && !e.remainingWorkUnitMinutes))
             throw AppError(ErrorCode::PROGRESS_DATES_INVALID, {});
-        if (!e.actualStart && e.remainingMinutes == 0 && e.planDurationMinutes.value_or(1) != 0)
+        if (!e.actualStart && e.remainingMinutes == 0 && e.planDurationMinutes.value_or(1) != 0 &&
+            e.remainingWorkUnitMinutes.value_or(0) == 0)
             throw AppError(ErrorCode::PROGRESS_COMPLETION_REQUIRED, {});
         if (e.actualStart &&
             e.actualDurationMinutes > civilMinute(e.actualFinish.value_or(e.statusAt)) - civilMinute(*e.actualStart))

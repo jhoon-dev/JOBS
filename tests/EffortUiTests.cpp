@@ -198,6 +198,46 @@ int main(int argc, char **argv) {
         check(*readonly.project() == before, "read-only inspection changed data");
         reader.hide();
         window.hide();
+        {
+            jobs::Document pending(store);
+            pending.create("착수 전 공수 보고", "2026-10-26", {"미착수"});
+            const auto pid = pending.project()->tasks[0].id;
+            const auto resource = pending.putResource({{}, "R", "labor", 100, {}});
+            pending.setAssignments(pid, {{pid, resource, 100}});
+            pending.setTaskEffort(0, jobs::TaskType::FixedWork, true, 480, 48000, {});
+            pending.setStatusAt("2026-10-27 09:00");
+            jobs::MainWindow reporter(pending);
+            reporter.show();
+            calculate(reporter, pending);
+            taskTable(reporter)->selectRow(0);
+            QTimer::singleShot(30, [] {
+                auto *d = QApplication::activeModalWidget();
+                callback(d && d->objectName() == "progressDialog", "not-started progress dialog absent");
+                callback(d->findChild<QLineEdit *>("actualStart")->text().isEmpty() &&
+                             !d->findChild<QSpinBox *>("remainingMinutes")->isEnabled() &&
+                             d->findChild<QSpinBox *>("remainingMinutes")->value() == 0,
+                         "not-started UI invented start or remaining duration");
+                d->findChild<QLineEdit *>("remainingWorkHours")->setText("8");
+                d->findChild<QLineEdit *>("progressReporter")->setText("PM");
+                d->findChild<QLineEdit *>("progressReason")->setText("미착수 잔여 공수 확인");
+                d->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+            });
+            bool reported = false;
+            for (auto *a : reporter.findChildren<QAction *>())
+                if (a->text() == "선택 작업 실적") {
+                    check(a->isEnabled(), "not-started progress action disabled");
+                    a->trigger();
+                    reported = true;
+                    break;
+                }
+            check(reported && pending.project()->progress.size() == 1 && !pending.project()->progress[0].actualStart &&
+                      pending.project()->progress[0].remainingWorkUnitMinutes == 48000,
+                  "not-started work report was not accepted through the UI");
+            calculate(reporter, pending);
+            check(pending.calculation()->tasks[0].finish == "2026-10-27 18:00",
+                  "not-started UI report forecast changed work");
+            reporter.hide();
+        }
         std::cout << "PASS: effort/type/split UI, validation with no partial edit, automatic FS propagation, split "
                      "Gantt paths, single-step undo/redo, resource calendar edit and read-only inspection\n";
     } catch (const std::exception &e) {

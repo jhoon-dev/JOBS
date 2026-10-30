@@ -5,30 +5,36 @@
 #include <stdexcept>
 namespace jobs {
 namespace {
-void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::int64_t duration,
-                      bool planOnly = false) {
+void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::int64_t duration, bool planOnly = false,
+                      const TaskSchedule *source = nullptr) {
     calculationCheckpoint();
     auto t = p.tasks.at(index);
     t.taskType = TaskType::FixedDuration;
     t.workDriven = false;
     t.workUnitMinutes.reset();
     t.durationMinutes = duration;
-    Project trial;
-    if (planOnly) {
-        static_cast<PlanInput &>(trial) = p;
-        trial.documentId = p.documentId;
-        trial.revision = p.revision;
-    } else
-        trial = p;
-    trial.tasks[index] = t;
-    auto plan = calculatePlan(trial);
-    std::int64_t local = 0;
+    TaskSchedule scheduled;
+    if (!source) {
+        Project trial;
+        if (planOnly) {
+            static_cast<PlanInput &>(trial) = p;
+            trial.documentId = p.documentId;
+            trial.revision = p.revision;
+        } else
+            trial = p;
+        trial.tasks[index] = t;
+        const auto plan = calculatePlan(trial);
+        if (plan.status != CalculationStatus::Valid)
+            throw AppError(ErrorCode::INVERSE_PLAN_REQUIRED, {});
+        const auto row =
+            std::find_if(plan.tasks.begin(), plan.tasks.end(), [&](const auto &r) { return r.taskId == t.id; });
+        if (row == plan.tasks.end())
+            throw AppError(ErrorCode::INVERSE_PLAN_REQUIRED, {});
+        scheduled = *row;
+        source = &scheduled;
+    }
     TaskExecution model(p, t);
-    if (plan.status != CalculationStatus::Valid)
-        throw AppError(ErrorCode::INVERSE_PLAN_REQUIRED, {});
-    for (const auto &row : plan.tasks)
-        if (row.taskId == t.id)
-            local = model.calendar().offset(row.start);
+    const auto local = model.calendar().offset(source->start);
     const auto work = model.work(model.dates(local));
     if (target && work == 0)
         throw AppError(ErrorCode::INVERSE_CAPACITY_REQUIRED, {});
@@ -44,6 +50,48 @@ void scaleAssignments(Project &p, std::size_t index, std::int64_t target, std::i
     std::erase_if(p.assignments, [&](const auto &a) { return a.taskId == t.id && !a.units; });
 }
 } // namespace
+void changeFixedWorkDurations(Project &p, const std::vector<std::size_t> &indices) {
+    if (indices.empty())
+        return;
+    auto current = indices.front();
+    try {
+        Project trial;
+        static_cast<PlanInput &>(trial) = p;
+        trial.documentId = p.documentId;
+        trial.revision = p.revision;
+        // Every requested duration participates in the same schedule, including
+        // predecessors that appear below their successors in the task table.
+        for (const auto index : indices) {
+            calculationCheckpoint();
+            current = index;
+            auto &task = trial.tasks.at(index);
+            if (task.taskType != TaskType::FixedWork || !task.durationMinutes ||
+                (*task.durationMinutes == 0 && task.workUnitMinutes.value_or(0) > 0))
+                throw AppError(ErrorCode::FIXED_WORK_DURATION_REQUIRED, {});
+            task.taskType = TaskType::FixedDuration;
+            task.workDriven = false;
+            task.workUnitMinutes.reset();
+        }
+        current = indices.front();
+        const auto plan = calculatePlan(trial);
+        if (plan.status != CalculationStatus::Valid)
+            throw AppError(ErrorCode::INVERSE_PLAN_REQUIRED, {});
+        std::unordered_map<std::string, const TaskSchedule *> rows;
+        for (const auto &row : plan.tasks)
+            rows.emplace(row.taskId, &row);
+        for (const auto index : indices) {
+            current = index;
+            const auto &task = p.tasks.at(index);
+            scaleAssignments(p, index, task.workUnitMinutes.value(), task.durationMinutes.value(), true,
+                             rows.at(task.id));
+        }
+    } catch (const std::exception &error) {
+        const auto &task = p.tasks.at(current);
+        auto diagnostic = diagnosticFromException(error, "TASK_EDIT_FAILED", {task.id});
+        diagnostic.arguments = {task.name};
+        throw AppError(std::move(diagnostic));
+    }
+}
 void changeDuration(Project &p, std::size_t index, std::optional<std::int64_t> duration, bool planOnly) {
     auto &t = p.tasks.at(index);
     if (isEffort(p) && t.taskType == TaskType::FixedWork) {
