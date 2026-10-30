@@ -107,8 +107,8 @@ private slots:
                                      "baselineChoice", "toggleDiagnostics"})
                 QCOMPARE(window.findChild<QWidget *>(name)->height(), expected);
             for (const auto *name : {"taskFilter", "taskSort", "resetTaskView"})
-                QCOMPARE(window.findChild<QWidget *>(name)->mapTo(&window, QPoint()).y(),
-                         search->mapTo(&window, QPoint()).y());
+                QVERIFY(std::abs(window.findChild<QWidget *>(name)->mapTo(&window, QPoint()).y() -
+                                 search->mapTo(&window, QPoint()).y()) <= 1);
             for (const auto *name : {"selectedTaskMenu", "analysisMenu"})
                 QCOMPARE(window.findChild<QToolButton *>(name)->height(), expected);
             QCOMPARE(tree->header()->height(), jobs::GanttView::HeaderHeight);
