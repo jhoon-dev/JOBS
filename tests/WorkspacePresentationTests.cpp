@@ -24,6 +24,7 @@
 #include <QJsonObject>
 #include <QPaintEvent>
 #include <QScrollBar>
+#include <QScreen>
 
 namespace {
 class PaintCoverage : public QObject {
@@ -111,6 +112,7 @@ private slots:
             qInfo().noquote() << QJsonDocument(positions).toJson(QJsonDocument::Compact);
             measurements.append(QJsonObject{{"width", window.width()},
                                             {"height", window.height()},
+                                            {"available_screen_height", window.screen()->availableGeometry().height()},
                                             {"control_height", expected},
                                             {"pane_header_height", tree->header()->height()},
                                             {"row_height", tree->visualItemRect(tree->topLevelItem(0)).height()},
