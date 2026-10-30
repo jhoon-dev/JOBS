@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QFontMetrics>
 #include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
@@ -18,6 +19,7 @@
 
 namespace jobs {
 void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
+    const int controlHeight = std::max(32, fontMetrics().height() + 16);
     tools->setObjectName("primaryTools");
     tools->setIconSize({18, 18});
     tools->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -146,6 +148,16 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     table_->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     wbsTree_->setAlternatingRowColors(true);
     wbsTree_->setUniformRowHeights(true);
+    wbsTree_->header()->setFixedHeight(GanttView::HeaderHeight);
+    wbsTree_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    wbsTree_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    for (const auto *name : {"taskSearch", "taskFilter", "taskSort", "resetTaskView", "toggleWbs", "ganttZoom",
+                             "baselineChoice", "toggleDiagnostics"})
+        if (auto *control = findChild<QWidget *>(name))
+            control->setFixedHeight(controlHeight);
+    for (auto *button : tools->findChildren<QToolButton *>())
+        if (button->objectName() != "qt_toolbar_ext_button")
+            button->setFixedHeight(controlHeight);
     workspaceSplit_->setHandleWidth(7);
     workspaceSplit_->setStretchFactor(0, 0);
     workspaceSplit_->setStretchFactor(1, 1);
@@ -156,7 +168,8 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
         "QLabel#projectTitle { font-size: 21px; font-weight: 600; padding: 2px 0; }"
         "QLabel#documentNotice { padding: 6px; border: 1px solid palette(mid); }"
         "QLineEdit#taskSearch { padding: 6px 8px; border: 1px solid palette(mid); border-radius: 4px; }"
-        "QComboBox { padding: 4px 6px; }"
+        "QWidget#planningWorkspace QComboBox { padding: 4px 6px; }"
+        "QTreeWidget#wbsTree::item { height: 28px; }"
         "QHeaderView::section { padding: 4px; border: 0; border-bottom: 1px solid palette(midlight); }"
         "QTableView#taskTable, QTreeWidget#wbsTree, QGraphicsView#ganttView { border: 1px solid palette(midlight); }"
         "QToolButton#toggleWbs, QToolButton#toggleDiagnostics { padding: 5px 8px; }"

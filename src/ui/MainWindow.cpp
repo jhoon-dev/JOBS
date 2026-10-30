@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/ApplicationIcon.h"
 #include "ui/DesktopWorkspace.h"
 #include "ui/GanttView.h"
 #include "ui/ReportDialog.h"
@@ -58,6 +59,7 @@ std::string str(const QString &s) {
 MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, DesktopWorkspace *workspace)
     : workspace_(workspace), document_(document) {
     resize(1560, 900);
+    setWindowIcon(applicationIcon());
     auto *menu = menuBar()->addMenu("파일(&F)");
     if (workspace_) {
         auto *multiple = menu->addAction("다중 프로젝트·공유 자원…");

@@ -20,6 +20,8 @@ VIAddVersionKey "LegalCopyright" "ToolMoa"
 
 !define RegistryKey "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS"
 !define MUI_ABORTWARNING
+!define MUI_ICON "${__FILEDIR__}\icons\JOBS.ico"
+!define MUI_UNICON "${__FILEDIR__}\icons\JOBS.ico"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\JOBS.exe"
 !define MUI_FINISHPAGE_RUN_NOTCHECKED
 !insertmacro MUI_PAGE_WELCOME

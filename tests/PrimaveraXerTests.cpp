@@ -32,6 +32,23 @@ QByteArray read(const QString &p) {
     check(f.open(QIODevice::ReadOnly), "file read failed");
     return f.readAll();
 }
+QByteArray repeatTableRows(const QByteArray &source, const QByteArray &name, int count) {
+    QByteArray output;
+    bool inside = false, written = false;
+    for (const auto &line : source.split('\n')) {
+        if (line.startsWith("%T\t"))
+            inside = line.trimmed() == "%T\t" + name;
+        if (inside && line.startsWith("%R\t")) {
+            if (!written)
+                for (int i = 0; i < count; ++i)
+                    output += line + '\n';
+            written = true;
+        } else
+            output += line + '\n';
+    }
+    check(written, "missing row-limit fixture table");
+    return output;
+}
 QByteArray modify(const QByteArray &source, const QString &table, const QString &column, int row,
                   const QString &value) {
     auto lines = QString::fromUtf8(source).split('\n', Qt::KeepEmptyParts);
@@ -80,6 +97,53 @@ int main(int argc, char **argv) {
         auto source = read(QString::fromUtf8(JOBS_XER_FIXTURE));
         auto imported = jobs::importPrimaveraXer(source, "골든.xer");
         const auto &p = imported.project;
+        {
+            auto many = p;
+            many.tasks.clear();
+            many.assignments.clear();
+            std::size_t relationships = 0;
+            for (int i = 0; i < 10000; ++i) {
+                auto task = p.tasks[0];
+                task.id = "large-" + std::to_string(i);
+                task.name = task.id;
+                task.durationMinutes = 60;
+                task.predecessors.clear();
+                task.dependencyRules.clear();
+                if (i >= 100)
+                    task.predecessors.push_back("large-" + std::to_string(i - 100));
+                if (i >= 200 && i % 10 == 0)
+                    task.predecessors.push_back("large-" + std::to_string(i - 200));
+                relationships += task.predecessors.size();
+                many.assignments.push_back({task.id, p.resources[0].id, 50});
+                if (i % 10 == 0)
+                    many.assignments.push_back({task.id, p.resources[1].id, 50});
+                many.tasks.push_back(std::move(task));
+            }
+            auto large = jobs::importPrimaveraXer(jobs::exportPrimaveraXer(many).xer, "10000-tasks.xer");
+            std::size_t actualRelationships = 0;
+            for (const auto &task : large.project.tasks)
+                actualRelationships += task.predecessors.size();
+            check(large.project.tasks.size() == 10000 && actualRelationships == relationships &&
+                      relationships > 10000 && large.project.assignments.size() == 11000,
+                  "10k tasks with more than 10k relationships/assignments failed roundtrip");
+            auto extra = many.tasks.back();
+            extra.id = "over-activity-limit";
+            many.tasks.push_back(extra);
+            rejects([&] { jobs::exportPrimaveraXer(many); });
+            for (const auto *name : {"TASK", "TASKPRED", "TASKRSRC", "NOTEBOOK"}) {
+                const int count = std::string(name) == "TASK"       ? 10001
+                                  : std::string(name) == "NOTEBOOK" ? 300002
+                                                                    : 100001;
+                bool rejectedByLimit = false;
+                try {
+                    jobs::importPrimaveraXer(repeatTableRows(source, name, count), "over-limit.xer");
+                } catch (const jobs::AppError &error) {
+                    rejectedByLimit = error.code() == (std::string(name) == "NOTEBOOK" ? "FILE_PRIMAVERAXER_010"
+                                                                                       : "FILE_PRIMAVERAXER_024");
+                }
+                check(rejectedByLimit, "XER activity/relation/assignment/global bound lost");
+            }
+        }
         check(p.name == "한글 XER 계획" && p.tasks.size() == 6 && p.wbsNodes.size() == 2 && p.resources.size() == 2 &&
                   p.assignments.size() == 2,
               "project/WBS/task/resource counts");

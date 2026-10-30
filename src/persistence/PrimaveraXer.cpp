@@ -203,7 +203,8 @@ File parse(const QString &text) {
 const Table &table(File &file, const char *name) {
     auto [it, inserted] = file.tables.try_emplace(name, Table{name, {}, {}, {}});
     (void)inserted;
-    if (it->second.rows.size() > 10000)
+    const std::size_t limit = (it->first == "TASKPRED" || it->first == "TASKRSRC") ? 100000 : 10000;
+    if (it->second.rows.size() > limit)
         throw AppError(ErrorCode::FILE_PRIMAVERAXER_024, {diagnosticArgument(QString::fromLatin1(name))});
     return it->second;
 }
@@ -751,7 +752,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     validate(p);
     graph(p);
     if (p.tasks.size() > 10000 || p.wbsNodes.size() >= 10000 || p.resources.size() > 10000 ||
-        p.assignments.size() > 10000 || p.calendars.size() >= 10000)
+        p.assignments.size() > 100000 || p.calendars.size() >= 10000)
         throw AppError(ErrorCode::FILE_PRIMAVERAXER_074, {});
     QByteArray bytes("\xef\xbb\xbf");
     auto line = [&](const QStringList &cells) {
@@ -885,7 +886,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     next = 1;
     for (const auto &t : p.tasks)
         for (const auto &d : dependencies(t)) {
-            if (next > 10000)
+            if (next > 100000)
                 throw AppError(ErrorCode::FILE_PRIMAVERAXER_079, {});
             row({QString::number(next++), QString::number(tasks.at(t.id)), QString::number(tasks.at(d.predecessorId)),
                  "1", "1", "PR_" + qs(enumToken(d.type)), hourText(d.lagMinutes)});

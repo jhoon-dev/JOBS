@@ -1,5 +1,6 @@
 #include "persistence/JsonProjectStore.h"
 #include "ui/MainWindow.h"
+#include "ui/ApplicationIcon.h"
 #include "ui/DesktopWorkspace.h"
 #include "persistence/JsonRecoveryStore.h"
 #include "updates/UpdateController.h"
@@ -10,6 +11,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName("JOBS");
     QCoreApplication::setApplicationVersion(jobs::appVersion());
     QCoreApplication::setOrganizationName("ToolMoa");
+    QApplication::setWindowIcon(jobs::applicationIcon());
     auto store = std::make_shared<jobs::JsonProjectStore>();
     auto recovery = std::make_shared<jobs::JsonRecoveryStore>(jobs::JsonRecoveryStore::defaultDirectory());
     jobs::UpdateController updates(jobs::updateConfig());

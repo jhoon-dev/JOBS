@@ -2,6 +2,7 @@
 #include "persistence/JsonProjectStore.h"
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
+#include "ui/ApplicationIcon.h"
 #include <QAction>
 #include <QComboBox>
 #include <QDir>
@@ -15,10 +16,73 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
+#include <QPushButton>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 class WorkspacePresentationTests : public QObject {
     Q_OBJECT
 private slots:
+    void componentHeightsAndApplicationIcon() {
+        jobs::JsonProjectStore store;
+        jobs::Document document(store);
+        document.create("높이·아이콘 확인", "2026-11-02", {"작업 1", "작업 2"});
+        auto scope = document.addWbs("하위 범위");
+        document.assignWbs(0, scope);
+        document.setDuration(0, 480);
+        document.setDuration(1, 960);
+        document.applyCalculation(jobs::calculate(*document.project()));
+        jobs::MainWindow window(document);
+        window.show();
+        QTest::qWait(30);
+        QVERIFY(!window.windowIcon().isNull());
+        for (int size : {16, 24, 32, 48, 128, 256})
+            QVERIFY(!jobs::applicationIcon().pixmap(size, size).isNull());
+        auto *tree = window.findChild<QTreeWidget *>("wbsTree");
+        auto *table = taskTable(window);
+        auto *gantt = window.findChild<QGraphicsView *>("ganttView");
+        QJsonArray measurements;
+        const auto folder = qEnvironmentVariable("JOBS_LAYOUT_OUTPUT_DIR");
+        for (const auto &size : {QSize(1024, 650), QSize(1280, 720), QSize(1440, 900)}) {
+            window.resize(size);
+            QTest::qWait(20);
+            auto *search = window.findChild<QLineEdit *>("taskSearch");
+            const int expected = search->height();
+            for (const auto *name : {"taskFilter", "taskSort", "resetTaskView", "toggleWbs", "ganttZoom",
+                                     "baselineChoice", "toggleDiagnostics"})
+                QCOMPARE(window.findChild<QWidget *>(name)->height(), expected);
+            for (const auto *name : {"taskFilter", "taskSort", "resetTaskView"})
+                QCOMPARE(window.findChild<QWidget *>(name)->mapTo(&window, QPoint()).y(),
+                         search->mapTo(&window, QPoint()).y());
+            for (const auto *name : {"selectedTaskMenu", "analysisMenu"})
+                QCOMPARE(window.findChild<QToolButton *>(name)->height(), expected);
+            QCOMPARE(tree->header()->height(), jobs::GanttView::HeaderHeight);
+            QCOMPARE(tree->visualItemRect(tree->topLevelItem(0)).height(), jobs::GanttView::RowHeight);
+            QCOMPARE(tree->viewport()->mapTo(&window, QPoint()).y(), table->viewport()->mapTo(&window, QPoint()).y());
+            QCOMPARE(tree->viewport()->height(), table->viewport()->height());
+            QCOMPARE(gantt->viewport()->height() - jobs::GanttView::HeaderHeight, table->viewport()->height());
+            QVERIFY(table->viewport()->height() >= jobs::GanttView::RowHeight * 4);
+            measurements.append(QJsonObject{{"width", window.width()},
+                                            {"height", window.height()},
+                                            {"control_height", expected},
+                                            {"pane_header_height", tree->header()->height()},
+                                            {"row_height", tree->visualItemRect(tree->topLevelItem(0)).height()},
+                                            {"table_viewport_height", table->viewport()->height()},
+                                            {"dpr", window.devicePixelRatioF()}});
+            if (!folder.isEmpty()) {
+                QVERIFY(QDir().mkpath(folder));
+                QVERIFY(window.grab().save(
+                    QDir(folder).filePath(QString("layout-%1-%2.png").arg(size.width()).arg(size.height()))));
+            }
+        }
+        if (!folder.isEmpty()) {
+            QFile output(QDir(folder).filePath("geometry.json"));
+            QVERIFY(output.open(QIODevice::WriteOnly));
+            QVERIFY(output.write(QJsonDocument(measurements).toJson()) > 0);
+        }
+    }
     void compactWindowKeepsCommandsAndRows() {
         jobs::JsonProjectStore store;
         jobs::Document document(store);
@@ -137,7 +201,7 @@ private slots:
         QCOMPARE(table->rowCount(), 8);
         QCOMPARE(table->horizontalHeader()->height(), jobs::GanttView::HeaderHeight);
         QCOMPARE(table->verticalHeader()->sectionSize(0), jobs::GanttView::RowHeight);
-        QVERIFY(table->viewport()->height() >= 500);
+        QVERIFY(table->viewport()->height() >= std::max(4 * jobs::GanttView::RowHeight, window.height() / 2));
         QVERIFY(!window.findChild<QPlainTextEdit *>("calculationDiagnostics")->isVisible());
         QVERIFY(!gantt->scene()->items().isEmpty());
         table->selectRow(3);
