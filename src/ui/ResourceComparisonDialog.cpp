@@ -314,7 +314,8 @@ void ResourceComparisonDialog::recalculate() {
                     for (const auto &t : computed.otherProject->tasks)
                         if (std::none_of(all.begin(), all.end(), [&](const auto &a) { return a.id == t.id; }))
                             all.push_back(t);
-                std::map<std::string, WorkCalendar> taskCalendars;
+                using CalendarKey = std::pair<std::string, std::vector<std::pair<std::string, std::string>>>;
+                std::map<CalendarKey, WorkCalendar> taskCalendars;
                 tasks_->setRowCount(int(all.size()));
                 for (int i = 0; i < tasks_->rowCount(); ++i) {
                     const auto &t = all[std::size_t(i)];
@@ -323,9 +324,11 @@ void ResourceComparisonDialog::recalculate() {
                     const auto *c = other.contains(t.id) ? other.at(t.id) : nullptr;
                     QString delay = "—";
                     if (a && b) {
-                        if (!taskCalendars.contains(t.calendarId))
-                            taskCalendars.emplace(t.calendarId, WorkCalendar(snapshot, t));
-                        const auto &calendar = taskCalendars.at(t.calendarId);
+                        CalendarKey key{t.calendarId, {}};
+                        if (isEffort(snapshot))
+                            for (const auto &gap : t.breaks)
+                                key.second.emplace_back(gap.start, gap.finish);
+                        const auto &calendar = taskCalendars.try_emplace(std::move(key), snapshot, t).first->second;
                         delay = hours(calendar.offset(b->remainingStart.value_or(b->start)) -
                                       calendar.offset(a->remainingStart.value_or(a->start)));
                     }

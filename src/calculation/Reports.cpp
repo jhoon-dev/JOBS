@@ -511,6 +511,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
     meta("일별 명세 끝", o.toDate.value_or("제한 없음"));
     meta("일별 필터 의미", "일별 자원/원가 명세·추이에만 적용. 누적 금액·완료일·작업 수는 전체 계획/상태일 기준");
     meta("기준선 ID", baseline ? baseline->id : "없음");
+    meta("기준선 계산 엔진", baseline ? baseline->engineVersion : "없음");
     if (baseline) {
         meta("기준선", baseline->name);
         meta("기준선 버전", std::to_string(baseline->version));
@@ -520,6 +521,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
         meta("기준선 원본 ID", baseline->sourceDocumentId);
         meta("기준선 입력 revision", std::to_string(baseline->inputRevision));
     }
+    meta("현재 계획 계산 엔진", comparison.plan.engineVersion);
     meta("계산 엔진", active.engineVersion);
     meta("계획 계산 정책", comparison.plan.calculationPolicy);
     meta("활성 일정 정책", active.calculationPolicy);

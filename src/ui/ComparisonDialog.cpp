@@ -126,18 +126,19 @@ void ComparisonDialog::display(const ComparisonReport &r) {
         if (b.id == r.baselineId)
             metadata = "기준선 v" + QString::number(b.version) + " · " + qs(b.name) + " · 승인자 " + qs(b.approvedBy) +
                        " · 사유 " + qs(b.reason) + "\n고정 입력 revision " + QString::number(b.inputRevision) +
-                       " · 생성(UTC) " + qs(b.createdAt);
+                       " · 생성(UTC) " + qs(b.createdAt) + "\n기준선 계산 엔진 " + qs(b.engineVersion);
     if (metadata.isEmpty())
         metadata = "기준선 없음 · 편차 미정";
     QStringList context;
     for (const auto &c : r.contextChanges)
         context << qs(c);
-    summary_->setText(metadata + "\n현재 문서 revision " + QString::number(r.revision) + " · 상태일 " +
-                      stamp(document_.project()->statusAt) + " · 보고 범위 " + QString::number(r.reportedTasks) + "/" +
-                      QString::number(r.totalTasks) + "\n프로젝트 완료: 기준선 " + stamp(r.baselineFinish) +
-                      " | 현재 계획 " + stamp(r.plan.projectFinish) + " (" + variance(r.planFinishVariance) +
-                      "h) | 실적 반영 예측 " + stamp(r.forecast.projectFinish) + " (" +
-                      variance(r.forecastFinishVariance) + "h)" +
+    summary_->setText(metadata + "\n현재 계획 계산 엔진 " + qs(r.plan.engineVersion) + " · 예측 계산 엔진 " +
+                      qs(r.forecast.engineVersion) + "\n현재 문서 revision " + QString::number(r.revision) +
+                      " · 상태일 " + stamp(document_.project()->statusAt) + " · 보고 범위 " +
+                      QString::number(r.reportedTasks) + "/" + QString::number(r.totalTasks) +
+                      "\n프로젝트 완료: 기준선 " + stamp(r.baselineFinish) + " | 현재 계획 " +
+                      stamp(r.plan.projectFinish) + " (" + variance(r.planFinishVariance) + "h) | 실적 반영 예측 " +
+                      stamp(r.forecast.projectFinish) + " (" + variance(r.forecastFinishVariance) + "h)" +
                       (context.isEmpty() ? "" : "\n프로젝트 변경: " + context.join(" · ")));
     table_->setRowCount(int(r.tasks.size()));
     for (int i = 0; i < int(r.tasks.size()); ++i) {

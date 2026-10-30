@@ -115,6 +115,9 @@ ComparisonReport compareToBaseline(const Project &p, const std::string &baseline
             report.contextChanges.push_back("달력/휴일 변경");
         if (baseline->input.calculationProfile != p.calculationProfile)
             report.contextChanges.push_back("계산 정책 변경");
+        if (baseline->engineVersion != report.plan.engineVersion)
+            report.contextChanges.push_back("계산 엔진 변경: " + baseline->engineVersion + " → " +
+                                            report.plan.engineVersion);
         if (baseline->input.wbsNodes != p.wbsNodes)
             report.contextChanges.push_back("프로젝트 WBS 정의 변경");
         if (baseline->input.resources != p.resources)
