@@ -15,7 +15,8 @@ void validateWorkspace(const Workspace &workspace, bool requirePaths) {
         throw AppError(ErrorCode::WORKSPACE_LIMIT);
     std::set<std::string> projects, paths, resources;
     for (const auto &ref : workspace.projects) {
-        if (!text(ref.documentId, 200) || !text(ref.path, 4096, !requirePaths) || !text(ref.name, 2000, true))
+        if (!text(ref.documentId, 200) || !text(ref.path, 4096, !requirePaths) ||
+            ref.name.find('\0') != std::string::npos)
             throw AppError(ErrorCode::WORKSPACE_INVALID, {"project reference"});
         if (!projects.insert(ref.documentId).second)
             throw AppError(ErrorCode::WORKSPACE_DUPLICATE_PROJECT, {ref.documentId});

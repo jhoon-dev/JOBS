@@ -54,7 +54,8 @@ int main(int argc, char **argv) {
         std::vector<std::string> paths, ids;
         for (int i = 0; i < 2; ++i) {
             jobs::Document doc(*files);
-            doc.create("Project " + std::to_string(i), "2026-10-26", {"Task"});
+            const auto name = i == 0 ? QString(700, QChar(0xAC00)).toStdString() : "Project " + std::to_string(i);
+            doc.create(name, "2026-10-26", {"Task"});
             doc.setDuration(0, 60);
             auto resource = doc.putResource({"", "Shared", "labor", 100, {}});
             doc.setAssignments(doc.project()->tasks[0].id, {{doc.project()->tasks[0].id, resource, 100}});
@@ -154,6 +155,9 @@ int main(int argc, char **argv) {
         restored.openWorkspace(group.toStdString());
         check(restored.snapshots().size() == 2 && restored.configuration().bindings.size() == 2 && !restored.dirty(),
               "transactional workspace reopen failed");
+        check(restored.configuration().projects[0].name == QString(700, QChar(0xAC00)).toStdString() &&
+                  restored.document(ids[0])->project()->name == restored.configuration().projects[0].name,
+              "long project name changed between document and workspace");
         const auto frozen = restored.configuration();
         const auto roots = restored.snapshots();
         auto broken = frozen;

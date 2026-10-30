@@ -111,9 +111,10 @@ int main(int argc, char **argv) {
                 "WORKSPACE_LIMIT");
         const auto boundaryPath = dir.filePath("Boundaries.jobsworkspace").toStdString();
         auto boundary = w;
+        boundary.projects[0].name = QString(5000, QChar(0xAC00)).toStdString();
         boundary.resources[0].name = std::string(4097, 'x') + QString(4097, QChar(0xAC00)).toStdString();
         auto boundaryFingerprint = store.save(boundaryPath, boundary, {});
-        check(store.load(boundaryPath).workspace == boundary, "long Unicode shared name failed to reopen");
+        check(store.load(boundaryPath).workspace == boundary, "long Unicode project/shared names failed to reopen");
         for (const auto capacity : {std::optional<int>{}, std::optional<int>{0}, std::optional<int>{100001},
                                     std::optional<int>{jobs::maxSharedResourceUnits}}) {
             boundary.resources[0].maxUnits = capacity;
@@ -133,6 +134,9 @@ int main(int argc, char **argv) {
         }
         invalid = boundary;
         invalid.resources[0].name.push_back('\0');
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_INVALID");
+        invalid = boundary;
+        invalid.projects[0].name.push_back('\0');
         rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_INVALID");
         invalid = boundary;
         invalid.resources[0].calendar.periods.clear();
@@ -157,6 +161,9 @@ int main(int argc, char **argv) {
         rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
         invalid = boundary;
         invalid.resources[0].name.assign(8 * 1024 * 1024, 'x');
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
+        invalid = boundary;
+        invalid.projects[0].name.assign(8 * 1024 * 1024, 'x');
         rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
         check(read(boundaryPath) == boundaryBytes, "rejected workspace save replaced valid bytes");
         write(path, "external bytes");

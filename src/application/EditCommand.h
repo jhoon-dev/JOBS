@@ -28,6 +28,9 @@ struct AssignmentEdit {
 struct ProgressEdit {
     ProgressEntry entry;
 };
+struct BaselineEdit {
+    std::string name, approvedBy, reason, createdAt;
+};
 struct BatchTaskEdit {
     std::vector<TaskEdit> changes;
 };
@@ -54,7 +57,8 @@ using BulkTaskCommand = std::variant<InsertTasksEdit, RemoveTasksEdit, Duplicate
 struct DeferredTaskEdit {
     std::function<BulkTaskCommand(const Project &)> decode;
 };
-using EditCommand = std::variant<DurationEdit, EffortEdit, AssignmentEdit, ProgressEdit, BatchTaskEdit, GanttTaskEdit,
-                                 InsertTasksEdit, RemoveTasksEdit, DuplicateTasksEdit, DeferredTaskEdit, HistoryEdit>;
+using EditCommand =
+    std::variant<DurationEdit, EffortEdit, AssignmentEdit, ProgressEdit, BaselineEdit, BatchTaskEdit, GanttTaskEdit,
+                 InsertTasksEdit, RemoveTasksEdit, DuplicateTasksEdit, DeferredTaskEdit, HistoryEdit>;
 enum class EditState { Ready, Applied, NoChange, Cancelled, Stale, Failed };
 } // namespace jobs

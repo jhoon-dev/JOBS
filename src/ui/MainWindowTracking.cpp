@@ -9,7 +9,6 @@
 #include <QDateTimeEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QFutureWatcher>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -19,7 +18,6 @@
 #include <QSpinBox>
 #include <QTableWidget>
 #include <QTimeZone>
-#include <QtConcurrent/QtConcurrentRun>
 #include <cmath>
 namespace jobs {
 namespace {
@@ -35,10 +33,6 @@ std::string utcNow() {
 std::optional<std::string> optional(const QString &s) {
     return s.trimmed().isEmpty() ? std::nullopt : std::optional<std::string>{str(s.trimmed())};
 }
-struct BaselinePreparation {
-    std::optional<Baseline> baseline;
-    std::optional<Diagnostic> error;
-};
 } // namespace
 void MainWindow::refreshTracking() {
     const auto &p = document_.project();
@@ -99,32 +93,25 @@ void MainWindow::saveBaseline() {
     prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return;
-    const auto snapshot = document_.snapshot();
     const auto n = str(name->text().trimmed()), a = str(author->text().trimmed()), r = str(reason->text().trimmed()),
                utc = utcNow();
     baselinePreparing_ = true;
     refreshTracking();
-    auto *watcher = new QFutureWatcher<BaselinePreparation>(this);
-    connect(watcher, &QFutureWatcher<BaselinePreparation>::finished, this, [this, watcher] {
+    try {
+        submitEdit(BaselineEdit{n, a, r, utc}, "기준선 승인 준비·검증",
+                   [this](EditState state, const QString &message) {
+                       baselinePreparing_ = false;
+                       if (state == EditState::Applied)
+                           selectedBaseline_ = document_.project()->baselines.back().id;
+                       refresh();
+                       if (state == EditState::Failed)
+                           QMessageBox::warning(this, "기준선 저장 실패", message);
+                   });
+    } catch (const std::exception &e) {
         baselinePreparing_ = false;
-        try {
-            auto prepared = watcher->result();
-            if (!prepared.baseline)
-                throw AppError(prepared.error.value_or(Diagnostic{"INTERNAL_ERROR", {}, {}}));
-            selectedBaseline_ = document_.appendBaseline(std::move(*prepared.baseline));
-        } catch (const std::exception &e) {
-            report(e);
-        }
-        watcher->deleteLater();
-        refresh();
-    });
-    watcher->setFuture(QtConcurrent::run([snapshot, n, a, r, utc] {
-        try {
-            return BaselinePreparation{prepareBaseline(*snapshot, n, a, r, utc), {}};
-        } catch (const std::exception &e) {
-            return BaselinePreparation{std::nullopt, diagnosticFromException(e)};
-        }
-    }));
+        refreshTracking();
+        report(e);
+    }
 }
 void MainWindow::editStatusAt() {
     if (!document_.project() || document_.readOnly())

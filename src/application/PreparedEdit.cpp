@@ -130,8 +130,9 @@ std::shared_ptr<BulkView> prepareView(const Project &before, const Project &afte
 Document::EditRequest Document::makeEditRequest(EditCommand command, ViewPreparation viewPreparation) const {
     requireEditable();
     const bool reserve =
-        std::holds_alternative<ProgressEdit>(command) || std::holds_alternative<InsertTasksEdit>(command) ||
-        std::holds_alternative<DuplicateTasksEdit>(command) || std::holds_alternative<DeferredTaskEdit>(command);
+        std::holds_alternative<ProgressEdit>(command) || std::holds_alternative<BaselineEdit>(command) ||
+        std::holds_alternative<InsertTasksEdit>(command) || std::holds_alternative<DuplicateTasksEdit>(command) ||
+        std::holds_alternative<DeferredTaskEdit>(command);
     auto request = EditRequest(project_, savedState_, dirtyState_, std::move(command), sessionGeneration_,
                                reserve ? store_.newId() : std::string{});
     if (auto *replay = std::get_if<HistoryEdit>(&request.command_)) {
@@ -168,7 +169,8 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
         std::vector<std::string> created;
         bool clearSelection = false;
         PreparationStore store(std::move(request.factId_), *request.snapshot_,
-                               !std::holds_alternative<ProgressEdit>(request.command_));
+                               !std::holds_alternative<ProgressEdit>(request.command_) &&
+                                   !std::holds_alternative<BaselineEdit>(request.command_));
         Document trial(store);
         // Closed bulk methods and plan-history replay build their own proposal
         // before writing. Share their read-only source to avoid a redundant deep
@@ -195,6 +197,9 @@ std::shared_ptr<Document::PreparedEdit> Document::prepareEdit(EditRequest reques
                     trial.setAssignments(command.taskId, std::move(command.assignments));
                 else if constexpr (std::is_same_v<T, ProgressEdit>)
                     trial.recordProgress(std::move(command.entry));
+                else if constexpr (std::is_same_v<T, BaselineEdit>)
+                    trial.captureBaseline(std::move(command.name), std::move(command.approvedBy),
+                                          std::move(command.reason), std::move(command.createdAt));
                 else if constexpr (std::is_same_v<T, BatchTaskEdit>)
                     trial.editTasks(command.changes);
                 else if constexpr (std::is_same_v<T, InsertTasksEdit>)

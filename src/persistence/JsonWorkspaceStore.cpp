@@ -138,7 +138,7 @@ Workspace decodeWorkspaceFile(const QByteArray &bytes, const QString &baseDirect
         if (relative.empty())
             invalid("project path");
         const auto full = str(QDir::cleanPath(directory.absoluteFilePath(qs(relative))));
-        workspace.projects.push_back({text(ref, "documentId"), full, text(ref, "name")});
+        workspace.projects.push_back({text(ref, "documentId"), full, text(ref, "name", limit)});
     }
     for (const auto &item : array(payload, "resources", 1000)) {
         const auto value = object(item);
