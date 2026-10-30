@@ -77,6 +77,7 @@ def main():
     installer = output / f'JOBS-{version}-Setup-win64-{revision[:8]}.exe'
     with (workspace / 'nsis.log').open('w', encoding='utf-8') as log:
         run([nsis / 'makensis.exe', '/V3', f'/DAppVersion={version}', f'/DStageDir={stage}',
+             f'/DAppIconPath={ROOT / "packaging/icons/JOBS.ico"}',
              f'/DInstallerPath={installer}',
              f'/DInstalledSizeKiB={sum(p.stat().st_size for p in stage.rglob("*") if p.is_file()) // 1024}', source],
             stdout=log, stderr=subprocess.STDOUT)
