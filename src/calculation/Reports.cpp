@@ -197,6 +197,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
         schedule.rows.push_back(
             {text(t.id), text(t.name), text(t.wbsId.empty() ? "미분류" : path(p, t.wbsId)),
              optional(isEffort(p) && s ? std::optional<std::int64_t>{TaskExecution(p, t).duration(*s)}
+                      : usesWork(t)    ? std::nullopt
                                        : t.durationMinutes,
                       CellFormat::Integer),
              s ? text(s->start) : ReportCell{}, s ? text(s->finish) : ReportCell{},

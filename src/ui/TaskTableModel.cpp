@@ -63,10 +63,14 @@ QString TaskTableModel::text(const Task &task, int column) const {
     case 0:
         return qs(task.name);
     case 1:
-        if (usesWork(task) && row && result_ && !result_->isForecast) {
+        if (usesWork(task)) {
+            const auto planned = plannedDates_.find(task.id);
+            if (planned == plannedDates_.end())
+                return {};
             EvaluationScope scope({}, renderCache_);
             WorkCalendar calendar(plan_, task);
-            return QString::number(calendar.offset(row->finish) - calendar.offset(row->start)) + "m";
+            return QString::number(calendar.offset(planned->second.finish) - calendar.offset(planned->second.start)) +
+                   "m";
         }
         return !task.durationMinutes            ? QString{}
                : *task.durationMinutes % 3 == 0 ? QString::number(double(*task.durationMinutes) / 60, 'g', 12)
@@ -147,10 +151,14 @@ bool TaskTableModel::setData(const QModelIndex &index, const QVariant &value, in
         document_.project()->documentId != documentId_ || document_.project()->revision != revision_ ||
         document_.sessionGeneration() != session_)
         return false;
-    const auto taskId = plan_.tasks.at(rows_[std::size_t(index.row())]).id;
+    const auto &task = plan_.tasks.at(rows_[std::size_t(index.row())]);
+    const auto input = value.toString().trimmed();
+    if (input == text(task, index.column()))
+        return true;
+    const auto taskId = task.id;
     const int row = index.row(), column = index.column();
     QPointer<TaskTableModel> guard(this);
-    const bool accepted = editRequested(taskId, column, value.toString().trimmed());
+    const bool accepted = editRequested(taskId, column, input);
     if (!guard)
         return accepted;
     // Canonical values also replace rejected/no-op drafts. A callback may reset
@@ -209,6 +217,7 @@ bool TaskTableModel::synchronizeBulk(BulkView &view) {
     for (const auto &[id, label] : view.assignmentLabels)
         assignments_.emplace(id, qs(label));
     schedules_.clear();
+    plannedDates_.clear();
     issues_.clear();
     result_.reset();
     renderCache_ = std::make_shared<EvaluationCache>();
@@ -266,6 +275,7 @@ bool TaskTableModel::synchronizeProjected(BulkView &view) {
         for (const auto &[id, label] : view.assignmentLabels)
             assignments_.emplace(id, qs(label));
         schedules_.clear();
+        plannedDates_.clear();
         issues_.clear();
         result_.reset();
         renderCache_ = std::make_shared<EvaluationCache>();
@@ -345,6 +355,7 @@ void TaskTableModel::synchronize(const std::vector<std::size_t> &rows) {
         positions_.clear();
         result_.reset();
         schedules_.clear();
+        plannedDates_.clear();
         numbers_.clear();
         assignments_.clear();
         issues_.clear();
@@ -410,6 +421,7 @@ void TaskTableModel::synchronize(const std::vector<std::size_t> &rows) {
     }
     if (calculation || newSession) {
         schedules_.clear();
+        plannedDates_.clear();
         issues_.clear();
         result_.reset();
         if (document_.calculation()) {
@@ -417,9 +429,17 @@ void TaskTableModel::synchronize(const std::vector<std::size_t> &rows) {
             result_.emplace();
             result_->status = source.status;
             result_->isForecast = source.isForecast;
-            if (source.status == CalculationStatus::Valid)
+            if (source.status == CalculationStatus::Valid) {
                 for (const auto &schedule : source.tasks)
                     schedules_[schedule.taskId] = schedule;
+                // Forecast dates serve the result columns; duration edits use
+                // the worker's plan, without recalculating on the GUI thread.
+                for (const auto &planned : source.isForecast ? source.plannedTasks : source.tasks) {
+                    const auto number = numbers_.find(planned.taskId);
+                    if (number != numbers_.end() && usesWork(plan_.tasks[std::size_t(number->second - 1)]))
+                        plannedDates_[planned.taskId] = {planned.start, planned.finish};
+                }
+            }
             if (source.status == CalculationStatus::Conflict)
                 for (const auto &diagnostic : source.diagnostics)
                     for (const auto &id : diagnostic.taskIds)
