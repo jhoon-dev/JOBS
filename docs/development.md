@@ -21,7 +21,7 @@ WBS는 별도 그룹 트리로 편집하며 작업을 그룹에 배치한다. �
 추적 메뉴에서 기준선을 새 버전으로 저장하고 상태일·실제 시작/완료·실제 소요/잔여 근무분을 입력한다.
 기준선은 불변 입력·달력·결과 스냅샷, 실적은 정정 사유를 가진 append-only 보고 원장이다.
 현재 계획과 상태일 이후 잔여 예측을 나누어 비교하며, 간트에서 선택 기준선을 회색으로 표시한다.
-공수 중심 일정·왼쪽 끝 resize/관계 생성 드래그는 후속 범위다. 간트 날짜/기간 드래그, 작업 제약·마감, FS·SS·FF·SF/lag와 작업별 달력, 일반 입력 실행 취소/다시 실행과 EVM용 물리 진척은 별도 구현 계약을 따른다.
+공수 중심 일정은 아래 공수·자원 달력·분할 계약을 따른다. 왼쪽 끝 resize/관계 생성 드래그는 후속 범위다. 간트 날짜/기간 드래그, 작업 제약·마감, FS·SS·FF·SF/lag와 작업별 달력, 일반 입력 실행 취소/다시 실행과 EVM용 물리 진척은 별도 구현 계약을 따른다.
 [현재 계산 정책·수용시험·입력 예제](calculation-native-v1.md)를 참고한다.
 [WBS·표·간트 사용법과 검증 계약](wbs-gantt.md)을 함께 따른다.
 [기준선·실적·변경 비교 계약](baseline-progress.md)에 재현 예제와 예측 범위를 기록한다.
@@ -29,7 +29,7 @@ WBS는 별도 그룹 트리로 편집하며 작업을 그룹에 배치한다. �
 
 ## 빌드와 실행
 
-초기 개발 기준: CMake 3.24+, C++20 컴파일러, Qt **6.8.3 Core/Widgets/Concurrent**.
+개발 기준: CMake 3.24+, C++20 컴파일러, Qt **6.8.3 Core/Widgets/Concurrent/Network**.
 Qt 패키지와 컴파일러 ABI를 맞춘다. Qt 6.8 이상을 CMake에서 허용하되 CI 기준 버전은 고정한다.
 
 ```powershell
@@ -64,16 +64,16 @@ open build/JOBS.app
 GitHub Actions는 Windows/macOS 빌드와 계산·파일·화면 테스트를 수행한다.
 macOS는 `macos-15`와 Xcode 16.4를 고정한다. 최신 SDK에서 Qt 6.8.3의 AGL 링크 실패를 확인했다.
 
-## 현재 `.jobs` 형식 (schema 6)
+## 현재 `.jobs` 형식 (schema 9)
 
-UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 6`, `payload`, `sha256`을 보존한다.
+UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 9`, `payload`, `sha256`을 보존한다.
 payload에는 documentId, derivedFrom, revision, name, startDate, calendar, tasks, holidays,
-calculationProfile, wbsNodes, resources(rates 포함), assignments, currency, costProfile, taskCosts, statusAt, baselines, progress, scenarios, costEntries가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·FS 선행 ID 목록·wbsId를 갖는다.
+calculationProfile, wbsNodes, resources(rates·calendarId 포함), assignments, currency, costProfile, taskCosts, calendars, statusAt, baselines, progress, scenarios, costEntries가 들어간다. 각 작업은 UUID·이름·정수 근무분 또는 null·선행 ID 목록·wbsId를 갖는다. 계산 정책에 따라 관계 종류/지연(dependencyRules)·작업 달력(calendarId), 제약/마감, 작업 유형·입력 공수·공수 기준 여부·분할 중단을 함께 저장한다.
 WBS 노드는 ID·이름·parentId를 가지며 빈 부모/소속 ID는 프로젝트 루트다. 순환·누락 부모·누락 소속을 거절한다.
 현재 계산 결과는 세션 cache이며 재열기 후 F9로 재계산한다. 기준선의 동결 결과는 파일에 보존한다.
 기준선 입력과 결과는 열기/저장 시 고정 엔진으로 재검산한다. 실적은 source document/revision·상태일·UTC 기록시각·보고자·사유·이전 보고 ID를 보존한다.
 checksum은 Qt의 compact JSON payload에 대한 SHA-256이며
-보안 서명이 아닌 우발적 손상 검사다. 현재 최대 64 MiB, 첨부/외부 링크/교환 형식 없음.
+보안 서명이 아닌 우발적 손상 검사다. 현재 최대 64 MiB이며 첨부/외부 링크는 포함하지 않는다. Project XML/XER 교환은 별도 변환·진단 패키지로 제공한다.
 checksum과 구조·필드·날짜·ID 중복·revision을 검사한다. 미지원 schema/필드는 무음 삭제하지 않고 거절한다.
 
 첫 저장은 새 프로젝트 ID를 유지한다. 저장된 문서의 다른 이름 저장은 새 documentId와
@@ -85,8 +85,8 @@ QSaveFile로 임시 파일을 쓰고 flush 후 commit한다. 직접 덮어쓰기
 QLockFile sidecar는 전달 파일이 아니며 단일 writer를 위한 협조적 잠금이다.
 잠금 실패 시 읽기 전용 열기와 다른 이름 저장을 제공한다.
 외부 비협조 writer의 검사 직후 변경, 네트워크/동기화 폴더 원자성, 정전 내구성은 보장하지 않는다.
-schema 1/2/3/4/5는 ID·revision·기존 입력을 유지하여 읽고 새 필드에 null/빈 목록/미분류/빈 이력을 적용한다.
-이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 6 사본을 만들며
+schema 1~8은 ID·revision·기존 입력과 계산 정책을 유지하여 읽고 누락된 새 필드에 null/빈 목록/기본값을 적용한다.
+이전 형식의 원본 덮어쓰기는 거절한다. 편집 후 저장하면 다른 이름 저장으로 schema 9 사본을 만들며
 원본 bytes를 보존한다. 일반적인 다단계 이관·별도 백업 순환 정책은 아직 없다. 자동복구 체크포인트는 원본과 분리한 별도 레코드로 제공한다.
 미지원 버전은 원본을 수정하지 않는다.
 
@@ -118,7 +118,9 @@ GUI 수동 점검: 새로 만들기→작업 목록 입력→저장→작업명 
 `jobs_tracking_ui_tests`는 기준선/상태일/실적/비교 대화상자, +8h 표시·미보고 coverage·회색 기준선 선택,
 모순 보고 오류·정정 이력·새 기준선 버전·저장/재열기를 검사한다.
 
-## 실행 증거 · 2026-10-26
+## 구현 이력과 당시 실행 증거 · 2026-10-26 이후
+
+아래 schema 번호와 테스트 개수는 각 증분 당시의 기록이다. 현재 파일 계약은 위의 schema 9 설명과 기능별 계약을 따른다.
 
 Windows x64, Qt 6.8.3, MinGW GCC 13.1.0, CMake 4.4.4, Ninja에서
 첫 파일 구현은 `scripts/dev.ps1 -TestOnly`로 Release 빌드 및 2/2 테스트에 통과했다.
@@ -153,7 +155,7 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 로컬 Release 전체 14/14, Windows 네이티브 보고서 UI와 출력 시험을 통과했다. openpyxl/pypdf로 ZIP/숫자/미정/출처, PDF 크기·본문·긴 행 700구간과 마지막 표식을 독립 대조했다. 엑셀 14개 시트와 PDF 페이지를 렌더링해 한글/줄바꿈/정렬을 확인했다. 독립 재열기 검사 스크립트는 `scripts/verify-report-fixtures.py build`이며 Python 의존성은 개발/CI에만 사용한다. Windows/macOS CI에서도 CTest 뒤 같은 파일 검증을 실행한다.
 
 자동 저장/복구·실행 취소 증분은 `undo_contract`, `recovery_crash_file`, `recovery_ui`를 더해 전체 17개로 확장했다. 실제 별도 프로세스 강제 종료와 flush 이후 commit 직전 강제 종료를 포함한다. 일반 입력은 새로운 revision으로 취소/재실행하고, 승인·제출 사실은 불변 이력 경계로 유지한다. 저장 입력과의 동일성(dirty)과 실제 저장된 revision을 구분해 보고서 출처도 보정했다.
-[자동 저장·복구·편집 이력 계약](recovery-undo.md)에 저장 위치/간격·사본 복구·잠금/세대·중단·한도·후속 검증을 기록한다. `.jobs`는 schema 6이며 복구 envelope는 별도 schema 1이다. 회귀 시험용 저장 단계 observer는 실제 flush/commit 사이에서 중단·경쟁을 재현하며 제품 UI에서는 설정하지 않는다.
+[자동 저장·복구·편집 이력 계약](recovery-undo.md)에 저장 위치/간격·사본 복구·잠금/세대·중단·한도·후속 검증을 기록한다. 이 증분 당시 `.jobs`는 schema 6이었으며 복구 envelope는 별도 schema 1이다. 현재 `.jobs`는 schema 9이고 복구 envelope schema 1은 내부 projectSchema 6~9를 지원한다. 회귀 시험용 저장 단계 observer는 실제 flush/commit 사이에서 중단·경쟁을 재현하며 제품 UI에서는 설정하지 않는다.
 
 후속 PDM/작업 달력 증분은 `.jobs` schema 7을 사용하며 schema 1~6 원본과 기존 기준선을 보존한다. 복구 envelope schema 1의 내부 projectSchema 6/7을 지원한다. `native-pdm-taskcal-v1`은 civil 분 좌표와 작업별 근무분을 구분하며 `jobs-pdm-1.0`으로 계산한다. 자원/원가는 같은 근무 구간을 사용한다. 기존 `native-fs0-workminutes-v1` / `jobs-cpm-0.2` 결과는 유지한다. [PDM·작업 달력 계약](pdm-calendars.md), `pdm_calendar_contract`/`pdm_calendar_ui`와 독립 reader를 추가해 CTest 19개로 확장했다.
 

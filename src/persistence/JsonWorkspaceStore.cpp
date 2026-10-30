@@ -46,9 +46,9 @@ QJsonArray array(const QJsonObject &parent, const char *name, std::size_t maximu
         invalid(name);
     return value.toArray();
 }
-std::string text(const QJsonObject &parent, const char *name) {
+std::string text(const QJsonObject &parent, const char *name, qsizetype maximum = 4096) {
     const auto value = parent.value(QLatin1String(name));
-    if (!value.isString() || value.toString().size() > 4096 || value.toString().contains(QChar(0)))
+    if (!value.isString() || value.toString().size() > maximum || value.toString().contains(QChar(0)))
         invalid(name);
     return str(value.toString());
 }
@@ -62,7 +62,7 @@ int integer(const QJsonValue &value, int minimum, int maximum) {
 std::optional<int> units(const QJsonValue &value) {
     if (value.isNull())
         return {};
-    return integer(value, 0, 10000000);
+    return integer(value, 0, maxSharedResourceUnits);
 }
 QJsonValue units(std::optional<int> value) {
     return value ? QJsonValue(*value) : QJsonValue(QJsonValue::Null);
@@ -145,7 +145,7 @@ Workspace decodeWorkspaceFile(const QByteArray &bytes, const QString &baseDirect
         keys(value, {"id", "name", "type", "maxUnits", "exceptions", "calendar"});
         SharedResource resource;
         resource.id = text(value, "id");
-        resource.name = text(value, "name");
+        resource.name = text(value, "name", limit);
         resource.type = text(value, "type");
         resource.maxUnits = units(value.value("maxUnits"));
         for (const auto &day : array(value, "exceptions", 10000)) {
@@ -215,6 +215,8 @@ std::string JsonWorkspaceStore::save(const std::string &inputPath, const Workspa
             .toJson();
     if (bytes.size() > limit)
         throw AppError(ErrorCode::WORKSPACE_LIMIT);
+    // Validate the exact envelope before replacing a file or reporting a successful save.
+    (void)decodeWorkspaceFile(bytes, QFileInfo(qs(path)).absolutePath());
     QSaveFile file(qs(path));
     file.setDirectWriteFallback(false);
     if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size() || !file.flush())

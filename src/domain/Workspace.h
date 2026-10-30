@@ -2,6 +2,7 @@
 #include "domain/Project.h"
 
 namespace jobs {
+inline constexpr int maxSharedResourceUnits = 10000000;
 struct ProjectReference {
     std::string documentId, path, name;
     bool operator==(const ProjectReference &) const = default;

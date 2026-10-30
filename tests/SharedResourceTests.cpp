@@ -59,6 +59,19 @@ int main() {
               "30-minute overlap mismatch");
         w.resources[0].maxUnits = 200;
         check(run(w, a, b).status == CalculationStatus::Valid, "shared capacity ignored");
+        auto largeA = a, largeB = b;
+        largeA.resources[0].maxUnits = largeB.resources[0].maxUnits = 100000;
+        largeA.assignments[0].units = largeB.assignments[0].units = 100000;
+        auto largePool = w;
+        largePool.resources[0].maxUnits = 100001;
+        auto largeLoad = run(largePool, largeA, largeB);
+        check(largeLoad.status == CalculationStatus::Conflict && largeLoad.days[0].peakUnits == 200000 &&
+                  largeLoad.days[0].overloadMinutes == 30 && largeLoad.days[0].excessUnitMinutes == 2999970,
+              "shared capacity above local ceiling was not applied to overlapping demand");
+        largePool.resources[0].maxUnits = jobs::maxSharedResourceUnits;
+        check(run(largePool, largeA, largeB).status == CalculationStatus::Valid, "maximum shared capacity rejected");
+        largePool.resources[0].exceptions = {{"2026-10-26", 100001}};
+        check(run(largePool, largeA, largeB).days[0].overloadMinutes == 30, "large shared daily override ignored");
         w.resources[0].maxUnits.reset();
         result = run(w, a, b);
         check(result.status == CalculationStatus::Incomplete && result.days[0].unknownCapacityMinutes == 90 &&

@@ -4,6 +4,7 @@
 #include "formatting/DiagnosticText.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QDate>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
@@ -108,6 +109,56 @@ int main(int argc, char **argv) {
                 "WORKSPACE_INVALID");
         rejects([&] { (void)jobs::decodeWorkspaceFile(QByteArray(8 * 1024 * 1024 + 1, ' '), dir.path()); },
                 "WORKSPACE_LIMIT");
+        const auto boundaryPath = dir.filePath("Boundaries.jobsworkspace").toStdString();
+        auto boundary = w;
+        boundary.resources[0].name = std::string(4097, 'x') + QString(4097, QChar(0xAC00)).toStdString();
+        auto boundaryFingerprint = store.save(boundaryPath, boundary, {});
+        check(store.load(boundaryPath).workspace == boundary, "long Unicode shared name failed to reopen");
+        for (const auto capacity : {std::optional<int>{}, std::optional<int>{0}, std::optional<int>{100001},
+                                    std::optional<int>{jobs::maxSharedResourceUnits}}) {
+            boundary.resources[0].maxUnits = capacity;
+            boundary.resources[0].exceptions = {{"2026-10-26", capacity}};
+            boundaryFingerprint = store.save(boundaryPath, boundary, boundaryFingerprint);
+            check(store.load(boundaryPath).workspace == boundary, "shared capacity boundary failed to reopen");
+        }
+        const auto boundaryBytes = read(boundaryPath);
+        for (const auto capacity : {-1, jobs::maxSharedResourceUnits + 1}) {
+            invalid = boundary;
+            invalid.resources[0].maxUnits = capacity;
+            rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "RESOURCE_INPUT_INVALID");
+            invalid = boundary;
+            invalid.resources[0].exceptions[0].units = capacity;
+            rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); },
+                    "RESOURCE_EXCEPTION_INVALID");
+        }
+        invalid = boundary;
+        invalid.resources[0].name.push_back('\0');
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_INVALID");
+        invalid = boundary;
+        invalid.resources[0].calendar.periods.clear();
+        for (int i = 0; i < 101; ++i)
+            invalid.resources[0].calendar.periods.push_back({i * 2, i * 2 + 1});
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
+        invalid = boundary;
+        invalid.resources[0].calendar.holidays.clear();
+        invalid.resources[0].exceptions.clear();
+        for (int i = 0; i < 10000; ++i) {
+            const auto date = QDate(2026, 1, 1).addDays(i).toString(Qt::ISODate).toStdString();
+            invalid.resources[0].calendar.holidays.push_back(date);
+            invalid.resources[0].exceptions.push_back({date, jobs::maxSharedResourceUnits});
+        }
+        const auto arrayPath = dir.filePath("ArrayLimits.jobsworkspace").toStdString();
+        (void)store.save(arrayPath, invalid, {});
+        check(store.load(arrayPath).workspace == invalid, "shared array boundaries failed to reopen");
+        invalid.resources[0].calendar.holidays.push_back("2054-01-01");
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
+        invalid.resources[0].calendar.holidays.pop_back();
+        invalid.resources[0].exceptions.push_back({"2054-01-01", 0});
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
+        invalid = boundary;
+        invalid.resources[0].name.assign(8 * 1024 * 1024, 'x');
+        rejects([&] { (void)store.save(boundaryPath, invalid, boundaryFingerprint); }, "WORKSPACE_LIMIT");
+        check(read(boundaryPath) == boundaryBytes, "rejected workspace save replaced valid bytes");
         write(path, "external bytes");
         const auto external = read(path);
         rejects([&] { (void)store.save(path, w, next); }, "WORKSPACE_EXTERNAL_CHANGE");

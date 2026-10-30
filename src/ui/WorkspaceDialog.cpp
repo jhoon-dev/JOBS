@@ -70,7 +70,7 @@ int integer(const QString &text, int minimum, int maximum) {
     return value;
 }
 std::optional<int> capacity(const QString &text) {
-    return text.trimmed() == "?" ? std::optional<int>{} : std::optional<int>{integer(text, 0, 10000000)};
+    return text.trimmed() == "?" ? std::optional<int>{} : std::optional<int>{integer(text, 0, maxSharedResourceUnits)};
 }
 int minute(const QString &text, bool finish) {
     auto parts = text.trimmed().split(':');
