@@ -188,7 +188,8 @@ void MainWindow::updateCompactLayout() {
     }
     if (auto *status = findChild<QLabel *>("calculationStatus")) {
         status->setVisible(!shortWindow);
-        diagnosticsToggle_->setToolTip(status->text());
+        if (diagnosticsToggle_)
+            diagnosticsToggle_->setToolTip(status->text());
     }
     if (auto *tools = findChild<QToolBar *>("primaryTools");
         tools && tools->property("compactWorkspace").toBool() != shortWindow) {
