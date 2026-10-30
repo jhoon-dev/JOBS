@@ -1,0 +1,10 @@
+{
+  "product_source_revision": "97045d1cd19883f647175745c93d4b703fd81051",
+  "public_corpus_parser_revision": "035a8c9e88e8243bc5773287a4b9a929161aec93",
+  "scope": "Local Windows native checks plus separately sourced macOS CI evidence; original source/probe binaries and raw samples retained.",
+  "oracle_p6_execution_equivalence": "unverified",
+  "local_ctest_count": 54,
+  "local_ctest_status": "passed",
+  "ci_status": "all four workflows passed",
+  "requirements": "POLISH-01 through POLISH-09 implemented and verified within the documented scope"
+}

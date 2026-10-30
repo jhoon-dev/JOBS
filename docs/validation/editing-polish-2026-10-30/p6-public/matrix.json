@@ -1,0 +1,241 @@
+{
+  "status": "passed",
+  "mpxj": "16.10.0",
+  "jpype": "1.6.0",
+  "scope": "Unmodified public P6 files; independent parsing and supported JOBS projection. No Oracle execution equivalence.",
+  "files": [
+    {
+      "file": "PredecessorCalendar.xer",
+      "sha256": "46f3c1c68552429cf32191ebc8f48d12f52e517481b6fb588ad1955937c5cd1d",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/PredecessorCalendar.xer",
+      "jobs_status": "imported",
+      "jobs_error": null,
+      "raw_counts": {
+        "TASK": 1,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 1,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": [],
+      "supported_projection": "passed",
+      "milestones_checked": 0,
+      "jobs_finish": "2019-06-12 17:00"
+    },
+    {
+      "file": "ProjectDefaultCalendar.xer",
+      "sha256": "e48eb3a53b7e8f40a5a87af8e983e9932c298baeb572e3a901b3961f997674ef",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/ProjectDefaultCalendar.xer",
+      "jobs_status": "imported",
+      "jobs_error": null,
+      "raw_counts": {
+        "TASK": 1,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 1,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": [],
+      "supported_projection": "passed",
+      "milestones_checked": 0,
+      "jobs_finish": "2019-06-12 17:00"
+    },
+    {
+      "file": "SuccessorCalendar.xer",
+      "sha256": "ab420cc573be248ef7ef344f77b204176c3263fceb45c27866276929bf1e59e2",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/SuccessorCalendar.xer",
+      "jobs_status": "imported",
+      "jobs_error": null,
+      "raw_counts": {
+        "TASK": 1,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 1,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": [],
+      "supported_projection": "passed",
+      "milestones_checked": 0,
+      "jobs_finish": "2019-06-12 17:00"
+    },
+    {
+      "file": "TwentyFourHourCalendar.xer",
+      "sha256": "9b91bf5bfcc0df4f6a2fec8867a923af7758058c224a9772a728e8d2ba0f0fc5",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/TwentyFourHourCalendar.xer",
+      "jobs_status": "imported",
+      "jobs_error": null,
+      "raw_counts": {
+        "TASK": 1,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 1,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": [],
+      "supported_projection": "passed",
+      "milestones_checked": 0,
+      "jobs_finish": "2019-06-12 17:00"
+    },
+    {
+      "file": "resource-rates-test.xer",
+      "sha256": "7298574bb32ac3068b07b427a35cd2834308d2fcb0e2ac74fea4e013e738c62e",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/assignment/resource-rates-test.xer",
+      "jobs_status": "rejected",
+      "jobs_error": "ASSIGNMENT_INPUT_INVALID",
+      "raw_counts": {
+        "TASK": 1,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 1,
+        "ROLES": 1,
+        "TASKRSRC": 5
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [
+        {
+          "field": "native_projection",
+          "reason": "[ASSIGNMENT_INPUT_INVALID] 배정할 작업·자원이 없거나 배정률 중복/범위 오류입니다. 1~100,000%를 사용하세요.\n관련 대상과 입력값을 확인해 수정한 뒤 다시 시도하세요."
+        }
+      ],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 1,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 1,
+        "roles": 1,
+        "assignments": 5
+      },
+      "relationship_types_checked": []
+    },
+    {
+      "file": "invalid-8.4.xer",
+      "sha256": "85f8c7d681b15daf755ba1d568eb09ebcdd529a16c20045e6db6c2937899f54b",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/calendar/invalid/invalid-8.4.xer",
+      "jobs_status": "rejected",
+      "jobs_error": "FILE_PRIMAVERAXER_028",
+      "raw_counts": {
+        "TASK": 12,
+        "TASKPRED": 0,
+        "CALENDAR": 3,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [
+        {
+          "field": "native_projection",
+          "reason": "[FILE_PRIMAVERAXER_028] clndr_data 괄호/문법 오류\n파일 경로·권한·열린 원본의 변경 여부를 확인하세요. 원본을 보존하려면 새 경로에 사본을 저장하세요."
+        }
+      ],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 12,
+        "relationships": 0,
+        "calendars": 3,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": []
+    },
+    {
+      "file": "percent-complete-8.4.xer",
+      "sha256": "71e56568075852d00507ff5506d5c055912ce0ba0982b97b8ace6269f794d10a",
+      "source_url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/generated/task-percentcomplete/percent-complete-8.4.xer",
+      "jobs_status": "imported",
+      "jobs_error": null,
+      "raw_counts": {
+        "TASK": 12,
+        "TASKPRED": 0,
+        "CALENDAR": 1,
+        "RSRC": 0,
+        "ROLES": 0,
+        "TASKRSRC": 0
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [
+        {
+          "task_id": "101718",
+          "field": "current_vs_planned_duration",
+          "mpxj_current_minutes": 36000.0,
+          "jobs_planned_minutes": 48000
+        },
+        {
+          "task_id": "101719",
+          "field": "current_vs_planned_duration",
+          "mpxj_current_minutes": 12000.0,
+          "jobs_planned_minutes": 48000
+        },
+        {
+          "task_id": "101720",
+          "field": "current_vs_planned_duration",
+          "mpxj_current_minutes": 0.0,
+          "jobs_planned_minutes": 48000
+        }
+      ],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 12,
+        "relationships": 0,
+        "calendars": 1,
+        "resources": 0,
+        "roles": 0,
+        "assignments": 0
+      },
+      "relationship_types_checked": [],
+      "supported_projection": "passed",
+      "milestones_checked": 0,
+      "jobs_finish": "2015-07-13 16:00"
+    }
+  ]
+}

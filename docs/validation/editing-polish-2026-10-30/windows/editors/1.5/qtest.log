@@ -1,0 +1,11 @@
+********* Start testing of EditingPolishTests *********
+Config: Using QtTest library 6.8.3, Qt 6.8.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11
+PASS   : EditingPolishTests::initTestCase()
+PASS   : EditingPolishTests::ganttCacheDoesNotRetainDocumentAndUsesCalculationGeneration()
+PASS   : EditingPolishTests::selectionFitAndFilteredScope()
+PASS   : EditingPolishTests::noScheduleDisablesNavigation()
+PASS   : EditingPolishTests::editorGeometryDraftsAndErrors(light)
+PASS   : EditingPolishTests::editorGeometryDraftsAndErrors(dark)
+PASS   : EditingPolishTests::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 4760ms
+********* Finished testing of EditingPolishTests *********

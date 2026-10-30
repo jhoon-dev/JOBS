@@ -1,0 +1,114 @@
+Internal ctest changing into directory: /home/runner/work/JOBS/JOBS/build-sanitized
+Test project /home/runner/work/JOBS/JOBS/build-sanitized
+      Start  1: application_updates
+ 1/54 Test  #1: application_updates ..............   Passed    6.81 sec
+      Start  2: editing_polish_ui
+ 2/54 Test  #2: editing_polish_ui ................   Passed    0.66 sec
+      Start  3: workspace_presentation
+ 3/54 Test  #3: workspace_presentation ...........   Passed    0.70 sec
+      Start  4: primavera_public_corpus
+ 4/54 Test  #4: primavera_public_corpus ..........   Passed    0.12 sec
+      Start  5: application_storage_contract
+ 5/54 Test  #5: application_storage_contract .....   Passed    0.01 sec
+      Start  6: msix_workflow_unpacked
+ 6/54 Test  #6: msix_workflow_unpacked ...........   Passed    0.34 sec
+      Start  7: structured_diagnostics
+ 7/54 Test  #7: structured_diagnostics ...........   Passed    0.03 sec
+      Start  8: shared_resource_intervals
+ 8/54 Test  #8: shared_resource_intervals ........   Passed    0.20 sec
+      Start  9: workspace_file_contract
+ 9/54 Test  #9: workspace_file_contract ..........   Passed    0.04 sec
+      Start 10: multi_project_workspace_ui
+10/54 Test #10: multi_project_workspace_ui .......   Passed    0.57 sec
+      Start 11: document_edit_guards
+11/54 Test #11: document_edit_guards .............   Passed    0.03 sec
+      Start 12: parser_seed_replay
+12/54 Test #12: parser_seed_replay ...............   Passed    0.30 sec
+      Start 13: responsive_document_contract
+13/54 Test #13: responsive_document_contract .....   Passed   42.85 sec
+      Start 14: responsive_editing_ui
+14/54 Test #14: responsive_editing_ui ............   Passed    6.89 sec
+      Start 15: prepared_edit_contract
+15/54 Test #15: prepared_edit_contract ...........   Passed    2.35 sec
+      Start 16: task_table_model_contract
+16/54 Test #16: task_table_model_contract ........   Passed    0.08 sec
+      Start 17: async_editing_ui
+17/54 Test #17: async_editing_ui .................   Passed   38.25 sec
+      Start 18: primavera_xer_contract
+18/54 Test #18: primavera_xer_contract ...........   Passed    4.12 sec
+      Start 19: primavera_xer_ui
+19/54 Test #19: primavera_xer_ui .................   Passed    0.93 sec
+      Start 20: project_xml_contract
+20/54 Test #20: project_xml_contract .............   Passed    1.20 sec
+      Start 21: project_xml_ui
+21/54 Test #21: project_xml_ui ...................   Passed    0.71 sec
+      Start 22: bulk_editing_contract_ui
+22/54 Test #22: bulk_editing_contract_ui .........   Passed    2.46 sec
+      Start 23: projected_views_ui
+23/54 Test #23: projected_views_ui ...............   Passed    5.60 sec
+      Start 24: task_editing_contract
+24/54 Test #24: task_editing_contract ............   Passed    0.33 sec
+      Start 25: task_editing_ui
+25/54 Test #25: task_editing_ui ..................   Passed    1.20 sec
+      Start 26: calculation_cancellation
+26/54 Test #26: calculation_cancellation .........   Passed    5.96 sec
+      Start 27: integrated_project_workflow
+27/54 Test #27: integrated_project_workflow ......   Passed    1.22 sec
+      Start 28: performance_cancellation_ui
+28/54 Test #28: performance_cancellation_ui ......   Passed    0.59 sec
+      Start 29: effort_work_calendar_split
+29/54 Test #29: effort_work_calendar_split .......   Passed    1.35 sec
+      Start 30: effort_ui
+30/54 Test #30: effort_ui ........................   Passed    0.57 sec
+      Start 31: constraint_contract
+31/54 Test #31: constraint_contract ..............   Passed    0.14 sec
+      Start 32: constraint_gantt_ui
+32/54 Test #32: constraint_gantt_ui ..............   Passed    0.53 sec
+      Start 33: pdm_calendar_contract
+33/54 Test #33: pdm_calendar_contract ............   Passed    0.43 sec
+      Start 34: pdm_calendar_ui
+34/54 Test #34: pdm_calendar_ui ..................   Passed    0.29 sec
+      Start 35: undo_contract
+35/54 Test #35: undo_contract ....................   Passed   12.98 sec
+      Start 36: plan_enum_compatibility
+36/54 Test #36: plan_enum_compatibility ..........   Passed    0.62 sec
+      Start 37: input_delta_contract
+37/54 Test #37: input_delta_contract .............   Passed    0.07 sec
+      Start 38: editing_performance_ui
+38/54 Test #38: editing_performance_ui ...........   Passed    0.79 sec
+      Start 39: recovery_crash_file
+39/54 Test #39: recovery_crash_file ..............   Passed    1.05 sec
+      Start 40: recovery_ui
+40/54 Test #40: recovery_ui ......................   Passed    1.15 sec
+      Start 41: reports_export
+41/54 Test #41: reports_export ...................   Passed    0.98 sec
+      Start 42: reports_ui
+42/54 Test #42: reports_ui .......................   Passed    1.10 sec
+      Start 43: cost_contract_file
+43/54 Test #43: cost_contract_file ...............   Passed    0.16 sec
+      Start 44: cost_ui
+44/54 Test #44: cost_ui ..........................   Passed    0.56 sec
+      Start 45: resource_contract_file
+45/54 Test #45: resource_contract_file ...........   Passed    0.17 sec
+      Start 46: resource_ui
+46/54 Test #46: resource_ui ......................   Passed    0.72 sec
+      Start 47: tracking_contract
+47/54 Test #47: tracking_contract ................   Passed    0.04 sec
+      Start 48: tracking_file
+48/54 Test #48: tracking_file ....................   Passed    0.06 sec
+      Start 49: wbs_contract
+49/54 Test #49: wbs_contract .....................   Passed    0.02 sec
+      Start 50: schedule_contract
+50/54 Test #50: schedule_contract ................   Passed    0.02 sec
+      Start 51: file_lifecycle
+51/54 Test #51: file_lifecycle ...................   Passed    0.05 sec
+      Start 52: ui_lifecycle
+52/54 Test #52: ui_lifecycle .....................   Passed    0.52 sec
+      Start 53: wbs_gantt_ui
+53/54 Test #53: wbs_gantt_ui .....................   Passed    0.68 sec
+      Start 54: tracking_ui
+54/54 Test #54: tracking_ui ......................   Passed    0.68 sec
+
+100% tests passed, 0 tests failed out of 54
+
+Total Test time (real) = 150.41 sec

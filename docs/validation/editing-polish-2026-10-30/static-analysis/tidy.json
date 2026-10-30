@@ -1,0 +1,921 @@
+{
+  "status": "success",
+  "tool": "Ubuntu LLVM version 18.1.3\n  Optimized build.",
+  "source_revision": "97045d1cd19883f647175745c93d4b703fd81051",
+  "database": "/home/runner/work/JOBS/JOBS/build-quality/compile_commands.json",
+  "translation_units": 76,
+  "commands": [
+    {
+      "file": "src/application/Document.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/application/Document.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/application/InputDelta.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/application/InputDelta.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/application/PreparedEdit.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/application/PreparedEdit.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/application/ProjectState.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/application/ProjectState.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/application/TaskEditing.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/application/TaskEditing.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Constraints.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Constraints.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Costs.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Costs.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Effort.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Effort.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/EffortEditing.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/EffortEditing.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/EffortScheduler.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/EffortScheduler.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Forecast.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Forecast.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Pdm.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Pdm.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/PdmResources.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/PdmResources.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Reports.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Reports.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Resources.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Resources.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Scheduler.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Scheduler.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/SharedResources.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/SharedResources.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/Tracking.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/Tracking.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/WbsSummary.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/WbsSummary.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/calculation/WorkCalendar.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/calculation/WorkCalendar.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/domain/CalculationControl.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/domain/CalculationControl.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/domain/Diagnostics.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/domain/Diagnostics.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/domain/Project.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/domain/Project.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/domain/Wbs.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/domain/Wbs.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/domain/Workspace.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/domain/Workspace.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/formatting/DiagnosticText.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/formatting/DiagnosticText.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/main.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/main.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/ApplicationStorage.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/ApplicationStorage.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/ExchangePackage.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/ExchangePackage.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/JsonProjectStore.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/JsonProjectStore.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/JsonRecoveryStore.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/JsonRecoveryStore.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/JsonWorkspaceStore.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/JsonWorkspaceStore.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/PrimaveraXer.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/PrimaveraXer.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/ProjectFile.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/ProjectFile.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/ProjectJson.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/ProjectJson.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/persistence/ProjectXml.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/persistence/ProjectXml.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/reporting/PdfExport.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/reporting/PdfExport.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/reporting/ReportFormat.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/reporting/ReportFormat.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/reporting/XlsxExport.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/reporting/XlsxExport.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/ApplicationIcon.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/ApplicationIcon.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/AsyncEditController.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/AsyncEditController.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/AutoSaveController.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/AutoSaveController.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/ComparisonDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/ComparisonDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/CostAnalysisDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/CostAnalysisDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/DesktopWorkspace.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/DesktopWorkspace.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/EditorUi.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/EditorUi.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/GanttEditing.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/GanttEditing.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/GanttView.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/GanttView.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindow.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindow.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowAsync.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowAsync.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowCalendars.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowCalendars.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowConstraints.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowConstraints.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowCosts.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowCosts.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowEffort.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowEffort.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowRecovery.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowRecovery.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowResources.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowResources.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowResponsive.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowResponsive.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowTaskEditing.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowTaskEditing.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowTracking.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowTracking.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowWorkspace.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowWorkspace.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowWorkspaceUi.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowWorkspaceUi.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowXer.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowXer.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/MainWindowXml.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/MainWindowXml.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/RecoveryDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/RecoveryDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/ReportDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/ReportDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/ResourceComparisonDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/ResourceComparisonDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/TaskInput.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/TaskInput.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/TaskTableModel.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/TaskTableModel.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/TaskTableView.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/TaskTableView.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/TaskViewProjection.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/TaskViewProjection.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/UpdateUi.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/UpdateUi.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/ui/WorkspaceDialog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/ui/WorkspaceDialog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/updates/StoreUpdateClient.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/updates/StoreUpdateClient.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/updates/UpdateCatalog.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/updates/UpdateCatalog.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/updates/UpdateController.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/updates/UpdateController.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    },
+    {
+      "file": "src/updates/UpdateInstaller.cpp",
+      "command": [
+        "clang-tidy-18",
+        "-p",
+        "/home/runner/work/JOBS/JOBS/build-quality",
+        "--quiet",
+        "/home/runner/work/JOBS/JOBS/src/updates/UpdateInstaller.cpp"
+      ],
+      "timeout_seconds": 180,
+      "returncode": 0
+    }
+  ]
+}

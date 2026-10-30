@@ -1,0 +1,79 @@
+{
+  "status": "passed",
+  "mpxj": "16.10.0",
+  "jpype": "1.6.0",
+  "scope": "Unmodified public P6 files; independent parsing and supported JOBS projection. No Oracle execution equivalence.",
+  "files": [
+    {
+      "file": "sample.xer",
+      "sha256": "4d8bce790a93b9bc747abec5d99840e3e0d1ce5523e0afae3ba881762cfe2c13",
+      "source_url": "https://raw.githubusercontent.com/Taraxtix/xerParser/a7e7f932aa3fb4304211661d36a2f2f74843953c/sample.xer",
+      "jobs_status": "rejected",
+      "jobs_error": "CURRENCY_UNSUPPORTED",
+      "raw_counts": {
+        "TASK": 25,
+        "TASKPRED": 40,
+        "CALENDAR": 2,
+        "RSRC": 1,
+        "ROLES": 0,
+        "TASKRSRC": 1
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [
+        {
+          "field": "native_projection",
+          "reason": "[CURRENCY_UNSUPPORTED] 지원 통화는 KRW/JPY/USD/EUR입니다. 통화 환산은 지원하지 않습니다.\n관련 대상과 입력값을 확인해 수정한 뒤 다시 시도하세요."
+        }
+      ],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 25,
+        "relationships": 40,
+        "calendars": 2,
+        "resources": 1,
+        "roles": 0,
+        "assignments": 1
+      },
+      "relationship_types_checked": [
+        "FS"
+      ]
+    },
+    {
+      "file": "wk2.xer",
+      "sha256": "ead9bb86613e55fc4992ad458852240ea06160191b342eeab4fd453e7affb1de",
+      "source_url": "https://raw.githubusercontent.com/Taraxtix/xerParser/a7e7f932aa3fb4304211661d36a2f2f74843953c/wk2.xer",
+      "jobs_status": "rejected",
+      "jobs_error": "CURRENCY_UNSUPPORTED",
+      "raw_counts": {
+        "TASK": 198,
+        "TASKPRED": 301,
+        "CALENDAR": 1,
+        "RSRC": 59,
+        "ROLES": 0,
+        "TASKRSRC": 596
+      },
+      "p6_execution_equivalence": "unverified",
+      "differences": [
+        {
+          "field": "native_projection",
+          "reason": "[CURRENCY_UNSUPPORTED] 지원 통화는 KRW/JPY/USD/EUR입니다. 통화 환산은 지원하지 않습니다.\n관련 대상과 입력값을 확인해 수정한 뒤 다시 시도하세요."
+        }
+      ],
+      "mpxj_status": "read",
+      "mpxj_counts": {
+        "tasks": 198,
+        "relationships": 301,
+        "calendars": 1,
+        "resources": 59,
+        "roles": 0,
+        "assignments": 596
+      },
+      "relationship_types_checked": [
+        "FF",
+        "FS",
+        "SF",
+        "SS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "installer": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\dist\\JOBS-0.2.0-Setup-win64-97045d1c.exe",
+  "bytes": 13518073,
+  "sha256": "34c99b82051462b746e8e9e851b235eb32bc0647c93adc4bc31aad9e4feb0dea",
+  "source_revision": "97045d1cd19883f647175745c93d4b703fd81051",
+  "version": "0.2.0",
+  "stage": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\97045d1c-38f89699\\payload",
+  "logs": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\97045d1c-38f89699",
+  "signed": false
+}

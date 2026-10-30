@@ -1,0 +1,86 @@
+[
+    {
+        "available_screen_height": 688,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 153
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 153
+            }
+        },
+        "dpr": 1.5,
+        "height": 650,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 290,
+        "width": 1024
+    },
+    {
+        "available_screen_height": 688,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 153
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 153
+            }
+        },
+        "dpr": 1.5,
+        "height": 707,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 347,
+        "width": 1173
+    },
+    {
+        "available_screen_height": 688,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 153
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 153
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 153
+            }
+        },
+        "dpr": 1.5,
+        "height": 900,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 540,
+        "width": 1440
+    }
+]

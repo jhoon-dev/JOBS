@@ -1,0 +1,21 @@
+{
+  "source_revision": "97045d1cd19883f647175745c93d4b703fd81051",
+  "application_path": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\packages\\97045d1c-38f89699\\payload\\JOBS.exe",
+  "application_sha256": "45fcdddc6837e997a8395c3cfc927b9ac61ed61a2b4b9ae41c2a3b2bd6e2f62a",
+  "project_path": "C:\\Users\\dow\\Development\\ToolMoa\\JOBS\\build\\polish-live-97045d1\\project.jobs",
+  "project_sha256": "527d47721df8c1b6f296b7e877af3f9fde0593bef4a0605a7e4195c7950c0c56",
+  "matches_original_import_copy": true,
+  "window_id": 85988004,
+  "checks": [
+    "10000 tasks opened",
+    "F9 valid schedule",
+    "last-task selection and date reveal",
+    "fit all displayed schedule",
+    "WBS scope 500 and 50 tasks",
+    "milestone filter 5 tasks in scope",
+    "input unchanged and all-task scope restored"
+  ],
+  "finish": "2027-08-09 17:00",
+  "performed_with": "computer-use sky native Windows UI; independent benchmark timings are reported separately",
+  "left_open_view": "all 10000 tasks, weekly Gantt"
+}

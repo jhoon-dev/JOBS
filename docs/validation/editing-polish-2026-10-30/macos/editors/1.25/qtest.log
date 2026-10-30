@@ -1,0 +1,11 @@
+********* Start testing of EditingPolishTests *********
+Config: Using QtTest library 6.8.3, Qt 6.8.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 15.0.0 (clang-1500.3.9.4)), macos 15.7
+PASS   : EditingPolishTests::initTestCase()
+PASS   : EditingPolishTests::ganttCacheDoesNotRetainDocumentAndUsesCalculationGeneration()
+PASS   : EditingPolishTests::selectionFitAndFilteredScope()
+PASS   : EditingPolishTests::noScheduleDisablesNavigation()
+PASS   : EditingPolishTests::editorGeometryDraftsAndErrors(light)
+PASS   : EditingPolishTests::editorGeometryDraftsAndErrors(dark)
+PASS   : EditingPolishTests::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 2616ms
+********* Finished testing of EditingPolishTests *********

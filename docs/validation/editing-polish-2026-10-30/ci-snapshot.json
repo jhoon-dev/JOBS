@@ -1,0 +1,1172 @@
+{
+  "source_revision": "97045d1cd19883f647175745c93d4b703fd81051",
+  "runs": [
+    {
+      "databaseId": 41022222221,
+      "name": "Desktop build and file lifecycle",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-30T08:00:24Z",
+          "conclusion": "success",
+          "databaseId": 123951928550,
+          "name": "build (macos-15, clang_64)",
+          "startedAt": "2026-10-30T07:47:17Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T07:47:25Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T07:47:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:27Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-30T07:47:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:28Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "startedAt": "2026-10-30T07:47:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:28Z",
+              "conclusion": "success",
+              "name": "Select Qt 6.8 compatible macOS SDK",
+              "number": 4,
+              "startedAt": "2026-10-30T07:47:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:17Z",
+              "conclusion": "success",
+              "name": "Run jurplel/install-qt-action@v4",
+              "number": 5,
+              "startedAt": "2026-10-30T07:47:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:25Z",
+              "conclusion": "success",
+              "name": "Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+              "number": 6,
+              "startedAt": "2026-10-30T07:48:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:51:39Z",
+              "conclusion": "success",
+              "name": "Run cmake --build build --config Release --parallel 3",
+              "number": 7,
+              "startedAt": "2026-10-30T07:48:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:08Z",
+              "conclusion": "success",
+              "name": "Run ctest --test-dir build -C Release --output-on-failure",
+              "number": 8,
+              "startedAt": "2026-10-30T07:51:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:10Z",
+              "conclusion": "success",
+              "name": "Capture task and Gantt workspace presentation",
+              "number": 9,
+              "startedAt": "2026-10-30T07:53:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:12Z",
+              "conclusion": "success",
+              "name": "Preserve task and Gantt workspace screens",
+              "number": 10,
+              "startedAt": "2026-10-30T07:53:10Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:14Z",
+              "conclusion": "success",
+              "name": "Exercise native multi-project windows and shared resource load",
+              "number": 11,
+              "startedAt": "2026-10-30T07:53:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:38Z",
+              "conclusion": "success",
+              "name": "Verify workspace scaling and realistic 10k XER",
+              "number": 12,
+              "startedAt": "2026-10-30T07:53:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:41Z",
+              "conclusion": "success",
+              "name": "Preserve scaling and 10k XER samples",
+              "number": 13,
+              "startedAt": "2026-10-30T07:53:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:42Z",
+              "conclusion": "success",
+              "name": "Preserve workspace screen and acceptance log",
+              "number": 14,
+              "startedAt": "2026-10-30T07:53:41Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:48Z",
+              "conclusion": "success",
+              "name": "Verify exported XLSX and PDF with independent readers",
+              "number": 15,
+              "startedAt": "2026-10-30T07:53:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:59Z",
+              "conclusion": "success",
+              "name": "Measure deterministic 1k and 10k schedules and UI",
+              "number": 16,
+              "startedAt": "2026-10-30T07:53:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:54:08Z",
+              "conclusion": "success",
+              "name": "Measure cell edits and retained undo at 1k and 10k tasks",
+              "number": 17,
+              "startedAt": "2026-10-30T07:53:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:54:26Z",
+              "conclusion": "success",
+              "name": "Measure request worker and GUI commit phases",
+              "number": 18,
+              "startedAt": "2026-10-30T07:54:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:54:28Z",
+              "conclusion": "success",
+              "name": "Check out pre-optimization editing reference",
+              "number": 19,
+              "startedAt": "2026-10-30T07:54:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:55:58Z",
+              "conclusion": "success",
+              "name": "Build reference with the same Qt and compiler",
+              "number": 20,
+              "startedAt": "2026-10-30T07:54:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:56:36Z",
+              "conclusion": "success",
+              "name": "Measure reference and compare paired editing observations",
+              "number": 21,
+              "startedAt": "2026-10-30T07:55:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:56:56Z",
+              "conclusion": "success",
+              "name": "Measure paired bulk UI operations",
+              "number": 22,
+              "startedAt": "2026-10-30T07:56:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:18Z",
+              "conclusion": "success",
+              "name": "Measure paired filtered sorted and WBS view operations",
+              "number": 23,
+              "startedAt": "2026-10-30T07:56:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:25Z",
+              "conclusion": "success",
+              "name": "Exercise native projected views and publication races",
+              "number": 24,
+              "startedAt": "2026-10-30T07:58:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:27Z",
+              "conclusion": "success",
+              "name": "Preserve projected view evidence",
+              "number": 25,
+              "startedAt": "2026-10-30T07:58:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:30Z",
+              "conclusion": "success",
+              "name": "Exercise native structural editing and row notifications",
+              "number": 26,
+              "startedAt": "2026-10-30T07:58:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:32Z",
+              "conclusion": "success",
+              "name": "Preserve native structural editing evidence",
+              "number": 27,
+              "startedAt": "2026-10-30T07:58:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:32Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@v4",
+              "number": 28,
+              "startedAt": "2026-10-30T07:58:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:59:42Z",
+              "conclusion": "success",
+              "name": "Verify XER with independent TSV and MPXJ readers",
+              "number": 29,
+              "startedAt": "2026-10-30T07:58:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:59:44Z",
+              "conclusion": "success",
+              "name": "Preserve independent public P6 comparison matrices",
+              "number": 30,
+              "startedAt": "2026-10-30T07:59:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:59:44Z",
+              "conclusion": "success",
+              "name": "Capture native task editing screen",
+              "number": 31,
+              "startedAt": "2026-10-30T07:59:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:59:59Z",
+              "conclusion": "success",
+              "name": "Exercise native model and cancellable editing",
+              "number": 32,
+              "startedAt": "2026-10-30T07:59:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:03Z",
+              "conclusion": "success",
+              "name": "Exercise native incremental refresh and WBS fallbacks",
+              "number": 33,
+              "startedAt": "2026-10-30T07:59:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:05Z",
+              "conclusion": "success",
+              "name": "Preserve model and async editing evidence",
+              "number": 34,
+              "startedAt": "2026-10-30T08:00:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:08Z",
+              "conclusion": "success",
+              "name": "Exercise native Project XML dialogs",
+              "number": 35,
+              "startedAt": "2026-10-30T08:00:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:11Z",
+              "conclusion": "success",
+              "name": "Exercise native Primavera XER dialogs",
+              "number": 36,
+              "startedAt": "2026-10-30T08:00:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:13Z",
+              "conclusion": "success",
+              "name": "Preserve Primavera XER evidence",
+              "number": 37,
+              "startedAt": "2026-10-30T08:00:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:15Z",
+              "conclusion": "success",
+              "name": "Preserve Project XML evidence",
+              "number": 38,
+              "startedAt": "2026-10-30T08:00:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:16Z",
+              "conclusion": "success",
+              "name": "Preserve native UI evidence",
+              "number": 39,
+              "startedAt": "2026-10-30T08:00:15Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:18Z",
+              "conclusion": "success",
+              "name": "Preserve performance evidence",
+              "number": 40,
+              "startedAt": "2026-10-30T08:00:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:18Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@v4",
+              "number": 76,
+              "startedAt": "2026-10-30T08:00:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:18Z",
+              "conclusion": "success",
+              "name": "Post Check out pre-optimization editing reference",
+              "number": 77,
+              "startedAt": "2026-10-30T08:00:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:19Z",
+              "conclusion": "success",
+              "name": "Post Run jurplel/install-qt-action@v4",
+              "number": 78,
+              "startedAt": "2026-10-30T08:00:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:19Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 79,
+              "startedAt": "2026-10-30T08:00:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:19Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 80,
+              "startedAt": "2026-10-30T08:00:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:20Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 81,
+              "startedAt": "2026-10-30T08:00:19Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/jhoon-dev/JOBS/actions/runs/41022222221/job/123951928550"
+        },
+        {
+          "completedAt": "2026-10-30T08:10:35Z",
+          "conclusion": "success",
+          "databaseId": 123951928881,
+          "name": "build (windows-latest, win64_msvc2022_64)",
+          "startedAt": "2026-10-30T07:47:16Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T07:47:24Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T07:47:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:30Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-30T07:47:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:30Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "startedAt": "2026-10-30T07:47:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:30Z",
+              "conclusion": "skipped",
+              "name": "Select Qt 6.8 compatible macOS SDK",
+              "number": 4,
+              "startedAt": "2026-10-30T07:47:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:28Z",
+              "conclusion": "success",
+              "name": "Run jurplel/install-qt-action@v4",
+              "number": 5,
+              "startedAt": "2026-10-30T07:47:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:44Z",
+              "conclusion": "success",
+              "name": "Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+              "number": 6,
+              "startedAt": "2026-10-30T07:48:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:58:49Z",
+              "conclusion": "success",
+              "name": "Run cmake --build build --config Release --parallel 3",
+              "number": 7,
+              "startedAt": "2026-10-30T07:48:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:22Z",
+              "conclusion": "success",
+              "name": "Run ctest --test-dir build -C Release --output-on-failure",
+              "number": 8,
+              "startedAt": "2026-10-30T07:58:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:24Z",
+              "conclusion": "success",
+              "name": "Capture task and Gantt workspace presentation",
+              "number": 9,
+              "startedAt": "2026-10-30T08:00:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:25Z",
+              "conclusion": "success",
+              "name": "Preserve task and Gantt workspace screens",
+              "number": 10,
+              "startedAt": "2026-10-30T08:00:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:26Z",
+              "conclusion": "success",
+              "name": "Exercise native multi-project windows and shared resource load",
+              "number": 11,
+              "startedAt": "2026-10-30T08:00:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:42Z",
+              "conclusion": "success",
+              "name": "Verify workspace scaling and realistic 10k XER",
+              "number": 12,
+              "startedAt": "2026-10-30T08:00:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:43Z",
+              "conclusion": "success",
+              "name": "Preserve scaling and 10k XER samples",
+              "number": 13,
+              "startedAt": "2026-10-30T08:00:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:45Z",
+              "conclusion": "success",
+              "name": "Preserve workspace screen and acceptance log",
+              "number": 14,
+              "startedAt": "2026-10-30T08:00:43Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:00:52Z",
+              "conclusion": "success",
+              "name": "Verify exported XLSX and PDF with independent readers",
+              "number": 15,
+              "startedAt": "2026-10-30T08:00:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:01:03Z",
+              "conclusion": "success",
+              "name": "Measure deterministic 1k and 10k schedules and UI",
+              "number": 16,
+              "startedAt": "2026-10-30T08:00:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:01:12Z",
+              "conclusion": "success",
+              "name": "Measure cell edits and retained undo at 1k and 10k tasks",
+              "number": 17,
+              "startedAt": "2026-10-30T08:01:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:01:35Z",
+              "conclusion": "success",
+              "name": "Measure request worker and GUI commit phases",
+              "number": 18,
+              "startedAt": "2026-10-30T08:01:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:01:38Z",
+              "conclusion": "success",
+              "name": "Check out pre-optimization editing reference",
+              "number": 19,
+              "startedAt": "2026-10-30T08:01:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:06:56Z",
+              "conclusion": "success",
+              "name": "Build reference with the same Qt and compiler",
+              "number": 20,
+              "startedAt": "2026-10-30T08:01:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:07:27Z",
+              "conclusion": "success",
+              "name": "Measure reference and compare paired editing observations",
+              "number": 21,
+              "startedAt": "2026-10-30T08:06:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:07:41Z",
+              "conclusion": "success",
+              "name": "Measure paired bulk UI operations",
+              "number": 22,
+              "startedAt": "2026-10-30T08:07:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:40Z",
+              "conclusion": "success",
+              "name": "Measure paired filtered sorted and WBS view operations",
+              "number": 23,
+              "startedAt": "2026-10-30T08:07:41Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:47Z",
+              "conclusion": "success",
+              "name": "Exercise native projected views and publication races",
+              "number": 24,
+              "startedAt": "2026-10-30T08:08:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:48Z",
+              "conclusion": "success",
+              "name": "Preserve projected view evidence",
+              "number": 25,
+              "startedAt": "2026-10-30T08:08:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:50Z",
+              "conclusion": "success",
+              "name": "Exercise native structural editing and row notifications",
+              "number": 26,
+              "startedAt": "2026-10-30T08:08:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:51Z",
+              "conclusion": "success",
+              "name": "Preserve native structural editing evidence",
+              "number": 27,
+              "startedAt": "2026-10-30T08:08:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:08:52Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@v4",
+              "number": 28,
+              "startedAt": "2026-10-30T08:08:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:09:53Z",
+              "conclusion": "success",
+              "name": "Verify XER with independent TSV and MPXJ readers",
+              "number": 29,
+              "startedAt": "2026-10-30T08:08:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:09:55Z",
+              "conclusion": "success",
+              "name": "Preserve independent public P6 comparison matrices",
+              "number": 30,
+              "startedAt": "2026-10-30T08:09:53Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:09:55Z",
+              "conclusion": "success",
+              "name": "Capture native task editing screen",
+              "number": 31,
+              "startedAt": "2026-10-30T08:09:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:13Z",
+              "conclusion": "success",
+              "name": "Exercise native model and cancellable editing",
+              "number": 32,
+              "startedAt": "2026-10-30T08:09:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:18Z",
+              "conclusion": "success",
+              "name": "Exercise native incremental refresh and WBS fallbacks",
+              "number": 33,
+              "startedAt": "2026-10-30T08:10:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:19Z",
+              "conclusion": "success",
+              "name": "Preserve model and async editing evidence",
+              "number": 34,
+              "startedAt": "2026-10-30T08:10:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:21Z",
+              "conclusion": "success",
+              "name": "Exercise native Project XML dialogs",
+              "number": 35,
+              "startedAt": "2026-10-30T08:10:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:24Z",
+              "conclusion": "success",
+              "name": "Exercise native Primavera XER dialogs",
+              "number": 36,
+              "startedAt": "2026-10-30T08:10:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:25Z",
+              "conclusion": "success",
+              "name": "Preserve Primavera XER evidence",
+              "number": 37,
+              "startedAt": "2026-10-30T08:10:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:26Z",
+              "conclusion": "success",
+              "name": "Preserve Project XML evidence",
+              "number": 38,
+              "startedAt": "2026-10-30T08:10:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:27Z",
+              "conclusion": "success",
+              "name": "Preserve native UI evidence",
+              "number": 39,
+              "startedAt": "2026-10-30T08:10:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:29Z",
+              "conclusion": "success",
+              "name": "Preserve performance evidence",
+              "number": 40,
+              "startedAt": "2026-10-30T08:10:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:29Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@v4",
+              "number": 76,
+              "startedAt": "2026-10-30T08:10:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:31Z",
+              "conclusion": "success",
+              "name": "Post Check out pre-optimization editing reference",
+              "number": 77,
+              "startedAt": "2026-10-30T08:10:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:31Z",
+              "conclusion": "success",
+              "name": "Post Run jurplel/install-qt-action@v4",
+              "number": 78,
+              "startedAt": "2026-10-30T08:10:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:31Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 79,
+              "startedAt": "2026-10-30T08:10:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:33Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 80,
+              "startedAt": "2026-10-30T08:10:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T08:10:34Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 81,
+              "startedAt": "2026-10-30T08:10:33Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/jhoon-dev/JOBS/actions/runs/41022222221/job/123951928881"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "databaseId": 41022222229,
+      "name": "C++ format and static analysis",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-30T07:53:21Z",
+          "conclusion": "success",
+          "databaseId": 123951928510,
+          "name": "quality",
+          "startedAt": "2026-10-30T07:47:16Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T07:47:19Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T07:47:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:20Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-30T07:47:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:20Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "startedAt": "2026-10-30T07:47:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:34Z",
+              "conclusion": "success",
+              "name": "Install pinned formatting and Clang 18 analysis tools",
+              "number": 4,
+              "startedAt": "2026-10-30T07:47:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:39Z",
+              "conclusion": "success",
+              "name": "Exercise read-only formatting and real analyzer failure gates",
+              "number": 5,
+              "startedAt": "2026-10-30T07:47:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:39Z",
+              "conclusion": "success",
+              "name": "Check enrolled and changed C++ sources",
+              "number": 6,
+              "startedAt": "2026-10-30T07:47:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:08Z",
+              "conclusion": "success",
+              "name": "Run jurplel/install-qt-action@v4",
+              "number": 7,
+              "startedAt": "2026-10-30T07:47:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:11Z",
+              "conclusion": "success",
+              "name": "Configure actual Qt compilation database",
+              "number": 8,
+              "startedAt": "2026-10-30T07:48:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:17Z",
+              "conclusion": "success",
+              "name": "Analyze every production C++ translation unit",
+              "number": 9,
+              "startedAt": "2026-10-30T07:48:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:18Z",
+              "conclusion": "success",
+              "name": "Preserve source lists and raw diagnostics",
+              "number": 10,
+              "startedAt": "2026-10-30T07:53:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:18Z",
+              "conclusion": "success",
+              "name": "Post Run jurplel/install-qt-action@v4",
+              "number": 18,
+              "startedAt": "2026-10-30T07:53:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:18Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 19,
+              "startedAt": "2026-10-30T07:53:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:19Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-30T07:53:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:19Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-30T07:53:19Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/jhoon-dev/JOBS/actions/runs/41022222229/job/123951928510"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "databaseId": 41022222257,
+      "name": "Parser fuzzing and runtime checks",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-30T07:57:21Z",
+          "conclusion": "success",
+          "databaseId": 123951928894,
+          "name": "sanitized",
+          "startedAt": "2026-10-30T07:47:16Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T07:47:19Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T07:47:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:20Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-30T07:47:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:30Z",
+              "conclusion": "success",
+              "name": "Install runtime and Clang dependencies",
+              "number": 3,
+              "startedAt": "2026-10-30T07:47:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:59Z",
+              "conclusion": "success",
+              "name": "Run jurplel/install-qt-action@v4",
+              "number": 4,
+              "startedAt": "2026-10-30T07:47:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:00Z",
+              "conclusion": "success",
+              "name": "Record toolchain",
+              "number": 5,
+              "startedAt": "2026-10-30T07:47:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:03Z",
+              "conclusion": "success",
+              "name": "Configure instrumented JOBS and parser targets",
+              "number": 6,
+              "startedAt": "2026-10-30T07:48:00Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:03Z",
+              "conclusion": "success",
+              "name": "Verify instrumentation of real parser dependencies",
+              "number": 7,
+              "startedAt": "2026-10-30T07:48:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:54:43Z",
+              "conclusion": "success",
+              "name": "Build with bounded parallelism",
+              "number": 8,
+              "startedAt": "2026-10-30T07:48:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:14Z",
+              "conclusion": "success",
+              "name": "Run all regression contracts under ASan and UBSan",
+              "number": 9,
+              "startedAt": "2026-10-30T07:54:43Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:17Z",
+              "conclusion": "success",
+              "name": "Replay seeds and fuzz each real parser",
+              "number": 10,
+              "startedAt": "2026-10-30T07:57:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:19Z",
+              "conclusion": "success",
+              "name": "Preserve runtime and parser evidence",
+              "number": 11,
+              "startedAt": "2026-10-30T07:57:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:19Z",
+              "conclusion": "success",
+              "name": "Post Run jurplel/install-qt-action@v4",
+              "number": 21,
+              "startedAt": "2026-10-30T07:57:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:19Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 22,
+              "startedAt": "2026-10-30T07:57:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:57:19Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 23,
+              "startedAt": "2026-10-30T07:57:19Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/jhoon-dev/JOBS/actions/runs/41022222257/job/123951928894"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "databaseId": 41022222259,
+      "name": "MSIX package and installed lifecycle",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-30T07:54:01Z",
+          "conclusion": "success",
+          "databaseId": 123951928797,
+          "name": "msix",
+          "startedAt": "2026-10-30T07:47:16Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T07:47:23Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T07:47:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:29Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-30T07:47:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:47:29Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "startedAt": "2026-10-30T07:47:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:36Z",
+              "conclusion": "success",
+              "name": "Run jurplel/install-qt-action@v4",
+              "number": 4,
+              "startedAt": "2026-10-30T07:47:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:40Z",
+              "conclusion": "success",
+              "name": "Configure Release MinGW",
+              "number": 5,
+              "startedAt": "2026-10-30T07:48:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:48:42Z",
+              "conclusion": "success",
+              "name": "Verify packaging contracts and pinned Microsoft SDK",
+              "number": 6,
+              "startedAt": "2026-10-30T07:48:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:52:20Z",
+              "conclusion": "success",
+              "name": "Build development packages and upgrade fixture",
+              "number": 7,
+              "startedAt": "2026-10-30T07:48:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:52:37Z",
+              "conclusion": "success",
+              "name": "Install activate update recover and uninstall with package identity",
+              "number": 8,
+              "startedAt": "2026-10-30T07:52:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:52:56Z",
+              "conclusion": "success",
+              "name": "Verify update service and native widgets",
+              "number": 9,
+              "startedAt": "2026-10-30T07:52:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:50Z",
+              "conclusion": "success",
+              "name": "Package standalone updater and verify installation handoff",
+              "number": 10,
+              "startedAt": "2026-10-30T07:52:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:56Z",
+              "conclusion": "success",
+              "name": "Preserve MSIX and actual packaged UI evidence",
+              "number": 11,
+              "startedAt": "2026-10-30T07:53:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:56Z",
+              "conclusion": "success",
+              "name": "Post Run jurplel/install-qt-action@v4",
+              "number": 20,
+              "startedAt": "2026-10-30T07:53:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:56Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 21,
+              "startedAt": "2026-10-30T07:53:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:59Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 22,
+              "startedAt": "2026-10-30T07:53:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T07:53:59Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 23,
+              "startedAt": "2026-10-30T07:53:59Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/jhoon-dev/JOBS/actions/runs/41022222259/job/123951928797"
+        }
+      ],
+      "status": "completed"
+    }
+  ]
+}

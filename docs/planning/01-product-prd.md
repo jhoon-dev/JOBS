@@ -397,3 +397,16 @@ macOS CI의 150%에서 실제 창 높이가 437 논리 픽셀로 제한되어 �
 ### POLISH-09 · 전체 맞춤의 날짜축 가독성 (구현 전 보완)
 
 실제 1만 작업의 전체 맞춤에서 월 날짜 문자열과 일별 격자가 조밀해지는 문제를 확인했다. 축은 배율에 따라 일·주·월·분기·연 단위와 간결한 날짜 표기를 사용하고 폰트의 실제 너비를 기준으로 겹치는 레이블을 생략한다. 축소된 보기의 격자는 주요 구간만 표시하며, 구분할 수 없을 정도로 좁은 휴무일 음영은 생략한다. 일정 날짜·근무 달력·분할 표시·드래그 좌표와 확대 보기의 의미는 바꾸지 않는다. 실제 전체 맞춤 화면과 기존 고정 헤더 회귀를 다시 검증한다.
+
+### POLISH 구현·검증 연결
+
+제품 소스 `97045d1`의 [검증 기록](../validation/editing-polish-2026-10-30/README.md)을 기준으로 한다. 공개 P6 corpus의 통과는 Oracle 실행 동등성이나 완전 호환성의 완료를 뜻하지 않는다.
+
+| 요구사항 | 구현·검증 근거 |
+|---|---|
+| POLISH-01·08 | `workspace_presentation`, Windows/macOS 네 배율×세 크기의 실제 치수·최소 네 줄, 작은 창 복원 |
+| POLISH-02 | `editing_polish_ui`의 COW/cache generation 검사, 세 프로세스의 1만 작업 timing·heartbeat, 셀 편집/undo·비동기 단계 표본 |
+| POLISH-03·09 | `editing_polish_ui`, `jobs_large_xer_ui_probe`의 fit 범위/revision/dirty 검사와 캡처, 실제 앱의 선택·전체 맞춤·WBS/필터 탐색 |
+| POLISH-04 | 주요 편집기 7개의 밝은/어두운 팔레트·네 배율 native 검사, 탭/레이블·초안/수정 포커스·오류 가시성 |
+| POLISH-05·07 | `primavera_public_corpus`, `primavera_xer_contract`, pinned MPXJ 독립 비교와 원본 checksum·지원/거부 행렬 |
+| POLISH-06 | 최종 Release CTest 54개·포맷 검사, 설치파일/아이콘/payload hash 및 실제 앱 확인, Windows/macOS·정적 분석·ASan/UBSan/퍼징·MSIX/업데이트 CI 통과와 결과 보존 |

@@ -1,0 +1,358 @@
+[
+  {
+    "scale_factor": "1",
+    "checks": [
+      {
+        "available_screen_height": 681,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1,
+        "height": 650,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 332,
+        "width": 1024
+      },
+      {
+        "available_screen_height": 681,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1,
+        "height": 653,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 320,
+        "width": 1280
+      },
+      {
+        "available_screen_height": 681,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1,
+        "height": 653,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 320,
+        "width": 1440
+      }
+    ]
+  },
+  {
+    "scale_factor": "1.25",
+    "checks": [
+      {
+        "available_screen_height": 547,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1.25,
+        "height": 525,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 192,
+        "width": 1024
+      },
+      {
+        "available_screen_height": 547,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1.25,
+        "height": 525,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 192,
+        "width": 1280
+      },
+      {
+        "available_screen_height": 547,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 117
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 117
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 117
+          }
+        },
+        "dpr": 1.25,
+        "height": 525,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 192,
+        "width": 1440
+      }
+    ]
+  },
+  {
+    "scale_factor": "1.5",
+    "checks": [
+      {
+        "available_screen_height": 456,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 1.5,
+        "height": 437,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 225,
+        "width": 1024
+      },
+      {
+        "available_screen_height": 456,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 1.5,
+        "height": 437,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 225,
+        "width": 1280
+      },
+      {
+        "available_screen_height": 456,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 1.5,
+        "height": 437,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 225,
+        "width": 1440
+      }
+    ]
+  },
+  {
+    "scale_factor": "2",
+    "checks": [
+      {
+        "available_screen_height": 342,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 2,
+        "height": 328,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 116,
+        "width": 1024
+      },
+      {
+        "available_screen_height": 342,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 2,
+        "height": 328,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 116,
+        "width": 1280
+      },
+      {
+        "available_screen_height": 342,
+        "control_height": 32,
+        "controls": {
+          "resetTaskView": {
+            "height": 32,
+            "y": 48
+          },
+          "taskFilter": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSearch": {
+            "height": 32,
+            "y": 48
+          },
+          "taskSort": {
+            "height": 32,
+            "y": 48
+          }
+        },
+        "dpr": 2,
+        "height": 328,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 116,
+        "width": 1440
+      }
+    ]
+  }
+]

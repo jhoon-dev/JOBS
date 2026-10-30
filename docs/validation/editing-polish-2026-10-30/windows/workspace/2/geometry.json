@@ -1,0 +1,86 @@
+[
+    {
+        "available_screen_height": 516,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 81
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 81
+            }
+        },
+        "dpr": 2,
+        "height": 650,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 414,
+        "width": 1024
+    },
+    {
+        "available_screen_height": 516,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 81
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 81
+            }
+        },
+        "dpr": 2,
+        "height": 720,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 484,
+        "width": 1280
+    },
+    {
+        "available_screen_height": 516,
+        "control_height": 32,
+        "controls": {
+            "resetTaskView": {
+                "height": 32,
+                "y": 81
+            },
+            "taskFilter": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSearch": {
+                "height": 32,
+                "y": 81
+            },
+            "taskSort": {
+                "height": 32,
+                "y": 81
+            }
+        },
+        "dpr": 2,
+        "height": 900,
+        "pane_header_height": 44,
+        "row_height": 28,
+        "table_viewport_height": 664,
+        "width": 1440
+    }
+]

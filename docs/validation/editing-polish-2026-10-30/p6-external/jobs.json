@@ -1,0 +1,19 @@
+{
+    "files": [
+        {
+            "error_code": "CURRENCY_UNSUPPORTED",
+            "file": "sample.xer",
+            "reason": "[CURRENCY_UNSUPPORTED] 지원 통화는 KRW/JPY/USD/EUR입니다. 통화 환산은 지원하지 않습니다.\n관련 대상과 입력값을 확인해 수정한 뒤 다시 시도하세요.",
+            "sha256": "4d8bce790a93b9bc747abec5d99840e3e0d1ce5523e0afae3ba881762cfe2c13",
+            "status": "rejected"
+        },
+        {
+            "error_code": "CURRENCY_UNSUPPORTED",
+            "file": "wk2.xer",
+            "reason": "[CURRENCY_UNSUPPORTED] 지원 통화는 KRW/JPY/USD/EUR입니다. 통화 환산은 지원하지 않습니다.\n관련 대상과 입력값을 확인해 수정한 뒤 다시 시도하세요.",
+            "sha256": "ead9bb86613e55fc4992ad458852240ea06160191b342eeab4fd453e7affb1de",
+            "status": "rejected"
+        }
+    ],
+    "status": "passed"
+}
