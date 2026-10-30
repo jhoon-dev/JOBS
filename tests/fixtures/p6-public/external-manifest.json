@@ -1,0 +1,69 @@
+{
+  "files": [
+    {
+      "file": "sample.xer",
+      "url": "https://raw.githubusercontent.com/Taraxtix/xerParser/a7e7f932aa3fb4304211661d36a2f2f74843953c/sample.xer",
+      "repository": "https://github.com/Taraxtix/xerParser",
+      "revision": "a7e7f932aa3fb4304211661d36a2f2f74843953c",
+      "license": "not declared; raw fixture retained only in ignored local validation directory, not redistributed",
+      "sha256": "4d8bce790a93b9bc747abec5d99840e3e0d1ce5523e0afae3ba881762cfe2c13",
+      "encoding": "utf-8",
+      "bytes": 23176,
+      "header": "ERMHDR\t8.2\t2013-09-18\tProject\tadmin\tadmin\tdbxDatabaseNoName\tProject Management\tEP",
+      "counts": {
+        "CURRTYPE": 17,
+        "OBS": 1,
+        "UDFTYPE": 3,
+        "PROJECT": 1,
+        "CALENDAR": 2,
+        "SCHEDOPTIONS": 1,
+        "PROJWBS": 6,
+        "RSRC": 1,
+        "RSRCRATE": 1,
+        "TASK": 25,
+        "TASKPRED": 40,
+        "TASKRSRC": 1,
+        "UDFVALUE": 75
+      },
+      "expected_status": "rejected",
+      "expected_error": "CURRENCY_UNSUPPORTED"
+    },
+    {
+      "file": "wk2.xer",
+      "url": "https://raw.githubusercontent.com/Taraxtix/xerParser/a7e7f932aa3fb4304211661d36a2f2f74843953c/wk2.xer",
+      "repository": "https://github.com/Taraxtix/xerParser",
+      "revision": "a7e7f932aa3fb4304211661d36a2f2f74843953c",
+      "license": "not declared; raw fixture retained only in ignored local validation directory, not redistributed",
+      "sha256": "ead9bb86613e55fc4992ad458852240ea06160191b342eeab4fd453e7affb1de",
+      "encoding": "windows-1252",
+      "bytes": 320258,
+      "header": "ERMHDR\t8.2\t2013-09-18\tProject\tadmin\tadmin\tdbxDatabaseNoName\tProject Management\tEP",
+      "counts": {
+        "COSTTYPE": 1,
+        "CURRTYPE": 19,
+        "OBS": 1,
+        "POBS": 9,
+        "RCATTYPE": 3,
+        "UMEASURE": 6,
+        "RCATVAL": 4,
+        "PROJECT": 1,
+        "CALENDAR": 1,
+        "SCHEDOPTIONS": 1,
+        "PROJWBS": 1,
+        "RSRC": 59,
+        "ACTVTYPE": 4,
+        "RSRCRATE": 58,
+        "RSRCRCAT": 10,
+        "TASK": 198,
+        "ACTVCODE": 34,
+        "PROJCOST": 10,
+        "TASKPRED": 301,
+        "TASKPROC": 6,
+        "TASKRSRC": 596,
+        "TASKACTV": 792
+      },
+      "expected_status": "rejected",
+      "expected_error": "CURRENCY_UNSUPPORTED"
+    }
+  ]
+}

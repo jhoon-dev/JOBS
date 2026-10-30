@@ -4,6 +4,7 @@
 #include <QDate>
 #include <QSet>
 #include <functional>
+#include <unordered_map>
 class QGraphicsRectItem;
 class QGraphicsSimpleTextItem;
 namespace jobs {
@@ -12,10 +13,14 @@ public:
     static constexpr int RowHeight = 28, HeaderHeight = 44;
     explicit GanttView(QWidget *parent = nullptr);
     void setPlan(const Project *project, const ScheduleResult *result, const std::vector<std::size_t> &rows,
-                 bool editable = false);
+                 bool editable = false, std::shared_ptr<const Project> snapshot = {},
+                 std::uint64_t calculationGeneration = 0);
     void setSelectedTask(const std::string &id);
     void setDayWidth(int width);
     void setBaseline(const Baseline *baseline);
+    bool hasSchedule() const;
+    void focusSelectedTask(bool center = true);
+    void fitSchedule();
     std::function<void(const std::string &)> taskSelected;
     std::function<void(const std::string &, std::uint64_t, const std::string &, bool, const std::string &)> taskEdited;
     std::function<void(const QString &)> editHint;
@@ -39,12 +44,19 @@ private:
         bool operator==(const BaselineDate &) const = default;
     };
     std::vector<BaselineDate> baselineDates_;
+    std::unordered_map<std::string, std::size_t> rowIndex_, baselineIndex_;
     bool isForecast_ = false;
     QSet<QDate> holidays_;
-    int dayWidth_ = 64, dayCount_ = 0;
+    qreal dayWidth_ = 64;
+    int dayCount_ = 0;
+    bool fitted_ = false;
+    bool chartSelection_ = false;
     std::size_t displayRowCount_ = 0;
     std::string selectedId_;
-    std::optional<PlanInput> input_;
+    std::shared_ptr<const PlanInput> input_;
+    std::weak_ptr<const Project> inputSource_;
+    std::uint64_t renderedCalculation_ = 0;
+    std::vector<std::size_t> displayedIndices_;
     std::shared_ptr<EvaluationCache> renderCache_;
     std::string documentId_;
     std::uint64_t revision_ = 0;

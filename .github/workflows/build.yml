@@ -42,6 +42,7 @@ jobs:
       - name: Verify workspace scaling and realistic 10k XER
         run: |
           python scripts/check-workspace-scaling.py --build-dir build
+          python scripts/check-editing-polish-native.py --build-dir build
           python scripts/make-xer-performance-fixture.py --tasks 10000 --output build/large-xer-fixture
           python scripts/run-large-xer-ui-probe.py --build-dir build --input build/large-xer-fixture/industrial-campus-10000.xer --output build/large-xer-performance/result.json
       - name: Preserve scaling and 10k XER samples
@@ -51,6 +52,7 @@ jobs:
           name: large-xer-scaling-${{ runner.os }}
           path: |
             build/workspace-scaling/
+            build/editing-polish-native/
             build/large-xer-fixture/
             build/large-xer-performance/
           if-no-files-found: warn
@@ -125,6 +127,22 @@ jobs:
         run: |
           python -m pip install mpxj==16.10.0 JPype1==1.6.0
           python scripts/verify-primavera-xer.py build
+          python scripts/verify-p6-corpus.py --build-dir build --corpus tests/fixtures/p6-public --output build/p6-public-comparison
+          python scripts/fetch-p6-external-samples.py --output build/p6-external
+          python scripts/verify-p6-corpus.py --build-dir build --corpus build/p6-external --output build/p6-external-comparison
+      - name: Preserve independent public P6 comparison matrices
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p6-public-comparison-${{ runner.os }}
+          path: |
+            build/p6-public-comparison/matrix.json
+            build/p6-public-comparison/jobs.json
+            build/p6-public-comparison/jobs.log
+            build/p6-external-comparison/matrix.json
+            build/p6-external-comparison/jobs.json
+            build/p6-external-comparison/jobs.log
+          if-no-files-found: warn
       - name: Capture native task editing screen
         run: python scripts/capture-task-editing-ui.py build
       - name: Exercise native model and cancellable editing

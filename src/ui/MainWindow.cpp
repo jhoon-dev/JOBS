@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QAction>
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QPointer>
 #include <QAbstractItemDelegate>
 #include <QCloseEvent>
@@ -233,6 +234,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     baselineSave_ = trackingAction("기준선 저장", [this] { saveBaseline(); });
     statusEdit_ = trackingAction("상태일 설정", [this] { editStatusAt(); });
     progressEdit_ = trackingAction("선택 작업 실적", [this] { reportProgress(); });
+    progressEdit_->setObjectName("reportTaskProgress");
     comparison_ = trackingAction("계획 대비 비교", [this] { showComparison(); });
     baselineChoice_ = new QComboBox(this);
     baselineChoice_->setObjectName("baselineChoice");
@@ -337,7 +339,12 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     gantt_ = new GanttView(split);
     gantt_->setMinimumWidth(300);
     split->setSizes({180, 690, 650});
-    connect(zoom, &QComboBox::currentIndexChanged, this, [this](int i) { gantt_->setDayWidth(i == 0 ? 64 : 16); });
+    connect(zoom, &QComboBox::currentIndexChanged, this, [this](int i) {
+        if (i < 2)
+            gantt_->setDayWidth(i == 0 ? 64 : 16);
+        else
+            gantt_->fitSchedule();
+    });
     connect(table_->verticalScrollBar(), &QScrollBar::valueChanged, gantt_->verticalScrollBar(), &QScrollBar::setValue);
     connect(gantt_->verticalScrollBar(), &QScrollBar::valueChanged, table_->verticalScrollBar(), &QScrollBar::setValue);
     connect(wbsTree_, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *item) {
@@ -519,15 +526,15 @@ void MainWindow::refresh(bool rebuildTree) {
     refreshDocumentSummary();
     const auto &calculation = document_.calculation();
     std::unordered_map<std::string, int> numbers;
-    for (std::size_t row = 0; row < p->tasks.size(); ++row)
-        numbers[p->tasks[row].id] = int(row + 1);
+
     restoreTaskSelection(selectedColumn);
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     taskCost_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() && p->statusAt.has_value());
     refreshTracking();
     assignResources_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
-    gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_, !document_.readOnly() && !calculating_);
+    gantt_->setPlan(&*p, calculation ? &*calculation : nullptr, visibleRows_, !document_.readOnly() && !calculating_,
+                    document_.snapshot(), document_.calculationGeneration());
     gantt_->setSelectedTask(selectedTask_);
     refreshBaseline();
     const auto rollup = summarizeWbs(*p, calculation ? &*calculation : nullptr, selectedWbs_);
@@ -565,6 +572,9 @@ void MainWindow::refresh(bool rebuildTree) {
                 }
                 state += "\n[" + qs(d.code) + "] " + qs(diagnosticMessage(d));
                 if (!d.taskIds.empty()) {
+                    if (numbers.empty())
+                        for (std::size_t row = 0; row < p->tasks.size(); ++row)
+                            numbers.emplace(p->tasks[row].id, int(row + 1));
                     QStringList path;
                     for (const auto &id : d.taskIds)
                         path << (numbers.contains(id) ? QString::number(numbers.at(id)) : qs(id));
@@ -575,6 +585,7 @@ void MainWindow::refresh(bool rebuildTree) {
     }
     diagnostics_->setPlainText(calculating_ ? "계산 중 · 편집할 수 있습니다. 변경 시 계산 결과는 오래됨으로 처리됩니다."
                                             : state);
+    refreshWorkspaceUi();
     rendered_ = true;
     renderedView_ = viewKey();
     renderedSession_ = document_.sessionGeneration();
@@ -594,7 +605,10 @@ void MainWindow::calculateSchedule() {
         queuedCalculation_ = document_.sessionGeneration();
         return;
     }
+    QElapsedTimer preparationClock;
+    preparationClock.start();
     const auto snapshot = document_.snapshot();
+    auto workerNanos = std::make_shared<std::atomic<qint64>>(0);
     calculating_ = true;
     calculationControl_ = std::make_shared<CalculationControl>();
     const auto control = calculationControl_;
@@ -604,7 +618,10 @@ void MainWindow::calculateSchedule() {
     refresh();
     auto *watcher = new QFutureWatcher<ScheduleResult>(this);
     connect(watcher, &QFutureWatcher<ScheduleResult>::finished, this,
-            [this, watcher, control, session = document_.sessionGeneration()] {
+            [this, watcher, control, workerNanos, session = document_.sessionGeneration()] {
+                QElapsedTimer commitClock;
+                commitClock.start();
+                setProperty("scheduleWorkerMs", double(workerNanos->load()) / 1e6);
                 calculating_ = false;
                 calculationProgressTimer_->stop();
                 calculationProgressLabel_->clear();
@@ -626,12 +643,20 @@ void MainWindow::calculateSchedule() {
                 }
                 watcher->deleteLater();
                 refresh();
+                setProperty("scheduleCommitMs", double(commitClock.nsecsElapsed()) / 1e6);
                 const auto queued = queuedCalculation_;
                 queuedCalculation_.reset();
                 if (queued && *queued == document_.sessionGeneration())
                     calculateSchedule();
             });
-    watcher->setFuture(QtConcurrent::run([snapshot, control] { return jobs::calculate(*snapshot, control); }));
+    setProperty("schedulePreparationMs", double(preparationClock.nsecsElapsed()) / 1e6);
+    watcher->setFuture(QtConcurrent::run([snapshot, control, workerNanos] {
+        QElapsedTimer clock;
+        clock.start();
+        auto result = jobs::calculate(*snapshot, control);
+        workerNanos->store(clock.nsecsElapsed());
+        return result;
+    }));
 }
 void MainWindow::rebuildWbsTree() {
     if (document_.project()) {

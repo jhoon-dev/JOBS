@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/CostAnalysisDialog.h"
 #include "ui/MoneyFields.h"
 #include <QDialog>
@@ -95,7 +96,7 @@ void MainWindow::editRates() {
             error->setText("통화를 설정했습니다. 파일 저장으로 보존하세요.");
         } catch (const std::exception &e) {
             currency->setCurrentText(qs(document_.project()->currency));
-            error->setText(qErrorText(e));
+            showEditorError(*error, e, rates);
         }
     });
     connect(save, &QPushButton::clicked, &dialog, [&] {
@@ -123,13 +124,14 @@ void MainWindow::editRates() {
                     break;
                 }
         } catch (const std::exception &e) {
-            error->setText(qErrorText(e));
+            showEditorError(*error, e, rates);
         }
     });
     auto *close = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
     layout->addWidget(close);
     connect(close, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     fill();
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -190,9 +192,10 @@ void MainWindow::editTaskCost() {
                                    str(accrual->currentData().toString()), str(credit->currentData().toString())});
             dialog.accept();
         } catch (const std::exception &e) {
-            error->setText(qErrorText(e));
+            showEditorError(*error, e, fixed);
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -283,6 +286,7 @@ void MainWindow::reportCost() {
             error->setText(qErrorText(e));
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -290,6 +294,7 @@ void MainWindow::showCosts() {
     if (!document_.project())
         return;
     CostAnalysisDialog dialog(document_, selectedBaseline_, this);
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }

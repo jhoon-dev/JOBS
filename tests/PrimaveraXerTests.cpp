@@ -324,6 +324,40 @@ int main(int argc, char **argv) {
         auto schema = source;
         schema.replace("task_id\tproj_id\twbs_id", "task_id\ttask_id\twbs_id");
         rejects([&] { jobs::importPrimaveraXer(schema, "duplicate-fields.xer"); });
+        auto shortTail = source;
+        shortTail.replace("%R\t1\t원본에만 보존", "%R\t1");
+        auto restored = jobs::importPrimaveraXer(shortTail, "short-tail.xer");
+        check(restored.project.tasks == p.tasks && diagnostic(restored, "NOTEBOOK/line-"),
+              "trailing null projection lost");
+        auto mixedCase = source;
+        mixedCase.replace("note_id\ttext", "note_id\tLevelPriorityList");
+        check(jobs::importPrimaveraXer(mixedCase, "mixed-field.xer").project.tasks == p.tasks,
+              "native mixed-case field rejected");
+        auto delNotes = source;
+        delNotes.replace("원본에만 보존", QByteArray("line one") + char(0x7f) + "line two");
+        auto preserved = jobs::importPrimaveraXer(delNotes, "memo-newlines.xer");
+        check(preserved.xer == delNotes && diagnostic(preserved, "NOTEBOOK/line-"), "memo original/normalization lost");
+        auto extraCells = source;
+        extraCells.replace("%R\t1\t원본에만 보존", "%R\t1\t원본에만 보존\textra");
+        rejects([&] { jobs::importPrimaveraXer(extraCells, "extra-cells.xer"); });
+        bad("TASK", "task_id", 0, "");
+        bad("TASK", "task_name", 0, QString("bad") + QChar(0x7f) + "name");
+        bad("NOTEBOOK", "text", 0, QString("bad") + QChar(0x01) + "text");
+        auto paddedBudget = source.left(source.lastIndexOf("%T\tNOTEBOOK"));
+        paddedBudget += "%T\tNOTEBOOK\n%F";
+        for (int column = 0; column < 200; ++column)
+            paddedBudget += "\tf" + QByteArray::number(column);
+        paddedBudget += '\n';
+        for (int row = 0; row < 5001; ++row)
+            paddedBudget += "%R\t\n";
+        paddedBudget += "%E\n";
+        bool budgetRejected = false;
+        try {
+            jobs::importPrimaveraXer(paddedBudget, "padded-budget.xer");
+        } catch (const jobs::AppError &error) {
+            budgetRejected = error.code() == "FILE_PRIMAVERAXER_014";
+        }
+        check(budgetRejected, "restored cells escaped global allocation budget");
         auto noEnd = source.left(source.lastIndexOf("%E"));
         rejects([&] { jobs::importPrimaveraXer(noEnd, "no-end.xer"); });
         rejects([&] { jobs::importPrimaveraXer(source + "junk", "tail.xer"); });

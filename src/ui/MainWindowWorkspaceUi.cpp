@@ -1,5 +1,6 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
+#include "ui/EditorUi.h"
 #include <QAction>
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -11,6 +12,7 @@
 #include <QPlainTextEdit>
 #include <QSplitter>
 #include <QStyle>
+#include <QSignalBlocker>
 #include <QTextBlock>
 #include <QToolBar>
 #include <QToolButton>
@@ -98,6 +100,26 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     view->addWidget(wbsSummary_, 1);
     view->addWidget(new QLabel("간트 배율", centralWidget()));
     view->addWidget(zoom);
+    auto *navigation = menuBar()->addMenu("보기(&V)");
+    const auto navigationButton = [&](const char *id, const QString &label, const QKeySequence &key, auto callback) {
+        auto *action = navigation->addAction(label);
+        action->setObjectName(id);
+        action->setShortcut(key);
+        connect(action, &QAction::triggered, this, callback);
+        auto *button = new QToolButton(centralWidget());
+        button->setDefaultAction(action);
+        alignEditorControl(*button, controlHeight);
+        view->addWidget(button);
+    };
+    navigationButton("focusGanttSelection", "선택 보기", QKeySequence("Ctrl+Shift+J"),
+                     [this] { gantt_->focusSelectedTask(); });
+    navigationButton("fitGanttSchedule", "전체 맞춤", QKeySequence("Ctrl+Shift+F"), [this, zoom] {
+        const QSignalBlocker block(zoom);
+        if (zoom->findData("fit") < 0)
+            zoom->addItem("맞춤", "fit");
+        zoom->setCurrentIndex(zoom->findData("fit"));
+        gantt_->fitSchedule();
+    });
     baselineChoice_->setMinimumWidth(150);
     view->addWidget(baselineChoice_);
     layout->insertLayout(3, view);
@@ -154,10 +176,10 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     for (const auto *name : {"taskSearch", "taskFilter", "taskSort", "resetTaskView", "toggleWbs", "ganttZoom",
                              "baselineChoice", "toggleDiagnostics"})
         if (auto *control = findChild<QWidget *>(name))
-            control->setFixedHeight(controlHeight);
+            alignEditorControl(*control, controlHeight);
     for (auto *button : tools->findChildren<QToolButton *>())
         if (button->objectName() != "qt_toolbar_ext_button")
-            button->setFixedHeight(controlHeight);
+            alignEditorControl(*button, controlHeight);
     workspaceSplit_->setHandleWidth(7);
     workspaceSplit_->setStretchFactor(0, 0);
     workspaceSplit_->setStretchFactor(1, 1);
@@ -177,6 +199,10 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
 }
 void MainWindow::refreshWorkspaceUi() {
     const auto &project = document_.project();
+    if (auto *fit = findChild<QAction *>("fitGanttSchedule"))
+        fit->setEnabled(gantt_->hasSchedule());
+    if (auto *focus = findChild<QAction *>("focusGanttSelection"))
+        focus->setEnabled(gantt_->hasSchedule() && !selectedTask_.empty());
     if (!projectTitle_)
         return;
     if (!project) {

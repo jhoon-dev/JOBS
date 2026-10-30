@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -56,10 +57,15 @@ void MainWindow::manageCalendars() {
     form->addRow("근무 요일 (월1~일7)", weekdays);
     auto *periods = new QLineEdit;
     periods->setObjectName("calendarPeriods");
+    periods->setPlaceholderText("09:00-12:00,13:00-18:00");
     form->addRow("시간대 (쉼표 구분)", periods);
     auto *holidays = new QPlainTextEdit;
     holidays->setObjectName("calendarHolidays");
     form->addRow("휴일 YYYY-MM-DD (줄 구분)", holidays);
+    auto *error = new QLabel(&dialog);
+    error->setObjectName("calendarError");
+    error->setWordWrap(true);
+    layout->addWidget(error);
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close);
     auto *apply = buttons->addButton("등록/변경 적용", QDialogButtonBox::ActionRole);
     apply->setObjectName("applyCalendar");
@@ -129,7 +135,7 @@ void MainWindow::manageCalendars() {
             populate(id);
             load();
         } catch (const std::exception &e) {
-            report(e);
+            showEditorError(*error, e, name->text().trimmed().isEmpty() ? static_cast<QWidget *>(name) : periods);
         }
     });
     connect(remove, &QPushButton::clicked, &dialog, [&] {
@@ -138,9 +144,10 @@ void MainWindow::manageCalendars() {
             populate({});
             load();
         } catch (const std::exception &e) {
-            report(e);
+            showEditorError(*error, e, name->text().trimmed().isEmpty() ? static_cast<QWidget *>(name) : periods);
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }

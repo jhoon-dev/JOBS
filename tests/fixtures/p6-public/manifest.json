@@ -1,0 +1,80 @@
+{
+  "repository": "https://github.com/joniles/mpxj",
+  "revision": "3f7b69edb439486709af09a0415175ec0fac9d21",
+  "upstream_license": "LGPL-2.1",
+  "scope": "Unmodified upstream P6 XER regression fixtures; original P6 application execution and customer-project provenance are not independently attested. Test inputs only; not shipped in application payload.",
+  "files": [
+    {
+      "file": "PredecessorCalendar.xer",
+      "upstream_path": "junit/data/PredecessorCalendar.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/PredecessorCalendar.xer",
+      "bytes": 6428,
+      "sha256": "46f3c1c68552429cf32191ebc8f48d12f52e517481b6fb588ad1955937c5cd1d",
+      "encoding": "utf-8",
+      "header": "ERMHDR\t8.2.0\t2020-03-17\tProject\tadmin\tPrimavera Admin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "imported"
+    },
+    {
+      "file": "ProjectDefaultCalendar.xer",
+      "upstream_path": "junit/data/ProjectDefaultCalendar.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/ProjectDefaultCalendar.xer",
+      "bytes": 6428,
+      "sha256": "e48eb3a53b7e8f40a5a87af8e983e9932c298baeb572e3a901b3961f997674ef",
+      "encoding": "utf-8",
+      "header": "ERMHDR\t8.2.0\t2020-03-17\tProject\tadmin\tPrimavera Admin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "imported"
+    },
+    {
+      "file": "SuccessorCalendar.xer",
+      "upstream_path": "junit/data/SuccessorCalendar.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/SuccessorCalendar.xer",
+      "bytes": 6426,
+      "sha256": "ab420cc573be248ef7ef344f77b204176c3263fceb45c27866276929bf1e59e2",
+      "encoding": "utf-8",
+      "header": "ERMHDR\t8.2.0\t2020-03-17\tProject\tadmin\tPrimavera Admin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "imported"
+    },
+    {
+      "file": "TwentyFourHourCalendar.xer",
+      "upstream_path": "junit/data/TwentyFourHourCalendar.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/TwentyFourHourCalendar.xer",
+      "bytes": 6423,
+      "sha256": "9b91bf5bfcc0df4f6a2fec8867a923af7758058c224a9772a728e8d2ba0f0fc5",
+      "encoding": "utf-8",
+      "header": "ERMHDR\t8.2.0\t2020-03-17\tProject\tadmin\tPrimavera Admin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "imported"
+    },
+    {
+      "file": "resource-rates-test.xer",
+      "upstream_path": "junit/data/assignment/resource-rates-test.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/assignment/resource-rates-test.xer",
+      "bytes": 8431,
+      "sha256": "7298574bb32ac3068b07b427a35cd2834308d2fcb0e2ac74fea4e013e738c62e",
+      "encoding": "windows-1252",
+      "header": "ERMHDR\t20.12\t2022-08-22\tProject\tADMIN\tjon\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "rejected",
+      "expected_error": "ASSIGNMENT_INPUT_INVALID"
+    },
+    {
+      "file": "invalid-8.4.xer",
+      "upstream_path": "junit/data/calendar/invalid/invalid-8.4.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/calendar/invalid/invalid-8.4.xer",
+      "bytes": 9737,
+      "sha256": "85f8c7d681b15daf755ba1d568eb09ebcdd529a16c20045e6db6c2937899f54b",
+      "encoding": "windows-1252",
+      "header": "ERMHDR\t8.4\t2015-02-25\tProject\tadmin\tadmin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "rejected",
+      "expected_error": "FILE_PRIMAVERAXER_028"
+    },
+    {
+      "file": "percent-complete-8.4.xer",
+      "upstream_path": "junit/data/generated/task-percentcomplete/percent-complete-8.4.xer",
+      "url": "https://raw.githubusercontent.com/joniles/mpxj/3f7b69edb439486709af09a0415175ec0fac9d21/junit/data/generated/task-percentcomplete/percent-complete-8.4.xer",
+      "bytes": 8908,
+      "sha256": "71e56568075852d00507ff5506d5c055912ce0ba0982b97b8ace6269f794d10a",
+      "encoding": "windows-1252",
+      "header": "ERMHDR\t8.4\t2015-02-25\tProject\tadmin\tadmin\tdbxDatabaseNoName\tProject Management\tUSD",
+      "expected_status": "imported"
+    }
+  ]
+}

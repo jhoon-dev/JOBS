@@ -120,6 +120,7 @@ struct Table {
 struct File {
     QStringList header;
     std::map<QString, Table> tables;
+    QJsonArray normalizations;
 };
 QString path(const Table &t, const Row &r, const QString &field) {
     return t.name + "/line-" + QString::number(r.line) + "/" + field;
@@ -127,7 +128,13 @@ QString path(const Table &t, const Row &r, const QString &field) {
 QString get(const Table &t, const Row &r, const QString &field) {
     t.used.insert(field);
     auto i = t.fields.indexOf(field);
-    return i < 0 ? QString{} : r.cells.at(i);
+    auto value = i < 0 ? QString{} : r.cells.at(i);
+    if (value.contains(QChar(0x7f))) {
+        if (field != "clndr_data" && !field.endsWith("_descr") && !field.endsWith("_memo"))
+            throw AppError(ErrorCode::FILE_PRIMAVERAXER_012, {diagnosticArgument(path(t, r, field))});
+        value.replace(QChar(0x7f), QChar('\n'));
+    }
+    return value;
 }
 QString id(const Table &t, const Row &r, const QString &field) {
     return QString::number(integer(get(t, r, field), path(t, r, field)));
@@ -140,7 +147,7 @@ File parse(const QString &text) {
     if (text.count('\n') > 300001)
         throw AppError(ErrorCode::FILE_PRIMAVERAXER_010, {});
     auto lines = text.split('\n', Qt::KeepEmptyParts);
-    static const QRegularExpression tableName("^[A-Z][A-Z0-9_]{0,127}$"), fieldName("^[a-z][a-z0-9_]{0,127}$");
+    static const QRegularExpression tableName("^[A-Z][A-Z0-9_]{0,127}$"), fieldName("^[A-Za-z][A-Za-z0-9_]{0,127}$");
     int lineNumber = 0;
     for (auto line : lines) {
         ++lineNumber;
@@ -151,7 +158,7 @@ File parse(const QString &text) {
         if (ended)
             throw AppError(ErrorCode::FILE_PRIMAVERAXER_011, {});
         for (auto c : line)
-            if (forbiddenTextCharacter(c) && c != '\t')
+            if (forbiddenTextCharacter(c) && c != '\t' && !(c == QChar(0x7f) && line.startsWith("%R\t")))
                 throw AppError(ErrorCode::FILE_PRIMAVERAXER_012, {diagnosticArgument(QString::number(lineNumber))});
         if (line.count('\t') > 256)
             throw AppError(ErrorCode::FILE_PRIMAVERAXER_013, {});
@@ -186,9 +193,22 @@ File parse(const QString &text) {
                     throw AppError(ErrorCode::FILE_PRIMAVERAXER_019, {});
             current->fields = cells.mid(1);
         } else if (cells[0] == "%R") {
-            if (!current || current->fields.isEmpty() || cells.size() != current->fields.size() + 1)
+            if (!current || current->fields.isEmpty() || cells.size() > current->fields.size() + 1)
                 throw AppError(ErrorCode::FILE_PRIMAVERAXER_020, {diagnosticArgument(QString::number(lineNumber))});
-            current->rows.push_back({cells.mid(1), lineNumber});
+            auto values = cells.mid(1);
+            if (values.size() < current->fields.size()) {
+                totalCells += current->fields.size() - values.size();
+                if (totalCells > 1000000)
+                    throw AppError(ErrorCode::FILE_PRIMAVERAXER_014, {});
+                diagnostic(file.normalizations, current->name + "/line-" + QString::number(lineNumber),
+                           "생략된 행 끝 필드를 빈 값으로 복원 · 필수 값 검증 유지");
+                while (values.size() < current->fields.size())
+                    values.append(QString{});
+            }
+            if (line.contains(QChar(0x7f)))
+                diagnostic(file.normalizations, current->name + "/line-" + QString::number(lineNumber),
+                           "DEL 메모 줄바꿈 표기 · 사용 필드는 줄바꿈으로 해석 · 원본 바이트 보존");
+            current->rows.push_back({std::move(values), lineNumber});
         } else if (cells[0] == "%E") {
             if (cells.size() != 1 || (current && current->fields.isEmpty()))
                 throw AppError(ErrorCode::FILE_PRIMAVERAXER_021, {});
@@ -389,7 +409,8 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     currencyDecimals(p.currency);
     auto start = stamp(get(projects, pr, "plan_start_date"), path(projects, pr, "plan_start_date"));
     p.startDate = str(start.left(10));
-    QJsonArray diagnostics, mapping;
+    QJsonArray diagnostics = file.normalizations;
+    QJsonArray mapping;
     diagnostic(diagnostics, "PROJECT",
                "기간 기반 고정 기간 투영 · 공수/자원 종속 일정·실적/원가/P6 재계산 호환은 미검증입니다.");
     diagnostic(diagnostics, "CALENDAR",

@@ -4,6 +4,7 @@
 #include "calculation/WorkCalendar.h"
 #include "calculation/Effort.h"
 #include <QApplication>
+#include <QScopedValueRollback>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QMouseEvent>
@@ -36,10 +37,12 @@ void GanttView::mousePressEvent(QMouseEvent *e) {
     const auto kind = item ? item->data(1).toString() : QString{};
     if (item && (kind == "task" || kind == "milestone" || kind == "label" || kind == "resizeHandle")) {
         const auto id = item->data(0).toString().toStdString();
-        if (taskSelected)
+        if (taskSelected) {
+            QScopedValueRollback<bool> guard(chartSelection_, true);
             taskSelected(id);
+        }
         const auto row = std::find_if(rows_.begin(), rows_.end(), [&](const auto &r) { return r.id == id; });
-        if (e->button() == Qt::LeftButton && row != rows_.end() && row->editable && taskEdited) {
+        if (e->button() == Qt::LeftButton && row != rows_.end() && editable_ && row->editable && taskEdited) {
             const auto finishX = mapFromScene(QPointF(position(row->finish), 0)).x();
             const auto startX = mapFromScene(QPointF(position(row->start), 0)).x();
             const bool resize =

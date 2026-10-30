@@ -118,6 +118,9 @@ int main(int argc, char **argv) {
         while (!calculate->isEnabled() && clock.elapsed() < 180000)
             QTest::qWait(2);
         report["f9_calculation_and_commit_ms"] = milliseconds(clock);
+        report["preparation_ms"] = window.property("schedulePreparationMs").toDouble();
+        report["worker_ms"] = window.property("scheduleWorkerMs").toDouble();
+        report["gui_commit_ms"] = window.property("scheduleCommitMs").toDouble();
         require(calculate->isEnabled(), "180 second calculation timeout");
         require(document.calculation() && document.calculation()->status == jobs::CalculationStatus::Valid,
                 "calculation incomplete or conflicting");

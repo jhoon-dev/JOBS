@@ -1,6 +1,7 @@
 #include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -54,6 +55,10 @@ void MainWindow::editTaskConstraints() {
     due->setObjectName("deadlineAt");
     due->setPlaceholderText("없음");
     form->addRow("마감일·시각", due);
+    auto *error = new QLabel(&dialog);
+    error->setObjectName("constraintError");
+    error->setWordWrap(true);
+    layout->addWidget(error);
     const bool editable = !document_.readOnly();
     auto enabled = [&] {
         const auto key = constraintTypeFromToken(type->currentData().toString().toStdString());
@@ -80,9 +85,10 @@ void MainWindow::editTaskConstraints() {
             document_.setTaskTiming(row, key, stamp, deadline);
             dialog.accept();
         } catch (const std::exception &e) {
-            report(e);
+            showEditorError(*error, e, at->isEnabled() ? static_cast<QWidget *>(at) : due);
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     if (document_.project() && document_.project()->revision != before) {
         refresh();
@@ -177,6 +183,7 @@ void MainWindow::showScheduleIssues() {
             table->setCurrentCell(0, 0);
     });
     watcher->setFuture(QtConcurrent::run([snapshot] { return calculate(snapshot); }));
+    prepareEditorDialog(dialog);
     const auto accepted = dialog.exec() == QDialog::Accepted;
     const auto id = task->currentData().toString().toStdString();
     if (accepted && !id.empty() && document_.project() && document_.project()->documentId == snapshot.documentId &&

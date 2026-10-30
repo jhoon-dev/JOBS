@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/ResourceComparisonDialog.h"
 #include <QDialog>
 #include <QVBoxLayout>
@@ -183,7 +184,7 @@ void MainWindow::manageResources() {
             fill();
             error->setText("문서에 반영했습니다. 파일 저장으로 보존하세요.");
         } catch (const std::exception &e) {
-            error->setText(qErrorText(e));
+            showEditorError(*error, e, name->text().trimmed().isEmpty() ? static_cast<QWidget *>(name) : dates);
         }
     });
     connect(remove, &QPushButton::clicked, &dialog, [&] {
@@ -195,13 +196,14 @@ void MainWindow::manageResources() {
             dates->clear();
             error->setText("자원을 삭제했습니다.");
         } catch (const std::exception &e) {
-            error->setText(qErrorText(e));
+            showEditorError(*error, e, name->text().trimmed().isEmpty() ? static_cast<QWidget *>(name) : dates);
         }
     });
     auto *close = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
     layout->addWidget(close);
     connect(close, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     fill();
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -277,6 +279,7 @@ void MainWindow::assignResources() {
             error->setText(qErrorText(e));
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -284,6 +287,7 @@ void MainWindow::showResources() {
     if (!document_.project())
         return;
     ResourceComparisonDialog dialog(document_, this);
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }

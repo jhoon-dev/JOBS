@@ -1,6 +1,7 @@
 #include "formatting/QtDiagnosticText.h"
 #include "formatting/PlanTokens.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "calculation/Effort.h"
 #include <QComboBox>
 #include <QDialog>
@@ -240,6 +241,7 @@ void MainWindow::editTaskEffort() {
             error->setText(qErrorText(exception));
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     previewControl->cancel();
     refresh();

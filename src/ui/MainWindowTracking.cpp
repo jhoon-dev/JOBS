@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/ComparisonDialog.h"
 #include <QAction>
 #include <algorithm>
@@ -95,6 +96,7 @@ void MainWindow::saveBaseline() {
         }
         dialog.accept();
     });
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return;
     const auto snapshot = document_.snapshot();
@@ -164,6 +166,7 @@ void MainWindow::editStatusAt() {
             error->setText(qErrorText(e));
         }
     });
+    prepareEditorDialog(dialog);
     if (dialog.exec() == QDialog::Accepted)
         refresh();
 }
@@ -317,6 +320,7 @@ void MainWindow::reportProgress() {
             error->setText(qErrorText(ex));
         }
     });
+    prepareEditorDialog(dialog);
     if (dialog.exec() == QDialog::Accepted)
         refresh();
 }
@@ -324,6 +328,7 @@ void MainWindow::showComparison() {
     if (!document_.project())
         return;
     ComparisonDialog dialog(document_, selectedBaseline_, this);
+    prepareEditorDialog(dialog);
     dialog.exec();
 }
 } // namespace jobs

@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/AsyncEditController.h"
 #include "ui/TaskInput.h"
 #include <QAction>
@@ -104,6 +105,7 @@ void MainWindow::submitDialogEdit(QDialog &dialog, QLabel *error, QDialogButtonB
     if (!cancel) {
         cancel = buttons->addButton("계산 취소", QDialogButtonBox::ActionRole);
         cancel->setObjectName("cancelDialogEdit");
+        alignEditorControl(*cancel, std::max(32, dialog.fontMetrics().height() + 16));
     }
     error->setText(label + " · 계산 중…");
     setPending(true);

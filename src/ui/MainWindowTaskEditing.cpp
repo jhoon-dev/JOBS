@@ -180,6 +180,7 @@ void MainWindow::syncTaskSelection() {
     costReport_->setEnabled(!selectedTask_.empty() && !document_.readOnly() &&
                             document_.project()->statusAt.has_value());
     gantt_->setSelectedTask(selectedTask_);
+    refreshWorkspaceUi();
     assignWbs_->setEnabled(!selectedTask_.empty() && !document_.readOnly());
     progressEdit_->setEnabled(!selectedTask_.empty() && !document_.readOnly() &&
                               document_.project()->statusAt.has_value());

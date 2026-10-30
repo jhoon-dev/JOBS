@@ -11,6 +11,7 @@
 #include <QScopedValueRollback>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace jobs {
 namespace {
@@ -28,6 +29,7 @@ GanttView::GanttView(QWidget *parent) : QGraphicsView(parent) {
     setObjectName("ganttView");
     setAccessibleName("간트 일정 · 표와 같은 작업 선택");
     setScene(new QGraphicsScene(this));
+    scene()->setItemIndexMethod(QGraphicsScene::NoIndex);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::NoDrag);
@@ -45,21 +47,39 @@ qreal GanttView::position(const QString &stamp) const {
     return (qreal(firstDay_.daysTo(day)) + qreal(time.hour() * 60 + time.minute()) / 1440) * dayWidth_;
 }
 void GanttView::setPlan(const Project *p, const ScheduleResult *result, const std::vector<std::size_t> &indices,
-                        bool editable) {
+                        bool editable, std::shared_ptr<const Project> snapshot, std::uint64_t calculationGeneration) {
     EvaluationScope evaluation;
     cancelDrag();
-    input_.reset();
+    const bool valid = p && result && result->status == CalculationStatus::Valid &&
+                       result->documentId == p->documentId && result->inputRevision == p->revision &&
+                       result->profile == p->calculationProfile && result->projectFinish;
+    const bool reusable = input_ && p && snapshot && inputSource_.lock() == snapshot && revision_ == p->revision;
+    if (valid && reusable && calculationGeneration && renderedCalculation_ == calculationGeneration &&
+        displayedIndices_ == indices) {
+        const bool enabled = editable && !result->isForecast;
+        if (editable_ != enabled) {
+            editable_ = enabled;
+            rebuild();
+        }
+        return;
+    }
+    auto previousInput = std::move(input_);
+    inputSource_ = snapshot;
+    displayedIndices_ = indices;
+    renderedCalculation_ = calculationGeneration;
     renderCache_ = std::make_shared<EvaluationCache>();
     editable_ = false;
     const auto x = horizontalScrollBar()->value(), y = verticalScrollBar()->value();
     rows_.clear();
+    rowIndex_.clear();
     dayCount_ = 0;
     holidays_.clear();
     displayRowCount_ = indices.size();
     isForecast_ = result && result->isForecast;
-    if (p && result && result->status == CalculationStatus::Valid && result->documentId == p->documentId &&
-        result->inputRevision == p->revision && result->profile == p->calculationProfile && result->projectFinish) {
-        input_ = static_cast<const PlanInput &>(*p);
+    if (valid) {
+        // A weak source identity permits reuse without retaining the document's
+        // COW state and forcing its next ordinary edit to copy the whole project.
+        input_ = reusable ? std::move(previousInput) : std::make_shared<PlanInput>(*p);
         documentId_ = p->documentId;
         revision_ = p->revision;
         editable_ = editable && !isForecast_;
@@ -73,6 +93,10 @@ void GanttView::setPlan(const Project *p, const ScheduleResult *result, const st
         std::unordered_map<std::string, const TaskSchedule *> dates;
         for (const auto &row : result->tasks)
             dates.emplace(row.taskId, &row);
+        std::unordered_set<std::string> started;
+        for (const auto &entry : p->progress)
+            if (entry.actualStart)
+                started.insert(entry.taskId);
         bool complete = true;
         for (auto index : indices) {
             const auto &t = p->tasks.at(index);
@@ -87,9 +111,7 @@ void GanttView::setPlan(const Project *p, const ScheduleResult *result, const st
             rows_.back().edges = dependencies(t);
             rows_.back().calendar = qs(taskCalendarName(*p, t));
             auto &added = rows_.back();
-            added.editable = editable_ && !std::any_of(p->progress.begin(), p->progress.end(), [&](const auto &e) {
-                                 return e.taskId == t.id && e.actualStart.has_value();
-                             });
+            added.editable = !started.contains(t.id);
             added.constraintType = t.constraintType;
             added.constraintAt = t.constraintAt;
             added.deadlineAt = t.deadlineAt;
@@ -123,6 +145,8 @@ void GanttView::setPlan(const Project *p, const ScheduleResult *result, const st
             dayCount_ = 0;
         }
     }
+    for (std::size_t i = 0; i < rows_.size(); ++i)
+        rowIndex_.emplace(rows_[i].id, i);
     rebuild();
     horizontalScrollBar()->setValue(x);
     verticalScrollBar()->setValue(y);
@@ -136,12 +160,16 @@ void GanttView::setBaseline(const Baseline *baseline) {
     if (dates == baselineDates_)
         return;
     baselineDates_ = std::move(dates);
+    baselineIndex_.clear();
+    for (std::size_t i = 0; i < baselineDates_.size(); ++i)
+        baselineIndex_.emplace(baselineDates_[i].id, i);
     rebuild();
 }
 void GanttView::setDayWidth(int width) {
     if (width != 16 && width != 64)
         return;
-    auto day = qreal(horizontalScrollBar()->value()) / dayWidth_;
+    auto day = qreal(planFirstDay_.daysTo(firstDay_)) + horizontalScrollBar()->value() / dayWidth_;
+    fitted_ = false;
     dayWidth_ = width;
     rebuild();
     horizontalScrollBar()->setValue(int(day * dayWidth_));
@@ -150,14 +178,16 @@ void GanttView::setSelectedTask(const std::string &id) {
     const bool changed = selectedId_ != id;
     selectedId_ = id;
     if (changed && rows_.size() > 200) {
-        const auto row = std::find_if(rows_.begin(), rows_.end(), [&](const auto &r) { return r.id == id; });
-        if (row != rows_.end()) {
-            const auto y = HeaderHeight + int(row - rows_.begin()) * RowHeight;
+        const auto row = rowIndex_.find(id);
+        if (row != rowIndex_.end()) {
+            const auto y = HeaderHeight + int(row->second) * RowHeight;
             const auto top = verticalScrollBar()->value();
             if (y < top + HeaderHeight || y + RowHeight > top + viewport()->height())
                 verticalScrollBar()->setValue(std::max(0, y - HeaderHeight));
         }
     }
+    if (changed && !rebuilding_ && !chartSelection_)
+        focusSelectedTask(false);
     for (auto *item : scene()->items()) {
         const auto kind = item->data(1).toString();
         if (kind != "task" && kind != "milestone")
@@ -172,6 +202,28 @@ void GanttView::setSelectedTask(const std::string &id) {
             item->setVisible(item->data(0).toString() == qs(id));
     viewport()->update();
 }
+bool GanttView::hasSchedule() const {
+    return dayCount_ > 0 && !rows_.empty();
+}
+void GanttView::focusSelectedTask(bool center) {
+    const auto it = rowIndex_.find(selectedId_);
+    if (!hasSchedule() || it == rowIndex_.end() || drag_)
+        return;
+    const auto &row = rows_[it->second];
+    const auto begin = position(row.start), end = position(row.finish);
+    const auto left = horizontalScrollBar()->value();
+    const auto width = viewport()->width();
+    if (center || begin < left + 16 || end > left + width - 16)
+        horizontalScrollBar()->setValue(
+            int((end - begin < width - 32 ? (begin + end) / 2 : begin + width / 2 - 16) - width / 2));
+}
+void GanttView::fitSchedule() {
+    if (!hasSchedule())
+        return;
+    fitted_ = true;
+    rebuild();
+    horizontalScrollBar()->setValue(0);
+}
 void GanttView::ensureVisibleRows() {
     if (rebuilding_ || rows_.size() <= 200 || !dayCount_)
         return;
@@ -182,7 +234,10 @@ void GanttView::ensureVisibleRows() {
 }
 void GanttView::resizeEvent(QResizeEvent *event) {
     QGraphicsView::resizeEvent(event);
-    ensureVisibleRows();
+    if (fitted_ && hasSchedule())
+        rebuild();
+    else
+        ensureVisibleRows();
 }
 void GanttView::rebuild() {
     if (rebuilding_)
@@ -202,11 +257,23 @@ void GanttView::rebuild() {
     }
     firstDay_ = planFirstDay_;
     auto lastDay = planLastDay_;
+    if (fitted_ && !rows_.empty()) {
+        firstDay_ = QDate::fromString(rows_.front().start.left(10), Qt::ISODate);
+        lastDay = firstDay_;
+        for (const auto &row : rows_) {
+            firstDay_ = std::min(firstDay_, QDate::fromString(row.start.left(10), Qt::ISODate));
+            lastDay = std::max(lastDay, QDate::fromString(row.finish.left(10), Qt::ISODate));
+        }
+    }
     for (const auto &date : baselineDates_) {
+        if (!rowIndex_.contains(date.id))
+            continue;
         firstDay_ = std::min(firstDay_, QDate::fromString(date.start.left(10), Qt::ISODate));
         lastDay = std::max(lastDay, QDate::fromString(date.finish.left(10), Qt::ISODate));
     }
     dayCount_ = std::max(7, int(firstDay_.daysTo(lastDay)) + 2);
+    if (fitted_)
+        dayWidth_ = std::clamp(qreal(std::max(1, viewport()->width() - 20)) / dayCount_, qreal(.05), qreal(64));
     if (rows_.empty()) {
         auto *message = scene()->addText("선택한 WBS에 작업이 없습니다.");
         message->setDefaultTextColor(palette().color(QPalette::Text));
@@ -215,12 +282,6 @@ void GanttView::rebuild() {
     const auto width = dayCount_ * dayWidth_;
     const auto height = HeaderHeight + int(rows_.size()) * RowHeight;
     scene()->setSceneRect(0, 0, width, std::max(height, 120));
-    std::unordered_map<std::string, std::size_t> index;
-    std::unordered_map<std::string, const BaselineDate *> baseline;
-    for (const auto &date : baselineDates_)
-        baseline.emplace(date.id, &date);
-    for (std::size_t i = 0; i < rows_.size(); ++i)
-        index.emplace(rows_[i].id, i);
     renderedFirst_ =
         rows_.size() > 200 ? std::max(0, (verticalScrollBar()->value() - HeaderHeight) / RowHeight - 4) : 0;
     renderedLast_ = rows_.size() > 200 ? std::min(int(rows_.size()) - 1,
@@ -251,8 +312,8 @@ void GanttView::rebuild() {
         }
         const auto y = HeaderHeight + int(i) * RowHeight + RowHeight / 2;
         const auto start = position(row.start), finish = position(row.finish);
-        if (baseline.contains(row.id)) {
-            const auto &old = *baseline.at(row.id);
+        if (baselineIndex_.contains(row.id)) {
+            const auto &old = baselineDates_[baselineIndex_.at(row.id)];
             const auto x = position(old.start), end = position(old.finish);
             auto *oldBar = scene()->addRect(QRectF(x, y + 8, std::max(qreal(3), end - x), 3),
                                             QPen(QColor("#a0a0a0"), 1, Qt::DashLine), QBrush(QColor("#a0a0a0")));
@@ -298,19 +359,19 @@ void GanttView::rebuild() {
         tooltip += "\n제약: " + qs(constraintName(row.constraintType)) + " (" + qs(enumToken(row.constraintType)) +
                    ")" + (row.constraintAt ? " " + qs(*row.constraintAt) : QString{}) +
                    "\n마감: " + (row.deadlineAt ? qs(*row.deadlineAt) : "없음");
-        tooltip += row.editable
+        tooltip += (editable_ && row.editable)
                        ? "\n드래그=날짜 이동 · 오른쪽 끝/Shift+드래그=기간 · 15분 격자 · Esc=취소 · 적용 후 자동 재계산"
                        : "\n현재 작업은 드래그할 수 없습니다 (읽기 전용/예측/실제 시작 이력).";
         if (row.remainingStart)
             tooltip += "\n잔여 작업 재개: " + qs(*row.remainingStart);
         int hidden = 0;
         for (const auto &prev : row.predecessors)
-            if (!index.contains(prev))
+            if (!rowIndex_.contains(prev))
                 ++hidden;
         if (hidden)
             tooltip += "\n현재 WBS 밖 선행: " + QString::number(hidden) + "개 (전체 프로젝트 계산에 반영됨)";
         bar->setToolTip(tooltip);
-        if (row.editable && !milestone) {
+        if (editable_ && row.editable && !milestone) {
             auto *handle =
                 scene()->addRect(QRectF(finish - 3, y - 8, 6, 16), QPen(QColor("#153b5a")), QBrush(QColor("#d6eafa")));
             handle->setData(0, qs(row.id));
@@ -344,8 +405,8 @@ void GanttView::rebuild() {
         label->setToolTip(tooltip);
         for (const auto &edge : row.edges) {
             const auto &predecessor = edge.predecessorId;
-            auto found = index.find(predecessor);
-            if (found == index.end())
+            auto found = rowIndex_.find(predecessor);
+            if (found == rowIndex_.end())
                 continue;
             const auto &prev = rows_[found->second];
             auto x1 = position(dependencyFromFinish(edge.type) ? prev.finish : prev.start);
@@ -411,7 +472,9 @@ void GanttView::drawForeground(QPainter *painter, const QRectF &rect) {
     for (int i = first; i <= last; ++i) {
         const auto d = firstDay_.addDays(i);
         const auto x = i * dayWidth_;
-        if (dayWidth_ >= 64 || d.dayOfWeek() == 1 || i == 0) {
+        if (dayWidth_ >= 64 || (dayWidth_ >= 12 && d.dayOfWeek() == 1) ||
+            (dayWidth_ < 12 && dayWidth_ >= 2 && d.day() == 1) ||
+            (dayWidth_ < 2 && d.day() == 1 && (d.month() - 1) % 3 == 0) || i == 0) {
             painter->drawText(QRectF(x + 3, top + 3, 90, 18), Qt::AlignLeft,
                               d.toString(dayWidth_ >= 64 ? "MM-dd" : "yyyy-MM-dd"));
             painter->drawText(QRectF(x + 3, top + 23, 90, 17), Qt::AlignLeft, d.toString("ddd"));
