@@ -165,6 +165,21 @@ int main(int argc, char **argv) {
         report["vertical_scroll_and_paint"] = distribution(scrolling);
         report["max_scene_items_observed"] = maximumItems;
         report["last_row_checked"] = rows;
+        const auto revision = document.project()->revision;
+        const auto dirty = document.dirty();
+        auto *fit = window.findChild<QAction *>("fitGanttSchedule");
+        require(fit && fit->isEnabled(), "fit action unavailable");
+        fit->trigger();
+        paint();
+        require(gantt->sceneRect().width() <= gantt->viewport()->width() && gantt->horizontalScrollBar()->value() == 0,
+                "full schedule does not fit viewport");
+        require(document.project()->revision == revision && document.dirty() == dirty,
+                "view navigation changed document");
+        report["fit_scene_width"] = gantt->sceneRect().width();
+        report["fit_viewport_width"] = gantt->viewport()->width();
+        const auto capture = qEnvironmentVariable("JOBS_GANTT_FIT_CAPTURE");
+        if (!capture.isEmpty())
+            require(window.grab().save(capture), "fit screenshot failed");
         report["status"] = "passed";
         window.hide();
     } catch (const std::exception &error) {

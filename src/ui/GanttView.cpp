@@ -9,7 +9,9 @@
 #include <QTime>
 #include <QResizeEvent>
 #include <QScopedValueRollback>
+#include <QFontMetrics>
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -448,10 +450,14 @@ void GanttView::drawBackground(QPainter *painter, const QRectF &rect) {
     for (int i = first; i <= last; ++i) {
         const auto d = firstDay_.addDays(i);
         const auto x = i * dayWidth_;
-        if (d.dayOfWeek() > 5 || holidays_.contains(d))
+        if (dayWidth_ >= 6 && (d.dayOfWeek() > 5 || holidays_.contains(d)))
             painter->fillRect(QRectF(x, rect.top(), dayWidth_, rect.height()), QColor(128, 128, 128, 25));
-        painter->setPen(QPen(palette().color(QPalette::Midlight), 0));
-        painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
+        if (dayWidth_ >= 6 || (dayWidth_ >= 2 && d.day() == 1) ||
+            (dayWidth_ < 2 && dayWidth_ >= .5 && d.day() == 1 && (d.month() - 1) % 3 == 0) ||
+            (dayWidth_ < .5 && d.dayOfYear() == 1)) {
+            painter->setPen(QPen(palette().color(QPalette::Midlight), 0));
+            painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
+        }
     }
     painter->setPen(QPen(palette().color(QPalette::Midlight), 0));
     for (int y = HeaderHeight + std::max(0, int((rect.top() - HeaderHeight) / RowHeight)) * RowHeight;
@@ -469,15 +475,28 @@ void GanttView::drawForeground(QPainter *painter, const QRectF &rect) {
     painter->setPen(palette().color(QPalette::Text));
     auto first = std::max(0, int(rect.left() / dayWidth_));
     auto last = std::min(dayCount_ - 1, int(rect.right() / dayWidth_));
+    const auto metrics = painter->fontMetrics();
+    const int yearStep = std::max(1, int(std::ceil(64 / (365 * dayWidth_))));
+    qreal labelRight = rect.left() - 1000;
     for (int i = first; i <= last; ++i) {
         const auto d = firstDay_.addDays(i);
         const auto x = i * dayWidth_;
         if (dayWidth_ >= 64 || (dayWidth_ >= 12 && d.dayOfWeek() == 1) ||
             (dayWidth_ < 12 && dayWidth_ >= 2 && d.day() == 1) ||
-            (dayWidth_ < 2 && d.day() == 1 && (d.month() - 1) % 3 == 0) || i == 0) {
-            painter->drawText(QRectF(x + 3, top + 3, 90, 18), Qt::AlignLeft,
-                              d.toString(dayWidth_ >= 64 ? "MM-dd" : "yyyy-MM-dd"));
-            painter->drawText(QRectF(x + 3, top + 23, 90, 17), Qt::AlignLeft, d.toString("ddd"));
+            (dayWidth_ < 2 && dayWidth_ >= .5 && d.day() == 1 && (d.month() - 1) % 3 == 0) ||
+            (dayWidth_ < .5 && d.dayOfYear() == 1 && d.year() % yearStep == 0) || i == 0) {
+            const auto label = dayWidth_ >= 64   ? d.toString("MM-dd")
+                               : dayWidth_ >= 12 ? d.toString("yyyy-MM-dd")
+                               : dayWidth_ >= 2  ? d.toString("yyyy-MM")
+                               : dayWidth_ >= .5 ? QString("%1 Q%2").arg(d.year()).arg((d.month() - 1) / 3 + 1)
+                                                 : d.toString("yyyy");
+            const auto detail = dayWidth_ >= 12 ? d.toString("ddd") : QString{};
+            const auto width = std::max(metrics.horizontalAdvance(label), metrics.horizontalAdvance(detail)) + 2;
+            if (x + 3 < labelRight + 8)
+                continue;
+            painter->drawText(QRectF(x + 3, top + 3, width, 18), Qt::AlignLeft, label);
+            painter->drawText(QRectF(x + 3, top + 23, width, 17), Qt::AlignLeft, detail);
+            labelRight = x + 3 + width;
         }
     }
     painter->drawLine(QPointF(rect.left(), top + HeaderHeight), QPointF(rect.right(), top + HeaderHeight));

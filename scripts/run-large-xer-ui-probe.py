@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -17,10 +18,12 @@ binary = next((path for path in (build/name, build/'Release'/name) if path.is_fi
 if binary is None or output.exists():
     raise SystemExit('Probe missing or output already exists')
 output.parent.mkdir(parents=True, exist_ok=True)
+environment = os.environ.copy()
+environment['JOBS_GANTT_FIT_CAPTURE'] = str(output.with_suffix('.fit.png'))
 with output.with_suffix('.log').open('wb') as log:
     try:
         result = subprocess.run([str(binary), str(source), str(output)], cwd=build,
-                                stdout=log, stderr=subprocess.STDOUT, timeout=300)
+                                stdout=log, stderr=subprocess.STDOUT, timeout=300, env=environment)
     except subprocess.TimeoutExpired:
         output.write_text(json.dumps({'status': 'timeout', 'limit_seconds': 300})+'\n', encoding='utf-8')
         raise SystemExit('Native probe timed out')
