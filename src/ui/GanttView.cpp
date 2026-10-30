@@ -401,6 +401,9 @@ void GanttView::drawForeground(QPainter *painter, const QRectF &rect) {
     if (!dayCount_)
         return;
     const auto top = mapToScene(QPoint(0, 0)).y();
+    auto opaqueBase = palette().color(QPalette::Base);
+    opaqueBase.setAlpha(255);
+    painter->fillRect(QRectF(rect.left(), top, rect.width(), HeaderHeight), opaqueBase);
     painter->fillRect(QRectF(rect.left(), top, rect.width(), HeaderHeight), palette().brush(QPalette::AlternateBase));
     painter->setPen(palette().color(QPalette::Text));
     auto first = std::max(0, int(rect.left() / dayWidth_));

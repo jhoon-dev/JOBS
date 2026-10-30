@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QDir>
 #include <QGraphicsScene>
+#include <QGraphicsItem>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -67,6 +68,15 @@ private slots:
         // A scene bit-blit can otherwise leave overscan task labels in the frozen date header.
         QVERIFY(coverage.painted.contains(QRect(0, 0, gantt->viewport()->width(), jobs::GanttView::HeaderHeight)));
         QCOMPARE(table->verticalScrollBar()->value(), gantt->verticalScrollBar()->value());
+        auto colors = gantt->palette();
+        colors.setColor(QPalette::AlternateBase, QColor(255, 255, 255, 12));
+        gantt->setPalette(colors);
+        const QRect header(0, 0, gantt->viewport()->width(), jobs::GanttView::HeaderHeight);
+        const auto before = gantt->viewport()->grab(header).toImage();
+        auto *underlay = gantt->scene()->addRect(gantt->mapToScene(header).boundingRect(), Qt::NoPen, Qt::magenta);
+        underlay->setZValue(10000);
+        const auto after = gantt->viewport()->grab(header).toImage();
+        QCOMPARE(after, before);
     }
     void componentHeightsAndApplicationIcon() {
         jobs::JsonProjectStore store;
