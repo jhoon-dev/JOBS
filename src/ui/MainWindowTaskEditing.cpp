@@ -158,7 +158,7 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     QTimer::singleShot(0, this, [this] { updateCompactLayout(); });
 }
 void MainWindow::updateCompactLayout() {
-    if (!editingHelp_ || !diagnostics_)
+    if (!editingHelp_ || !diagnostics_ || !projectTitle_ || !summary_ || !diagnosticsToggle_ || !centralWidget())
         return;
     const bool compact = height() < 760;
     editingHelp_->hide();
