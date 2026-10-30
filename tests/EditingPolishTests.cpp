@@ -19,6 +19,7 @@
 #include <QScrollBar>
 #include <QTest>
 #include <QTimer>
+#include <QScopeGuard>
 
 class EditingPolishTests : public QObject {
     Q_OBJECT
@@ -112,9 +113,10 @@ private slots:
         doc.setDuration(0, 480);
         doc.putResource({{}, "검증 팀", "labor", 100, {}});
         doc.setStatusAt("2026-11-02 18:00");
-        jobs::MainWindow window(doc);
+        const auto originalPalette = QApplication::palette();
+        const auto restorePalette = qScopeGuard([&] { QApplication::setPalette(originalPalette); });
         if (dark) {
-            auto palette = window.palette();
+            auto palette = originalPalette;
             palette.setColor(QPalette::Window, QColor("#242a33"));
             palette.setColor(QPalette::Base, QColor("#19202a"));
             palette.setColor(QPalette::AlternateBase, QColor("#303947"));
@@ -122,9 +124,9 @@ private slots:
             palette.setColor(QPalette::Text, Qt::white);
             palette.setColor(QPalette::Button, QColor("#303947"));
             palette.setColor(QPalette::ButtonText, Qt::white);
-            window.setPalette(palette);
+            QApplication::setPalette(palette);
         } else {
-            auto palette = window.palette();
+            auto palette = originalPalette;
             palette.setColor(QPalette::Window, QColor("#f4f5f7"));
             palette.setColor(QPalette::Base, Qt::white);
             palette.setColor(QPalette::AlternateBase, QColor("#e7eaf0"));
@@ -132,8 +134,9 @@ private slots:
             palette.setColor(QPalette::Text, Qt::black);
             palette.setColor(QPalette::Button, QColor("#e7eaf0"));
             palette.setColor(QPalette::ButtonText, Qt::black);
-            window.setPalette(palette);
+            QApplication::setPalette(palette);
         }
+        jobs::MainWindow window(doc);
         window.show();
         QTest::qWait(30);
         auto *table = taskTable(window);

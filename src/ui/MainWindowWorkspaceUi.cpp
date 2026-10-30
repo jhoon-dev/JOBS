@@ -89,6 +89,7 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     wbsSummary_->setWordWrap(false);
     wbsSummary_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     auto *view = new QHBoxLayout;
+    view->setObjectName("workspaceViewRow");
     auto *wbs = new QToolButton(centralWidget());
     wbs->setObjectName("toggleWbs");
     wbs->setText("WBS 탐색");
@@ -125,6 +126,7 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     layout->insertLayout(3, view);
 
     auto *diagnosticBar = new QHBoxLayout;
+    diagnosticBar->setObjectName("workspaceDiagnosticRow");
     auto *status = new QLabel(centralWidget());
     status->setObjectName("calculationStatus");
     status->setTextFormat(Qt::PlainText);
@@ -186,6 +188,7 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     workspaceSplit_->setStretchFactor(2, 1);
     setStyleSheet(
         "QToolBar { spacing: 4px; padding: 6px; border: 0; border-bottom: 1px solid palette(midlight); }"
+        "QToolBar[compactWorkspace=\"true\"] { padding: 2px 6px; }"
         "QToolBar QToolButton { padding: 6px 8px; }"
         "QLabel#projectTitle { font-size: 21px; font-weight: 600; padding: 2px 0; }"
         "QLabel#documentNotice { padding: 6px; border: 1px solid palette(mid); }"

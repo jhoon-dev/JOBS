@@ -26,6 +26,8 @@
 #include <QTimer>
 #include <QResizeEvent>
 #include <QVBoxLayout>
+#include <QToolBar>
+#include <QStyle>
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
@@ -158,6 +160,34 @@ void MainWindow::updateCompactLayout() {
     const bool compact = height() < 760;
     editingHelp_->hide();
     diagnostics_->setMaximumHeight(compact ? 80 : 140);
+    const bool shortWindow = height() < 520;
+    projectTitle_->setVisible(!shortWindow);
+    summary_->setVisible(!shortWindow);
+    if (auto *layout = qobject_cast<QVBoxLayout *>(centralWidget()->layout())) {
+        layout->setContentsMargins(shortWindow ? 8 : 16, shortWindow ? 4 : 12, shortWindow ? 8 : 16,
+                                   shortWindow ? 4 : 8);
+        layout->setSpacing(shortWindow ? 4 : 8);
+    }
+    auto *view = findChild<QHBoxLayout *>("workspaceViewRow");
+    auto *diagnostic = findChild<QHBoxLayout *>("workspaceDiagnosticRow");
+    if (view && diagnostic && diagnosticsToggle_) {
+        auto *target = shortWindow ? view : diagnostic;
+        if (target->indexOf(diagnosticsToggle_) < 0) {
+            (shortWindow ? diagnostic : view)->removeWidget(diagnosticsToggle_);
+            target->addWidget(diagnosticsToggle_);
+        }
+    }
+    if (auto *status = findChild<QLabel *>("calculationStatus")) {
+        status->setVisible(!shortWindow);
+        diagnosticsToggle_->setToolTip(status->text());
+    }
+    if (auto *tools = findChild<QToolBar *>("primaryTools");
+        tools && tools->property("compactWorkspace").toBool() != shortWindow) {
+        tools->setProperty("compactWorkspace", shortWindow);
+        tools->style()->unpolish(tools);
+        tools->style()->polish(tools);
+        tools->updateGeometry();
+    }
 }
 void MainWindow::syncTaskSelection() {
 

@@ -146,6 +146,22 @@ private slots:
             QVERIFY(output.write(QJsonDocument(measurements).toJson()) > 0);
         }
     }
+    void shortWindowPreservesFourRowsAndCommands() {
+        jobs::JsonProjectStore store;
+        jobs::Document document(store);
+        jobs::MainWindow window(document);
+        window.resize(1280, 340);
+        window.show();
+        QTest::qWait(30);
+        QVERIFY(!window.findChild<QLabel *>("projectTitle")->isVisible());
+        QVERIFY(window.findChild<QToolButton *>("toggleDiagnostics")->isVisible());
+        QVERIFY(window.findChild<QLineEdit *>("taskSearch")->isVisible());
+        QVERIFY(window.findChild<QComboBox *>("ganttZoom")->isVisible());
+        QVERIFY(taskTable(window)->viewport()->height() >= jobs::GanttView::RowHeight * 4);
+        window.resize(1280, 720);
+        QTest::qWait(30);
+        QCOMPARE(window.findChild<QLabel *>("projectTitle")->isVisible(), window.height() >= 520);
+    }
     void compactWindowKeepsCommandsAndRows() {
         jobs::JsonProjectStore store;
         jobs::Document document(store);
