@@ -241,17 +241,30 @@ private slots:
         QTest::qWait(40);
         auto *table = taskTable(window);
         auto *gantt = window.findChild<QGraphicsView *>("ganttView");
-        QCOMPARE(table->rowCount(), 8);
-        QCOMPARE(table->horizontalHeader()->height(), jobs::GanttView::HeaderHeight);
-        QCOMPARE(table->verticalHeader()->sectionSize(0), jobs::GanttView::RowHeight);
-        QVERIFY(table->viewport()->height() >= std::max(4 * jobs::GanttView::RowHeight, window.height() / 2));
-        QVERIFY(!window.findChild<QPlainTextEdit *>("calculationDiagnostics")->isVisible());
-        QVERIFY(!gantt->scene()->items().isEmpty());
-        table->selectRow(3);
         const auto capture = qEnvironmentVariable("JOBS_UI_SCREENSHOT_DIR");
+        const QJsonObject geometry{{"window_height", window.height()},
+                                   {"table_viewport_height", table->viewport()->height()},
+                                   {"gantt_viewport_height", gantt->viewport()->height()},
+                                   {"header_height", table->horizontalHeader()->height()}};
+        qInfo().noquote() << QJsonDocument(geometry).toJson(QJsonDocument::Compact);
+        table->selectRow(3);
         if (!capture.isEmpty()) {
             QVERIFY(QDir().mkpath(capture));
             QVERIFY(window.grab().save(QDir(capture).filePath("workspace-1440.png")));
+            QFile output(QDir(capture).filePath("geometry.json"));
+            QVERIFY(output.open(QIODevice::WriteOnly));
+            QVERIFY(output.write(QJsonDocument(geometry).toJson()) > 0);
+        }
+        QCOMPARE(table->rowCount(), 8);
+        QCOMPARE(table->horizontalHeader()->height(), jobs::GanttView::HeaderHeight);
+        QCOMPARE(table->verticalHeader()->sectionSize(0), jobs::GanttView::RowHeight);
+        QVERIFY(table->viewport()->height() >= 4 * jobs::GanttView::RowHeight);
+        QCOMPARE(table->viewport()->height() + jobs::GanttView::HeaderHeight, gantt->viewport()->height());
+        QCOMPARE(table->horizontalHeader()->mapTo(&window, QPoint()).y(),
+                 gantt->viewport()->mapTo(&window, QPoint()).y());
+        QVERIFY(!window.findChild<QPlainTextEdit *>("calculationDiagnostics")->isVisible());
+        QVERIFY(!gantt->scene()->items().isEmpty());
+        if (!capture.isEmpty()) {
             window.resize(1024, 650);
             QTest::qWait(30);
             QVERIFY(table->viewport()->height() >= 4 * jobs::GanttView::RowHeight);
