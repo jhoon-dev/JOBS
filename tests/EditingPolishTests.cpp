@@ -123,6 +123,16 @@ private slots:
             palette.setColor(QPalette::Button, QColor("#303947"));
             palette.setColor(QPalette::ButtonText, Qt::white);
             window.setPalette(palette);
+        } else {
+            auto palette = window.palette();
+            palette.setColor(QPalette::Window, QColor("#f4f5f7"));
+            palette.setColor(QPalette::Base, Qt::white);
+            palette.setColor(QPalette::AlternateBase, QColor("#e7eaf0"));
+            palette.setColor(QPalette::WindowText, Qt::black);
+            palette.setColor(QPalette::Text, Qt::black);
+            palette.setColor(QPalette::Button, QColor("#e7eaf0"));
+            palette.setColor(QPalette::ButtonText, Qt::black);
+            window.setPalette(palette);
         }
         window.show();
         QTest::qWait(30);
@@ -140,6 +150,7 @@ private slots:
                     failure = "dialog missing";
                     return;
                 }
+                dialog->setPalette(window.palette());
                 dialog->resize(640, 480);
                 QTest::qWait(20);
                 if (!dialog->findChild<QScrollArea *>("editorScrollArea") || dialog->height() > 520)
@@ -193,6 +204,11 @@ private slots:
                 }
                 if (invalid && (invalid->text().isEmpty() || !error || error->text().isEmpty() || !invalid->hasFocus()))
                     failure = "invalid draft/focus/inline feedback lost";
+                if (error) {
+                    auto *viewport = dialog->findChild<QScrollArea *>("editorScrollArea")->viewport();
+                    if (!viewport->rect().contains(error->mapTo(viewport, error->rect().center())))
+                        failure = "inline feedback outside scroll viewport";
+                }
                 if (doc.project()->revision != before)
                     failure = "invalid draft modified document";
                 if (!capture.isEmpty()) {

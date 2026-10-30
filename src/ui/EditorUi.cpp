@@ -36,6 +36,11 @@ void prepareEditorDialog(QDialog &dialog) {
         if (input || qobject_cast<QPushButton *>(control) || qobject_cast<QToolButton *>(control) ||
             qobject_cast<QCheckBox *>(control) || qobject_cast<QRadioButton *>(control))
             alignEditorControl(*control, height);
+        if (auto *button = qobject_cast<QPushButton *>(control)) {
+            auto text = button->text();
+            text.remove('&');
+            button->setMinimumWidth(button->fontMetrics().horizontalAdvance(text) + 28);
+        }
     }
     for (auto *form : dialog.findChildren<QFormLayout *>()) {
         form->setRowWrapPolicy(QFormLayout::WrapLongRows);
@@ -88,5 +93,14 @@ void showEditorError(QLabel &label, const std::exception &error, QWidget *field)
         if (auto *line = qobject_cast<QLineEdit *>(field))
             line->selectAll();
     }
+    // The feedback may be below a tall editor on a small display. Keep it in
+    // view without discarding the focused field's draft.
+    if (label.parentWidget() && label.parentWidget()->layout())
+        label.parentWidget()->layout()->activate();
+    for (auto *parent = label.parentWidget(); parent; parent = parent->parentWidget())
+        if (auto *scroll = qobject_cast<QScrollArea *>(parent)) {
+            scroll->ensureWidgetVisible(&label, 12, 12);
+            break;
+        }
 }
 } // namespace jobs
