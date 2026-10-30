@@ -27,6 +27,7 @@
 #include <QResizeEvent>
 #include <QVBoxLayout>
 #include <QToolBar>
+#include <QToolButton>
 #include <QStyle>
 #include <algorithm>
 #include <unordered_map>
