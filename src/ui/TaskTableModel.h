@@ -28,6 +28,7 @@ public:
         return lastTaskVisits_;
     }
     std::function<bool(std::string, int, QString)> editRequested;
+    std::function<void(std::string, int)> unchangedEditRequested;
 
 private:
     Document &document_;

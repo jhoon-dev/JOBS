@@ -463,17 +463,42 @@ void MainWindow::pasteCells() {
     try {
         const auto text = QApplication::clipboard()->text();
         const int row = table_->currentRow(), column = table_->currentColumn();
-        submitEdit(DeferredTaskEdit{[text, row, column, rows = visibleRows_](const Project &p) -> BulkTaskCommand {
+        const bool periodsKnown =
+            document_.calculation() && document_.calculation()->status == CalculationStatus::Valid;
+        submitEdit(DeferredTaskEdit{[text, row, column, periodsKnown,
+                                     rows = visibleRows_](const Project &p) -> BulkTaskCommand {
                        const auto cells = decodeTaskTsv(text);
                        if (cells.isEmpty() || row < 0 || column < 0 || column >= 3 || column + cells.front().size() > 3)
                            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_007, {});
                        if (std::size_t(row) + std::size_t(cells.size()) > rows.size())
                            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_008, {});
                        std::vector<TaskEdit> edits;
+                       std::optional<ScheduleResult> periodPlan;
+                       std::unordered_map<std::string, const TaskSchedule *> periodDates;
+                       auto currentPeriod = [&](const Task &task) -> std::optional<std::int64_t> {
+                           if (!usesWork(task))
+                               return task.durationMinutes;
+                           if (!periodsKnown)
+                               return {};
+                           // Compare with the same plan period displayed by the table.
+                           // Keep this calculation in the decoder's worker, once per paste.
+                           if (!periodPlan) {
+                               periodPlan = calculatePlan(p);
+                               if (periodPlan->status == CalculationStatus::Valid)
+                                   for (const auto &date : periodPlan->tasks)
+                                       periodDates[date.taskId] = &date;
+                           }
+                           const auto found = periodDates.find(task.id);
+                           if (found == periodDates.end())
+                               return {};
+                           WorkCalendar calendar(p, task);
+                           return calendar.offset(found->second->finish) - calendar.offset(found->second->start);
+                       };
                        for (qsizetype r = 0; r < cells.size(); ++r) {
                            calculationCheckpoint();
                            TaskEdit e;
-                           e.taskId = p.tasks[rows.at(std::size_t(row) + std::size_t(r))].id;
+                           const auto &task = p.tasks[rows.at(std::size_t(row) + std::size_t(r))];
+                           e.taskId = task.id;
                            for (qsizetype c = 0; c < cells[r].size(); ++c) {
                                try {
                                    const auto &value = cells[r][c];
@@ -481,9 +506,16 @@ void MainWindow::pasteCells() {
                                        if (value.trimmed().isEmpty())
                                            throw AppError(ErrorCode::MAINWINDOWTASKEDITING_009, {});
                                        e.name = value.trimmed().toUtf8().toStdString();
-                                   } else if (column + c == 1)
-                                       e.duration.emplace(taskDurationInput(value));
-                                   else
+                                   } else if (column + c == 1) {
+                                       const auto current = currentPeriod(task);
+                                       // A computed work period can exceed the duration-input limit.
+                                       if (usesWork(task) && current &&
+                                           value.trimmed() == QString::number(*current) + "m")
+                                           continue;
+                                       const auto requested = taskDurationInput(value);
+                                       if (requested != current)
+                                           e.duration.emplace(requested);
+                                   } else
                                        e.edges = taskDependencyInput(value, p, e.taskId);
                                } catch (const std::exception &error) {
                                    throw AppError(ErrorCode::MAINWINDOWTASKEDITING_010,

@@ -153,8 +153,11 @@ bool TaskTableModel::setData(const QModelIndex &index, const QVariant &value, in
         return false;
     const auto &task = plan_.tasks.at(rows_[std::size_t(index.row())]);
     const auto input = value.toString().trimmed();
-    if (input == text(task, index.column()))
+    if (input == text(task, index.column())) {
+        if (unchangedEditRequested)
+            unchangedEditRequested(task.id, index.column());
         return true;
+    }
     const auto taskId = task.id;
     const int row = index.row(), column = index.column();
     QPointer<TaskTableModel> guard(this);

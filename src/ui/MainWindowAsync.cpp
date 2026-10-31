@@ -3,6 +3,7 @@
 #include "ui/EditorUi.h"
 #include "ui/AsyncEditController.h"
 #include "ui/TaskInput.h"
+#include "ui/TaskTableModel.h"
 #include <QAction>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -17,6 +18,10 @@
 namespace jobs {
 void MainWindow::setupAsyncEditing(QToolBar *tools) {
     editController_ = new AsyncEditController(document_, this);
+    taskModel_->unchangedEditRequested = [this](std::string id, int column) {
+        if (column == 1 && editController_->cancelDurationEdit(id))
+            afterEdit_ = {};
+    };
     editController_->beforeApply = [this] { commitPendingCell(); };
     editController_->captureView = [this] { return captureTaskView(); };
     cancelEdit_ = new QAction("편집 계산 취소", this);

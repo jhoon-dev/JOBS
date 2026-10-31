@@ -25,9 +25,12 @@ AsyncEditController::~AsyncEditController() {
 std::shared_ptr<CalculationControl> AsyncEditController::submit(EditCommand command, QString label,
                                                                 Completion completion) {
     auto control = std::make_shared<CalculationControl>();
+    std::optional<std::string> durationTaskId;
+    if (const auto *duration = std::get_if<DurationEdit>(&command))
+        durationTaskId = duration->taskId;
     Pending next{
         document_.makeEditRequest(std::move(command), captureView ? captureView() : Document::ViewPreparation{}),
-        std::move(label), std::move(completion), control};
+        std::move(label), std::move(completion), control, std::move(durationTaskId)};
     QPointer<AsyncEditController> guard(this);
     if (busy_) {
         invalidate(EditState::Cancelled);
@@ -49,6 +52,14 @@ std::shared_ptr<CalculationControl> AsyncEditController::submit(EditCommand comm
 }
 void AsyncEditController::cancel() {
     invalidate(EditState::Cancelled);
+}
+bool AsyncEditController::cancelDurationEdit(const std::string &taskId) {
+    // A newer queued edit supersedes the active one, even for another task.
+    const auto &target = pending_ ? pending_->durationTaskId : activeDurationTaskId_;
+    if (!busy_ || !target || *target != taskId)
+        return false;
+    invalidate(EditState::Cancelled);
+    return true;
 }
 void AsyncEditController::invalidate(EditState reason) {
     if (!busy_ && !pending_)
@@ -76,6 +87,7 @@ void AsyncEditController::start(Pending pending) {
     label_ = std::move(pending.label);
     control_ = std::move(pending.control);
     activeSession_ = document_.sessionGeneration();
+    activeDurationTaskId_ = std::move(pending.durationTaskId);
     auto control = control_;
     auto *watcher = new QFutureWatcher<std::shared_ptr<Document::PreparedEdit>>(this);
     connect(watcher, &QFutureWatcher<std::shared_ptr<Document::PreparedEdit>>::finished, this,
@@ -136,6 +148,7 @@ void AsyncEditController::start(Pending pending) {
                 if (state == EditState::Stale)
                     message = "문서가 변경되어 오래된 편집 결과를 반영하지 않았습니다.";
                 busy_ = false;
+                activeDurationTaskId_.reset();
                 control_.reset();
                 label_.clear();
                 watcher->deleteLater();
