@@ -5,7 +5,7 @@
 #include <optional>
 
 namespace jobs {
-enum class UpdateChannel { Release, Store, DevelopmentPackage };
+enum class UpdateChannel { Release, Store, DevelopmentPackage, MacAppStore };
 enum class UpdateState {
     Idle,
     Checking,
@@ -41,4 +41,5 @@ bool releasePageAllowed(const QUrl &);
 bool downloadUrlAllowed(const QUrl &);
 QUrl updateCatalogUrl();
 QUrl storeUpdatesUrl();
+QUrl macAppStoreUrl();
 } // namespace jobs

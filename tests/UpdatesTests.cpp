@@ -168,6 +168,9 @@ private slots:
 #else
         QVERIFY(!updateConfig().installedWindows);
 #endif
+#ifdef JOBS_MAC_APP_STORE
+        QCOMPARE(updateConfig().channel, UpdateChannel::MacAppStore);
+#endif
     }
     void versions() {
         QVERIFY(newerVersion("0.10.0", "0.2.9"));
@@ -393,6 +396,36 @@ private slots:
         window.findChild<QPushButton *>("installApplicationUpdate")->click();
         QCOMPARE(opened, storeUpdatesUrl());
         QCOMPARE(network.requests.size(), 0);
+    }
+    void macStoreDoesNotUseExternalUpdater() {
+        QTemporaryDir dir;
+        Network network;
+        auto options = config(dir);
+        options.channel = UpdateChannel::MacAppStore;
+        auto client = std::make_unique<Store>();
+        auto *store = client.get();
+        UpdateController controller(options, nullptr, &network, std::move(client));
+        controller.setAutomatic(true);
+        QVERIFY(!controller.automatic());
+        controller.check();
+        QCOMPARE(controller.state(), UpdateState::Unsupported);
+        QVERIFY(!controller.canDownload());
+        controller.download();
+        QCOMPARE(store->calls, 0);
+        QCOMPARE(network.requests.size(), 0);
+        QMainWindow window;
+        QUrl opened;
+        attachUpdateUi(window, controller, {{}, {}, {}, [&](const QUrl &url) {
+                                                opened = url;
+                                                return true;
+                                            }});
+        window.findChild<QAction *>("applicationUpdates")->trigger();
+        QVERIFY(!window.findChild<QCheckBox *>("updateAutomatic")->isEnabled());
+        window.findChild<QPushButton *>("checkApplicationUpdate")->click();
+        window.findChild<QPushButton *>("installApplicationUpdate")->click();
+        QCOMPARE(opened, QUrl("macappstore://apps.apple.com/app/id6829146371"));
+        QCOMPARE(network.requests.size(), 0);
+        QCOMPARE(store->calls, 0);
     }
     void installCancelAndLaunchFailure() {
         QTemporaryDir dir;

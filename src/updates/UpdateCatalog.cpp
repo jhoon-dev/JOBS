@@ -75,6 +75,9 @@ UpdateConfig updateConfig() {
                                   registered.compare(executableDirectory, Qt::CaseInsensitive) == 0;
     }
 #endif
+#ifdef JOBS_MAC_APP_STORE
+    config.channel = UpdateChannel::MacAppStore;
+#endif
     return config;
 }
 bool newerVersion(const QString &candidate, const QString &current) {
@@ -86,6 +89,9 @@ QUrl updateCatalogUrl() {
 }
 QUrl storeUpdatesUrl() {
     return QUrl("ms-windows-store://downloadsandupdates");
+}
+QUrl macAppStoreUrl() {
+    return QUrl("macappstore://apps.apple.com/app/id6829146371");
 }
 bool releasePageAllowed(const QUrl &url) {
     return https(url) && url.host() == "github.com" && url.query().isEmpty() &&

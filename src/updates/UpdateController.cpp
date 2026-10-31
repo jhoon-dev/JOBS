@@ -61,11 +61,15 @@ UpdateController::~UpdateController() {
     store_->cancel();
 }
 bool UpdateController::automatic() const {
+    if (config_.channel == UpdateChannel::MacAppStore)
+        return false;
     if (automaticOverride_)
         return *automaticOverride_;
     return settings(config_).value("updates/checkAtStartup", true).toBool();
 }
 void UpdateController::setAutomatic(bool enabled) {
+    if (config_.channel == UpdateChannel::MacAppStore)
+        return;
     automaticOverride_ = enabled;
     auto preference = settings(config_);
     preference.setValue("updates/checkAtStartup", enabled);
@@ -116,7 +120,7 @@ void UpdateController::scheduleStartup(std::function<quintptr()> window) {
     startupScheduled_ = true;
     QTimer::singleShot(3000, this, [this, window] {
         if (automatic() && !busy() && state_ == UpdateState::Idle &&
-            config_.channel != UpdateChannel::DevelopmentPackage)
+            config_.channel != UpdateChannel::DevelopmentPackage && config_.channel != UpdateChannel::MacAppStore)
             check(window());
     });
 }
@@ -128,6 +132,11 @@ void UpdateController::check(quintptr window) {
     response_.clear();
     downloading_ = false;
     const auto generation = ++generation_;
+    if (config_.channel == UpdateChannel::MacAppStore) {
+        setState(UpdateState::Unsupported,
+                 "Mac App Store에서 업데이트를 관리합니다. App Store를 열어 업데이트를 확인해 주세요.");
+        return;
+    }
     if (config_.channel == UpdateChannel::DevelopmentPackage) {
         setState(UpdateState::Unsupported,
                  "개발용 MSIX입니다. Store 등록·게시 후 Store 업데이트를 사용할 수 있습니다.");

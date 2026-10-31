@@ -29,7 +29,7 @@ jobs:
       - run: cmake --build build --config Release --parallel 3
       - run: ctest --test-dir build -C Release --output-on-failure
       - name: Capture task and Gantt workspace presentation
-        run: python scripts/capture-workspace-ui.py build
+        run: python scripts/capture-workspace-ui.py build --store
       - name: Preserve task and Gantt workspace screens
         if: always()
         uses: actions/upload-artifact@v4

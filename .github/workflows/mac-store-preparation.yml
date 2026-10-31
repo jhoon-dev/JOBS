@@ -57,7 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           export PATH="$JOBS_QT_PREFIX/bin:$PATH"
-          cmake -S . -B build-mac-store -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$JOBS_QT_PREFIX" '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          cmake -S . -B build-mac-store -DCMAKE_BUILD_TYPE=Release -DJOBS_MAC_APP_STORE=ON "-DCMAKE_PREFIX_PATH=$JOBS_QT_PREFIX" '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
           cmake --build build-mac-store --parallel 3
       - name: Run application regressions and native presentation capture
         shell: bash
@@ -65,7 +65,7 @@ jobs:
           set -euo pipefail
           export PATH="$JOBS_QT_PREFIX/bin:$PATH"
           ctest --test-dir build-mac-store --output-on-failure
-          python scripts/capture-workspace-ui.py build-mac-store
+          python scripts/capture-workspace-ui.py build-mac-store --store
       - name: Prepare a relocatable development bundle
         shell: bash
         run: |

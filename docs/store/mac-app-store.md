@@ -8,6 +8,10 @@
 
 이 출력은 **미서명 개발용 앱**이며, App Sandbox·서명/프로비저닝·설치/저장/복구 검증이 끝난 제출용 `.pkg`가 아니다. 출력 status JSON에도 서명·sandbox 검증·제출 가능 여부를 각각 기록한다.
 
+`-DJOBS_MAC_APP_STORE=ON`은 Mac 전용 업데이트 경로를 선택한다. 앱 자체의 시작/수동 HTTP 버전 확인과 Windows Store API/설치기 다운로드를 사용하지 않고 전용 Apple 앱 레코드를 App Store에서 연다. 이 옵션만으로 sandbox나 서명을 구성하지 않는다. 회귀 검사는 네트워크·Windows Store 호출이 발생하지 않는지와 실제 UI 버튼의 URL을 확인한다.
+
+`JOBS_MAC_BUILD_NUMBER`는 기본값 `1`인 양의 정수이며 재업로드 때 증가시킨다. 표시 버전은 `0.2.0`이다. `capture-workspace-ui.py build --store`는 최초 표시 후 1440×900 네이티브 창 배치를 렌더링하고 실제 PNG 크기를 검증한다. 일반 화면 크기·배율 검사를 대신하지 않는다.
+
 ## 최종 제출에 필요한 구성
 
 - 앱 버전 `0.2.0`과 별도 증가하는 build 번호, 전용 Bundle ID·실제 Apple 팀의 프로파일을 일치시킨다.

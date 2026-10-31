@@ -277,6 +277,13 @@ private slots:
         window.resize(1440, 900);
         window.show();
         QTest::qWait(40);
+        const bool storeCapture = qEnvironmentVariableIsSet("JOBS_STORE_SCREENSHOT");
+        if (storeCapture) {
+            // Cocoa can cap a newly shown window to the CI display. Render the requested native layout after show.
+            window.setFixedSize(1440, 900);
+            QTest::qWait(40);
+            QCOMPARE(window.size(), QSize(1440, 900));
+        }
         auto *table = taskTable(window);
         auto *gantt = window.findChild<QGraphicsView *>("ganttView");
         const auto capture = qEnvironmentVariable("JOBS_UI_SCREENSHOT_DIR");
@@ -303,6 +310,10 @@ private slots:
         QVERIFY(!window.findChild<QPlainTextEdit *>("calculationDiagnostics")->isVisible());
         QVERIFY(!gantt->scene()->items().isEmpty());
         if (!capture.isEmpty()) {
+            if (storeCapture) {
+                window.setMinimumSize(0, 0);
+                window.setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+            }
             window.resize(1024, 650);
             QTest::qWait(30);
             QVERIFY(table->viewport()->height() >= 4 * jobs::GanttView::RowHeight);

@@ -84,7 +84,8 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
         auto *version = new QLabel("현재 앱 버전: " + controller.config().currentVersion, dialog);
         const auto channel = controller.config().channel;
         auto *source =
-            new QLabel(channel == UpdateChannel::Store ? "업데이트 경로: Microsoft Store"
+            new QLabel(channel == UpdateChannel::Store         ? "업데이트 경로: Microsoft Store"
+                       : channel == UpdateChannel::MacAppStore ? "업데이트 경로: Mac App Store"
                        : channel == UpdateChannel::DevelopmentPackage ? "업데이트 경로: 개발용 MSIX · Store 미연결"
                                                                       : "업데이트 경로: GitHub 정식 릴리스",
                        dialog);
@@ -93,6 +94,8 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
         auto *privacy =
             new QLabel("확인 시 배포 서버에 연결합니다. 프로젝트 내용이나 파일 경로는 전송하지 않습니다.", dialog);
         privacy->setWordWrap(true);
+        if (channel == UpdateChannel::MacAppStore)
+            privacy->setText("업데이트는 App Store에서 관리합니다. 앱 자체의 외부 서버 버전 확인은 사용하지 않습니다.");
         auto *status = new QLabel(dialog);
         status->setObjectName("updateStatus");
         status->setWordWrap(true);
@@ -122,7 +125,8 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
         auto refresh = [&controller, automatic, status, last, notes, progress, check, cancel, install, page, channel] {
             QSignalBlocker blocker(automatic);
             automatic->setChecked(controller.automatic());
-            automatic->setEnabled(channel != UpdateChannel::DevelopmentPackage);
+            automatic->setEnabled(channel != UpdateChannel::DevelopmentPackage &&
+                                  channel != UpdateChannel::MacAppStore);
             status->setText(controller.status());
             auto time = QDateTime::fromString(controller.lastChecked(), Qt::ISODate);
             last->setText("마지막 확인: " +
@@ -131,10 +135,13 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
             check->setEnabled(!controller.busy());
             cancel->setEnabled(controller.busy());
             progress->setVisible(controller.state() == UpdateState::Downloading);
-            install->setEnabled(channel == UpdateChannel::Store ? !controller.busy() : controller.available());
+            install->setEnabled(channel == UpdateChannel::Store || channel == UpdateChannel::MacAppStore
+                                    ? !controller.busy()
+                                    : controller.available());
             page->setVisible(channel == UpdateChannel::Release && controller.config().installedWindows);
             page->setEnabled(releasePageAllowed(controller.release().page));
             install->setText(channel == UpdateChannel::Store            ? "Microsoft Store에서 업데이트"
+                             : channel == UpdateChannel::MacAppStore    ? "App Store에서 업데이트"
                              : controller.state() == UpdateState::Ready ? "저장 확인 후 설치…"
                              : controller.canDownload()                 ? "업데이트 다운로드"
                                                                         : "릴리스 페이지 열기");
@@ -154,7 +161,10 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
                 status->setText("릴리스 페이지를 열지 못했습니다.");
         });
         QObject::connect(install, &QPushButton::clicked, dialog, [&controller, dialog, status, hooks, channel] {
-            if (channel == UpdateChannel::Store) {
+            if (channel == UpdateChannel::MacAppStore) {
+                if (!hooks.openUrl(macAppStoreUrl()))
+                    status->setText("App Store를 열지 못했습니다. macOS의 App Store를 직접 열어 주세요.");
+            } else if (channel == UpdateChannel::Store) {
                 if (!hooks.openUrl(storeUpdatesUrl()))
                     status->setText("Microsoft Store를 열지 못했습니다. 시작 메뉴에서 Store를 열어 주세요.");
             } else if (controller.state() == UpdateState::Ready) {
