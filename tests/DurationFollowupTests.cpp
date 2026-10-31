@@ -68,7 +68,8 @@ void pasteRoundtrip(jobs::JsonProjectStore &store, const std::string &path, bool
         doc.applyCalculation(jobs::calculate(*doc.project()));
     doc.saveAs(path);
     const auto source = *doc.project();
-    const auto history = doc.historyBytes(), generation = doc.calculationGeneration();
+    const auto history = doc.historyBytes();
+    const auto generation = doc.calculationGeneration();
     const auto redo = doc.redoLabel(), undo = doc.undoLabel();
     const auto disk = bytes(path);
     jobs::MainWindow window(doc);
@@ -145,7 +146,8 @@ void revertPending(jobs::JsonProjectStore &store, const std::string &path, bool 
     doc.applyCalculation(jobs::calculate(*doc.project()));
     doc.saveAs(path);
     const auto source = *doc.project();
-    const auto history = doc.historyBytes(), generation = doc.calculationGeneration();
+    const auto history = doc.historyBytes();
+    const auto generation = doc.calculationGeneration();
     const auto disk = bytes(path);
     jobs::MainWindow window(doc);
     window.show();

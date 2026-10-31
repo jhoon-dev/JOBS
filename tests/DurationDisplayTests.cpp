@@ -52,7 +52,8 @@ void unchangedEditor(jobs::JsonProjectStore &store, const std::string &path, boo
     const auto source = *doc.project();
     const auto saved = bytes(path);
     const auto undo = doc.undoLabel(), redo = doc.redoLabel();
-    const auto history = doc.historyBytes(), generation = doc.calculationGeneration();
+    const auto history = doc.historyBytes();
+    const auto generation = doc.calculationGeneration();
     jobs::MainWindow window(doc);
     window.show();
     auto *view = taskTable(window);
