@@ -1,0 +1,98 @@
+name: Mac App Store preparation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: macos-15
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Identify the active Apple SDK
+        id: sdk
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
+          echo "key=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "JOBS_QT_PREFIX=$RUNNER_TEMP/qt-appstore-6.8.3" >> "$GITHUB_ENV"
+      - uses: actions/cache/restore@v4
+        id: qt
+        with:
+          path: ${{ runner.temp }}/qt-appstore-6.8.3
+          key: qtbase-6.8.3-appstore-universal-v1-${{ runner.os }}-${{ steps.sdk.outputs.key }}
+      - name: Build universal Qt with App Store compliance enabled
+        if: steps.qt.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/qtbase-6.8.3.tar.xz"
+          curl --fail --location --retry 3 --output "$archive" https://download.qt.io/archive/qt/6.8/6.8.3/submodules/qtbase-everywhere-src-6.8.3.tar.xz
+          echo "56001b905601bb9023d399f3ba780d7fa940f3e4861e496a7c490331f49e0b80  $archive" | shasum -a 256 --check
+          tar -xf "$archive" -C "$RUNNER_TEMP"
+          mkdir "$RUNNER_TEMP/qtbase-appstore-build"
+          cd "$RUNNER_TEMP/qtbase-appstore-build"
+          "$RUNNER_TEMP/qtbase-everywhere-src-6.8.3/configure" -release -opensource -confirm-license -shared -feature-appstore-compliant -nomake examples -nomake tests -no-openssl -prefix "$JOBS_QT_PREFIX" -- '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          cmake --build . --parallel 3
+          cmake --install .
+          toolarchive="$RUNNER_TEMP/qttools-6.8.3.tar.xz"
+          curl --fail --location --retry 3 --output "$toolarchive" https://download.qt.io/archive/qt/6.8/6.8.3/submodules/qttools-everywhere-src-6.8.3.tar.xz
+          echo "02a4e219248b94f1333df843d25763f35251c1074cdc4fb5bda67d340f8c8b3a  $toolarchive" | shasum -a 256 --check
+          tar -xf "$toolarchive" -C "$RUNNER_TEMP"
+          "$JOBS_QT_PREFIX/bin/qt-cmake" -S "$RUNNER_TEMP/qttools-everywhere-src-6.8.3" -B "$RUNNER_TEMP/qttools-appstore-build" -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_PCH=OFF -DQT_BUILD_TESTS=OFF -DQT_BUILD_EXAMPLES=OFF -DFEATURE_assistant=OFF -DFEATURE_designer=OFF -DFEATURE_linguist=OFF '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          cmake --build "$RUNNER_TEMP/qttools-appstore-build" --target macdeployqt --parallel 3
+          install -m 755 "$RUNNER_TEMP/qttools-appstore-build/bin/macdeployqt" "$JOBS_QT_PREFIX/bin/macdeployqt"
+      - uses: actions/cache/save@v4
+        if: steps.qt.outputs.cache-hit != 'true'
+        with:
+          path: ${{ runner.temp }}/qt-appstore-6.8.3
+          key: qtbase-6.8.3-appstore-universal-v1-${{ runner.os }}-${{ steps.sdk.outputs.key }}
+      - name: Configure and build JOBS against the App Store Qt runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$JOBS_QT_PREFIX/bin:$PATH"
+          cmake -S . -B build-mac-store -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$JOBS_QT_PREFIX" '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          cmake --build build-mac-store --parallel 3
+      - name: Run application regressions and native presentation capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$JOBS_QT_PREFIX/bin:$PATH"
+          ctest --test-dir build-mac-store --output-on-failure
+          python scripts/capture-workspace-ui.py build-mac-store
+      - name: Prepare a relocatable development bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$PWD/build-mac-store/JOBS.app"
+          "$JOBS_QT_PREFIX/bin/macdeployqt" "$app" -appstore-compliant -no-codesign -verbose=2
+          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/JOBS"
+          mkdir -p "$app/Contents/Resources/licenses"
+          cp -R packaging/licenses/qtbase "$app/Contents/Resources/licenses/qtbase"
+          test -f "$app/Contents/Resources/licenses/qtbase/LGPL-3.0-only.txt"
+          mkdir -p dist/mac-store-preparation
+          ditto -c -k --sequesterRsrc --keepParent "$app" dist/mac-store-preparation/JOBS-unsigned-universal.app.zip
+          shasum -a 256 dist/mac-store-preparation/JOBS-unsigned-universal.app.zip > dist/mac-store-preparation/SHA256SUMS.txt
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          data = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'qt_version': '6.8.3', 'qt_appstore_compliant': True, 'architectures': ['arm64', 'x86_64'], 'signed': False, 'sandbox_verified': False, 'store_uploadable': False, 'submitted': False, 'purpose': 'Native runtime preparation only; distribution signing, sandbox lifecycle and provisioning remain required.'}
+          Path('dist/mac-store-preparation/status.json').write_text(json.dumps(data, indent=2) + '\n')
+          PY
+      - name: Preserve unsigned development bundle and native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-store-preparation
+          path: |
+            dist/mac-store-preparation/
+            build-mac-store/Testing/Temporary/
+            build-mac-store/workspace-ui/
+            build-mac-store/CMakeCache.txt
+          if-no-files-found: warn
