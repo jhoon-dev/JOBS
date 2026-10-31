@@ -1,4 +1,4 @@
-JOBS 0.1.0 Preview - Windows x64
+JOBS desktop application - Windows x64
 
 JOBS uses unmodified Qt 6.8.3 shared libraries (Qt Company and contributors),
 distributed here under the LGPL v3 option. The DLLs can be replaced with compatible
@@ -18,9 +18,11 @@ https://gcc.gnu.org/releases.html
 https://github.com/niXman/mingw-builds-binaries/releases/tag/13.1.0-rt_v11-rev1
 https://www.mingw-w64.org/
 
-The installer uses NSIS 3.11. Its copyright and license notice is in licenses/nsis.
+The standalone EXE installer uses NSIS 3.11; MSIX packages do not include NSIS.
+When present, its copyright and license notice is in licenses/nsis.
 https://nsis.sourceforge.io/Download
 
 Third-party licenses apply to their respective components. This notice does not
-assign a license to the JOBS application itself. This is an unsigned preview build.
-Application provenance and SHA-256 file inventory are in package-manifest.json.
+assign a license to the JOBS application itself.
+Application version, source revision, signing status and SHA-256 file inventory
+are recorded in the package's generated manifest and adjacent provenance JSON.
