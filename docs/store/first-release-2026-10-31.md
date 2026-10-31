@@ -29,6 +29,6 @@ macOS CI에서 `std::size_t`와 `std::uint64_t`를 하나의 `auto` 선언으로
 
 최신 Windows 실제 패키지의 1440×900 일정 화면을 업로드하고 한국어·영어 소개의 완료 상태를 확인했다. 영어 소개에도 앱 UI는 한국어임을 명시했다. macOS 일반 CI의 `workspace-1440.png`는 파일 이름과 달리 실제 PNG가 1024×653이므로 Apple 제출에 사용하지 않았다. 임의 확대 대신 허용 해상도에서 새 네이티브 화면이 필요하다. 전용 크기 캡처 모드와 PNG 실제 치수 검사를 추가했고 Windows 네이티브 캡처·기존 `workspace_presentation` 회귀를 통과했다. macOS 결과는 새 CI에서 별도로 확인한다.
 
-Mac 전용 Qt 준비 workflow [41177090201](https://github.com/jhoon-dev/JOBS/actions/runs/41177090201)은 별도 universal Qt를 빌드 중이다. 이 실행의 출력은 서명·sandbox 미검증 개발용 번들이며 제출 가능한 `.pkg`가 아니다. 후속 Mac Store 업데이트 채널 검사는 로컬 `application_updates`와 clang-format 18.1.8 검사를 통과했다.
+Mac 전용 Qt 준비 workflow [41177090201](https://github.com/jhoon-dev/JOBS/actions/runs/41177090201)은 별도 universal Qt와 내장 macdeployqt 빌드·설치까지 통과했지만, 이미 qtbase에 포함된 macdeployqt를 qttools에서 다시 빌드하려는 잘못된 후속 단계에서 실패했다. 해당 단계를 제거하고 내장 도구의 존재를 검사하도록 수정했다. 수정 후 전체 준비 workflow는 재검증이 필요하다. 이 workflow의 출력은 서명·sandbox 미검증 개발용 번들이며 제출 가능한 `.pkg`가 아니다. 후속 Mac Store 업데이트 채널 검사는 로컬 `application_updates`와 clang-format 18.1.8 검사를 통과했다.
 
 Microsoft 제출은 실제 identity의 probe 없는 MSIX, 심사/설치 검증과 소개·실제 화면·등급·국가·가격 설정을 완료한 뒤 진행한다. Mac 제출은 샌드박스 파일 접근·서명/프로비저닝·Qt App Store 준수 빌드·업데이트 경로까지 검증한 후 진행한다. 개발용 패키지나 미서명 Mac 앱을 심사용 산출물로 표시하지 않는다.

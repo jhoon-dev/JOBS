@@ -4,7 +4,7 @@
 
 ## 현재 준비와 실제 제출의 구분
 
-`Mac App Store preparation` 수동 workflow는 Qt 6.8.3의 qtbase·qttools 공식 source archive와 고정 SHA-256을 검증한다. qtbase는 `-feature-appstore-compliant`를 사용해 arm64/x86_64 동적 프레임워크로 빌드하고 qttools의 macdeployqt만 같은 Qt에 연결해 빌드한다. 일반 macOS용 Qt 바이너리를 그대로 스토어용으로 간주하지 않는다. 앱의 네이티브 회귀와 실제 화면 캡처를 거쳐 `macdeployqt -appstore-compliant`로 별도 개발용 번들을 만든다.
+`Mac App Store preparation` 수동 workflow는 Qt 6.8.3의 qtbase 공식 source archive와 고정 SHA-256을 검증한다. qtbase는 `-feature-appstore-compliant`를 사용해 arm64/x86_64 동적 프레임워크와 내장 macdeployqt를 함께 빌드한다. 일반 macOS용 Qt 바이너리를 그대로 스토어용으로 간주하지 않는다. 앱의 네이티브 회귀와 실제 화면 캡처를 거쳐 `macdeployqt -appstore-compliant`로 별도 개발용 번들을 만든다.
 
 이 출력은 **미서명 개발용 앱**이며, App Sandbox·서명/프로비저닝·설치/저장/복구 검증이 끝난 제출용 `.pkg`가 아니다. 출력 status JSON에도 서명·sandbox 검증·제출 가능 여부를 각각 기록한다.
 
