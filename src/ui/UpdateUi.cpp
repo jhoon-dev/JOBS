@@ -1,4 +1,5 @@
 #include "ui/UpdateUi.h"
+#include "application/ProductIdentity.h"
 #include "updates/UpdateController.h"
 #include "updates/UpdateInstaller.h"
 #include <QApplication>
@@ -50,6 +51,14 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
     auto *menu = window.menuBar()->addMenu("설정(&S)");
     auto *action = menu->addAction("업데이트…");
     action->setObjectName("applicationUpdates");
+    auto *about = menu->addAction("Project Planning Manager 정보…");
+    about->setObjectName("applicationAbout");
+    QObject::connect(about, &QAction::triggered, &window, [&window, &controller] {
+        QMessageBox::about(&window, productDisplayName,
+                           QString("<h3>%1</h3><p>버전 %2</p><p>개발자: %3<br>브랜드: %4</p>")
+                               .arg(productDisplayName, controller.config().currentVersion.toHtmlEscaped(),
+                                    developerName, productBrand));
+    });
     auto *banner = new QWidget(&window);
     banner->setObjectName("updateBanner");
     auto *row = new QHBoxLayout(banner);

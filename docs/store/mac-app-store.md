@@ -2,6 +2,8 @@
 
 전용 앱은 **Project Planning Manager**, Apple 앱 ID `6829387727`, Bundle ID `app.toolmoa.ppm`, 팀 `V6445K474Q`다. 무료·지원 가능한 모든 국가에 출시한다. 다른 앱의 기록·서명 자료를 임의로 가져오지 않는다.
 
+개발자는 `jhoon-dev`, 브랜드는 `Toolmoa`, 표시 이름은 `Project Planning Manager`다. Apple 팀·인증서의 법적 소유자 이름과 개발자 핸들은 구분한다.
+
 ## 준비와 실제 제출
 
 `Mac App Store preparation`은 Qt 6.8.3 공식 qtbase archive와 고정 SHA-256을 확인하고 `-feature-appstore-compliant` universal arm64/x86_64 Qt를 사용한다. 네이티브 회귀·실제 Mac 화면·별도 서명된 sandbox 검증 앱을 실행한 다음 미서명 `PPM.app` 개발 번들을 만든다. build_number 입력은 Apple CFBundleVersion이며 업로드마다 증가시킨다. 앱 버전은 0.2.0이다.

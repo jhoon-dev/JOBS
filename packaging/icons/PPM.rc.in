@@ -13,8 +13,10 @@ BEGIN
  BEGIN
   BLOCK "040904b0"
   BEGIN
-   VALUE "ProductName", "Project Planning Manager (PPM)\0"
-   VALUE "FileDescription", "Project Planning Manager (PPM)\0"
+   VALUE "ProductName", "Project Planning Manager\0"
+   VALUE "FileDescription", "Project Planning Manager\0"
+   VALUE "CompanyName", "Toolmoa\0"
+   VALUE "Comments", "Developer: jhoon-dev; App ID: app.toolmoa.ppm\0"
    VALUE "InternalName", "PPM\0"
    VALUE "OriginalFilename", "PPM.exe\0"
    VALUE "FileVersion", "@PROJECT_VERSION@\0"

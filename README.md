@@ -1,6 +1,8 @@
 # Project Planning Manager (PPM)
 전문 프로젝트 관리 데스크톱 앱 · C++20 / Qt 6.8 · 개발 중
 
+개발자 **jhoon-dev** · 브랜드 **Toolmoa** · App ID **`app.toolmoa.ppm`** · 표시 이름 **Project Planning Manager**. 앱의 **설정 → Project Planning Manager 정보…**에서 개발자와 브랜드를 확인할 수 있다. 제품군 공통 기준은 `app.toolmoa.{product-id}`이며, 스토어가 별도로 발급한 패키지 ID·Publisher·제품 번호와 구분한다.
+
 ## 목표와 현재 상태
 프로젝트별 독립 PPM 파일로 새로 만들기·열기·저장·다른 이름 저장과 Windows/macOS 이동 열기를 제공하며, 기본 작업은 계정·서버 없이 수행한다.
 사용자 확정 목표는 Microsoft Project와 Oracle Primavera를 대체할 수준의 전문 PM 도구다. 양 제품의 전체 기능을 후보로 유지한다. 개발 단계는 제외 목록이 아니라 개발 순서다.

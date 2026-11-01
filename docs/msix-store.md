@@ -15,3 +15,10 @@ MSIX에서 앱 상태는 package family별 LocalState 아래에 둔다. 설정�
 제출 체크리스트는 현재 공백인 Partner Center ID, 실제 제출용 package 재생성, WACK 결과, privacy/support URL, 설명/화면·등급·국가·가격·runFullTrust 사유와 최종 심사를 구분한다. WACK와 실제 Store 승인은 실행하지 않은 경우 미완료로 남긴다. 업로드나 공개 게시를 자동으로 수행하지 않는다.
 
 공식 기준: [MSIX Store 패키지 요건](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/app-package-requirements), [MakeAppx](https://learn.microsoft.com/en-us/windows/msix/package/create-app-package-with-makeappx-tool), [unsigned 개발 패키지](https://learn.microsoft.com/en-us/windows/msix/package/unsigned-package), [패키지 앱 상태/제거](https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-behind-the-scenes), [Store 화면](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/screenshots-and-images).
+
+
+## 공개 브랜드와 Store identity
+
+Developer `jhoon-dev`, Brand `Toolmoa`, 제품 App ID `app.toolmoa.ppm`, Display Name `Project Planning Manager`를 적용한다. Windows 실행 파일의 제품 이름·회사 이름·설명과 설치기 게시자에 이 기준을 표시한다. `ToolMoa/JOBS` 등의 내부 저장 경로와 설치 식별자는 기존 데이터·업그레이드 호환을 위해 유지한다.
+
+제품 App ID는 Microsoft가 발급하는 MSIX `IdentityName` 또는 `Store ID`를 대체하지 않는다. `store-identity.template.json`의 `PublisherDisplayName`은 개발자 핸들 `jhoon-dev`를 추정 입력하는 곳이 아니며, Partner Center에서 받은 실제 값이 필요하다. Apple Bundle ID는 제품 App ID와 같은 `app.toolmoa.ppm`을 사용한다.

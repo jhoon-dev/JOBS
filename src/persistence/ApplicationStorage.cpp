@@ -18,7 +18,8 @@
 namespace jobs {
 namespace {
 bool brandedApplication() {
-    return QCoreApplication::organizationName() == "ToolMoa" && QCoreApplication::applicationName() == productShortName;
+    return QCoreApplication::organizationName() == storageOrganizationName &&
+           QCoreApplication::applicationName() == productShortName;
 }
 } // namespace
 ApplicationStorage applicationStorage() {

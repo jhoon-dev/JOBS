@@ -13,7 +13,8 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName(jobs::productShortName);
     QGuiApplication::setApplicationDisplayName(jobs::productDisplayName);
     QCoreApplication::setApplicationVersion(jobs::appVersion());
-    QCoreApplication::setOrganizationName("ToolMoa");
+    QCoreApplication::setOrganizationName(jobs::storageOrganizationName);
+    QGuiApplication::setDesktopFileName(jobs::productAppId);
     QApplication::setWindowIcon(jobs::applicationIcon());
     jobs::restoreSandboxFolders();
     auto store = std::make_shared<jobs::JsonProjectStore>();

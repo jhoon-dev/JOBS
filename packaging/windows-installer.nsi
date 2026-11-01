@@ -5,18 +5,20 @@ Unicode true
 !include "WinVer.nsh"
 !include "FileFunc.nsh"
 
-Name "Project Planning Manager (PPM) ${AppVersion} Preview"
+Name "Project Planning Manager ${AppVersion} Preview"
 OutFile "${InstallerPath}"
 InstallDir "$LOCALAPPDATA\Programs\PPM"
 InstallDirRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS" "InstallLocation"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 VIProductVersion "${AppVersion}.0"
-VIAddVersionKey "ProductName" "Project Planning Manager (PPM)"
-VIAddVersionKey "FileDescription" "Project Planning Manager (PPM) Windows x64 Setup"
+VIAddVersionKey "ProductName" "Project Planning Manager"
+VIAddVersionKey "CompanyName" "Toolmoa"
+VIAddVersionKey "Comments" "Developer: jhoon-dev; App ID: app.toolmoa.ppm"
+VIAddVersionKey "FileDescription" "Project Planning Manager Windows x64 Setup"
 VIAddVersionKey "FileVersion" "${AppVersion}"
 VIAddVersionKey "ProductVersion" "${AppVersion}"
-VIAddVersionKey "LegalCopyright" "ToolMoa"
+VIAddVersionKey "LegalCopyright" "2026 JIN HOON KIM"
 
 !define RegistryKey "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS"
 !define MUI_ABORTWARNING
@@ -167,9 +169,9 @@ Section "PPM (필수)" MainSection
   CreateDirectory "$SMPROGRAMS\PPM"
   CreateShortcut "$SMPROGRAMS\PPM\PPM.lnk" "$INSTDIR\PPM.exe"
   CreateShortcut "$SMPROGRAMS\PPM\PPM 제거.lnk" "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "${RegistryKey}" "DisplayName" "Project Planning Manager (PPM) ${AppVersion} Preview"
+  WriteRegStr HKCU "${RegistryKey}" "DisplayName" "Project Planning Manager ${AppVersion} Preview"
   WriteRegStr HKCU "${RegistryKey}" "DisplayVersion" "${AppVersion}"
-  WriteRegStr HKCU "${RegistryKey}" "Publisher" "ToolMoa"
+  WriteRegStr HKCU "${RegistryKey}" "Publisher" "jhoon-dev"
   WriteRegStr HKCU "${RegistryKey}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "${RegistryKey}" "DisplayIcon" "$INSTDIR\PPM.exe"
   WriteRegStr HKCU "${RegistryKey}" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'

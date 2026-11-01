@@ -2,7 +2,9 @@
 
 2026-11-01. 제품명은 Project Planning Manager, 무료이며 지원 가능한 모든 국가에 출시한다. 등급과 제출 상태는 Partner Center에서 관리한다.
 
-**제품명:** Project Planning Manager (PPM)
+**제품명:** Project Planning Manager
+
+**개발자:** jhoon-dev · **브랜드:** Toolmoa · **제품 App ID:** `app.toolmoa.ppm`
 
 **짧은 설명:** 프로젝트 일정과 간트 차트, 자원 배정, 원가와 실적을 한곳에서 관리하세요.
 

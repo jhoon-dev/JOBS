@@ -1,5 +1,7 @@
 # Project Planning Manager — English store listing
 
+Developer: jhoon-dev. Brand: Toolmoa. Product App ID: `app.toolmoa.ppm`.
+
 Store display name: Project Planning Manager. Initial release: free in all supported markets. The application interface currently supports Korean; an English listing does not imply an English application interface.
 
 Short description: Plan project schedules, resources, costs and progress with a desktop Gantt workspace.

@@ -506,3 +506,15 @@ macOS CI의 150%에서 실제 창 높이가 437 논리 픽셀로 제한되어 �
 | MAS-05 | 서명·개인정보 보호 | 인증서·프로파일·API private key는 GitHub Secrets와 임시 runner 작업 경로에서만 사용한다. 저장소·로그·artifact에 private key를 포함하지 않는다. 유효한 앱/설치기 서명·프로파일·번들 버전을 확인한 pkg만 제출한다. |
 
 2026-11-01 후속 확정: Apple 제품 Bundle ID는 `app.toolmoa.ppm`이다. 이전 Bundle ID 보존 방침보다 이 사용자 지시가 우선하며 App ID·빌드·프로비저닝·서명 검증에 동일하게 적용한다.
+
+
+## 개발자·브랜드·제품 식별 기준 (CONFIRMED, 2026-11-01)
+
+| 요구사항 | 확정 기준 | 적용 |
+|---|---|---|
+| BRAND-01 | Developer는 `jhoon-dev`, Brand는 대소문자를 포함하여 `Toolmoa`다. | 앱 정보, Windows 실행 파일·설치기, 배포 소개에 구분하여 표시한다. |
+| BRAND-02 | 제품 App ID는 `app.toolmoa.{product-id}`, 표시 이름은 실제 제품명이다. | 이 저장소의 제품은 `ppm` / `app.toolmoa.ppm` / `Project Planning Manager`다. 약칭 `PPM`은 실행 파일·짧은 UI 표기에 사용한다. |
+| BRAND-03 | 공통 규칙과 플랫폼 발급 identity를 구분한다. | Apple Bundle ID는 `app.toolmoa.ppm`이다. Microsoft Store의 IdentityName·Publisher·PublisherDisplayName·Store ID는 Partner Center에서 실제 발급한 값을 그대로 사용하고 임의로 대체하지 않는다. |
+| BRAND-04 | 공개 브랜드 변경으로 기존 사용자 데이터를 잃지 않는다. | 내부 `ToolMoa/JOBS` 저장 경로·설정·설치/업데이트 식별자는 기존 데이터와 업그레이드 호환용 값으로 유지한다. 공개 Brand 표기는 `Toolmoa`다. |
+
+같은 제품군 예시는 `PM Canvas` / `pmcanvas` / `app.toolmoa.pmcanvas`다. 이는 공통 명명 규칙을 기록한 것으로 이 저장소에서 별도 PM Canvas 저장소나 스토어 등록을 수정했다는 뜻이 아니다. 개발자 핸들은 인증서 소유자·법적 게시자 이름을 임의로 바꾸는 근거로 사용하지 않는다.
