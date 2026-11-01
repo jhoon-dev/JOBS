@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
         model.synchronize(rows);
         check(model.data(model.index(0, 0)).toString() == "New", "session reset did not show new document");
         QTemporaryDir directory;
-        doc.saveAs(directory.filePath("Readonly.jobs").toUtf8().toStdString());
+        doc.saveAs(directory.filePath("Readonly.ppm").toUtf8().toStdString());
         doc.open(doc.path(), true);
         model.synchronize(rows);
         check(!(model.flags(model.index(0, 0)) & Qt::ItemIsEditable) && !model.setData(model.index(0, 0), "readonly"),

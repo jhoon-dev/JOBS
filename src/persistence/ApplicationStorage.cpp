@@ -1,5 +1,8 @@
 #include "persistence/ApplicationStorage.h"
 #include "domain/Diagnostics.h"
+#include "application/ProductIdentity.h"
+#include <QCoreApplication>
+#include <QFileInfo>
 #include <QDir>
 #include <QStandardPaths>
 #ifdef Q_OS_WIN
@@ -13,6 +16,11 @@
 #endif
 
 namespace jobs {
+namespace {
+bool brandedApplication() {
+    return QCoreApplication::organizationName() == "ToolMoa" && QCoreApplication::applicationName() == productShortName;
+}
+} // namespace
 ApplicationStorage applicationStorage() {
     ApplicationStorage storage;
 #ifdef Q_OS_WIN
@@ -42,6 +50,9 @@ ApplicationStorage applicationStorage() {
     }
 #endif
     storage.stateDirectory = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    // Product branding must not orphan existing settings or recovery generations.
+    if (brandedApplication())
+        storage.stateDirectory = QDir(QFileInfo(storage.stateDirectory).absolutePath()).filePath("JOBS");
     storage.recoveryDirectory = QDir(storage.stateDirectory).filePath("recovery");
     return storage;
 }
@@ -49,6 +60,8 @@ QSettings applicationSettings() {
     const auto storage = applicationStorage();
     if (storage.packaged())
         return QSettings(storage.settingsFile, QSettings::IniFormat);
+    if (brandedApplication())
+        return QSettings("ToolMoa", "JOBS");
     return QSettings();
 }
 } // namespace jobs

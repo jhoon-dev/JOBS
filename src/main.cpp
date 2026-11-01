@@ -4,11 +4,13 @@
 #include "ui/DesktopWorkspace.h"
 #include "persistence/JsonRecoveryStore.h"
 #include "updates/UpdateController.h"
+#include "application/ProductIdentity.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    QCoreApplication::setApplicationName("JOBS");
+    QCoreApplication::setApplicationName(jobs::productShortName);
+    QGuiApplication::setApplicationDisplayName(jobs::productDisplayName);
     QCoreApplication::setApplicationVersion(jobs::appVersion());
     QCoreApplication::setOrganizationName("ToolMoa");
     QApplication::setWindowIcon(jobs::applicationIcon());

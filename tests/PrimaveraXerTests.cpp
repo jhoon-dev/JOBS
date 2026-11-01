@@ -194,11 +194,11 @@ int main(int argc, char **argv) {
               "source code/encoding/mapping");
         jobs::JsonProjectStore store;
         jobs::Document doc(store);
-        doc.open(QDir(folder).filePath("project.jobs").toStdString());
+        doc.open(QDir(folder).filePath("project.ppm").toStdString());
         check(*doc.project() == p && !doc.dirty(), "native reopen");
-        auto native = read(QDir(folder).filePath("project.jobs"));
+        auto native = read(QDir(folder).filePath("project.ppm"));
         rejects([&] { jobs::publishPrimaveraXer(imported, folder); });
-        check(read(QDir(folder).filePath("project.jobs")) == native, "existing target preserved");
+        check(read(QDir(folder).filePath("project.ppm")) == native, "existing target preserved");
         rejects([&] { jobs::publishPrimaveraXer(imported, dir.filePath("missing/folder")); });
         auto snapshot = *doc.project();
         auto generation = doc.sessionGeneration();
@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
                   "roundtrip schedule semantics");
         }
         auto output = jobs::publishPrimaveraXer(exported, dir.filePath("export"));
-        check(store.load(QDir(output).filePath("source.jobs").toStdString()).project == p &&
+        check(store.load(QDir(output).filePath("source.ppm").toStdString()).project == p &&
                   *doc.project() == snapshot && doc.sessionGeneration() == generation && !doc.dirty() && !doc.canUndo(),
               "export source snapshot/document isolation");
         auto un = p;
@@ -405,7 +405,7 @@ int main(int argc, char **argv) {
         jobs::Document tracked(store);
         tracked.create("승인·실적 보존", "2026-10-26", {"보고"});
         tracked.setDuration(0, 60);
-        tracked.saveAs(dir.filePath("tracked.jobs").toStdString());
+        tracked.saveAs(dir.filePath("tracked.ppm").toStdString());
         tracked.captureBaseline("승인", "검증", "원본 보존", "2026-10-26T00:00:00Z");
         tracked.setStatusAt("2026-10-26 09:30");
         jobs::ProgressEntry progress;
@@ -429,7 +429,7 @@ int main(int argc, char **argv) {
         auto historyExport = jobs::exportPrimaveraXer(history);
         auto historyFolder = jobs::publishPrimaveraXer(historyExport, dir.filePath("history"));
         check(diagnostic(historyExport, "history-costs") &&
-                  store.load(QDir(historyFolder).filePath("source.jobs").toStdString()).project == history &&
+                  store.load(QDir(historyFolder).filePath("source.ppm").toStdString()).project == history &&
                   *tracked.project() == history,
               "approved/actual/cost preservation");
         QFile outputFile("primavera-export.xer");

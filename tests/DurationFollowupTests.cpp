@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
         check(dir.isValid(), "temporary directory unavailable");
         jobs::JsonProjectStore store;
         int sequence = 0;
-        auto path = [&] { return dir.filePath(QString::number(sequence++) + ".jobs").toStdString(); };
+        auto path = [&] { return dir.filePath(QString::number(sequence++) + ".ppm").toStdString(); };
         for (bool units : {false, true}) {
             for (bool forecast : {false, true})
                 for (bool nominal : {false, true})

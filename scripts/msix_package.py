@@ -29,7 +29,7 @@ def identity(mode, config=None):
             raise ValueError('Development identity is fixed; do not supply Store credentials')
         return {'IdentityName': 'ToolMoa.JOBS.MsixDevelopment',
                 'Publisher': 'CN=JOBS MSIX Development, ' + DEV_OID,
-                'PublisherDisplayName': 'JOBS Development', 'DisplayName': 'JOBS MSIX Development'}
+                'PublisherDisplayName': 'PPM Development', 'DisplayName': 'Project Planning Manager Development'}
     if mode != 'store' or not isinstance(config, dict) or set(config) != FIELDS:
         raise ValueError('Store mode requires exactly the Partner Center identity fields')
     for key, value in config.items():
@@ -63,7 +63,7 @@ def manifest(config, package_version, probe=False):
                               'Version': package_version, 'ProcessorArchitecture': 'x64'})
     properties = element(root, 'Properties')
     for name, value in [('DisplayName', config['DisplayName']), ('PublisherDisplayName', config['PublisherDisplayName']),
-                        ('Description', 'JOBS 프로젝트 일정·자원·원가 관리'), ('Logo', 'Assets\\StoreLogo.png')]:
+                        ('Description', 'PPM 프로젝트 일정·자원·원가 관리'), ('Logo', 'Assets\\StoreLogo.png')]:
         element(properties, name, text=value)
     dependencies = element(root, 'Dependencies')
     element(dependencies, 'TargetDeviceFamily', {'Name': 'Windows.Desktop', 'MinVersion': '10.0.19041.0',
@@ -71,11 +71,11 @@ def manifest(config, package_version, probe=False):
     resources = element(root, 'Resources')
     element(resources, 'Resource', {'Language': 'ko-KR'})
     applications = element(root, 'Applications')
-    for app_id, executable, hidden in [('JOBS', 'JOBS.exe', False)] + ([('PackageProbe', 'jobs_msix_probe.exe', True)] if probe else []):
+    for app_id, executable, hidden in [('JOBS', 'PPM.exe', False)] + ([('PackageProbe', 'jobs_msix_probe.exe', True)] if probe else []):
         app = element(applications, 'Application', {'Id': app_id, 'Executable': executable,
                       'EntryPoint': 'Windows.FullTrustApplication', '{' + UAP10 + '}RuntimeBehavior': 'packagedClassicApp',
                       '{' + UAP10 + '}TrustLevel': 'mediumIL'})
-        visual = {'DisplayName': config['DisplayName'], 'Description': 'JOBS 프로젝트 관리',
+        visual = {'DisplayName': config['DisplayName'], 'Description': 'PPM 프로젝트 관리',
                   'Square150x150Logo': 'Assets\\Square150x150Logo.png',
                   'Square44x44Logo': 'Assets\\Square44x44Logo.png', 'BackgroundColor': 'transparent'}
         if hidden:
@@ -119,7 +119,7 @@ def validate_payload(stage, mode, probe=False):
         total += file.stat().st_size
         if len(names) > 2000 or total > 300 * 1024 * 1024:
             raise ValueError('MSIX payload size/count limit exceeded')
-    if 'jobs.exe' not in names or 'appxmanifest.xml' not in names:
+    if 'ppm.exe' not in names or 'appxmanifest.xml' not in names:
         raise ValueError('Required app or manifest missing')
     return total
 

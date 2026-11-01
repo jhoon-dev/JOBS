@@ -55,15 +55,15 @@ def main():
         roaming = Path(os.environ['APPDATA']) / 'ToolMoa/JOBS'
         assert not local.exists() and not roaming.exists(), 'Existing JOBS data must be preserved; use a clean test account'
         case = ROOT / 'build' / ('installer-smoke-' + uuid.uuid4().hex[:8])
-        protected = case / 'protected/JOBS'
+        protected = case / 'protected/PPM'
         protected.mkdir(parents=True)
         keep = protected / 'keep.txt'; keep.write_text('unrelated data', encoding='utf-8')
         result = subprocess.run(installer_command(args.installer.resolve(), protected), shell=False, timeout=90)
         assert result.returncode == 3 and keep.read_text() == 'unrelated data'
-        assert not (protected / 'JOBS.exe').exists() and not exists(UNINSTALL)
-        target = case / '설치 확인/JOBS'
+        assert not (protected / 'PPM.exe').exists() and not exists(UNINSTALL)
+        target = case / '설치 확인/PPM'
         result = subprocess.run(installer_command(args.installer.resolve(), target), shell=False, timeout=120)
-        assert result.returncode == 0 and (target / 'JOBS.exe').is_file()
+        assert result.returncode == 0 and (target / 'PPM.exe').is_file()
         manifest = json.loads((target / 'package-manifest.json').read_text(encoding='utf-8'))
         for entry in manifest['files']:
             assert digest(target / entry['path']) == entry['sha256'], entry['path']
@@ -72,7 +72,7 @@ def main():
             assert winreg.QueryValueEx(key, 'UninstallString')[0] == f'"{target}\\Uninstall.exe"'
         desktop_buffer = ctypes.create_unicode_buffer(32768)
         assert ctypes.windll.shell32.SHGetFolderPathW(None, 0x10, None, 0, desktop_buffer) == 0
-        desktop_shortcut = Path(desktop_buffer.value) / 'JOBS.lnk'
+        desktop_shortcut = Path(desktop_buffer.value) / 'PPM.lnk'
         assert not desktop_shortcut.exists(), 'Existing desktop shortcut must be preserved; use a clean test account'
         desktop_shortcut.write_bytes(b'installer smoke synthetic shortcut')
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, UNINSTALL, 0,
@@ -91,7 +91,7 @@ def main():
     else:
         state = json.loads(args.state.read_text(encoding='utf-8'))
         target, case = Path(state['target']), Path(state['case'])
-        assert target.resolve().is_relative_to((ROOT / 'build').resolve()) and target.name == 'JOBS'
+        assert target.resolve().is_relative_to((ROOT / 'build').resolve()) and target.name == 'PPM'
         if args.mode == 'launch':
             environment = os.environ.copy()
             system_root = os.environ['SystemRoot']
@@ -100,12 +100,12 @@ def main():
                 if name.startswith(('QT_', 'QML_')) or name in ('QML2_IMPORT_PATH',):
                     environment.pop(name)
             with (case / 'application.log').open('wb') as log:
-                process = subprocess.Popen([str(target / 'JOBS.exe')], cwd=target, env=environment,
+                process = subprocess.Popen([str(target / 'PPM.exe')], cwd=target, env=environment,
                                            stdout=log, stderr=subprocess.STDOUT)
             time.sleep(2)
             assert process.poll() is None, (case / 'application.log').read_text(errors='replace')
             state.update({'application_pid': process.pid, 'development_path_removed': True,
-                          'project_file': str(case / '설치 확인 프로젝트.jobs')})
+                          'project_file': str(case / '설치 확인 프로젝트.ppm')})
         else:
             project = Path(state['project_file'])
             assert project.is_file(), 'Create/save/reopen the project in the native app before uninstall'
@@ -131,7 +131,7 @@ def main():
             assert not Path(state['local']).exists() and not Path(state['roaming']).exists()
             assert not exists(SETTINGS) and not exists(UNINSTALL)
             assert not Path(state['desktop_shortcut']).exists()
-            assert not (Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/JOBS').exists()
+            assert not (Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/PPM').exists()
             assert digest(project) == project_hash
             assert (sibling / 'keep.txt').read_text() == 'other application data'
             # Remove only the synthetic sibling; restore the pre-test empty settings key.

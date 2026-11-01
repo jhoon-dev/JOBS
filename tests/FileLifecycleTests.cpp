@@ -14,42 +14,51 @@
 #include <stdexcept>
 
 namespace {
-void check(bool condition, const char* message) { if (!condition) throw std::runtime_error(message); }
-void rejects(const std::function<void()>& fn) {
+void check(bool condition, const char *message) {
+    if (!condition)
+        throw std::runtime_error(message);
+}
+void rejects(const std::function<void()> &fn) {
     bool rejected = false;
-    try { fn(); } catch (const std::exception&) { rejected = true; }
+    try {
+        fn();
+    } catch (const std::exception &) {
+        rejected = true;
+    }
     check(rejected, "expected rejection");
 }
-QByteArray read(const QString& path) {
-    QFile f(path); check(f.open(QIODevice::ReadOnly), "test read failed"); return f.readAll();
+QByteArray read(const QString &path) {
+    QFile f(path);
+    check(f.open(QIODevice::ReadOnly), "test read failed");
+    return f.readAll();
 }
-void write(const QString& path, const QByteArray& bytes) {
-    QFile f(path); check(f.open(QIODevice::WriteOnly), "test write failed");
+void write(const QString &path, const QByteArray &bytes) {
+    QFile f(path);
+    check(f.open(QIODevice::WriteOnly), "test write failed");
     check(f.write(bytes) == bytes.size(), "test write incomplete");
 }
-}
-int main(int argc, char* argv[]) {
+} // namespace
+int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
     try {
         QTemporaryDir dir;
         check(dir.isValid(), "temporary directory unavailable");
-        auto a = dir.filePath(QString::fromUtf8("프로젝트 α.jobs"));
-        auto b = dir.filePath("copy.jobs");
+        auto a = dir.filePath(QString::fromUtf8("프로젝트 α.ppm"));
+        auto b = dir.filePath("copy.ppm");
         jobs::JsonProjectStore store;
         {
             QDir caseDirectory(dir.filePath("MixedCaseFolder"));
             check(QDir().mkpath(caseDirectory.path()), "case directory creation failed");
-            const auto filename = QString::fromUtf8("MyPlan_한글_Α.jobs");
+            const auto filename = QString::fromUtf8("MyPlan_한글_Α.ppm");
             const auto mixedPath = caseDirectory.filePath(filename);
             const auto mixedUtf8 = mixedPath.toUtf8().toStdString();
             jobs::Document mixed(store);
             mixed.create("case preservation", "2026-10-26", {"task"});
             mixed.saveAs(mixedUtf8);
-            const auto entries = caseDirectory.entryList({"*.jobs"}, QDir::Files);
+            const auto entries = caseDirectory.entryList({"*.ppm"}, QDir::Files);
             // Filesystems may normalize Unicode without changing letter case.
-            auto nfc = [](const QString& value) { return value.normalized(QString::NormalizationForm_C); };
-            check(entries.size() == 1 && nfc(entries.front()) == nfc(filename),
-                  "physical filename changed case");
+            auto nfc = [](const QString &value) { return value.normalized(QString::NormalizationForm_C); };
+            check(entries.size() == 1 && nfc(entries.front()) == nfc(filename), "physical filename changed case");
             check(nfc(QFileInfo(QString::fromUtf8(mixed.path())).fileName()) == nfc(filename),
                   "document filename changed case");
             const auto originalId = mixed.project()->documentId;
@@ -65,7 +74,10 @@ int main(int argc, char* argv[]) {
             const auto alternate = caseDirectory.filePath(filename.toLower()).toUtf8().toStdString();
             if (store.sameFile(mixedUtf8, alternate)) {
                 // Standard NTFS/macOS: a spelling alias must not obtain a second lease.
-                rejects([&] { jobs::Document other(store); other.open(alternate); });
+                rejects([&] {
+                    jobs::Document other(store);
+                    other.open(alternate);
+                });
                 rejects([&] { mixed.saveAs(alternate); });
                 mixed.open(alternate);
             } else {
@@ -76,12 +88,12 @@ int main(int argc, char* argv[]) {
                 distinct.saveAs(alternate);
                 check(!store.sameFile(mixedUtf8, alternate), "distinct files conflated");
             }
-            mixed.renameTask(0, "saved edit"); mixed.save();
-            check(store.load(mixedUtf8).project.tasks[0].name == "saved edit",
-                  "mixed-case save did not roundtrip");
+            mixed.renameTask(0, "saved edit");
+            mixed.save();
+            check(store.load(mixedUtf8).project.tasks[0].name == "saved edit", "mixed-case save did not roundtrip");
             check(read(mixedPath) != originalBytes, "same-file edit did not save");
             bool originalNameFound = false;
-            for (const auto& entry : caseDirectory.entryList({"*.jobs"}, QDir::Files))
+            for (const auto &entry : caseDirectory.entryList({"*.ppm"}, QDir::Files))
                 originalNameFound = originalNameFound || nfc(entry) == nfc(filename);
             check(originalNameFound, "saving an existing file changed its name");
         }
@@ -95,6 +107,46 @@ int main(int argc, char* argv[]) {
         doc.saveAs(a.toUtf8().toStdString());
         check(!doc.dirty() && *doc.project() == initial, "first save changed identity or data");
         check(store.load(a.toUtf8().toStdString()).project == initial, "roundtrip mismatch");
+        {
+            auto extensionRejected = [&](const std::function<void()> &operation) {
+                try {
+                    operation();
+                } catch (const jobs::AppError &error) {
+                    check(error.code() == "FILE_EXTENSION_UNSUPPORTED", "wrong extension rejection");
+                    return;
+                }
+                throw std::logic_error("unsupported project extension accepted");
+            };
+            const auto bytes = read(a);
+            const auto snapshot = *doc.project();
+            const auto savedPath = doc.path();
+            const auto generation = doc.sessionGeneration();
+            const auto history = doc.historyBytes();
+            for (const auto &name : {"Old.jobs", "Old.JOBS", "Wrong.txt", "NoExtension"}) {
+                const auto path = dir.filePath(name);
+                write(path, bytes);
+                const auto input = path.toUtf8().toStdString();
+                extensionRejected([&] { store.load(input); });
+                extensionRejected([&] { store.save(input, snapshot, {}); });
+                extensionRejected([&] { doc.open(input); });
+                extensionRejected([&] { doc.saveAs(input); });
+                check(read(path) == bytes && !QFileInfo::exists(path + ".lock"),
+                      "extension rejection touched the original or retained a lock");
+                check(*doc.project() == snapshot && doc.path() == savedPath && !doc.dirty() &&
+                          doc.sessionGeneration() == generation && doc.historyBytes() == history,
+                      "extension rejection changed document state");
+            }
+            jobs::Document uppercase(store);
+            uppercase.create("uppercase extension", "2026-10-26", {"task"});
+            const auto path = dir.filePath("Uppercase.PPM").toUtf8().toStdString();
+            uppercase.saveAs(path);
+            check(store.load(path).project == *uppercase.project(), "uppercase PPM did not roundtrip");
+            const auto image = dir.filePath("Image.ppm");
+            write(image, "P3\n1 1\n255\n255 0 0\n");
+            rejects([&] { doc.open(image.toUtf8().toStdString()); });
+            check(*doc.project() == snapshot && doc.path() == savedPath && !doc.dirty(),
+                  "PPM image rejection changed the document");
+        }
         jobs::Document second(store);
         rejects([&] { second.open(a.toUtf8().toStdString()); });
         second.open(a.toUtf8().toStdString(), true);
@@ -103,7 +155,9 @@ int main(int argc, char* argv[]) {
         doc.saveAs(b.toStdString());
         check(doc.project()->documentId != initial.documentId && doc.project()->derivedFrom == initial.documentId,
               "save as identity/lineage mismatch");
-        doc.renameTask(0, "변경된 설계"); doc.addTask("검증"); doc.save();
+        doc.renameTask(0, "변경된 설계");
+        doc.addTask("검증");
+        doc.save();
         check(read(a) == originalBytes, "save as changed source bytes");
         check(store.load(b.toStdString()).project == *doc.project(), "edited roundtrip mismatch");
         rejects([&] { doc.saveAs(a.toUtf8().toStdString()); });
@@ -115,46 +169,62 @@ int main(int argc, char* argv[]) {
         rejects([&] { doc.save(); });
         check(doc.dirty() && read(b) == external, "conflict overwrote external file or cleared dirty");
         auto beforeFailedOpen = *doc.project();
-        auto broken = dir.filePath("broken.jobs"); write(broken, "not JSON");
+        auto broken = dir.filePath("broken.ppm");
+        write(broken, "not JSON");
         rejects([&] { doc.open(broken.toStdString()); });
         check(*doc.project() == beforeFailedOpen, "failed open replaced active document");
-        auto future = QJsonDocument::fromJson(originalBytes).object(); future["schemaVersion"] = 10;
+        auto future = QJsonDocument::fromJson(originalBytes).object();
+        future["schemaVersion"] = 10;
         write(broken, QJsonDocument(future).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         auto corrupt = QJsonDocument::fromJson(originalBytes).object();
-        auto payload = corrupt["payload"].toObject(); payload["name"] = "tampered"; corrupt["payload"] = payload;
+        auto payload = corrupt["payload"].toObject();
+        payload["name"] = "tampered";
+        corrupt["payload"] = payload;
         write(broken, QJsonDocument(corrupt).toJson());
         rejects([&] { store.load(broken.toStdString()); });
         // A valid checksum must not allow duplicate task IDs or unknown fields to be silently lost.
         auto sign = [&](QJsonObject p) {
-            auto root = QJsonDocument::fromJson(originalBytes).object(); root["payload"] = p;
-            root["sha256"] = QString::fromLatin1(QCryptographicHash::hash(
-                QJsonDocument(p).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
+            auto root = QJsonDocument::fromJson(originalBytes).object();
+            root["payload"] = p;
+            root["sha256"] = QString::fromLatin1(
+                QCryptographicHash::hash(QJsonDocument(p).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256)
+                    .toHex());
             write(broken, QJsonDocument(root).toJson());
         };
         payload = QJsonDocument::fromJson(originalBytes).object()["payload"].toObject();
-        payload["futureField"] = true; sign(payload);
-        rejects([&] { store.load(broken.toStdString()); });
-        payload.remove("futureField");
-        auto tasks = payload["tasks"].toArray(); tasks.append(tasks.first()); payload["tasks"] = tasks;
+        payload["futureField"] = true;
         sign(payload);
         rejects([&] { store.load(broken.toStdString()); });
-        rejects([&] { doc.saveAs(dir.filePath("missing/test.jobs").toStdString()); });
+        payload.remove("futureField");
+        auto tasks = payload["tasks"].toArray();
+        tasks.append(tasks.first());
+        payload["tasks"] = tasks;
+        sign(payload);
+        rejects([&] { store.load(broken.toStdString()); });
+        rejects([&] { doc.saveAs(dir.filePath("missing/test.ppm").toStdString()); });
         check(doc.dirty() && *doc.project() == beforeFailedOpen, "failed save as changed session");
         // Copying a single file preserves IDs without the original folder/lock file.
-        auto moved = dir.filePath("moved.jobs"); write(moved, originalBytes);
+        auto moved = dir.filePath("moved.ppm");
+        write(moved, originalBytes);
         check(store.load(moved.toStdString()).project == initial, "single file portability mismatch");
-        second.saveAs(dir.filePath("read-only-copy.jobs").toStdString());
-        second.addTask("사본 편집"); second.save();
+        second.saveAs(dir.filePath("read-only-copy.ppm").toStdString());
+        second.addTask("사본 편집");
+        second.save();
         check(read(a) == originalBytes, "read-only copy modified source");
         // Scheduling inputs survive persistence; results remain a session cache.
-        second.setDuration(0, 480); second.setDuration(1, 240);
-        second.setPredecessors(1, {second.project()->tasks[0].id}); second.setHolidays({"2026-11-02"});
-        auto result = jobs::calculate(*second.project()); second.applyCalculation(result);
+        second.setDuration(0, 480);
+        second.setDuration(1, 240);
+        second.setPredecessors(1, {second.project()->tasks[0].id});
+        second.setHolidays({"2026-11-02"});
+        auto result = jobs::calculate(*second.project());
+        second.applyCalculation(result);
         check(second.calculation()->status == jobs::CalculationStatus::Incomplete, "missing task duration ignored");
-        second.setDuration(2, 60); second.applyCalculation(jobs::calculate(*second.project()));
+        second.setDuration(2, 60);
+        second.applyCalculation(jobs::calculate(*second.project()));
         check(second.calculation()->status == jobs::CalculationStatus::Valid, "application calculation rejected");
-        auto oldResult = *second.calculation(); second.setDuration(0, 960);
+        auto oldResult = *second.calculation();
+        second.setDuration(0, 960);
         check(second.calculation()->status == jobs::CalculationStatus::Stale, "edit failed to invalidate calculation");
         second.applyCalculation(oldResult);
         check(second.calculation()->status == jobs::CalculationStatus::Stale, "old revision overwrote current result");
@@ -163,50 +233,109 @@ int main(int argc, char* argv[]) {
         auto beforeBadHoliday = *second.project();
         rejects([&] { second.setHolidays({"2026-02-30"}); });
         check(*second.project() == beforeBadHoliday, "invalid holiday changed project");
-        second.create("different document", "2026-10-26", {"task"}); second.applyCalculation(oldResult);
+        second.create("different document", "2026-10-26", {"task"});
+        second.applyCalculation(oldResult);
         check(second.calculation()->status == jobs::CalculationStatus::Stale, "wrong document calculation accepted");
         // Construct an actual schema-1 payload, then check original-preserving migration by Save As.
         auto legacy = QJsonDocument::fromJson(originalBytes).object();
-        auto legacyPayload = legacy["payload"].toObject(); legacyPayload.remove("holidays"); legacyPayload.remove("calculationProfile"); legacyPayload.remove("wbsNodes");
-        legacyPayload.remove("costProfile"); legacyPayload.remove("currency"); legacyPayload.remove("taskCosts"); legacyPayload.remove("costEntries"); legacyPayload.remove("resources"); legacyPayload.remove("assignments"); legacyPayload.remove("scenarios");
-        legacyPayload.remove("baselines"); legacyPayload.remove("progress"); legacyPayload.remove("statusAt");
+        auto legacyPayload = legacy["payload"].toObject();
+        legacyPayload.remove("holidays");
+        legacyPayload.remove("calculationProfile");
+        legacyPayload.remove("wbsNodes");
+        legacyPayload.remove("costProfile");
+        legacyPayload.remove("currency");
+        legacyPayload.remove("taskCosts");
+        legacyPayload.remove("costEntries");
+        legacyPayload.remove("resources");
+        legacyPayload.remove("assignments");
+        legacyPayload.remove("scenarios");
+        legacyPayload.remove("baselines");
+        legacyPayload.remove("progress");
+        legacyPayload.remove("statusAt");
         QJsonArray legacyTasks;
-        for (const auto& value : legacyPayload["tasks"].toArray()) {
-            auto task = value.toObject(); task.remove("durationMinutes"); task.remove("predecessors"); task.remove("wbsId"); legacyTasks.append(task);
+        for (const auto &value : legacyPayload["tasks"].toArray()) {
+            auto task = value.toObject();
+            task.remove("durationMinutes");
+            task.remove("predecessors");
+            task.remove("wbsId");
+            legacyTasks.append(task);
         }
-        legacyPayload["tasks"] = legacyTasks; legacy["payload"] = legacyPayload; legacy["schemaVersion"] = 1;
-        legacy["sha256"] = QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(legacyPayload).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
-        auto legacyPath = dir.filePath("legacy.jobs"); const auto legacyBytes = QJsonDocument(legacy).toJson(); write(legacyPath, legacyBytes);
-        jobs::Document migrated(store); migrated.open(legacyPath.toStdString());
-        check(migrated.requiresSaveAs() && migrated.project()->documentId == initial.documentId && !migrated.project()->tasks[0].durationMinutes,
+        legacyPayload["tasks"] = legacyTasks;
+        legacy["payload"] = legacyPayload;
+        legacy["schemaVersion"] = 1;
+        legacy["sha256"] =
+            QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(legacyPayload).toJson(QJsonDocument::Compact),
+                                                         QCryptographicHash::Sha256)
+                                    .toHex());
+        auto legacyPath = dir.filePath("legacy.ppm");
+        const auto legacyBytes = QJsonDocument(legacy).toJson();
+        write(legacyPath, legacyBytes);
+        jobs::Document migrated(store);
+        migrated.open(legacyPath.toStdString());
+        check(migrated.requiresSaveAs() && migrated.project()->documentId == initial.documentId &&
+                  !migrated.project()->tasks[0].durationMinutes,
               "legacy defaults/identity mismatch");
-        migrated.setDuration(0, 480); rejects([&] { migrated.save(); });
+        migrated.setDuration(0, 480);
+        rejects([&] { migrated.save(); });
         check(read(legacyPath) == legacyBytes && migrated.dirty(), "legacy save modified original");
-        migrated.saveAs(dir.filePath("migrated.jobs").toStdString());
-        check(!migrated.requiresSaveAs() && read(legacyPath) == legacyBytes && store.load(migrated.path()).project == *migrated.project(), "legacy save as failed");
+        migrated.saveAs(dir.filePath("migrated.ppm").toStdString());
+        check(!migrated.requiresSaveAs() && read(legacyPath) == legacyBytes &&
+                  store.load(migrated.path()).project == *migrated.project(),
+              "legacy save as failed");
         auto parent = migrated.addWbs("단계 α"), child = migrated.addWbs("상세", parent);
-        migrated.assignWbs(0, child); migrated.save();
-        check(store.load(migrated.path()).project == *migrated.project(), "WBS hierarchy/task assignment roundtrip mismatch");
+        migrated.assignWbs(0, child);
+        migrated.save();
+        check(store.load(migrated.path()).project == *migrated.project(),
+              "WBS hierarchy/task assignment roundtrip mismatch");
         // Schema 2 keeps scheduling input and IDs, adds an empty hierarchy/history, and preserves original bytes.
         auto version2 = QJsonDocument::fromJson(read(QString::fromStdString(migrated.path()))).object();
-        auto p2 = version2["payload"].toObject(); p2.remove("costProfile"); p2.remove("currency"); p2.remove("taskCosts"); p2.remove("costEntries"); p2.remove("resources"); p2.remove("assignments"); p2.remove("scenarios"); p2.remove("wbsNodes"); p2.remove("baselines"); p2.remove("progress"); p2.remove("statusAt");
+        auto p2 = version2["payload"].toObject();
+        p2.remove("costProfile");
+        p2.remove("currency");
+        p2.remove("taskCosts");
+        p2.remove("costEntries");
+        p2.remove("resources");
+        p2.remove("assignments");
+        p2.remove("scenarios");
+        p2.remove("wbsNodes");
+        p2.remove("baselines");
+        p2.remove("progress");
+        p2.remove("statusAt");
         QJsonArray tasks2;
-        for (auto value : p2["tasks"].toArray()) { auto t = value.toObject(); t.remove("wbsId"); tasks2.append(t); }
-        p2["tasks"] = tasks2; version2["payload"] = p2; version2["schemaVersion"] = 2;
-        version2["sha256"] = QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(p2).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex());
-        const auto bytes2 = QJsonDocument(version2).toJson(); auto path2 = dir.filePath("version2.jobs"); write(path2, bytes2);
-        jobs::Document from2(store); from2.open(path2.toStdString());
+        for (auto value : p2["tasks"].toArray()) {
+            auto t = value.toObject();
+            t.remove("wbsId");
+            tasks2.append(t);
+        }
+        p2["tasks"] = tasks2;
+        version2["payload"] = p2;
+        version2["schemaVersion"] = 2;
+        version2["sha256"] = QString::fromLatin1(
+            QCryptographicHash::hash(QJsonDocument(p2).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256)
+                .toHex());
+        const auto bytes2 = QJsonDocument(version2).toJson();
+        auto path2 = dir.filePath("version2.ppm");
+        write(path2, bytes2);
+        jobs::Document from2(store);
+        from2.open(path2.toStdString());
         check(from2.requiresSaveAs() && from2.project()->wbsNodes.empty() && from2.project()->tasks[0].wbsId.empty() &&
-              from2.project()->tasks[0].id == migrated.project()->tasks[0].id && from2.project()->tasks[0].durationMinutes == 480,
+                  from2.project()->tasks[0].id == migrated.project()->tasks[0].id &&
+                  from2.project()->tasks[0].durationMinutes == 480,
               "schema 2 input/identity migration mismatch");
         rejects([&] { from2.save(); });
-        from2.saveAs(dir.filePath("version3.jobs").toStdString());
-        check(read(path2) == bytes2 && store.load(from2.path()).project == *from2.project(), "schema 2 original changed / new copy failed");
+        from2.saveAs(dir.filePath("version3.ppm").toStdString());
+        check(read(path2) == bytes2 && store.load(from2.path()).project == *from2.project(),
+              "schema 2 original changed / new copy failed");
         auto badWbs = QJsonDocument::fromJson(originalBytes).object()["payload"].toObject();
         badWbs["wbsNodes"] = QJsonArray{QJsonObject{{"id", "w1"}, {"name", "one"}, {"parentId", "w2"}},
-            QJsonObject{{"id", "w2"}, {"name", "two"}, {"parentId", "w1"}}};
-        sign(badWbs); rejects([&] { store.load(broken.toStdString()); });
-        std::cout << "PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, stale revision/identity, schema-1 copy migration\n";
+                                        QJsonObject{{"id", "w2"}, {"name", "two"}, {"parentId", "w1"}}};
+        sign(badWbs);
+        rejects([&] { store.load(broken.toStdString()); });
+        std::cout << "PASS: file lifecycle, Unicode, locks/conflicts, corruption/schema, schedule input roundtrip, "
+                     "stale revision/identity, schema-1 copy migration\n";
         return 0;
-    } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
+    } catch (const std::exception &e) {
+        std::cerr << "FAIL: " << e.what() << '\n';
+        return 1;
+    }
 }

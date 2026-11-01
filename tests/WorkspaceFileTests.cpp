@@ -53,8 +53,8 @@ int main(int argc, char **argv) {
         jobs::JsonWorkspaceStore store(files);
         jobs::Workspace w;
         w.id = "workspace";
-        const auto path = dir.filePath("MixedCase.jobsworkspace").toStdString();
-        w.projects = {{"P", dir.filePath("Project.jobs").toStdString(), "Project"}};
+        const auto path = dir.filePath("MixedCase.ppmworkspace").toStdString();
+        w.projects = {{"P", dir.filePath("Project.ppm").toStdString(), "Project"}};
         w.resources = {{"S", "Shared"}};
         w.resources[0].maxUnits.reset();
         w.resources[0].exceptions = {{"2026-10-26", 0}, {"2026-10-27", 100}};
@@ -63,14 +63,22 @@ int main(int argc, char **argv) {
         auto lease = files.lock(path);
         const auto fingerprint = store.save(path, w, {});
         auto loaded = store.load(path);
+        {
+            const auto old = dir.filePath("Old.jobsworkspace").toStdString();
+            const auto bytes = read(path);
+            write(old, bytes);
+            rejects([&] { store.load(old); }, "FILE_EXTENSION_UNSUPPORTED");
+            rejects([&] { store.save(old, w, {}); }, "FILE_EXTENSION_UNSUPPORTED");
+            check(read(old) == bytes, "old workspace extension rejection changed bytes");
+        }
         check(loaded.workspace == w && loaded.fingerprint == fingerprint && loaded.path == files.normalizePath(path),
               "roundtrip changed workspace");
         const auto bytes = read(path);
         const auto root = QJsonDocument::fromJson(bytes).object();
-        check(root["payload"].toObject()["projects"].toArray()[0].toObject()["path"] == "Project.jobs",
+        check(root["payload"].toObject()["projects"].toArray()[0].toObject()["path"] == "Project.ppm",
               "path not relative");
         check(jobs::decodeWorkspaceFile(bytes, dir.path()) == w, "memory/store decoder mismatch");
-        check(QDir(dir.path()).entryList({"*.jobsworkspace"}, QDir::Files) == QStringList{"MixedCase.jobsworkspace"},
+        check(QDir(dir.path()).entryList({"*.ppmworkspace"}, QDir::Files) == QStringList{"MixedCase.ppmworkspace"},
               "workspace filename lowercased");
         rejects([&] { (void)store.save(path, w, {}); }, "WORKSPACE_FILE_EXISTS");
         rejects([&] { (void)files.lock(path); }, "FILE_LOCKED");
@@ -105,11 +113,11 @@ int main(int argc, char **argv) {
         rejects([&] { jobs::validateWorkspace(invalid); }, "WORKSPACE_DUPLICATE_PROJECT");
         invalid = w;
         invalid.projects[0].path.clear();
-        rejects([&] { (void)store.save(dir.filePath("Empty.jobsworkspace").toStdString(), invalid, {}); },
+        rejects([&] { (void)store.save(dir.filePath("Empty.ppmworkspace").toStdString(), invalid, {}); },
                 "WORKSPACE_INVALID");
         rejects([&] { (void)jobs::decodeWorkspaceFile(QByteArray(8 * 1024 * 1024 + 1, ' '), dir.path()); },
                 "WORKSPACE_LIMIT");
-        const auto boundaryPath = dir.filePath("Boundaries.jobsworkspace").toStdString();
+        const auto boundaryPath = dir.filePath("Boundaries.ppmworkspace").toStdString();
         auto boundary = w;
         boundary.projects[0].name = QString(5000, QChar(0xAC00)).toStdString();
         boundary.resources[0].name = std::string(4097, 'x') + QString(4097, QChar(0xAC00)).toStdString();
@@ -151,7 +159,7 @@ int main(int argc, char **argv) {
             invalid.resources[0].calendar.holidays.push_back(date);
             invalid.resources[0].exceptions.push_back({date, jobs::maxSharedResourceUnits});
         }
-        const auto arrayPath = dir.filePath("ArrayLimits.jobsworkspace").toStdString();
+        const auto arrayPath = dir.filePath("ArrayLimits.ppmworkspace").toStdString();
         (void)store.save(arrayPath, invalid, {});
         check(store.load(arrayPath).workspace == invalid, "shared array boundaries failed to reopen");
         invalid.resources[0].calendar.holidays.push_back("2054-01-01");

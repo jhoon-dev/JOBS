@@ -259,12 +259,12 @@ WorkspaceDialog::WorkspaceDialog(DesktopWorkspace &workspace, QWidget *parent)
     };
     connect(create, &QPushButton::clicked, this, [this] { workspace_.createProject(); });
     connect(open, &QPushButton::clicked, this, [this, protect] {
-        auto path = QFileDialog::getOpenFileName(this, "프로젝트 추가", {}, "JOBS 프로젝트 (*.jobs)");
+        auto path = QFileDialog::getOpenFileName(this, "프로젝트 추가", {}, "PPM 프로젝트 (*.ppm)");
         if (!path.isEmpty())
             protect([&] { workspace_.openProject(str(path)); });
     });
     connect(openWorkspace, &QPushButton::clicked, this, [this, protect] {
-        auto path = QFileDialog::getOpenFileName(this, "작업공간 열기", {}, "JOBS 작업공간 (*.jobsworkspace)");
+        auto path = QFileDialog::getOpenFileName(this, "작업공간 열기", {}, "PPM 작업공간 (*.ppmworkspace)");
         if (!path.isEmpty())
             protect([&] { workspace_.openWorkspace(str(path), this); });
     });

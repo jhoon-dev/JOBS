@@ -219,7 +219,7 @@ void RecoveryDialog::discard() {
     const auto id = scan_.candidates[std::size_t(row)].sessionId;
     if (QMessageBox::question(this, "복구본 버리기",
                               "세션 " + id +
-                                  "의 모든 세대 복구본을 삭제합니다. 원본 .jobs 파일은 유지됩니다. 계속하시겠습니까?",
+                                  "의 모든 세대 복구본을 삭제합니다. 원본 .ppm 파일은 유지됩니다. 계속하시겠습니까?",
                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
     setBusy(true);

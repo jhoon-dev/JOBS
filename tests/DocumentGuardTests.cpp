@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
         QTemporaryDir directory;
         check(directory.isValid(), "temporary directory unavailable");
         CountingStore store;
-        const auto path = directory.filePath("Guard.jobs").toStdString();
+        const auto path = directory.filePath("Guard.ppm").toStdString();
         {
             jobs::Document source(store);
             source.create("Guard fixture", "2026-10-26", {"Task"});
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
         const auto taskId = readOnly.project()->tasks[0].id;
         check(readOnly.previewRemoveTasks({taskId}).tasks == 1, "read-only preview was blocked");
         const auto oldId = readOnly.project()->documentId;
-        readOnly.saveAs(directory.filePath("Independent.jobs").toStdString());
+        readOnly.saveAs(directory.filePath("Independent.ppm").toStdString());
         check(!readOnly.readOnly() && readOnly.project()->derivedFrom == oldId &&
                   readOnly.project()->documentId != oldId,
               "read-only independent copy was blocked");

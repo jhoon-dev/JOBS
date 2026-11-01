@@ -359,7 +359,7 @@ void exportXlsx(const ProjectReport &r, const QString &path, ReportFamily family
                 x.writeNamespace("http://purl.org/dc/terms/", "dcterms");
                 x.writeNamespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
                 x.writeTextElement("dc:title", reportText(r.projectName));
-                x.writeTextElement("dc:creator", "JOBS");
+                x.writeTextElement("dc:creator", "PPM");
                 x.writeTextElement("dc:description", "보고서 " + reportText(r.options.reportId) + " / 문서 " +
                                                          reportText(r.documentId) + " / rev " +
                                                          QString::number(r.revision));

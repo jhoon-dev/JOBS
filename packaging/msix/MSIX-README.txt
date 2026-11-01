@@ -1,7 +1,7 @@
-JOBS - Microsoft Store MSIX
+PPM - Microsoft Store MSIX
 
 Windows installs, updates and removes this package. No NSIS uninstaller is included.
-Projects (.jobs) and workspaces (.jobsworkspace) are saved to paths selected by you.
+Projects (.ppm) and workspaces (.ppmworkspace) are saved to paths selected by you.
 Settings and automatic recovery are stored in this package's private LocalState.
 An update keeps that state; a normal uninstall removes it.
 External project files and the standalone EXE edition's data are preserved.

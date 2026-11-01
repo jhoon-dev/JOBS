@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
         d.setTaskEffort(1, jobs::TaskType::FixedUnits, false, 60, {}, {{"2026-10-26 13:00", "2026-10-26 14:00"}});
         d.captureBaseline("Approved", "PM", "Plan", "2026-10-26T00:00:00Z");
         const auto baselines = d.project()->baselines;
-        d.saveAs(dir.filePath("editing.jobs").toStdString());
+        d.saveAs(dir.filePath("editing.ppm").toStdString());
         const auto disk = bytes(d.path());
         const auto before = plan(d);
         const auto revision = d.project()->revision;

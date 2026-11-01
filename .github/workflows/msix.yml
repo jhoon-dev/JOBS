@@ -37,8 +37,8 @@ jobs:
       - name: Install activate update recover and uninstall with package identity
         shell: powershell
         run: |
-          $initial = (Get-Item dist/msix/JOBS-development-1.0.2.0-x64-*-probe.msix).FullName
-          $upgrade = (Get-Item dist/msix/JOBS-development-1.0.3.0-x64-*-probe.msix).FullName
+          $initial = (Get-Item dist/msix/PPM-development-1.0.2.0-x64-*-probe.msix).FullName
+          $upgrade = (Get-Item dist/msix/PPM-development-1.0.3.0-x64-*-probe.msix).FullName
           ./scripts/check-msix-lifecycle.ps1 -InitialPackage $initial -UpgradePackage $upgrade
       - name: Verify update service and native widgets
         run: |
@@ -49,7 +49,7 @@ jobs:
         run: |
           python scripts/setup-nsis-tools.py
           python scripts/package-windows.py
-          $installer = (Get-Item dist/JOBS-0.2.0-Setup-win64-*.exe).FullName
+          $installer = (Get-Item dist/PPM-0.2.0-Setup-win64-*.exe).FullName
           python scripts/check-update-install.py --installer $installer
       - name: Preserve MSIX and actual packaged UI evidence
         if: always()

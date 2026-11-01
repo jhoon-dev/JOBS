@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
                   doc.project()->tasks[0].constraintAt == "2026-10-29 14:00",
               "move discarded fixed finish type");
         doc.captureBaseline("제약 계획", "PM", "승인", "2026-10-26T09:01:00Z");
-        const auto path = dir.filePath("제약.jobs");
+        const auto path = dir.filePath("제약.ppm");
         doc.saveAs(path.toStdString());
         check(store.load(path.toStdString()).project == *doc.project(), "schema8 roundtrip failed");
         auto bytes = read(path);
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
         legacy.create("v7", "2026-10-26", {"A"});
         legacy.setDuration(0, 60);
         legacy.putCalendar({{}, "old", {1, 2, 3, 4, 5}, {{540, 720}, {780, 1080}}, {}});
-        auto original = dir.filePath("v7.jobs");
+        auto original = dir.filePath("v7.ppm");
         legacy.saveAs(original.toStdString());
         auto root = QJsonDocument::fromJson(read(original)).object();
         root["schemaVersion"] = 7;
@@ -244,7 +244,7 @@ int main(int argc, char **argv) {
         migrated.open(original.toStdString(), true);
         check(migrated.requiresSaveAs() && jobs::calculatePlan(*migrated.project()).engineVersion == "jobs-pdm-1.2",
               "migrated plan did not select the current PDM engine");
-        migrated.saveAs(dir.filePath("v8.jobs").toStdString());
+        migrated.saveAs(dir.filePath("v8.ppm").toStdString());
         check(read(original) == oldBytes, "migration overwrote original");
         jobs::ReportOptions options;
         options.reportId = "constraints";

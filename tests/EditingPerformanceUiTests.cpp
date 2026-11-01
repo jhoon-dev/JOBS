@@ -17,14 +17,17 @@
 #include <iostream>
 
 namespace {
-void check(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
+void check(bool value, const char *message) {
+    if (!value)
+        throw std::runtime_error(message);
 }
-int main(int argc, char** argv) {
+} // namespace
+int main(int argc, char **argv) {
     QApplication app(argc, argv);
     bool unexpectedModal = false;
     QTimer modalGuard;
     QObject::connect(&modalGuard, &QTimer::timeout, [&] {
-        if (auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget())) {
+        if (auto *box = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
             unexpectedModal = true;
             std::cerr << "Unexpected modal: " << box->text().toStdString() << std::endl;
             box->reject();
@@ -34,71 +37,100 @@ int main(int argc, char** argv) {
     try {
         QTemporaryDir dir;
         jobs::JsonProjectStore store;
-        const auto path = dir.filePath("EditingUi.jobs").toUtf8().toStdString();
+        const auto path = dir.filePath("EditingUi.ppm").toUtf8().toStdString();
         const auto fixture = performanceFixture(1000, false);
         store.save(path, fixture, {});
-        jobs::Document document(store); document.open(path); document.applyCalculation(jobs::calculate(fixture));
-        jobs::MainWindow window(document); window.show(); app.processEvents();
+        jobs::Document document(store);
+        document.open(path);
+        document.applyCalculation(jobs::calculate(fixture));
+        jobs::MainWindow window(document);
+        window.show();
+        app.processEvents();
         std::cout << "stage: initial" << std::endl;
-        auto* table = taskTable(window);
-        auto* tree = window.findChild<QTreeWidget*>("wbsTree");
-        auto* undo = window.findChild<QAction*>("undoEdit");
-        auto* redo = window.findChild<QAction*>("redoEdit");
+        auto *table = taskTable(window);
+        auto *tree = window.findChild<QTreeWidget *>("wbsTree");
+        auto *undo = window.findChild<QAction *>("undoEdit");
+        auto *redo = window.findChild<QAction *>("redoEdit");
         check(table && tree && undo && redo, "editing controls missing");
         const QPersistentModelIndex unchangedItem(cell(table, 999, 0));
-        const auto* root = tree->topLevelItem(0);
+        const auto *root = tree->topLevelItem(0);
         table->setCurrentCell(0, 0);
-        setCellText(table, 0, 0, "First edit"); app.processEvents();
+        setCellText(table, 0, 0, "First edit");
+        app.processEvents();
         check(document.calculation()->status == jobs::CalculationStatus::Stale, "edit left a valid calculation");
         for (int row = 0; row < table->rowCount(); ++row)
             check(cellText(table, row, 3) == "미계산", "cached table left stale dates");
         QSet<int> changedRows;
         QObject::connect(table->model(), &QAbstractItemModel::dataChanged, &window,
-                         [&](const QModelIndex& first, const QModelIndex& last) {
-                             for (int row = first.row(); row <= last.row(); ++row) changedRows.insert(row);
+                         [&](const QModelIndex &first, const QModelIndex &last) {
+                             for (int row = first.row(); row <= last.row(); ++row)
+                                 changedRows.insert(row);
                          });
-        setCellText(table, 0, 0, "Second edit"); app.processEvents();
+        setCellText(table, 0, 0, "Second edit");
+        app.processEvents();
         std::cout << "stage: incremental" << std::endl;
         check(changedRows == QSet<int>{0}, "single edit refreshed unchanged table rows");
         check(cell(table, 999, 0) == unchangedItem && tree->topLevelItem(0) == root,
               "single edit reset persistent indexes or the WBS tree");
-        changedRows.clear(); undo->trigger(); app.processEvents();
+        changedRows.clear();
+        undo->trigger();
+        app.processEvents();
         check(document.project()->tasks[0].name == "First edit" && cellText(table, 0, 0) == "First edit" &&
-              changedRows == QSet<int>{0}, "undo failed to update only the changed row");
-        redo->trigger(); app.processEvents();
+                  changedRows == QSet<int>{0},
+              "undo failed to update only the changed row");
+        redo->trigger();
+        app.processEvents();
         check(cellText(table, 0, 0) == "Second edit", "redo did not refresh the edited row");
-        setCellText(table, 0, 0, "  Second edit  "); app.processEvents();
+        setCellText(table, 0, 0, "  Second edit  ");
+        app.processEvents();
         check(cellText(table, 0, 0) == "Second edit", "no-op edit bypassed display normalization");
         std::cout << "stage: undo/redo" << std::endl;
-        table->setCurrentCell(500, 0); table->selectRow(500); table->scrollTo(cell(table, 500, 0)); app.processEvents();
+        table->setCurrentCell(500, 0);
+        table->selectRow(500);
+        table->scrollTo(cell(table, 500, 0));
+        app.processEvents();
         const auto scroll = table->verticalScrollBar()->value();
         const auto id = cellText(table, 500, 8);
-        setCellText(table, 500, 1, "3"); app.processEvents();
+        setCellText(table, 500, 1, "3");
+        app.processEvents();
         check(document.project()->tasks[500].durationMinutes == 180 && table->currentRow() == 500 &&
-              cellText(table, 500, 8) == id && table->verticalScrollBar()->value() == scroll,
+                  cellText(table, 500, 8) == id && table->verticalScrollBar()->value() == scroll,
               "refresh changed selected ID, scroll or duration");
-        auto* sort = window.findChild<QComboBox*>("taskSort");
-        sort->setCurrentIndex(2); app.processEvents();
+        auto *sort = window.findChild<QComboBox *>("taskSort");
+        sort->setCurrentIndex(2);
+        app.processEvents();
         const auto currentRow = table->currentRow();
         std::cout << "stage: sort" << std::endl;
         check(currentRow >= 0 && cellText(table, currentRow, 8) == id, "sort lost the selected stable ID");
-        auto* search = window.findChild<QLineEdit*>("taskSearch");
-        search->setText("Second edit"); QTest::qWait(220); app.processEvents();
+        auto *search = window.findChild<QLineEdit *>("taskSearch");
+        search->setText("Second edit");
+        QTest::qWait(220);
+        app.processEvents();
         std::cout << "stage: search" << std::endl;
         check(table->rowCount() == 1 && cellText(table, 0, 8) == "T0", "filter reused the wrong cached row");
-        table->setCurrentCell(0, 0); setCellText(table, 0, 0, "Hidden by search"); app.processEvents();
+        table->setCurrentCell(0, 0);
+        setCellText(table, 0, 0, "Hidden by search");
+        app.processEvents();
         check(table->rowCount() == 0 && document.project()->tasks[0].name == "Hidden by search",
               "rename did not update search membership");
-        undo->trigger(); app.processEvents();
+        undo->trigger();
+        app.processEvents();
         std::cout << "stage: filtered undo" << std::endl;
         check(table->rowCount() == 1 && cellText(table, 0, 0) == "Second edit", "undo failed to restore filtered row");
-        search->clear(); QTest::qWait(220); app.processEvents();
+        search->clear();
+        QTest::qWait(220);
+        app.processEvents();
         document.save();
-        jobs::Document reopened(store); reopened.open(path, true);
+        jobs::Document reopened(store);
+        reopened.open(path, true);
         check(*reopened.project() == *document.project(), "optimized editing did not persist unchanged input/facts");
         check(!unexpectedModal, "editing opened an unexpected failure dialog");
         check(window.grab().save("editing-performance-ui.png"), "editing UI screenshot failed");
         window.hide();
-        std::cout << "PASS: incremental rows/items/tree, stale dates, normalization, undo/redo, selection, scrolling, sorting/filtering and save\n";
-    } catch (const std::exception& error) { std::cerr << "FAIL: " << error.what() << '\n'; return 1; }
+        std::cout << "PASS: incremental rows/items/tree, stale dates, normalization, undo/redo, selection, scrolling, "
+                     "sorting/filtering and save\n";
+    } catch (const std::exception &error) {
+        std::cerr << "FAIL: " << error.what() << '\n';
+        return 1;
+    }
 }

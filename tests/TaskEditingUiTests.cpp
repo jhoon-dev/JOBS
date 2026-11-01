@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
         doc.setDuration(2, 0);
         const auto a = doc.project()->tasks[0].id, b = doc.project()->tasks[1].id, c = doc.project()->tasks[2].id;
         doc.setPredecessors(1, {a});
-        doc.saveAs(dir.filePath("tasks.jobs").toStdString());
+        doc.saveAs(dir.filePath("tasks.ppm").toStdString());
         jobs::MainWindow window(doc);
         window.show();
         QTest::qWait(30);

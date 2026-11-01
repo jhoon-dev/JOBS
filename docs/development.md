@@ -36,7 +36,7 @@ Qt 패키지와 컴파일러 ABI를 맞춘다. Qt 6.8 이상을 CMake에서 허�
 cmake -S . -B build -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64
 cmake --build build --config Release --parallel
 ctest --test-dir build -C Release --output-on-failure
-& ./build/Release/JOBS.exe
+& ./build/Release/PPM.exe
 ```
 
 MinGW는 해당 Qt의 `bin`과 MinGW의 `bin`을 PATH에 추가한 뒤 Ninja를 사용한다.
@@ -48,7 +48,7 @@ MinGW는 해당 Qt의 `bin`과 MinGW의 `bin`을 PATH에 추가한 뒤 Ninja를 
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/mingw_64
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
-& ./build/JOBS.exe
+& ./build/PPM.exe
 ```
 
 macOS:
@@ -57,14 +57,14 @@ macOS:
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/6.8.3/macos"
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
-open build/JOBS.app
+open build/PPM.app
 ```
 
 개발 실행에는 Qt DLL/라이브러리 경로가 필요하다. Windows x64 preview 설치 파일은 [설치·완전 제거·패키징 계약](windows-installer.md)을 따른다. 설치 파일은 Qt/컴파일러 런타임을 포함하며 개발 환경이 필요 없다. 서명·공개 배포와 macOS 설치 패키지는 후속 범위다.
 GitHub Actions는 Windows/macOS 빌드와 계산·파일·화면 테스트를 수행한다.
 macOS는 `macos-15`와 Xcode 16.4를 고정한다. 최신 SDK에서 Qt 6.8.3의 AGL 링크 실패를 확인했다.
 
-## 현재 `.jobs` 형식 (schema 9)
+## 현재 `.ppm` 형식 (schema 9)
 
 UTF-8 JSON 한 파일에 `format: JOBS`, `schemaVersion: 9`, `payload`, `sha256`을 보존한다.
 payload에는 documentId, derivedFrom, revision, name, startDate, calendar, tasks, holidays,
@@ -149,15 +149,15 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 원가/EVM 증분의 로컬 Release 전체 12/12와 Windows 네이티브 원가 화면 테스트를 통과했다.
 단가·F10 EVM 표·PV/EV/AC 추이의 한글/금액 표시와 기존 자원 화면의 단가 보존을 확인했다.
 
-보고서 증분은 `reports_export`, `reports_ui`를 더해 CTest 14개로 확장했다. `jobs_calculation`의 표준 C++ 보고서 스냅샷을 대시보드/표·두 출력기가 공유하며 설정은 `.jobs` 입력을 바꾸지 않는다. Qt Gui는 Widgets 의존 모듈이므로 별도 Qt 패키지 설치가 필요하지 않다.
+보고서 증분은 `reports_export`, `reports_ui`를 더해 CTest 14개로 확장했다. `jobs_calculation`의 표준 C++ 보고서 스냅샷을 대시보드/표·두 출력기가 공유하며 설정은 `.ppm` 입력을 바꾸지 않는다. Qt Gui는 Widgets 의존 모듈이므로 별도 Qt 패키지 설치가 필요하지 않다.
 [대시보드·보고서·출력 계약](reports-export.md)에 필터와 집계 범위·용지/글자 크기·한도·후속 범위를 기록한다.
 
 로컬 Release 전체 14/14, Windows 네이티브 보고서 UI와 출력 시험을 통과했다. openpyxl/pypdf로 ZIP/숫자/미정/출처, PDF 크기·본문·긴 행 700구간과 마지막 표식을 독립 대조했다. 엑셀 14개 시트와 PDF 페이지를 렌더링해 한글/줄바꿈/정렬을 확인했다. 독립 재열기 검사 스크립트는 `scripts/verify-report-fixtures.py build`이며 Python 의존성은 개발/CI에만 사용한다. Windows/macOS CI에서도 CTest 뒤 같은 파일 검증을 실행한다.
 
 자동 저장/복구·실행 취소 증분은 `undo_contract`, `recovery_crash_file`, `recovery_ui`를 더해 전체 17개로 확장했다. 실제 별도 프로세스 강제 종료와 flush 이후 commit 직전 강제 종료를 포함한다. 일반 입력은 새로운 revision으로 취소/재실행하고, 승인·제출 사실은 불변 이력 경계로 유지한다. 저장 입력과의 동일성(dirty)과 실제 저장된 revision을 구분해 보고서 출처도 보정했다.
-[자동 저장·복구·편집 이력 계약](recovery-undo.md)에 저장 위치/간격·사본 복구·잠금/세대·중단·한도·후속 검증을 기록한다. 이 증분 당시 `.jobs`는 schema 6이었으며 복구 envelope는 별도 schema 1이다. 현재 `.jobs`는 schema 9이고 복구 envelope schema 1은 내부 projectSchema 6~9를 지원한다. 회귀 시험용 저장 단계 observer는 실제 flush/commit 사이에서 중단·경쟁을 재현하며 제품 UI에서는 설정하지 않는다.
+[자동 저장·복구·편집 이력 계약](recovery-undo.md)에 저장 위치/간격·사본 복구·잠금/세대·중단·한도·후속 검증을 기록한다. 이 증분 당시 `.ppm`는 schema 6이었으며 복구 envelope는 별도 schema 1이다. 현재 `.ppm`는 schema 9이고 복구 envelope schema 1은 내부 projectSchema 6~9를 지원한다. 회귀 시험용 저장 단계 observer는 실제 flush/commit 사이에서 중단·경쟁을 재현하며 제품 UI에서는 설정하지 않는다.
 
-후속 PDM/작업 달력 증분은 `.jobs` schema 7을 사용하며 schema 1~6 원본과 기존 기준선을 보존한다. 복구 envelope schema 1의 내부 projectSchema 6/7을 지원한다. `native-pdm-taskcal-v1`은 civil 분 좌표와 작업별 근무분을 구분하며 `jobs-pdm-1.0`으로 계산한다. 자원/원가는 같은 근무 구간을 사용한다. 기존 `native-fs0-workminutes-v1` / `jobs-cpm-0.2` 결과는 유지한다. [PDM·작업 달력 계약](pdm-calendars.md), `pdm_calendar_contract`/`pdm_calendar_ui`와 독립 reader를 추가해 CTest 19개로 확장했다.
+후속 PDM/작업 달력 증분은 `.ppm` schema 7을 사용하며 schema 1~6 원본과 기존 기준선을 보존한다. 복구 envelope schema 1의 내부 projectSchema 6/7을 지원한다. `native-pdm-taskcal-v1`은 civil 분 좌표와 작업별 근무분을 구분하며 `jobs-pdm-1.0`으로 계산한다. 자원/원가는 같은 근무 구간을 사용한다. 기존 `native-fs0-workminutes-v1` / `jobs-cpm-0.2` 결과는 유지한다. [PDM·작업 달력 계약](pdm-calendars.md), `pdm_calendar_contract`/`pdm_calendar_ui`와 독립 reader를 추가해 CTest 19개로 확장했다.
 
 제약·마감·간트 증분은 schema 8 / native-pdm-constraints-v1 / jobs-pdm-1.1을 사용하며 구 입력/기준선 정책을 보존한다. Constraints는 하드 충돌과 소프트 마감 경고를 구분하고, GanttEditing은 UI 미리보기 후 Document의 ID/revision guard와 단일 edit를 사용한다. [상세 계약](constraints-gantt.md), constraint_contract/constraint_gantt_ui로 CTest 21개와 독립 XLSX/PDF 검증을 제공한다.
 
@@ -169,7 +169,7 @@ macOS 및 MSVC 검증은 GitHub Actions에서 별도 추적한다.
 
 작업 편집 증분은 PRD EDIT-01~05를 먼저 정의한 뒤 `TaskEditing`의 Qt 독립 원자적 명령과 표 입력/TSV 공통 파서, ID 기반 검색/필터/정렬/선택을 구현했다. `task_editing_contract`, `task_editing_ui`로 CTest 28개이며 로컬 전체 28/28·네이티브 Windows UI·독립 XLSX/PDF 검사를 통과했다. [작업 편집 계약](task-editing.md)에 삭제 보호·복제 범위·붙여넣기 한도·완료 증거와 후속 범위를 기록한다.
 
-Project XML 증분은 PRD XML-01~04를 먼저 커밋하고 `persistence/ProjectXml`의 제한 파서·계획 투영·원본 보존 교환 폴더와 `MainWindowXml` 미리보기를 추가한다. 기존 .jobs schema 9와 계산 코어는 유지한다. `project_xml_contract`, `project_xml_ui`를 포함해 CTest 30개다. 도메인 기대값/지원 부분 왕복/원본 바이트 및 승인·실적·원가 사본, XML 한도/오류, UI 취소/오래된 미리보기/읽기 전용 내보내기를 검사한다. `python scripts/verify-project-xml.py build`는 표준 XML reader의 독립 값 검사이며 실제 Microsoft Project 검증을 대체하지 않는다. `python scripts/capture-project-xml-ui.py build`는 네이티브 UI 동작과 미리보기 PNG를 기록한다. CI에서 기존 XLSX/PDF·1천/1만 성능 검증과 함께 실행한다. [지원 범위·손실·사용법](project-xml.md)을 따른다.
+Project XML 증분은 PRD XML-01~04를 먼저 커밋하고 `persistence/ProjectXml`의 제한 파서·계획 투영·원본 보존 교환 폴더와 `MainWindowXml` 미리보기를 추가한다. 기존 .ppm schema 9와 계산 코어는 유지한다. `project_xml_contract`, `project_xml_ui`를 포함해 CTest 30개다. 도메인 기대값/지원 부분 왕복/원본 바이트 및 승인·실적·원가 사본, XML 한도/오류, UI 취소/오래된 미리보기/읽기 전용 내보내기를 검사한다. `python scripts/verify-project-xml.py build`는 표준 XML reader의 독립 값 검사이며 실제 Microsoft Project 검증을 대체하지 않는다. `python scripts/capture-project-xml-ui.py build`는 네이티브 UI 동작과 미리보기 PNG를 기록한다. CI에서 기존 XLSX/PDF·1천/1만 성능 검증과 함께 실행한다. [지원 범위·손실·사용법](project-xml.md)을 따른다.
 
 Primavera XER 증분은 PRD XER-01~04를 먼저 정의하고 `persistence/PrimaveraXer`의 제한된 탭/structured calendar 파서·기간 기반 계획 투영과 `MainWindowXer`의 인코딩/변환 미리보기를 추가했다. XML과 XER의 원자적 교환 폴더 게시를 `ExchangePackage`에서 공유한다. 파일 schema/계산 코어는 유지하며 `primavera_xer_contract`/`primavera_xer_ui`로 CTest 32개다. 소수 시간의 정수 분 변환/1분 오차·지연/24시간 달력·상속 휴일·가용량 미정/0·UTF-8/Windows-1252·승인/실적/원가 사본·오류/한도/취소/session 경계를 검사한다. 독립 검사는 Python 3.12+, `mpxj==16.10.0`, `JPype1==1.6.0`, Java 21을 설치하고 `python scripts/verify-primavera-xer.py build`로 실행한다. MPXJ의 공식 UniversalProjectReader proxy를 통해 BOM 인식과 strict read를 함께 적용하며 실제 파일을 수정하지 않는다. `python scripts/capture-primavera-xer-ui.py build`는 네이티브 UI 시험/미리보기 PNG를 기록한다. 앱 실행에는 Python/Java가 필요 없다. [형식·원본 보존·제한](primavera-xer.md)을 따른다.
 

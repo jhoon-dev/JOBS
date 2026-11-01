@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
         action(window, "taskConstraints");
         check(wait([&] { return doc.calculation() && doc.calculation()->status == jobs::CalculationStatus::Valid; }),
               "repair did not restore schedule");
-        auto path = dir.filePath("readonly.jobs");
+        auto path = dir.filePath("readonly.ppm");
         doc.saveAs(path.toStdString());
         jobs::Document readonly(store);
         readonly.open(path.toStdString(), true);

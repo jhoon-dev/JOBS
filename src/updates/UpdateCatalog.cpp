@@ -122,7 +122,7 @@ UpdateRelease parseRelease(const QByteArray &json, const QString &current) {
     require(releasePageAllowed(release.page) && release.page.path() == "/jhoon-dev/JOBS/releases/tag/" + tag,
             "Release URL does not match repository and tag");
     release.notes = object.value("body").toString().left(32000);
-    const QRegularExpression name("^JOBS-" + QRegularExpression::escape(release.version) +
+    const QRegularExpression name("^PPM-" + QRegularExpression::escape(release.version) +
                                   "-Setup-win64-[0-9a-f]{8,40}\\.exe$");
     const auto assets = object.value("assets");
     require(assets.isArray() && assets.toArray().size() <= 100, "Invalid release assets");

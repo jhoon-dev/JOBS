@@ -1,10 +1,10 @@
 # Microsoft Store 제출 준비와 남은 절차
 
-2026-10-29. **현재 상태: 개인 계정 등록/앱 이름 예약 전. 실제 제출·심사·승인은 아직 진행하지 않았다.** 개발용 MSIX는 심사용 파일이 아니다.
+2026-11-01. 개발자 계정 등록과 **Project Planning Manager 이름 예약**을 완료했다. 무료·지원 가능한 모든 국가가 출시 방침이다. 기존 초안의 이전 이름 패키지는 업로드·검증되었으며 새 PPM 이름과 실행 파일을 반영한 패키지로 교체해야 한다. 최종 제출·심사·승인은 아직 진행하지 않았다. 개발용 MSIX는 심사용 파일이 아니다.
 
 ## 1. 지금 준비한 파일
 
-- `dist/msix/JOBS-development-1.0.2.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
+- `dist/msix/PPM-development-1.0.2.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
 - `scripts/package-msix.py`: 실제 Partner Center identity를 받아 unsigned Store MSIX를 생성한다. Store에서는 심사 후 Microsoft가 다시 서명하므로 별도 공인 인증서 구매를 요구하지 않는다.
 - `packaging/msix/store-identity.template.json`: 실제 ID 입력용 서식. 빈 값으로는 Store 패키지를 만들 수 없다.
 - `docs/store/listing.ko.md`, `privacy-policy.ko.md`, 벡터 아이콘과 PNG 자산, 실제 앱 화면, 검증 결과.
@@ -13,8 +13,8 @@ Microsoft Store는 단일 아키텍처 `.msix` 제출을 지원한다. 이 파�
 
 ## 2. 계정 소유자가 확정할 항목
 
-- [ ] Microsoft Partner Center 개인 개발자 계정과 신원 확인을 완료한다.
-- [ ] 새 Windows 앱을 만들고 사용 가능한 앱 이름을 예약한다.
+- [x] Microsoft Partner Center 개발자 계정 등록 완료(사용자 확인).
+- [x] 기존 전용 앱에 Project Planning Manager 이름 예약 완료.
 - [ ] 제품 관리 → 제품 ID/앱 ID 화면에서 `Package/Identity/Name`, `Package/Identity/Publisher`, `Package/Properties/PublisherDisplayName`을 정확하게 복사한다. 대소문자·공백·구두점을 유지한다.
 - [ ] `DisplayName`은 예약한 앱 표시명으로 입력한다. JSON 서식의 네 필드를 모두 채운 별도 파일을 준비한다.
 - [ ] 게시자 표시명/문의, 가격(무료/유료), 출시 국가, 연령 등급, 분류, 출시 시기와 공개 범위를 결정한다. 현재 앱에는 앱 내 구매나 광고 기능이 없다.
@@ -50,8 +50,8 @@ python scripts/package-msix.py --mode store --identity build/store-identity.json
 Windows 11 이상 관리자 PowerShell에서만 다음 경로를 사용한다. 개발 OID는 별도 인증서/신뢰 저장소/개발자 모드 변경 없이 unsigned 테스트를 허용한다. 일반 사용자 배포용으로 안내하지 않는다.
 
 ```powershell
-Add-AppxPackage -Path "C:\path\JOBS-development-1.0.2.0-x64-REV.msix" -AllowUnsigned
-# 시작 메뉴: JOBS MSIX Development
+Add-AppxPackage -Path "C:\path\PPM-development-1.0.2.0-x64-REV.msix" -AllowUnsigned
+# 시작 메뉴: Project Planning Manager Development
 Get-AppxPackage -Name ToolMoa.JOBS.MsixDevelopment | Remove-AppxPackage
 ```
 

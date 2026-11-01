@@ -121,11 +121,11 @@ int main(int argc, char **argv) {
               "independent compatibility verdicts");
         jobs::JsonProjectStore store;
         jobs::Document doc(store);
-        doc.open(QDir(folder).filePath("project.jobs").toUtf8().toStdString());
+        doc.open(QDir(folder).filePath("project.ppm").toUtf8().toStdString());
         check(*doc.project() == p && !doc.dirty(), "native reopen");
-        const auto saved = read(QDir(folder).filePath("project.jobs"));
+        const auto saved = read(QDir(folder).filePath("project.ppm"));
         rejects([&] { jobs::publishProjectXml(imported, folder); });
-        check(read(QDir(folder).filePath("project.jobs")) == saved, "existing destination preserved");
+        check(read(QDir(folder).filePath("project.ppm")) == saved, "existing destination preserved");
         rejects([&] { jobs::publishProjectXml(imported, temporary.filePath("missing/child")); });
         const auto before = *doc.project();
         const auto generation = doc.sessionGeneration();
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
         check(*doc.project() == before && doc.sessionGeneration() == generation && !doc.dirty() && !doc.canUndo(),
               "export does not edit document");
         auto output = jobs::publishProjectXml(exported, temporary.filePath("export"));
-        check(store.load(QDir(output).filePath("source.jobs").toStdString()).project == p, "export source snapshot");
+        check(store.load(QDir(output).filePath("source.ppm").toStdString()).project == p, "export source snapshot");
         auto unknown = p;
         unknown.tasks[0].durationMinutes.reset();
         unknown.resources[0].maxUnits.reset();
@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
         jobs::Document tracked(store);
         tracked.create("승인·실적 원본", "2026-10-26", {"보고 작업"});
         tracked.setDuration(0, 60);
-        tracked.saveAs(temporary.filePath("tracked.jobs").toStdString());
+        tracked.saveAs(temporary.filePath("tracked.ppm").toStdString());
         tracked.captureBaseline("승인 기준선", "검증자", "XML 원본 보존", "2026-10-26T00:00:00Z");
         tracked.setStatusAt("2026-10-26 09:30");
         jobs::ProgressEntry progress;
@@ -289,7 +289,7 @@ int main(int argc, char **argv) {
         auto historyExport = jobs::exportProjectXml(historySnapshot);
         auto historyFolder = jobs::publishProjectXml(historyExport, temporary.filePath("history-export"));
         check(hasDiagnostic(historyExport, "history-costs") &&
-                  store.load(QDir(historyFolder).filePath("source.jobs").toStdString()).project == historySnapshot &&
+                  store.load(QDir(historyFolder).filePath("source.ppm").toStdString()).project == historySnapshot &&
                   *tracked.project() == historySnapshot,
               "source snapshot lost approved/actual/cost ledger");
         check(!historyExport.xml.contains("<Baseline>") && !historyExport.xml.contains("<ActualStart>") &&

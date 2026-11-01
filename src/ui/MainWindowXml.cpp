@@ -96,7 +96,7 @@ void MainWindow::importXml() {
         if (document_.sessionGeneration() != publishSession ||
             (document_.project() ? document_.project()->revision : 0) != publishRevision)
             throw AppError(ErrorCode::EXCHANGE_SOURCE_CHANGED);
-        document_.open(QDir(folder).filePath("project.jobs").toUtf8().toStdString());
+        document_.open(QDir(folder).filePath("project.ppm").toUtf8().toStdString());
         refresh();
         statusBar()->showMessage("XML 계획 변환 완료 · 원본/진단: " + folder);
     } catch (const std::exception &e) {

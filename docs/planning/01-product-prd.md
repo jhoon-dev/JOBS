@@ -481,3 +481,14 @@ macOS CI의 150%에서 실제 창 높이가 437 논리 픽셀로 제한되어 �
 | POLISH-04 | 주요 편집기 7개의 밝은/어두운 팔레트·네 배율 native 검사, 탭/레이블·초안/수정 포커스·오류 가시성 |
 | POLISH-05·07 | `primavera_public_corpus`, `primavera_xer_contract`, pinned MPXJ 독립 비교와 원본 checksum·지원/거부 행렬 |
 | POLISH-06 | 최종 Release CTest 54개·포맷 검사, 설치파일/아이콘/payload hash 및 실제 앱 확인, Windows/macOS·정적 분석·ASan/UBSan/퍼징·MSIX/업데이트 CI 통과와 결과 보존 |
+
+## 2026-11-01 Project Planning Manager (PPM) 이름·확장자 확정
+
+사용자가 제품명을 Project Planning Manager, 약칭 PPM으로 확정했다. 이전 `.jobs` 확장자는 지원하지 않는다는 후속 지시가 우선한다.
+
+| ID | 요구사항 | 완료조건 |
+|---|---|---|
+| PPM-01 | 표시 이름 통일 | 앱/창/오류/업데이트·보고서·XML/XER 진단과 동반 파일, 실행 파일·번들·설치기·패키지 표시를 Project Planning Manager 또는 PPM으로 바꾼다. |
+| PPM-02 | 새 네이티브 확장자 | 프로젝트 `.ppm`, 작업공간 `.ppmworkspace`만 열고 저장한다. 파일 선택 필터·기본 suffix·사본/복구·XML/XER 교환·workspace 참조 경로에 반영하고 이전 확장자는 저장 계층에서 거부한다. 파일의 내용·checksum·원자 저장·잠금·실패 시 세션 보존은 유지한다. |
+| PPM-03 | 식별자와 데이터 보호 | 등록된 Store/Bundle ID·업그레이드 등록·설정/복구 위치 및 내부 JSON 형식 식별자와 schema는 보존한다. 이 내부 식별자는 앱 표시 이름이나 허용 파일 확장자가 아니다. 기존 테스트 원본 bytes는 유지하고 fixture 파일 이름만 새 확장자로 옮긴다. |
+| PPM-04 | 검증 | 새 확장자의 저장·재열기·대소문자·읽기 전용/잠금·교환/복구를 검사한다. 이전 확장자 거부 시 원본·문서 상태·이력을 보존하는 회귀, 전체 CTest·패키징 검사와 실제 앱 화면을 확인한다. |

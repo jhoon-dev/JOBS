@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
                   doc.calculation()->tasks[0].finish == "2026-10-28 15:00",
               "explicit work forecast wrong");
         // A read-only document exposes definitions without an enabled apply button.
-        auto file = dir.filePath("effort.jobs");
+        auto file = dir.filePath("effort.ppm");
         doc.saveAs(file.toStdString());
         jobs::Document readonly(store);
         readonly.open(file.toStdString(), true);

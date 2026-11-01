@@ -352,7 +352,7 @@ void ReportDialog::exportFile(bool pdf) {
     name.replace(QRegularExpression("[<>:\"/\\\\|?*\\x00-\\x1f]"), "_");
     name = name.left(60);
     const auto extension = pdf ? ".pdf" : ".xlsx";
-    const auto suggested = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/JOBS_" + name + "_" +
+    const auto suggested = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/PPM_" + name + "_" +
                            QDateTime::currentDateTimeUtc().toString("yyyyMMdd_HHmmss_zzz") + extension;
     auto path = QFileDialog::getSaveFileName(this, "보고서 저장 · 새 파일명을 선택하세요", suggested,
                                              pdf ? "PDF (*.pdf)" : "Excel (*.xlsx)", nullptr,

@@ -1,14 +1,14 @@
 # Microsoft Store 한국어 소개 초안
 
-2026-10-29. 앱 이름 예약·계정·가격·등급·국가·최종 문구는 제출자가 Partner Center에서 확정한다. 현재 앱은 초기 공개 준비 버전이다.
+2026-11-01. 제품명은 Project Planning Manager, 무료이며 지원 가능한 모든 국가에 출시한다. 등급과 제출 상태는 Partner Center에서 관리한다.
 
-**제품명:** JOBS (이름 예약 전)
+**제품명:** Project Planning Manager (PPM)
 
 **짧은 설명:** 프로젝트 일정과 간트 차트, 자원 배정, 원가와 실적을 한곳에서 관리하세요.
 
 **설명:**
 
-JOBS는 프로젝트 계획과 진행 상황을 관리하는 Windows 데스크톱 앱입니다. 작업과 선행관계를 작성하고 일정을 계산해 간트 차트에서 확인할 수 있습니다. 작업별 달력과 제약조건, 자원 배정과 과부하, 기준선과 실적, 원가와 획득가치 분석을 함께 다룹니다.
+PPM은 프로젝트 계획과 진행 상황을 관리하는 Windows 데스크톱 앱입니다. 작업과 선행관계를 작성하고 일정을 계산해 간트 차트에서 확인할 수 있습니다. 작업별 달력과 제약조건, 자원 배정과 과부하, 기준선과 실적, 원가와 획득가치 분석을 함께 다룹니다.
 
 프로젝트별 창과 작업 영역을 사용해 여러 프로젝트를 열고 공유 자원 부하를 비교할 수 있습니다. 일정·자원·원가 보고서를 Excel과 PDF로 내보내고, Primavera XER 및 Microsoft Project XML 파일을 교환할 수 있습니다.
 
@@ -38,6 +38,6 @@ JOBS는 프로젝트 계획과 진행 상황을 관리하는 Windows 데스크�
 
 **심사 메모 / runFullTrust 요청 사유 (영문):**
 
-JOBS is a C++/Qt Widgets desktop project scheduling application. The runFullTrust capability is required for its existing Win32 desktop process, user-selected local project files, file locks, recovery checkpoints, and Excel/PDF/XER/XML import and export. It runs at medium integrity, does not request elevation, and installs no services, drivers, startup tasks, or background agents. It uses no account, advertisements, telemetry, or application-operated cloud sync. Store builds check this app for updates through Windows.Services.Store and open the Store update page for installation. Startup checks can be disabled in Settings > Updates; no project data is sent. Settings and recovery files are stored in the package LocalState. No test probe is included in the Store payload. Please launch JOBS from Start, create a project, calculate its schedule, save and reopen the project; no sign-in or purchase is needed to test the current build.
+PPM is a C++/Qt Widgets desktop project scheduling application. The runFullTrust capability is required for its existing Win32 desktop process, user-selected local project files, file locks, recovery checkpoints, and Excel/PDF/XER/XML import and export. It runs at medium integrity, does not request elevation, and installs no services, drivers, startup tasks, or background agents. It uses no account, advertisements, telemetry, or application-operated cloud sync. Store builds check this app for updates through Windows.Services.Store and open the Store update page for installation. Startup checks can be disabled in Settings > Updates; no project data is sent. Settings and recovery files are stored in the package LocalState. No test probe is included in the Store payload. Please launch PPM from Start, create a project, calculate its schedule, save and reopen the project; no sign-in or purchase is needed to test the current build.
 
 상표 표기는 외부 형식 호환성을 설명하기 위한 것이다. Microsoft·Oracle과의 제휴나 해당 제품과 동등한 전체 호환성을 주장하지 않는다.

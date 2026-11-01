@@ -177,7 +177,7 @@ int main(int argc, char **argv) {
         splitDelay(store, false, true, false, true, false);
         splitDelay(store, false, true, false, false, false);
         for (int mode : {0, 1, 2})
-            engineProvenance(store, dir.filePath(QString::number(mode) + ".jobs").toStdString(), mode);
+            engineProvenance(store, dir.filePath(QString::number(mode) + ".ppm").toStdString(), mode);
         std::cout << "PASS: split delay display across order/calendar/forecast variants, ordinary PDM, engine-only "
                      "variance explanation, same/no baseline UI/report provenance and original-byte preservation\n";
     } catch (const std::exception &error) {

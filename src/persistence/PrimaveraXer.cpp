@@ -414,7 +414,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     diagnostic(diagnostics, "PROJECT",
                "기간 기반 고정 기간 투영 · 공수/자원 종속 일정·실적/원가/P6 재계산 호환은 미검증입니다.");
     diagnostic(diagnostics, "CALENDAR",
-               "수입 작업/자원에 달력을 명시 배정합니다. 새 native 작업은 JOBS 기본 달력을 사용합니다. 기간 기반 "
+               "수입 작업/자원에 달력을 명시 배정합니다. 새 native 작업은 PPM 기본 달력을 사용합니다. 기간 기반 "
                "일정은 작업 달력을 사용합니다.");
     if (start.mid(11) != "09:00")
         diagnostic(diagnostics, "PROJECT/plan_start_date", "시작 날짜는 유지 · native 시작 기준은 09:00");
@@ -434,7 +434,7 @@ PrimaveraXerExchange importPrimaveraXer(const QByteArray &bytes, const QString &
     if (lagPolicy != "rcal_Successor")
         diagnostic(diagnostics, "SCHEDOPTIONS/sched_calendar_on_relationship_lag",
                    "원본 지연 달력 정책 " + (lagPolicy.isEmpty() ? "미기록" : lagPolicy) +
-                       " → JOBS 후행 작업 달력 기준; 계산 동등성 미검증");
+                       " → PPM 후행 작업 달력 기준; 계산 동등성 미검증");
     const auto &ct = table(file, "CALENDAR");
     unique(ct, "clndr_id");
     std::map<QString, const Row *> calendarRows;
@@ -806,11 +806,11 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
                                    {"jobsId", qs(target)},
                                    {"activityCode", kind == "task" ? "J" + QString::number(id) : QString{}}});
     };
-    const auto projectCode = "JOBS-" + hash(qs(p.documentId).toUtf8()).left(12);
-    line({"ERMHDR", "20.12", qs(p.startDate), "Project", "JOBS", "JOBS", "dbxDatabaseNoName", "Project Management",
+    const auto projectCode = "PPM-" + hash(qs(p.documentId).toUtf8()).left(12);
+    line({"ERMHDR", "20.12", qs(p.startDate), "Project", "PPM", "PPM", "dbxDatabaseNoName", "Project Management",
           qs(p.currency)});
     diagnostic(diagnostics, "PROJECT",
-               "기간 기반 계획 투영 · P6 계산/재저장 호환은 미검증. 전체 현재 입력/승인·실적/원가는 source.jobs 참조.");
+               "기간 기반 계획 투영 · P6 계산/재저장 호환은 미검증. 전체 현재 입력/승인·실적/원가는 source.ppm 참조.");
     header("CURRTYPE",
            {"curr_id", "decimal_digit_cnt", "curr_symbol", "decimal_symbol", "digit_group_symbol", "pos_curr_fmt_type",
             "neg_curr_fmt_type", "curr_type", "curr_short_name", "group_digit_cnt", "base_exch_rate"});
@@ -825,7 +825,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
                         "day_hr_cnt", "week_hr_cnt", "rsrc_private", "clndr_data"});
     std::map<std::string, int> calendars{{"", 1}};
     TaskCalendar standard;
-    standard.name = "JOBS standard";
+    standard.name = "PPM standard";
     standard.holidays = p.holidays;
     std::vector<TaskCalendar> allCalendars{standard};
     allCalendars.insert(allCalendars.end(), p.calendars.begin(), p.calendars.end());
@@ -951,7 +951,7 @@ PrimaveraXerExchange exportPrimaveraXer(const Project &p) {
     diagnostic(diagnostics, "PROJECT/IDs",
                "새 XER ID/Activity Code를 생성합니다. P6의 기존 프로젝트/활동 업데이트 동일성은 보장하지 않습니다.");
     auto report = reportFor(p, false);
-    report["source"] = QJsonObject{{"name", "source.jobs"}, {"product", "JOBS"}};
+    report["source"] = QJsonObject{{"name", "source.ppm"}, {"product", "PPM"}};
     report["outputProjectCode"] = projectCode;
     report["outputEncoding"] = "UTF-8 BOM";
     report["outputVersion"] = "20.12";
@@ -965,7 +965,7 @@ QString publishPrimaveraXer(const PrimaveraXerExchange &e, const QString &destin
 }
 QString primaveraXerPreview(const PrimaveraXerExchange &e) {
     auto text = QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n기간 기반 계획 변환 · P6 재계산/왕복 "
-                        "호환: 미검증\nJOBS "
+                        "호환: 미검증\nPPM "
                         "지연 정책: 후행 작업 달력 · 시작일 기준 09:00\n원본 보존: %7\n\n원본/진단은 교환 폴더에 "
                         "보관합니다. .jobs만 사본 "
                         "저장/이동하면 동반 파일은 자동 복제되지 않습니다.\n\n")
@@ -975,7 +975,7 @@ QString primaveraXerPreview(const PrimaveraXerExchange &e) {
                     .arg(e.project.calendars.size())
                     .arg(e.project.resources.size())
                     .arg(e.project.assignments.size())
-                    .arg(e.importing ? "original.xer 바이트 보존" : "현재 입력/이력의 source.jobs 사본");
+                    .arg(e.importing ? "original.xer 바이트 보존" : "현재 입력/이력의 source.ppm 사본");
     int count = 0;
     for (const auto &d : e.report["diagnostics"].toArray()) {
         if (count++ == 2000) {

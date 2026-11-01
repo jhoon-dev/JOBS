@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
         using jobs::EditState;
         QTemporaryDir dir;
         jobs::JsonProjectStore store;
-        const auto path = dir.filePath("Bulk.jobs").toStdString();
+        const auto path = dir.filePath("Bulk.ppm").toStdString();
         auto fixture = performanceFixture(1000, false);
         store.save(path, fixture, {});
         jobs::Document doc(store);
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
             // value stays identical. Column 7 must still receive dataChanged.
             auto effortFixture = performanceFixture(1000, true);
             effortFixture.tasks[0].durationMinutes = 120;
-            const auto effortPath = dir.filePath("Effort.jobs").toStdString();
+            const auto effortPath = dir.filePath("Effort.ppm").toStdString();
             store.save(effortPath, effortFixture, {});
             jobs::Document effortDoc(store);
             effortDoc.open(effortPath);
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
         {
             auto limitFixture = performanceFixture(2, false);
             limitFixture.revision = 9007199254740990ULL;
-            const auto limitPath = dir.filePath("Limit.jobs").toStdString();
+            const auto limitPath = dir.filePath("Limit.ppm").toStdString();
             store.save(limitPath, limitFixture, {});
             jobs::Document limitDoc(store);
             limitDoc.open(limitPath);

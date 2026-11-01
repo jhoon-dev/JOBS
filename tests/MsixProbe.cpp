@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
     QCoreApplication::setOrganizationName("ToolMoa");
-    QCoreApplication::setApplicationName("JOBS");
+    QCoreApplication::setApplicationName("PPM");
     const auto args = app.arguments();
     const bool local = args.contains("--local");
     QTemporaryDir temporary;
@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
             check(!forbidden.open(QIODevice::WriteOnly), "package install location is writable");
         }
         check(phase == "initial" || phase == "verify", "unsupported probe phase");
-        const auto project = QDir(root).filePath("Project.jobs"), other = QDir(root).filePath("Team.jobs"),
-                   workspaceFile = QDir(root).filePath("Projects.jobsworkspace");
+        const auto project = QDir(root).filePath("Project.ppm"), other = QDir(root).filePath("Team.ppm"),
+                   workspaceFile = QDir(root).filePath("Projects.ppmworkspace");
         auto files = std::make_shared<jobs::JsonProjectStore>();
         auto settings =
             local ? QSettings(QDir(root).filePath("settings.ini"), QSettings::IniFormat) : jobs::applicationSettings();

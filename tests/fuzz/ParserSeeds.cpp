@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
             body["tasks"] = QJsonArray{task};
             const auto bytes = envelope(body, schema);
             (void)jobs::decodeProjectFile(bytes);
-            seeds.push_back({"jobs", QString("schema-%1.jobs").arg(schema), bytes, true});
+            seeds.push_back({"jobs", QString("schema-%1.ppm").arg(schema), bytes, true});
             seeds.push_back({"jobs", QString("payload-%1.json").arg(schema), QJsonDocument(body).toJson(), true});
         }
         const auto xml = read(fixtureRoot + "/project-xml-plan.xml");
@@ -87,21 +87,21 @@ int main(int argc, char **argv) {
         const QJsonObject workspaceBody{
             {"id", "workspace-seed"},
             {"projects",
-             QJsonArray{QJsonObject{{"documentId", "parser-seed"}, {"name", "Project"}, {"path", "Project.jobs"}}}},
+             QJsonArray{QJsonObject{{"documentId", "parser-seed"}, {"name", "Project"}, {"path", "Project.ppm"}}}},
             {"resources", QJsonArray{}},
             {"bindings", QJsonArray{}}};
         auto workspaceSeed = QJsonDocument::fromJson(envelope(workspaceBody, 1)).object();
         workspaceSeed["format"] = "JOBS-WORKSPACE";
-        seeds.push_back({"workspace", "valid.jobsworkspace", QJsonDocument(workspaceSeed).toJson(), true});
+        seeds.push_back({"workspace", "valid.ppmworkspace", QJsonDocument(workspaceSeed).toJson(), true});
         workspaceSeed["sha256"] = "tampered";
-        seeds.push_back({"workspace", "checksum.jobsworkspace", QJsonDocument(workspaceSeed).toJson(), false});
+        seeds.push_back({"workspace", "checksum.ppmworkspace", QJsonDocument(workspaceSeed).toJson(), false});
         // Rich PDM, constraints and effort payloads reach profile-specific decoders.
         for (const auto *profile : {jobs::pdmProfile, jobs::constraintProfile, jobs::effortProfile}) {
             auto p = jobs::importProjectXml(xml, "seed.xml").project;
             p.calculationProfile = profile;
             const auto bytes = envelope(jobs::json::encodeProject(p), 9);
             (void)jobs::decodeProjectFile(bytes);
-            seeds.push_back({"jobs", QString::fromLatin1(profile) + ".jobs", bytes, true});
+            seeds.push_back({"jobs", QString::fromLatin1(profile) + ".ppm", bytes, true});
         }
         const auto seedCount = seeds.size();
         for (std::size_t i = 0; i < seedCount; ++i) {
@@ -122,10 +122,10 @@ int main(int argc, char **argv) {
             rejected = true;
         }
         check(rejected, "envelope checksum bypassed");
-        seeds.push_back({"jobs", "checksum.jobs", corrupt, true}); // body path still accepts it
+        seeds.push_back({"jobs", "checksum.ppm", corrupt, true}); // body path still accepts it
         auto unknown = jobs::json::encodeProject(minimal);
         unknown["unknown"] = 1;
-        seeds.push_back({"jobs", "unknown.jobs", envelope(unknown, 9), false});
+        seeds.push_back({"jobs", "unknown.ppm", envelope(unknown, 9), false});
         rejected = false;
         try {
             (void)jobs::decodeProjectFile(QByteArray(jobs::projectFileLimitBytes + 1, ' '));
@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
         // The memory parser and real store must agree on successful input.
         QTemporaryDir directory;
         jobs::JsonProjectStore store;
-        const auto path = directory.filePath("Seed.jobs").toStdString();
+        const auto path = directory.filePath("Seed.ppm").toStdString();
         store.save(path, minimal, {});
         check(store.load(path).project == jobs::decodeProjectFile(read(QString::fromStdString(path))),
               "store decoder diverged");

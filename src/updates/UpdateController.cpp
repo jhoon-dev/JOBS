@@ -179,7 +179,7 @@ void UpdateController::download() {
         fail("다운로드 폴더를 만들 수 없습니다.");
         return;
     }
-    installerPath_ = directory_->filePath("JOBS-update.exe");
+    installerPath_ = directory_->filePath("PPM-update.exe");
     file_ = std::make_unique<QFile>(installerPath_);
     if (!file_->open(QIODevice::WriteOnly | QIODevice::NewOnly)) {
         fail("다운로드 파일을 만들 수 없습니다.");
@@ -195,7 +195,7 @@ void UpdateController::download() {
 }
 void UpdateController::request(const QUrl &url, int redirects) {
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, "JOBS-Updater");
+    request.setHeader(QNetworkRequest::UserAgentHeader, "PPM-Updater");
     request.setRawHeader("Accept", downloading_ ? "application/octet-stream" : "application/vnd.github+json");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
     request.setTransferTimeout(30000);

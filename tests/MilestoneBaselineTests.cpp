@@ -172,7 +172,7 @@ void historical(jobs::JsonProjectStore &store, const std::string &path, const st
     doc.captureBaseline("Current", "PM", "Approved", b.createdAt);
     check(doc.project()->baselines[0] == b && doc.project()->baselines[1].engineVersion == jobs::engineFor(p),
           "new approval changed an old baseline or used an old engine");
-    doc.saveAs(path + ".copy.jobs");
+    doc.saveAs(path + ".copy.ppm");
     check(bytes(path) == disk && store.load(doc.path()).project == *doc.project(),
           "historical copy roundtrip changed original bytes or archive metadata");
 }
@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
         }
         for (const auto profile : {jobs::pdmProfile, jobs::constraintProfile, jobs::effortProfile}) {
             relations(profile);
-            historical(store, dir.filePath(QString::fromUtf8(profile) + ".jobs").toStdString(), profile);
+            historical(store, dir.filePath(QString::fromUtf8(profile) + ".ppm").toStdString(), profile);
         }
         for (auto type : {jobs::TaskType::FixedWork, jobs::TaskType::FixedUnits})
             for (bool nominal : {false, true})

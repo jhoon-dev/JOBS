@@ -205,15 +205,14 @@ int main(int argc, char **argv) {
         check(directory.isValid(), "temporary directory unavailable");
         jobs::JsonProjectStore store;
         for (bool fixedUnits : {false, true}) {
-            unchangedEditor(store, directory.filePath(fixedUnits ? "units.jobs" : "work.jobs").toStdString(),
-                            fixedUnits);
+            unchangedEditor(store, directory.filePath(fixedUnits ? "units.ppm" : "work.ppm").toStdString(), fixedUnits);
             for (bool nominal : {false, true})
                 for (bool split : {false, true})
                     periods(store, fixedUnits, nominal, split);
         }
         forecastUi(store, false);
         forecastUi(store, true);
-        modelNoopGuards(store, directory.filePath("guards.jobs").toStdString());
+        modelNoopGuards(store, directory.filePath("guards.ppm").toStdString());
         std::cout << "PASS: unchanged duration editor/history, real inverse/basis edits, plan/forecast/incomplete "
                      "periods, report consistency and model safety guards\n";
     } catch (const std::exception &error) {

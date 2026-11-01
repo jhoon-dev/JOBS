@@ -293,7 +293,7 @@ int main(int argc, char **argv) {
               "remaining work/actual preservation failed");
         auto costs = jobs::analyzeCosts(*doc.project(), baseline.id);
         check(costs.evm.bac == 48000 && costs.evm.pv == 18000, "frozen BAC/PV changed with split or units");
-        auto file = dir.filePath("공수.jobs");
+        auto file = dir.filePath("공수.ppm");
         doc.saveAs(file.toStdString());
         check(store.load(file.toStdString()).project == *doc.project(),
               "schema9 did not roundtrip work/baseline/remaining");
@@ -317,13 +317,13 @@ int main(int argc, char **argv) {
         root["sha256"] = QString::fromLatin1(
             QCryptographicHash::hash(QJsonDocument(payload).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256)
                 .toHex());
-        write(dir.filePath("bad.jobs"), root);
-        rejects([&] { store.load(dir.filePath("bad.jobs").toStdString()); });
+        write(dir.filePath("bad.ppm"), root);
+        rejects([&] { store.load(dir.filePath("bad.ppm").toStdString()); });
         jobs::Document legacy(store);
         legacy.create("schema8", "2026-10-26", {"old"});
         legacy.setDuration(0, 480);
         legacy.setTaskTiming(0, jobs::ConstraintType::SNET, "2026-10-27 09:00", {});
-        auto oldFile = dir.filePath("v8.jobs");
+        auto oldFile = dir.filePath("v8.ppm");
         legacy.saveAs(oldFile.toStdString());
         auto old = QJsonDocument::fromJson(read(oldFile)).object();
         old["schemaVersion"] = 8;
@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
         migrate.open(oldFile.toStdString(), true);
         check(migrate.requiresSaveAs() && jobs::calculatePlan(*migrate.project()).engineVersion == "jobs-pdm-1.2",
               "migrated plan did not select the current constraint engine");
-        migrate.saveAs(dir.filePath("v9.jobs").toStdString());
+        migrate.saveAs(dir.filePath("v9.ppm").toStdString());
         check(read(oldFile) == oldBytes, "schema8 migration overwrote original");
         jobs::ReportOptions options;
         options.reportId = "effort";

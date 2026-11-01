@@ -59,12 +59,12 @@ int main(int argc, char **argv) {
             doc.setDuration(0, 60);
             auto resource = doc.putResource({"", "Shared", "labor", 100, {}});
             doc.setAssignments(doc.project()->tasks[0].id, {{doc.project()->tasks[0].id, resource, 100}});
-            auto path = dir.filePath(QString("Project%1.jobs").arg(i)).toStdString();
+            auto path = dir.filePath(QString("Project%1.ppm").arg(i)).toStdString();
             doc.saveAs(path);
             paths.push_back(path);
             ids.push_back(doc.project()->documentId);
         }
-        const auto group = dir.filePath("Workspace.jobsworkspace");
+        const auto group = dir.filePath("Workspace.ppmworkspace");
         {
             jobs::DesktopWorkspace workspace(files, {});
             auto *first = workspace.openProject(paths[0]);
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
             check(first != second && workspace.snapshots().size() == 2, "projects did not get independent windows");
             check(workspace.openProject(paths[0]) == first && workspace.snapshots().size() == 2,
                   "same file duplicated");
-            const auto duplicate = dir.filePath("Duplicate.jobs");
+            const auto duplicate = dir.filePath("Duplicate.ppm");
             check(QFile::copy(QString::fromStdString(paths[0]), duplicate), "copy fixture");
             bool rejected = false;
             try {
@@ -161,8 +161,8 @@ int main(int argc, char **argv) {
         const auto frozen = restored.configuration();
         const auto roots = restored.snapshots();
         auto broken = frozen;
-        broken.projects[0].path = dir.filePath("Missing.jobs").toStdString();
-        const auto badPath = dir.filePath("Broken.jobsworkspace").toStdString();
+        broken.projects[0].path = dir.filePath("Missing.ppm").toStdString();
+        const auto badPath = dir.filePath("Broken.ppmworkspace").toStdString();
         jobs::JsonWorkspaceStore(*files).save(badPath, broken, {});
         QTimer dismiss;
         QObject::connect(&dismiss, &QTimer::timeout, [] {

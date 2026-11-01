@@ -16,5 +16,5 @@ try {
     if ($LASTEXITCODE -ne 0) { throw '빌드 실패' }
     ctest --test-dir "$taskRoot/build" --output-on-failure
     if ($LASTEXITCODE -ne 0) { throw '테스트 실패' }
-    if (!$TestOnly) { & "$taskRoot/build/JOBS.exe" }
+    if (!$TestOnly) { & "$taskRoot/build/PPM.exe" }
 } finally { $env:PATH = $taskOldPath }

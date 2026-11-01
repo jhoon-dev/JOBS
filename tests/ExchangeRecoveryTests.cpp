@@ -57,7 +57,7 @@ void publication(const QTemporaryDir &directory, jobs::JsonProjectStore &store) 
     jobs::Document doc(store);
     doc.create("Publication", "2026-10-26", {"Task"});
     doc.setDuration(0, 60);
-    doc.saveAs(directory.filePath("Source.jobs").toStdString());
+    doc.saveAs(directory.filePath("Source.ppm").toStdString());
     auto exchange = jobs::exportProjectXml(*doc.project());
     const auto source = read(QString::fromStdString(doc.path()));
     const auto original = *doc.project();
@@ -103,7 +103,7 @@ void publication(const QTemporaryDir &directory, jobs::JsonProjectStore &store) 
                   onGui(parent, cancelDialog);
               },
               true) &&
-              QFileInfo::exists(QDir(completed).filePath("source.jobs")),
+              QFileInfo::exists(QDir(completed).filePath("source.ppm")),
           "late cancellation discarded a fully published directory");
     const auto existing = directory.filePath("existing");
     check(QDir().mkdir(existing), "test destination creation failed");
@@ -115,7 +115,7 @@ void publication(const QTemporaryDir &directory, jobs::JsonProjectStore &store) 
         rejected = true;
     }
     check(rejected && read(QDir(existing).filePath("sentinel")) == "preserved", "existing destination overwritten");
-    check(QDir(directory.path()).entryList({".jobs-exchange-*"}, QDir::Dirs | QDir::Hidden).isEmpty(),
+    check(QDir(directory.path()).entryList({".ppm-exchange-*"}, QDir::Dirs | QDir::Hidden).isEmpty(),
           "cancelled/failed exchange leaked staged files");
 }
 void recoveryErrors(const QTemporaryDir &directory, jobs::JsonProjectStore &files) {
@@ -197,7 +197,7 @@ void exportUi(const QTemporaryDir &directory, jobs::JsonProjectStore &store, job
     project.baselines.push_back(std::move(baseline));
     ++project.revision;
     const auto name = QString(xer ? "xer" : "xml") + (cancelPublication ? "-cancel" : "-success");
-    const auto path = directory.filePath(name + ".jobs");
+    const auto path = directory.filePath(name + ".ppm");
     store.save(path.toStdString(), project, {});
     jobs::Document doc(store);
     doc.open(path.toStdString());
@@ -253,7 +253,7 @@ void exportUi(const QTemporaryDir &directory, jobs::JsonProjectStore &store, job
           "exchange UI blocked on domain work or changed the source");
     check(QFileInfo::exists(destination) != cancelPublication, "cancel/success publication boundary failed");
     if (!cancelPublication)
-        check(store.load(QDir(destination).filePath("source.jobs").toStdString()).project == before,
+        check(store.load(QDir(destination).filePath("source.ppm").toStdString()).project == before,
               "published source lost baseline input");
     std::cout << name.toStdString() << " tasks=" << project.tasks.size() << " total_ms=" << operationMs
               << " heartbeat_max_ms=" << maxBeat << " heartbeat_count=" << beats << " gui_checkpoints=0\n";

@@ -282,6 +282,7 @@ enum class ErrorCode {
     FILE_PROJECTXML_077,
     FILE_PROJECTXML_078,
     FILE_PROJECTXML_079,
+    FILE_EXTENSION_UNSUPPORTED,
     FILE_READ_FAILED,
     FILE_SIZE_LIMIT,
     FILE_UNKNOWN_FIELD,
@@ -1024,6 +1025,8 @@ constexpr std::string_view errorCodeToken(ErrorCode code) {
         return "FILE_PROJECTXML_078";
     case ErrorCode::FILE_PROJECTXML_079:
         return "FILE_PROJECTXML_079";
+    case ErrorCode::FILE_EXTENSION_UNSUPPORTED:
+        return "FILE_EXTENSION_UNSUPPORTED";
     case ErrorCode::FILE_READ_FAILED:
         return "FILE_READ_FAILED";
     case ErrorCode::FILE_SIZE_LIMIT:

@@ -93,7 +93,7 @@ try {
     if (-not ([IO.Path]::GetFullPath($first.settings_file)).StartsWith([IO.Path]::GetFullPath($privateRoot), [StringComparison]::OrdinalIgnoreCase) -or
         -not (Test-Path -LiteralPath $first.settings_file) -or -not (Test-Path -LiteralPath $first.recovery_directory)) { throw 'Private package state missing' }
     $external = @{}
-    foreach ($name in @('Project.jobs','Team.jobs','Projects.jobsworkspace')) { $external[$name] = (Get-FileHash -LiteralPath (Join-Path $testRoot $name)).Hash }
+    foreach ($name in @('Project.ppm','Team.ppm','Projects.ppmworkspace')) { $external[$name] = (Get-FileHash -LiteralPath (Join-Path $testRoot $name)).Hash }
     Add-AppxPackage -Path ([IO.Path]::GetFullPath($UpgradePackage)) -AllowUnsigned
     $package = Get-AppxPackage -Name $expectedName
     if ([version]$package.Version -ne [version]$upgrade.version -or $package.PackageFamilyName -ne $script:installedFamily) { throw 'Upgrade identity changed' }
@@ -117,7 +117,7 @@ try {
 } finally {
     foreach ($processId in $script:ownedProcesses) {
         $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
-        if ($process -and $process.Path -and $process.Path -like '*\ToolMoa.JOBS.MsixDevelopment_*\*' -and $process.ProcessName -in @('JOBS','jobs_msix_probe')) { Stop-Process -Id $processId -Force }
+        if ($process -and $process.Path -and $process.Path -like '*\ToolMoa.JOBS.MsixDevelopment_*\*' -and $process.ProcessName -in @('PPM','jobs_msix_probe')) { Stop-Process -Id $processId -Force }
     }
     $remaining = Get-AppxPackage -Name $expectedName
     if ($remaining -and $script:installedFamily -eq $remaining.PackageFamilyName) { Remove-AppxPackage -Package $remaining.PackageFullName }

@@ -5,6 +5,7 @@
 /.vs/
 /.idea/
 *.user
-*.jobs.lock
+*.ppm.lock
+*.ppmworkspace.lock
 __pycache__/
 aqtinstall.log

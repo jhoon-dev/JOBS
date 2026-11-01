@@ -262,7 +262,7 @@ private slots:
         jobs::JsonProjectStore store;
         jobs::Document document(store);
         document.create(
-            "JOBS 사옥 신축 프로젝트", "2026-10-26",
+            "PPM 사옥 신축 프로젝트", "2026-10-26",
             {"기획 검토", "기본 설계", "인허가 승인", "기반 공사", "구조 공사", "설비 설치", "시험 운전", "준공 검수"});
         for (std::size_t row = 0; row < document.project()->tasks.size(); ++row) {
             document.setDuration(row, row == 2 ? 0 : (row % 3 + 1) * 480);
@@ -275,6 +275,8 @@ private slots:
         document.applyCalculation(jobs::calculate(*document.project()));
         jobs::MainWindow window(document);
         window.resize(1440, 900);
+        QVERIFY(window.windowTitle().endsWith("— PPM"));
+        QVERIFY(!window.windowTitle().contains("JOBS"));
         window.show();
         QTest::qWait(40);
         const bool storeCapture = qEnvironmentVariableIsSet("JOBS_STORE_SCREENSHOT");

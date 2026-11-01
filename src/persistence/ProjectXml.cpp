@@ -242,23 +242,23 @@ void holiday(const Node &n, CalendarValue &c) {
     }
 }
 QJsonObject baseReport(const Project &p, bool importing) {
-    return {{"contract", "jobs-mspdi-plan-v1"},
-            {"direction", importing ? "import" : "export"},
-            {"format", "Microsoft Project XML"},
-            {"namespace", ns},
-            {"documentId", qs(p.documentId)},
-            {"revision", QString::number(p.revision)},
-            {"nativeSnapshotProfile", qs(p.calculationProfile)},
-            {"targetPolicy", QJsonObject{{"calculationProfile", effortProfile},
-                                         {"lagCalendar", "successor-working-calendar"},
-                                         {"projectStartAnchor", "09:00"}}},
-            {"compatibility",
-             QJsonObject{{"import", importing ? "mapped-subset" : "not-applicable"},
-                         {"originalPreservation", importing ? "exact-xml-bytes" : "exact-native-input-snapshot"},
-                         {"jobsRecomputation", "unverified"},
-                         {"externalRoundTrip", "unverified"}}},
-            {"companionPolicy",
-             "원본과 진단은 이 폴더의 동반 파일입니다. .jobs 사본 저장/이동 시 자동 복제되지 않습니다."}};
+    return {
+        {"contract", "jobs-mspdi-plan-v1"},
+        {"direction", importing ? "import" : "export"},
+        {"format", "Microsoft Project XML"},
+        {"namespace", ns},
+        {"documentId", qs(p.documentId)},
+        {"revision", QString::number(p.revision)},
+        {"nativeSnapshotProfile", qs(p.calculationProfile)},
+        {"targetPolicy", QJsonObject{{"calculationProfile", effortProfile},
+                                     {"lagCalendar", "successor-working-calendar"},
+                                     {"projectStartAnchor", "09:00"}}},
+        {"compatibility",
+         QJsonObject{{"import", importing ? "mapped-subset" : "not-applicable"},
+                     {"originalPreservation", importing ? "exact-xml-bytes" : "exact-native-input-snapshot"},
+                     {"jobsRecomputation", "unverified"},
+                     {"externalRoundTrip", "unverified"}}},
+        {"companionPolicy", "원본과 진단은 이 폴더의 동반 파일입니다. .ppm 사본 저장/이동 시 자동 복제되지 않습니다."}};
 }
 } // namespace
 
@@ -308,9 +308,9 @@ ProjectXmlExchange importProjectXml(const QByteArray &bytes, const QString &sour
     diagnostic(diagnostics, "/Project",
                "기간 기반 계획 변환입니다. 원본 날짜·공수·실적·비용의 계산 동등성은 미검증입니다.");
     diagnostic(diagnostics, "/Project/Calendars",
-               "프로젝트 달력을 수입 작업/자원에 명시 배정합니다. 이후 새 작업은 JOBS 기본 달력을 사용합니다.");
+               "프로젝트 달력을 수입 작업/자원에 명시 배정합니다. 이후 새 작업은 PPM 기본 달력을 사용합니다.");
     if (start.mid(11) != "09:00")
-        diagnostic(diagnostics, "/Project/StartDate", "시작 날짜는 보존하며 JOBS의 날짜 시작 기준은 09:00입니다.");
+        diagnostic(diagnostics, "/Project/StartDate", "시작 날짜는 보존하며 PPM의 날짜 시작 기준은 09:00입니다.");
     auto saveVersion = field(r, "SaveVersion"), build = field(r, "BuildNumber");
     if (saveVersion.isEmpty())
         throw AppError(ErrorCode::FILE_PROJECTXML_035, {});
@@ -638,7 +638,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
     QJsonArray diagnostics, mapping;
     diagnostic(diagnostics, "/Project",
                "기간 기반 계획 투영입니다. 외부 제품의 계산/재저장 호환은 미검증입니다. 원본 전체 입력/이력은 "
-               "source.jobs 참조.");
+               "source.ppm 참조.");
     auto map = [&](const QString &kind, int id, const std::string &target) {
         mapping.append(QJsonObject{{"kind", kind}, {"xmlUid", QString::number(id)}, {"jobsId", qs(target)}});
     };
@@ -686,7 +686,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
         w.writeEndElement();
     };
     TaskCalendar standard;
-    standard.name = "JOBS standard";
+    standard.name = "PPM standard";
     standard.holidays = p.holidays;
     calendar(standard, 1);
     map("calendar", 1, "");
@@ -824,7 +824,7 @@ ProjectXmlExchange exportProjectXml(const Project &p) {
         diagnostic(diagnostics, "/Project/history-costs",
                    "기준선·실적·원가·상태일·시나리오는 XML에 포함하지 않음 · source.jobs에 보존");
     auto report = baseReport(p, false);
-    report["source"] = QJsonObject{{"name", "source.jobs"}, {"product", "JOBS"}};
+    report["source"] = QJsonObject{{"name", "source.ppm"}, {"product", "PPM"}};
     report["xmlSha256"] = hash(bytes);
     report["mapping"] = mapping;
     report["diagnostics"] = diagnostics;
@@ -835,7 +835,7 @@ QString publishProjectXml(const ProjectXmlExchange &e, const QString &destinatio
     return publishPlanExchange(e.project, e.xml, e.report, e.importing, "xml", destination);
 }
 QString projectXmlPreview(const ProjectXmlExchange &e) {
-    auto text = QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n가져오기: %7\n원본 보존: %8\nJOBS "
+    auto text = QString("%1\n작업 %2 · WBS %3 · 달력 %4 · 자원 %5 · 배정 %6\n\n가져오기: %7\n원본 보존: %8\nPPM "
                         "재계산 동등성: 미검증\nMicrosoft Project 왕복: 미검증\n\n원본/진단은 교환 폴더에 보관됩니다. "
                         ".jobs만 사본 저장/이동하면 동반 파일은 자동 복제되지 않습니다.\n\n")
                     .arg(qs(e.project.name))

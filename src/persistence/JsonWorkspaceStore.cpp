@@ -1,5 +1,6 @@
 #include "persistence/JsonWorkspaceStore.h"
 #include "persistence/WorkspaceFile.h"
+#include "persistence/NativeFilePath.h"
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -138,6 +139,7 @@ Workspace decodeWorkspaceFile(const QByteArray &bytes, const QString &baseDirect
         if (relative.empty())
             invalid("project path");
         const auto full = str(QDir::cleanPath(directory.absoluteFilePath(qs(relative))));
+        requireNativeFilePath(qs(full), "ppm");
         workspace.projects.push_back({text(ref, "documentId"), full, text(ref, "name", limit)});
     }
     for (const auto &item : array(payload, "resources", 1000)) {
@@ -181,6 +183,7 @@ Workspace decodeWorkspaceFile(const QByteArray &bytes, const QString &baseDirect
     return workspace;
 }
 StoredWorkspace JsonWorkspaceStore::load(const std::string &inputPath) const {
+    requireNativeFilePath(qs(inputPath), "ppmworkspace");
     const auto path = files_.normalizePath(inputPath);
     const auto bytes = read(path);
     auto workspace = decodeWorkspaceFile(bytes, QFileInfo(qs(path)).absolutePath());
@@ -195,6 +198,7 @@ StoredWorkspace JsonWorkspaceStore::load(const std::string &inputPath) const {
 }
 std::string JsonWorkspaceStore::save(const std::string &inputPath, const Workspace &workspace,
                                      const std::string &expected) const {
+    requireNativeFilePath(qs(inputPath), "ppmworkspace");
     validateWorkspace(workspace, true);
     const auto path = files_.normalizePath(inputPath);
     const auto check = [&] {

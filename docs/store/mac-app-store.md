@@ -1,6 +1,6 @@
 # Mac App Store 배포 구성
 
-2026-10-31 사용자 요청으로 최초 배포를 진행한다. 앱은 `JOBS Project Planner`, 전용 Bundle ID는 `com.toolmoa.jobs`이다. 기존 PM Canvas 앱과 식별자·제출 기록을 공유하지 않는다.
+2026-10-31 사용자 요청으로 최초 배포를 진행한다. 앱은 `Project Planning Manager`, 전용 Bundle ID는 `com.toolmoa.jobs`이다. 기존 PM Canvas 앱과 식별자·제출 기록을 공유하지 않는다.
 
 ## 현재 준비와 실제 제출의 구분
 

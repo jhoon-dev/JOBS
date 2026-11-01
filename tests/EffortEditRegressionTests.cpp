@@ -170,10 +170,10 @@ int main(int argc, char **argv) {
             for (bool reverseCommands : {false, true})
                 for (bool addEdge : {false, true})
                     for (bool worker : {false, true})
-                        inverseBatch(store, directory.filePath(QString::number(n++) + ".jobs").toStdString(),
+                        inverseBatch(store, directory.filePath(QString::number(n++) + ".ppm").toStdString(),
                                      predecessorFirst, reverseCommands, addEdge, worker);
         for (const auto type : {jobs::TaskType::FixedWork, jobs::TaskType::FixedUnits})
-            notStarted(store, directory.filePath(QString::number(n++) + ".jobs").toStdString(), type);
+            notStarted(store, directory.filePath(QString::number(n++) + ".ppm").toStdString(), type);
         std::cout
             << "PASS: common batch inverse plan across row/command/edge permutations, atomic undo/failure/cancel, "
                "not-started work reports, persistence and unchanged completion evidence\n";

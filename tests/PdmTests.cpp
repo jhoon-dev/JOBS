@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
                   jobs::levelResources(jobs::scenarioProject(doc.project()->scenarios.back()), "task-order", 20)
                           .leveled.status == jobs::CalculationStatus::Valid,
               "PDM scenario provenance/replay");
-        auto path = dir.filePath("확장.jobs");
+        auto path = dir.filePath("확장.ppm");
         doc.saveAs(path.toStdString());
         check(store.load(path.toStdString()).project == *doc.project(), "schema7 roundtrip");
         const auto bytes = read(path);
@@ -225,17 +225,17 @@ int main(int argc, char **argv) {
         jobs::Document oldDoc(store);
         oldDoc.create("legacy6", "2026-10-26", {"A"});
         oldDoc.setDuration(0, 480);
-        auto seed = dir.filePath("seed.jobs");
+        auto seed = dir.filePath("seed.ppm");
         oldDoc.saveAs(seed.toStdString());
         old = QJsonDocument::fromJson(read(seed)).object();
         old["schemaVersion"] = 6;
-        auto legacyPath = dir.filePath("v6.jobs");
+        auto legacyPath = dir.filePath("v6.ppm");
         write(legacyPath, QJsonDocument(old).toJson());
         const auto legacyBytes = read(legacyPath);
         jobs::Document loaded(store);
         loaded.open(legacyPath.toStdString());
         check(loaded.requiresSaveAs(), "v6 not preserved");
-        loaded.saveAs(dir.filePath("migrated.jobs").toStdString());
+        loaded.saveAs(dir.filePath("migrated.ppm").toStdString());
         check(read(legacyPath) == legacyBytes, "v6 overwritten");
         // Real work intervals drive capacity and cost; lunch/weekends never consume units.
         auto money = sample();

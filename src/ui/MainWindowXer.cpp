@@ -74,7 +74,7 @@ std::optional<XerEncoding> encoding(QWidget *parent) {
     layout->addWidget(label);
     auto *choice = new QComboBox(&dialog);
     choice->setObjectName("xerEncoding");
-    choice->addItems({"UTF-8 (BOM 허용 · JOBS 내보내기)", "Windows-1252 (서유럽)"});
+    choice->addItems({"UTF-8 (BOM 허용 · PPM 내보내기)", "Windows-1252 (서유럽)"});
     layout->addWidget(choice);
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     layout->addWidget(buttons);
@@ -122,7 +122,7 @@ void MainWindow::importXer() {
         if (document_.sessionGeneration() != publishSession ||
             (document_.project() ? document_.project()->revision : 0) != publishRevision)
             throw AppError(ErrorCode::EXCHANGE_SOURCE_CHANGED);
-        document_.open(QDir(folder).filePath("project.jobs").toUtf8().toStdString());
+        document_.open(QDir(folder).filePath("project.ppm").toUtf8().toStdString());
         refresh();
         statusBar()->showMessage("XER 계획 변환 완료 · 원본/진단: " + folder);
     } catch (const std::exception &e) {

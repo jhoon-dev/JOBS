@@ -4,11 +4,11 @@
 
 Store판의 업데이트 진실 원본은 Windows.Services.Store.StoreContext다. GetAppAndOptionalStorePackageUpdatesAsync 결과로 판정하고 설치는 사용자가 Microsoft Store 업데이트 화면에서 진행한다. Microsoft Store가 서명/다운로드/설치를 관리한다. 개발용 unsigned identity는 Store 조회 대상이 아니며 아직 등록/심사/게시 전임을 안내한다. GitHub의 최신 버전과 Store 배포 상태를 섞지 않는다. 실제 Store 신규 버전은 계정 연결 및 게시 전이므로 모의 응답과 개발 패키지 검증을 실제 Store E2E로 주장하지 않는다.
 
-일반판은 인증 없이 https://api.github.com/repos/jhoon-dev/JOBS/releases/latest 를 조회한다. 정식 3자리 app version과 Release tag를 비교한다. App version은 CMake의 제품 버전과 일치시키며 Store의 4자리 패키지 버전과는 별개다. 초안/prerelease·잘못된 버전·타 저장소 링크·무제한 응답을 거부한다. 정식 Release가 아직 없으면 미게시로 안내한다. Windows 설치 자산 이름은 JOBS-<version>-Setup-win64-<revision>.exe이며 asset의 GitHub SHA-256 digest와 실제 크기를 확인한다. HTTPS GitHub/CDN으로만 이동하고 자동으로 다운로드/실행하지 않는다. digest가 없으면 자동 설치를 허용하지 않고 릴리스 페이지에서 수동 다운로드를 안내한다. 개발 실행·macOS는 릴리스 페이지를 사용한다.
+일반판은 인증 없이 https://api.github.com/repos/jhoon-dev/JOBS/releases/latest 를 조회한다. 정식 3자리 app version과 Release tag를 비교한다. App version은 CMake의 제품 버전과 일치시키며 Store의 4자리 패키지 버전과는 별개다. 초안/prerelease·잘못된 버전·타 저장소 링크·무제한 응답을 거부한다. 정식 Release가 아직 없으면 미게시로 안내한다. Windows 설치 자산 이름은 PPM-<version>-Setup-win64-<revision>.exe이며 asset의 GitHub SHA-256 digest와 실제 크기를 확인한다. HTTPS GitHub/CDN으로만 이동하고 자동으로 다운로드/실행하지 않는다. digest가 없으면 자동 설치를 허용하지 않고 릴리스 페이지에서 수동 다운로드를 안내한다. 개발 실행·macOS는 릴리스 페이지를 사용한다.
 
 검증된 설치기를 실행하기 전에 모든 문서의 기존 저장 확인을 거친다. 취소/편집/계산 중에는 설치를 시작하지 않는다. Windows 설치기는 이전 PID 종료 대기를 지원하며 기존 등록 경로에 같은 사용자 설치를 갱신한다. 업데이트는 제거기를 호출하지 않는다. 캐시는 앱 전용 상태 아래에 두고 취소/오류의 부분 파일을 폐기하며 일반 제거 범위에 포함한다. 실행 실패 시 앱을 유지하고 오류를 표시한다.
 
-설정은 배포판별 applicationSettings에 저장한다. 자동 확인을 끄면 시작 시 외부 요청이 발생하지 않는다. 요청에는 프로젝트·자원·비용·파일 경로·계정 토큰을 담지 않는다. GitHub에는 일반 HTTP 연결 정보와 JOBS updater User-Agent가 전달되고 Store는 Microsoft 정책에 따른다. 배포 전 개인정보 처리방침을 갱신한다. 공개 Release·Store 업로드·오픈소스 라이선스 선택은 이 작업에서 수행하지 않는다.
+설정은 배포판별 applicationSettings에 저장한다. 자동 확인을 끄면 시작 시 외부 요청이 발생하지 않는다. 요청에는 프로젝트·자원·비용·파일 경로·계정 토큰을 담지 않는다. GitHub에는 일반 HTTP 연결 정보와 PPM-Updater User-Agent가 전달되고 Store는 Microsoft 정책에 따른다. 배포 전 개인정보 처리방침을 갱신한다. 공개 Release·Store 업로드·오픈소스 라이선스 선택은 이 작업에서 수행하지 않는다.
 
 운영자는 향후 더 높은 app version으로 빌드한 설치기를 같은 tag의 정식 GitHub Release에 올린다. GitHub가 제공하는 SHA-256 digest가 있어야 앱 내 검증 설치가 가능하다. 작성 중/프리뷰 Release는 자동 업데이트 대상이 아니다. Store판은 실제 identity를 유지하고 더 높은 패키지 버전으로 Store에 게시한다.
 

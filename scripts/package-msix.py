@@ -55,7 +55,7 @@ def main():
                    check=True, env=environment)
     if 'CMAKE_BUILD_TYPE:STRING=Release' not in (build / 'CMakeCache.txt').read_text():
         raise RuntimeError('This package pipeline requires a Release MinGW/Ninja build')
-    for executable in ['JOBS.exe'] + (['jobs_msix_probe.exe'] if args.include_probe else []):
+    for executable in ['PPM.exe'] + (['jobs_msix_probe.exe'] if args.include_probe else []):
         binary = (build / executable).read_bytes()
         pe = struct.unpack_from('<I', binary, 0x3c)[0]
         if binary[pe:pe+4] != b'PE\0\0' or struct.unpack_from('<H', binary, pe+4)[0] != 0x8664:
@@ -65,7 +65,7 @@ def main():
         raise RuntimeError('Qt 6.8.3 required')
     workspace = build / 'packages' / ('msix-' + revision[:8] + '-' + uuid.uuid4().hex[:8])
     stage = workspace / 'payload'
-    deploy(ROOT, stage, build / 'JOBS.exe', qt, compiler, environment, workspace / 'windeployqt.log')
+    deploy(ROOT, stage, build / 'PPM.exe', qt, compiler, environment, workspace / 'windeployqt.log')
     shutil.copyfile(ROOT / 'packaging/msix/MSIX-README.txt', stage / 'INSTALL-README.txt')
     validate_assets(ROOT / 'packaging/msix/Assets')
     (stage / 'Assets').mkdir()
@@ -79,7 +79,7 @@ def main():
     validate_payload(stage, args.mode, args.include_probe)
     files = inventory(stage)
     output.mkdir(parents=True, exist_ok=True)
-    name = f"JOBS-{args.mode}-{package_version}-x64-{revision[:8]}" + ('-probe' if args.include_probe else '')
+    name = f"PPM-{args.mode}-{package_version}-x64-{revision[:8]}" + ('-probe' if args.include_probe else '')
     package = output / (name + '.msix')
     if package.exists():
         raise RuntimeError('Package already exists; select a new --output-dir or version')
@@ -87,7 +87,7 @@ def main():
         subprocess.run([str(makeappx), 'pack', '/d', str(stage), '/p', str(package), '/v'],
                        check=True, stdout=log, stderr=subprocess.STDOUT)
     verify_archive(package, files, xml)
-    result = {'product': 'JOBS', 'source_revision': revision, 'mode': args.mode, 'version': package_version,
+    result = {'product': 'PPM', 'source_revision': revision, 'mode': args.mode, 'version': package_version,
               'architecture': 'x64', 'identity': config, 'signed': False, 'submitted': False, 'store_approved': False,
               'store_identity_supplied': args.mode == 'store', 'test_probe_included': args.include_probe,
               'package': str(package), 'bytes': package.stat().st_size, 'sha256': sha256(package),

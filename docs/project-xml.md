@@ -21,7 +21,7 @@
 
 파일 메뉴의 XML 가져오기/내보내기는 건수·손실 진단·대상 새 폴더를 미리 보여 준다. 진단을 확인하고 승인한 뒤 같은 부모의 임시 폴더에서 모든 파일을 기록/재열기 검증하고 새 폴더로 rename한다. 기존 목적지는 거절한다. 오류/취소 때 현재 문서는 그대로다. 가져오기는 미저장 변경 처리 후 project.jobs를 새 세션으로 연다. 내보내기는 읽기 전용 문서에서도 가능하며 전체 프로젝트를 사용한다.
 
-conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/SaveVersion/BuildNumber, 문서 ID/revision, UID 매핑과 경로/설명별 진단을 담는다. `import`, `originalPreservation`, `jobsRecomputation`, `externalRoundTrip` 네 판정은 독립이다. 수입 original.xml은 원본 바이트 exact이고 수출 source.jobs는 현재 입력/이력의 정확한 새 직렬화 스냅샷이다(기존 디스크 파일의 바이트 사본이라는 뜻이 아니다). 외부 재계산/왕복은 unverified다. .jobs schema 9는 그대로 유지한다. 동반 원본/진단 파일은 해당 교환 폴더에 보관되며 .jobs 파일만 별도 저장/이동하면 동반 이동하지 않는다.
+conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/SaveVersion/BuildNumber, 문서 ID/revision, UID 매핑과 경로/설명별 진단을 담는다. `import`, `originalPreservation`, `jobsRecomputation`, `externalRoundTrip` 네 판정은 독립이다. 수입 original.xml은 원본 바이트 exact이고 수출 source.jobs는 현재 입력/이력의 정확한 새 직렬화 스냅샷이다(기존 디스크 파일의 바이트 사본이라는 뜻이 아니다). 외부 재계산/왕복은 unverified다. .ppm schema 9는 그대로 유지한다. 동반 원본/진단 파일은 해당 교환 폴더에 보관되며 .ppm 파일만 별도 저장/이동하면 동반 이동하지 않는다.
 
 ## 완료 검사
 
@@ -31,7 +31,7 @@ conversion.json은 contract `jobs-mspdi-plan-v1`, 방향, 원본 SHA-256/이름/
 
 1. 파일 → Project XML 가져오기에서 .xml을 선택한다. 작업/자원 수·매핑하지 않는 경로와 미검증 판정을 확인한다.
 2. 아직 없는 새 교환 폴더의 전체 경로를 지정하고 `변환 확인 · 새 사본 열기`를 누른다. 기존 문서가 미저장이면 저장/버림/취소를 선택한다. 취소는 교환 폴더를 만들지 않는다.
-3. 해당 폴더의 `project.jobs`가 새 문서로 열린다. F9로 JOBS 일정을 계산한다. `original.xml`/`conversion.json`은 원본과 판단 근거로 함께 보관한다.
-4. 내보내기는 파일 → Project XML 내보내기에서 같은 미리보기 흐름을 사용한다. `project.xml`/`source.jobs`/`conversion.json`이 생성된다. 읽기 전용 문서와 미저장 입력도 내보낼 수 있으며 열린 원본의 편집 이력/저장 지점을 바꾸지 않는다.
+3. 해당 폴더의 `project.ppm`가 새 문서로 열린다. F9로 JOBS 일정을 계산한다. `original.xml`/`conversion.json`은 원본과 판단 근거로 함께 보관한다.
+4. 내보내기는 파일 → Project XML 내보내기에서 같은 미리보기 흐름을 사용한다. `project.xml`/`source.ppm`/`conversion.json`이 생성된다. 읽기 전용 문서와 미저장 입력도 내보낼 수 있으며 열린 원본의 편집 이력/저장 지점을 바꾸지 않는다.
 
 `project_xml_contract`/`project_xml_ui`를 추가해 전체 CTest는 30개다. 고정 fixture는 실제 제품에서 저장한 파일로 위장하지 않은 수작업 골든 입력이다. `scripts/verify-project-xml.py`는 Python 표준 XML reader로 고정 기대값을 독립 검사한다. `scripts/capture-project-xml-ui.py`는 네이티브 대화상자의 취소/가져오기/내보내기/오래된 입력/읽기 전용 동작과 `project-xml-import-native.png`/`project-xml-export-native.png`를 남긴다. CI artifact `project-xml-Windows`/`project-xml-macOS`에서 XML/진단/화면을 확인한다. 공식 근거 조회 시 MicrosoftDocs 소스 revision은 `c77602db4d0733ce57cb0e5514c6fc898c7fe2c2`였다. 내보내기는 schema의 프로젝트 이름 255자, 작업/WBS/자원/달력 이름 512자, 일중 구간 5개 한도도 검사한다.

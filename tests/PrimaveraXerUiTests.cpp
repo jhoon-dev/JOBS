@@ -75,7 +75,8 @@ struct Drive {
                 path->setText(destination);
                 modal->grab().save("primavera-xer-preview-native.png");
                 captured = true;
-                modal->grab().save(input.isEmpty() ? "primavera-xer-export-native.png" : "primavera-xer-import-native.png");
+                modal->grab().save(input.isEmpty() ? "primavera-xer-export-native.png"
+                                                   : "primavera-xer-import-native.png");
                 if (beforeAccept)
                     beforeAccept();
                 auto *buttons = modal->findChild<QDialogButtonBox *>();
@@ -168,13 +169,14 @@ int main(int argc, char **argv) {
             Drive drive({}, dir.filePath("export-cancel"));
             drive.accept = false;
             action(current, "exportPrimaveraXer");
-            check(drive.seenPreview && *doc.project() == imported && !QFileInfo::exists(drive.destination), "export cancel changed state");
+            check(drive.seenPreview && *doc.project() == imported && !QFileInfo::exists(drive.destination),
+                  "export cancel changed state");
         }
         {
             Drive drive({}, dir.filePath("exported"));
             action(current, "exportPrimaveraXer");
-            check(drive.seenPreview && *doc.project() == imported && !doc.dirty() && !doc.canUndo() && doc.path() == importPath &&
-                      QFileInfo::exists(QDir(drive.destination).filePath("source.jobs")),
+            check(drive.seenPreview && *doc.project() == imported && !doc.dirty() && !doc.canUndo() &&
+                      doc.path() == importPath && QFileInfo::exists(QDir(drive.destination).filePath("source.ppm")),
                   "export changed document or lacked source");
         }
         {
@@ -182,7 +184,8 @@ int main(int argc, char **argv) {
             drive.errorExpected = true;
             drive.beforeAccept = [&] { doc.renameTask(0, "이전 미리보기 이후 변경"); };
             action(current, "exportPrimaveraXer");
-            check(drive.seenError && !QFileInfo::exists(drive.destination) && doc.project()->revision == imported.revision + 1,
+            check(drive.seenError && !QFileInfo::exists(drive.destination) &&
+                      doc.project()->revision == imported.revision + 1,
                   "stale preview exported");
             doc.undo();
         }
@@ -191,7 +194,8 @@ int main(int argc, char **argv) {
             drive.errorExpected = true;
             drive.beforeAccept = [&] { doc.renameTask(0, "가져오기 미리보기 이후 변경"); };
             action(current, "importPrimaveraXer");
-            check(drive.seenError && !QFileInfo::exists(drive.destination) && doc.project()->tasks[0].name == "가져오기 미리보기 이후 변경",
+            check(drive.seenError && !QFileInfo::exists(drive.destination) &&
+                      doc.project()->tasks[0].name == "가져오기 미리보기 이후 변경",
                   "stale import replaced current input");
             doc.undo();
         }
@@ -217,8 +221,8 @@ int main(int argc, char **argv) {
         {
             Drive drive({}, dir.filePath("readonly-export"));
             action(reader, "exportPrimaveraXer");
-            check(drive.seenPreview && *readonly.project() == readSnapshot && readonly.readOnly() && !readonly.dirty() &&
-                      QFileInfo::exists(QDir(drive.destination).filePath("project.xer")),
+            check(drive.seenPreview && *readonly.project() == readSnapshot && readonly.readOnly() &&
+                      !readonly.dirty() && QFileInfo::exists(QDir(drive.destination).filePath("project.xer")),
                   "readonly export failed");
         }
         // Use a clean project snapshot to check support for empty native projects too.

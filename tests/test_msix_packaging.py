@@ -18,7 +18,7 @@ from windows_payload import inventory
 class PackagingContract(unittest.TestCase):
     def setUp(self):
         self.config = {'IdentityName': '12345.AccountJOBS', 'Publisher': 'CN=12345678-1234-1234-1234-123456789012',
-                       'PublisherDisplayName': '검증 전용 & Test', 'DisplayName': 'JOBS'}
+                       'PublisherDisplayName': '검증 전용 & Test', 'DisplayName': 'Project Planning Manager'}
 
     def test_store_requires_exact_nonempty_identity(self):
         for config in (None, {}, {**self.config, 'Publisher': ''}, {**self.config, 'unexpected': 'x'},
@@ -50,6 +50,10 @@ class PackagingContract(unittest.TestCase):
                          self.config['PublisherDisplayName'])
         self.assertEqual([c.get('Name') for c in root.find('f:Capabilities', ns)], ['runFullTrust'])
         self.assertEqual(len(root.find('f:Applications', ns)), 1)
+        app = root.find('f:Applications', ns)[0]
+        self.assertEqual(app.get('Id'), 'JOBS')  # Preserve the registered activation identity.
+        self.assertEqual(app.get('Executable'), 'PPM.exe')
+        self.assertEqual(root.find('f:Properties/f:DisplayName', ns).text, 'Project Planning Manager')
         dev = ET.fromstring(manifest(identity('development'), '1.0.0.0', True))
         self.assertEqual(len(dev.find('f:Applications', ns)), 2)
 
@@ -59,7 +63,7 @@ class PackagingContract(unittest.TestCase):
     def test_payload_rejects_secrets_installer_and_store_probe(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            (folder / 'JOBS.exe').write_bytes(b'executable')
+            (folder / 'PPM.exe').write_bytes(b'executable')
             (folder / 'AppxManifest.xml').write_bytes(b'manifest')
             validate_payload(folder, 'store')
             for name in ('key.pfx', 'Uninstall.exe', 'app-Setup.exe', 'jobs_msix_probe.exe', 'Qt6Test.dll', 'run.ps1'):
@@ -78,7 +82,7 @@ class PackagingContract(unittest.TestCase):
             folder = Path(temporary)
             payload = folder / 'payload'
             payload.mkdir()
-            (payload / 'JOBS.exe').write_bytes(b'executable')
+            (payload / 'PPM.exe').write_bytes(b'executable')
             (payload / 'AppxManifest.xml').write_bytes(xml)
             files = inventory(payload)
             (payload / 'libstdc++-6.dll').write_bytes(b'runtime')
@@ -88,7 +92,7 @@ class PackagingContract(unittest.TestCase):
                     package = folder / (modification + '.msix')
                     with zipfile.ZipFile(package, 'w') as archive:
                         archive.writestr('AppxManifest.xml', xml)
-                        archive.writestr('JOBS.exe', b'bad' if modification == 'corrupt' else b'executable')
+                        archive.writestr('PPM.exe', b'bad' if modification == 'corrupt' else b'executable')
                         archive.writestr('libstdc%2B%2B-6.dll', b'runtime')
                         archive.writestr('AppxBlockMap.xml', b'footprint')
                         if modification == 'extra':

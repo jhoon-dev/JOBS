@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
         QTemporaryDir directory;
         jobs::JsonProjectStore store;
         const auto fixture = performanceFixture(10000, true);
-        const auto path = directory.filePath("AsyncPlan.jobs").toUtf8().toStdString();
+        const auto path = directory.filePath("AsyncPlan.ppm").toUtf8().toStdString();
         store.save(path, fixture, {});
         jobs::Document document(store);
         document.open(path);
@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
         // Closing/destroying a view never leaves a worker holding its Document or widgets.
         jobs::Document temporary(store);
         temporary.open(path, true);
-        temporary.saveAs(directory.filePath("Lifetime.jobs").toUtf8().toStdString());
+        temporary.saveAs(directory.filePath("Lifetime.ppm").toUtf8().toStdString());
         const auto lifetimeBefore = *temporary.project();
         jobs::MainWindow *dying = nullptr;
         const auto destructionObserver = temporary.subscribe([&](auto event) {

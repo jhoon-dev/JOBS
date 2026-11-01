@@ -5,15 +5,15 @@ Unicode true
 !include "WinVer.nsh"
 !include "FileFunc.nsh"
 
-Name "JOBS ${AppVersion} Preview"
+Name "Project Planning Manager (PPM) ${AppVersion} Preview"
 OutFile "${InstallerPath}"
-InstallDir "$LOCALAPPDATA\Programs\JOBS"
+InstallDir "$LOCALAPPDATA\Programs\PPM"
 InstallDirRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS" "InstallLocation"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 VIProductVersion "${AppVersion}.0"
-VIAddVersionKey "ProductName" "JOBS"
-VIAddVersionKey "FileDescription" "JOBS Windows x64 Preview Setup"
+VIAddVersionKey "ProductName" "Project Planning Manager (PPM)"
+VIAddVersionKey "FileDescription" "Project Planning Manager (PPM) Windows x64 Setup"
 VIAddVersionKey "FileVersion" "${AppVersion}"
 VIAddVersionKey "ProductVersion" "${AppVersion}"
 VIAddVersionKey "LegalCopyright" "ToolMoa"
@@ -21,18 +21,18 @@ VIAddVersionKey "LegalCopyright" "ToolMoa"
 !define RegistryKey "Software\Microsoft\Windows\CurrentVersion\Uninstall\ToolMoa.JOBS"
 !define MUI_ABORTWARNING
 !ifndef AppIconPath
-!define AppIconPath "${__FILEDIR__}\icons\JOBS.ico"
+!define AppIconPath "${__FILEDIR__}\icons\PPM.ico"
 !endif
 !define MUI_ICON "${AppIconPath}"
 !define MUI_UNICON "${AppIconPath}"
-!define MUI_FINISHPAGE_RUN "$INSTDIR\JOBS.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\PPM.exe"
 !define MUI_FINISHPAGE_RUN_NOTCHECKED
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
-!define MUI_UNCONFIRMPAGE_TEXT_TOP "JOBS 설치 폴더의 모든 파일과 설정·캐시·자동 복구 데이터를 삭제합니다. 설치 폴더 밖에 따로 저장한 프로젝트 파일은 유지합니다. 제거 전에 JOBS 창을 닫아 주세요."
+!define MUI_UNCONFIRMPAGE_TEXT_TOP "PPM 설치 폴더의 모든 파일과 설정·캐시·자동 복구 데이터를 삭제합니다. 설치 폴더 밖에 따로 저장한 프로젝트 파일은 유지합니다. 제거 전에 PPM 창을 닫아 주세요."
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "Korean"
@@ -70,13 +70,13 @@ Function .onInit
       System::Call 'kernel32::WaitForSingleObject(p r2, i 30000) i .r3'
       System::Call 'kernel32::CloseHandle(p r2)'
       ${If} $3 != 0
-        MessageBox MB_ICONSTOP "JOBS 종료를 확인하지 못했습니다. 앱을 닫고 설치기를 다시 실행해 주세요." /SD IDOK
+        MessageBox MB_ICONSTOP "PPM 종료를 확인하지 못했습니다. 앱을 닫고 설치기를 다시 실행해 주세요." /SD IDOK
         SetErrorLevel 4
         Quit
       ${EndIf}
     ${Else}
       ${If} $3 != 87
-        MessageBox MB_ICONSTOP "실행 중인 JOBS 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
+        MessageBox MB_ICONSTOP "실행 중인 PPM 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
         SetErrorLevel 4
         Quit
       ${EndIf}
@@ -86,12 +86,12 @@ Function .onInit
   Pop $3
   ${If} $2 != 0
     System::Call 'kernel32::CloseHandle(p r2)'
-    MessageBox MB_ICONSTOP "실행 중인 다른 JOBS가 있습니다. 모든 JOBS 창을 닫고 다시 설치해 주세요." /SD IDOK
+    MessageBox MB_ICONSTOP "실행 중인 다른 PPM이 있습니다. 모든 PPM 창을 닫고 다시 설치해 주세요." /SD IDOK
     SetErrorLevel 4
     Quit
   ${Else}
     ${If} $3 != 2
-      MessageBox MB_ICONSTOP "JOBS 실행 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
+      MessageBox MB_ICONSTOP "PPM 실행 상태를 확인하지 못했습니다. 앱을 닫고 다시 설치해 주세요." /SD IDOK
       SetErrorLevel 4
       Quit
     ${EndIf}
@@ -109,15 +109,20 @@ Function VerifyInstallDirectory
   ${EndIf}
   StrCpy $INSTDIR $2
   ${GetFileName} "$INSTDIR" $2
-  StrCmp $2 "JOBS" valid_name
-    MessageBox MB_ICONSTOP "설치 전용 JOBS 폴더를 선택해 주세요. 예: D:\Apps\JOBS" /SD IDOK
+  StrCmp $2 "PPM" valid_name
+  StrCmp $2 "JOBS" legacy_name invalid_name
+  legacy_name:
+    ReadRegStr $3 HKCU "${RegistryKey}" "InstallLocation"
+    StrCmp $3 "$INSTDIR" valid_name invalid_name
+  invalid_name:
+    MessageBox MB_ICONSTOP "설치 전용 PPM 폴더를 선택해 주세요. 예: D:\Apps\PPM" /SD IDOK
     SetErrorLevel 3
     Quit
   valid_name:
   ReadRegStr $2 HKCU "${RegistryKey}" "InstallLocation"
   StrCmp $2 "" check_contents
   StrCmp $2 "$INSTDIR" check_contents
-    MessageBox MB_ICONSTOP "기존 JOBS를 먼저 제거한 뒤 다른 위치에 설치해 주세요." /SD IDOK
+    MessageBox MB_ICONSTOP "기존 PPM을 먼저 제거한 뒤 다른 위치에 설치해 주세요." /SD IDOK
     SetErrorLevel 3
     Quit
   check_contents:
@@ -129,7 +134,7 @@ Function VerifyInstallDirectory
     StrCmp $1 "." next
     StrCmp $1 ".." next
     FindClose $0
-    MessageBox MB_ICONSTOP "빈 폴더 또는 기존 JOBS 설치 폴더를 선택해 주세요." /SD IDOK
+    MessageBox MB_ICONSTOP "빈 폴더 또는 기존 PPM 설치 폴더를 선택해 주세요." /SD IDOK
     SetErrorLevel 3
     Quit
   next:
@@ -140,33 +145,49 @@ Function VerifyInstallDirectory
   verified:
 FunctionEnd
 
-Section "JOBS (필수)" MainSection
+Section "PPM (필수)" MainSection
   SectionIn RO
   Call VerifyInstallDirectory
   SetOutPath "$INSTDIR"
   File /r "${StageDir}\*"
+  ; The registered prior executable and shortcuts belonged to this same product.
+  IfFileExists "$INSTDIR\JOBS.exe" 0 legacy_shortcuts_done
+  ReadRegStr $0 HKCU "${RegistryKey}" "InstallLocation"
+  StrCmp $0 "$INSTDIR" 0 legacy_shortcuts_done
+  Delete "$INSTDIR\JOBS.exe"
+  Delete "$SMPROGRAMS\JOBS\JOBS.lnk"
+  Delete "$SMPROGRAMS\JOBS\JOBS 제거.lnk"
+  RMDir "$SMPROGRAMS\JOBS"
+  ReadRegDWORD $0 HKCU "${RegistryKey}" "DesktopShortcut"
+  ${If} $0 == 1
+    Delete "$DESKTOP\JOBS.lnk"
+  ${EndIf}
+  legacy_shortcuts_done:
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  CreateDirectory "$SMPROGRAMS\JOBS"
-  CreateShortcut "$SMPROGRAMS\JOBS\JOBS.lnk" "$INSTDIR\JOBS.exe"
-  CreateShortcut "$SMPROGRAMS\JOBS\JOBS 제거.lnk" "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "${RegistryKey}" "DisplayName" "JOBS ${AppVersion} Preview"
+  CreateDirectory "$SMPROGRAMS\PPM"
+  CreateShortcut "$SMPROGRAMS\PPM\PPM.lnk" "$INSTDIR\PPM.exe"
+  CreateShortcut "$SMPROGRAMS\PPM\PPM 제거.lnk" "$INSTDIR\Uninstall.exe"
+  WriteRegStr HKCU "${RegistryKey}" "DisplayName" "Project Planning Manager (PPM) ${AppVersion} Preview"
   WriteRegStr HKCU "${RegistryKey}" "DisplayVersion" "${AppVersion}"
   WriteRegStr HKCU "${RegistryKey}" "Publisher" "ToolMoa"
   WriteRegStr HKCU "${RegistryKey}" "InstallLocation" "$INSTDIR"
-  WriteRegStr HKCU "${RegistryKey}" "DisplayIcon" "$INSTDIR\JOBS.exe"
+  WriteRegStr HKCU "${RegistryKey}" "DisplayIcon" "$INSTDIR\PPM.exe"
   WriteRegStr HKCU "${RegistryKey}" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   WriteRegStr HKCU "${RegistryKey}" "QuietUninstallString" '$\"$INSTDIR\Uninstall.exe$\" /S'
   WriteRegDWORD HKCU "${RegistryKey}" "NoModify" 1
   WriteRegDWORD HKCU "${RegistryKey}" "NoRepair" 1
   WriteRegDWORD HKCU "${RegistryKey}" "EstimatedSize" ${InstalledSizeKiB}
   ReadRegDWORD $0 HKCU "${RegistryKey}" "DesktopShortcut"
+  ${If} $0 == 1
+    CreateShortcut "$DESKTOP\PPM.lnk" "$INSTDIR\PPM.exe"
+  ${EndIf}
   ${If} $0 != 1
     WriteRegDWORD HKCU "${RegistryKey}" "DesktopShortcut" 0
   ${EndIf}
 SectionEnd
 
 Section /o "바탕화면 바로가기" DesktopSection
-  CreateShortcut "$DESKTOP\JOBS.lnk" "$INSTDIR\JOBS.exe"
+  CreateShortcut "$DESKTOP\PPM.lnk" "$INSTDIR\PPM.exe"
   WriteRegDWORD HKCU "${RegistryKey}" "DesktopShortcut" 1
 SectionEnd
 
@@ -183,17 +204,18 @@ Function un.onInit
   StrCmp $0 "$INSTDIR" registered invalid_directory
   registered:
   ${GetFileName} "$INSTDIR" $0
+  StrCmp $0 "PPM" directory_ok
   StrCmp $0 "JOBS" directory_ok invalid_directory
   invalid_directory:
-    MessageBox MB_ICONSTOP "등록된 JOBS 설치 폴더와 일치하지 않아 제거를 중단합니다." /SD IDOK
+    MessageBox MB_ICONSTOP "등록된 PPM 설치 폴더와 일치하지 않아 제거를 중단합니다." /SD IDOK
     SetErrorLevel 3
     Abort
   directory_ok:
   ClearErrors
-  FileOpen $0 "$INSTDIR\JOBS.exe" a
+  FileOpen $0 "$INSTDIR\PPM.exe" a
   IfErrors app_running app_closed
   app_running:
-    MessageBox MB_ICONSTOP "실행 중인 JOBS 창을 닫고 다시 제거해 주세요." /SD IDOK
+    MessageBox MB_ICONSTOP "실행 중인 PPM 창을 닫고 다시 제거해 주세요." /SD IDOK
     SetErrorLevel 4
     Abort
   app_closed:
@@ -219,12 +241,12 @@ Section "Uninstall"
   own_registration:
     ReadRegDWORD $1 HKCU "${RegistryKey}" "DesktopShortcut"
     ${If} $1 == 1
-      Delete "$DESKTOP\JOBS.lnk"
+      Delete "$DESKTOP\PPM.lnk"
     ${EndIf}
     DeleteRegKey HKCU "${RegistryKey}"
-    Delete "$SMPROGRAMS\JOBS\JOBS.lnk"
-    Delete "$SMPROGRAMS\JOBS\JOBS 제거.lnk"
-    RMDir "$SMPROGRAMS\JOBS"
+    Delete "$SMPROGRAMS\PPM\PPM.lnk"
+    Delete "$SMPROGRAMS\PPM\PPM 제거.lnk"
+    RMDir "$SMPROGRAMS\PPM"
   keep_registration:
   ; The canonical directory, marker and per-user registration were checked above.
   RMDir /r "$INSTDIR"

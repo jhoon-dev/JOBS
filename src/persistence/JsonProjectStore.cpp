@@ -2,6 +2,7 @@
 #include "persistence/JsonProjectStore.h"
 #include "persistence/ProjectJson.h"
 #include "persistence/ProjectFile.h"
+#include "persistence/NativeFilePath.h"
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -81,12 +82,14 @@ std::unique_ptr<WriteLease> JsonProjectStore::lock(const std::string &path) {
     return std::make_unique<Lock>(qs(path));
 }
 StoredProject JsonProjectStore::load(const std::string &path) const {
+    requireNativeFilePath(qs(path), "ppm");
     auto bytes = read(qs(path));
     auto project = decodeProjectFile(bytes);
     const bool legacy = QJsonDocument::fromJson(bytes).object().value("schemaVersion") != QJsonValue(9);
     return {std::move(project), hash(bytes).toStdString(), legacy};
 }
 std::string JsonProjectStore::save(const std::string &path, const Project &project, const std::string &expected) {
+    requireNativeFilePath(qs(path), "ppm");
     validate(project);
     auto body = json::encodeProject(project);
     auto bytes =

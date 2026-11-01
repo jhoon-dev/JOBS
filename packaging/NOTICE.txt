@@ -1,6 +1,6 @@
-JOBS desktop application - Windows x64
+PPM desktop application - Windows x64
 
-JOBS uses unmodified Qt 6.8.3 shared libraries (Qt Company and contributors),
+PPM uses unmodified Qt 6.8.3 shared libraries (Qt Company and contributors),
 distributed here under the LGPL v3 option. The DLLs can be replaced with compatible
 modified builds. This package does not restrict reverse engineering for debugging
 modifications to these libraries. Qt copyright notices, license texts and the
@@ -23,6 +23,6 @@ When present, its copyright and license notice is in licenses/nsis.
 https://nsis.sourceforge.io/Download
 
 Third-party licenses apply to their respective components. This notice does not
-assign a license to the JOBS application itself.
+assign a license to the PPM application itself.
 Application version, source revision, signing status and SHA-256 file inventory
 are recorded in the package's generated manifest and adjacent provenance JSON.

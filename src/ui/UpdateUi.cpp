@@ -78,7 +78,7 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
         auto *dialog = new QDialog(&window);
         dialog->setObjectName("applicationUpdateDialog");
         dialog->setAttribute(Qt::WA_DeleteOnClose);
-        dialog->setWindowTitle("JOBS 업데이트");
+        dialog->setWindowTitle("PPM 업데이트");
         dialog->resize(650, 440);
         auto *layout = new QVBoxLayout(dialog);
         auto *version = new QLabel("현재 앱 버전: " + controller.config().currentVersion, dialog);
@@ -169,12 +169,12 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
                     status->setText("Microsoft Store를 열지 못했습니다. 시작 메뉴에서 Store를 열어 주세요.");
             } else if (controller.state() == UpdateState::Ready) {
                 if (!hooks.prepareInstall || !hooks.finishInstall) {
-                    status->setText("설치된 JOBS의 프로젝트 창에서 업데이트를 진행해 주세요.");
+                    status->setText("설치된 PPM의 프로젝트 창에서 업데이트를 진행해 주세요.");
                     return;
                 }
                 InstallBarrier barrier(dialog);
                 if (QMessageBox::question(&barrier, "업데이트 설치",
-                                          "열린 문서의 저장 여부를 확인한 뒤 JOBS를 종료하고 설치기를 실행합니다.",
+                                          "열린 문서의 저장 여부를 확인한 뒤 PPM을 종료하고 설치기를 실행합니다.",
                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
                     return;
                 if (hooks.prepareInstall && !hooks.prepareInstall())

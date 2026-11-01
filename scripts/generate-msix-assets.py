@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 folder = ROOT / 'packaging/msix/Assets'
-svg = ET.fromstring((folder / 'JOBS.svg').read_bytes())
+svg = ET.fromstring((folder / 'PPM.svg').read_bytes())
 files = {}
 for name, size in [('Square44x44Logo.png', 44), ('Square150x150Logo.png', 150),
                    ('StoreLogo.png', 50), ('StoreListing300.png', 300)]:
@@ -24,4 +24,4 @@ for name, size in [('Square44x44Logo.png', 44), ('Square150x150Logo.png', 150),
     path = folder / name
     canvas.save(path, optimize=False)
     files[name] = {'width': size, 'height': size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
-(folder / 'assets.json').write_text(json.dumps({'source': 'JOBS.svg', 'generator': 'Pillow 11.3.0', 'files': files}, indent=2) + '\n')
+(folder / 'assets.json').write_text(json.dumps({'source': 'PPM.svg', 'generator': 'Pillow 11.3.0', 'files': files}, indent=2) + '\n')

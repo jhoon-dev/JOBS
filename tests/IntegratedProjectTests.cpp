@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
         check(report.scheduleStatus == jobs::CalculationStatus::Valid && report.tables.size() >= 4 &&
                   !report.kpis.empty(),
               "report missing integrated data");
-        doc.saveAs(dir.filePath("integrated.jobs").toStdString());
+        doc.saveAs(dir.filePath("integrated.ppm").toStdString());
         const auto disk = bytes(doc.path());
         auto control = std::make_shared<jobs::CalculationControl>();
         control->cancel();
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
                   recovered.project()->baselines == frozen && recovered.project()->progress == facts &&
                   recovered.project()->costEntries == costs && bytes(doc.path()) == disk,
               "recovery lost facts or changed source");
-        recovered.saveAs(dir.filePath("recovered.jobs").toStdString());
+        recovered.saveAs(dir.filePath("recovered.ppm").toStdString());
         check(store.load(recovered.path()).project == *recovered.project(), "recovery copy roundtrip");
         claim->session->retire();
         std::cout << "PASS: create/WBS/calendar/effort/split/resource/cost, "

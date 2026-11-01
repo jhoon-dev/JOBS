@@ -31,7 +31,7 @@ using namespace jobs;
 namespace {
 const QByteArray installer("MZ deterministic installer fixture");
 QJsonObject releaseObject(QString version = "0.2.1") {
-    const QString name = "JOBS-" + version + "-Setup-win64-abcdef12.exe";
+    const QString name = "PPM-" + version + "-Setup-win64-abcdef12.exe";
     return {
         {"draft", false},
         {"prerelease", false},
@@ -473,7 +473,7 @@ private slots:
     void documentCancelKeepsAllWindows() {
         QTemporaryDir dir;
         auto files = std::make_shared<JsonProjectStore>();
-        const auto path = dir.filePath("Plan.jobs").toStdString();
+        const auto path = dir.filePath("Plan.ppm").toStdString();
         std::string id;
         {
             Document original(*files);

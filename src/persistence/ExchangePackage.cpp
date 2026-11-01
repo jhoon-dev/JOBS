@@ -25,7 +25,7 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_002, {});
     QDir directory(parent);
     auto finalPath = directory.filePath(target.fileName());
-    QTemporaryDir stage(directory.filePath(".jobs-exchange-XXXXXX"));
+    QTemporaryDir stage(directory.filePath(".ppm-exchange-XXXXXX"));
     if (!stage.isValid())
         throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_003, {});
     auto write = [&](const QString &name, const QByteArray &bytes) {
@@ -39,7 +39,7 @@ QString publishPlanExchange(const Project &project, const QByteArray &payload, Q
             throw AppError(ErrorCode::FILE_EXCHANGEPACKAGE_005, {diagnosticArgument(name)});
     };
     JsonProjectStore store;
-    auto jobsName = importing ? "project.jobs" : "source.jobs";
+    auto jobsName = importing ? "project.ppm" : "source.ppm";
     store.save(stage.filePath(jobsName).toUtf8().toStdString(), project, {});
     calculationCheckpoint();
     if (store.load(stage.filePath(jobsName).toUtf8().toStdString()).project != project)

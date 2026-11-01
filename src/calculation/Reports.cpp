@@ -493,7 +493,7 @@ ProjectReport buildReport(const Project &p, const ReportOptions &o) {
     append("공유 자원", load.diagnostics);
     append("원가/EVM", costs.diagnostics);
     auto &source = table("source", "출처와 설정", ReportFamily::All,
-                         "재계산된 메모리 스냅샷의 정적 보고서입니다. 엑셀 셀 편집이 JOBS 원본을 변경하거나 앱 계산을 "
+                         "재계산된 메모리 스냅샷의 정적 보고서입니다. 엑셀 셀 편집이 PPM 원본을 변경하거나 앱 계산을 "
                          "재실행하지 않습니다.",
                          {{"항목", 32}, {"값", 100}});
     auto meta = [&](const std::string &key, const std::string &value) {

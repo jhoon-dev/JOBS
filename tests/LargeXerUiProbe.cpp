@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
         jobs::JsonProjectStore files;
         jobs::Document document(files);
         clock.restart();
-        document.open((published + "/project.jobs").toUtf8().toStdString());
+        document.open((published + "/project.ppm").toUtf8().toStdString());
         report["open_document_ms"] = milliseconds(clock);
         clock.restart();
         jobs::MainWindow window(document);

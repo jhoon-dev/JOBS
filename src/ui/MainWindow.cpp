@@ -405,7 +405,7 @@ MainWindow::~MainWindow() {
 }
 void MainWindow::report(const std::exception &error) {
     const auto diagnostic = diagnosticFromException(error);
-    QMessageBox box(QMessageBox::Warning, "JOBS · 작업 실패", qDiagnosticText(diagnostic), QMessageBox::Ok, this);
+    QMessageBox box(QMessageBox::Warning, "PPM · 작업 실패", qDiagnosticText(diagnostic), QMessageBox::Ok, this);
     box.setTextFormat(Qt::PlainText);
     std::string task;
     if (document_.project())
@@ -478,7 +478,7 @@ void MainWindow::refresh(bool rebuildTree) {
     }
     if (rebuildTree)
         rebuildWbsTree();
-    setWindowTitle((p ? qs(p->name) : "프로젝트를 만들거나 여세요") + "[*] — JOBS");
+    setWindowTitle((p ? qs(p->name) : "프로젝트를 만들거나 여세요") + "[*] — PPM");
     setWindowModified(document_.dirty());
     save_->setEnabled(p.has_value());
     saveAs_->setEnabled(p.has_value());
@@ -843,9 +843,9 @@ bool MainWindow::save(bool as) {
         if (as || document_.path().empty() || document_.readOnly() || document_.requiresSaveAs()) {
             QFileDialog dialog(this, "다른 이름으로 저장 · 기존 파일은 덮어쓰지 않습니다");
             dialog.setAcceptMode(QFileDialog::AcceptSave);
-            dialog.setNameFilter("JOBS 프로젝트 (*.jobs)");
-            dialog.setDefaultSuffix("jobs");
-            dialog.selectFile(qs(document_.project()->name) + ".jobs");
+            dialog.setNameFilter("PPM 프로젝트 (*.ppm)");
+            dialog.setDefaultSuffix("ppm");
+            dialog.selectFile(qs(document_.project()->name) + ".ppm");
             if (dialog.exec() != QDialog::Accepted)
                 return false;
             document_.saveAs(str(dialog.selectedFiles().first()));
@@ -917,7 +917,7 @@ void MainWindow::create() {
     }
 }
 void MainWindow::open() {
-    auto path = QFileDialog::getOpenFileName(this, "프로젝트 열기", {}, "JOBS 프로젝트 (*.jobs);;모든 파일 (*)");
+    auto path = QFileDialog::getOpenFileName(this, "프로젝트 열기", {}, "PPM 프로젝트 (*.ppm)");
     if (path.isEmpty())
         return;
     if (workspace_) {

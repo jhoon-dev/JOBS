@@ -43,7 +43,7 @@ void contracts(jobs::JsonProjectStore &store, const QTemporaryDir &directory) {
     jobs::Document doc(store);
     doc.create("Baseline requests", "2026-10-26", {"Task"});
     doc.setDuration(0, 60);
-    doc.saveAs(directory.filePath("Requests.jobs").toStdString());
+    doc.saveAs(directory.filePath("Requests.ppm").toStdString());
     auto before = *doc.project();
     const auto history = doc.historyBytes();
     auto prepared = prepare(doc, approval());
@@ -119,7 +119,7 @@ void contracts(jobs::JsonProjectStore &store, const QTemporaryDir &directory) {
     check(doc.applyPreparedEdit(*prepared) == EditState::Stale && *doc.project() == before,
           "same ID/revision reload accepted an old approval session");
     prepared = prepare(doc, approval());
-    doc.saveAs(directory.filePath("Independent.jobs").toStdString());
+    doc.saveAs(directory.filePath("Independent.ppm").toStdString());
     before = *doc.project();
     check(doc.applyPreparedEdit(*prepared) == EditState::Stale && *doc.project() == before,
           "Save As accepted the old document's approval");
@@ -160,7 +160,7 @@ void approve(jobs::MainWindow &window) {
     baselineAction(window)->trigger();
 }
 void largeUi(jobs::JsonProjectStore &store, const QTemporaryDir &directory, jobs::Project project) {
-    const auto path = directory.filePath("Large.jobs").toStdString();
+    const auto path = directory.filePath("Large.ppm").toStdString();
     (void)store.save(path, project, {});
     jobs::Document doc(store);
     doc.open(path);

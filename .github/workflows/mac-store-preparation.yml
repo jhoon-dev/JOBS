@@ -46,7 +46,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/qt-appstore-6.8.3
           key: qtbase-6.8.3-appstore-universal-v1-${{ runner.os }}-${{ steps.sdk.outputs.key }}
-      - name: Configure and build JOBS against the App Store Qt runtime
+      - name: Configure and build PPM against the App Store Qt runtime
         shell: bash
         run: |
           set -euo pipefail
@@ -64,15 +64,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          app="$PWD/build-mac-store/JOBS.app"
-          "$JOBS_QT_PREFIX/bin/macdeployqt" "$app" -appstore-compliant -no-codesign -verbose=2
-          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/JOBS"
+          app="$PWD/build-mac-store/PPM.app"
+          "$JOBS_QT_PREFIX/bin/macdeployqt" "$app" -appstore-compliant -verbose=2
+          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/PPM"
           mkdir -p "$app/Contents/Resources/licenses"
           cp -R packaging/licenses/qtbase "$app/Contents/Resources/licenses/qtbase"
           test -f "$app/Contents/Resources/licenses/qtbase/LGPL-3.0-only.txt"
           mkdir -p dist/mac-store-preparation
-          ditto -c -k --sequesterRsrc --keepParent "$app" dist/mac-store-preparation/JOBS-unsigned-universal.app.zip
-          shasum -a 256 dist/mac-store-preparation/JOBS-unsigned-universal.app.zip > dist/mac-store-preparation/SHA256SUMS.txt
+          ditto -c -k --sequesterRsrc --keepParent "$app" dist/mac-store-preparation/PPM-unsigned-universal.app.zip
+          shasum -a 256 dist/mac-store-preparation/PPM-unsigned-universal.app.zip > dist/mac-store-preparation/SHA256SUMS.txt
           python - <<'PY'
           import json, os, subprocess
           from pathlib import Path

@@ -76,7 +76,7 @@ def verify(root: Path):
         # Native PDF fonts can encode typographic ligatures (e.g. ff as U+FB00).
         # Normalize presentation forms before comparing semantic text/numbers.
         compact = re.sub(r"\s+", "", unicodedata.normalize("NFKC", raw))
-        assert reader.pages and all("JOBS" in (p.extract_text() or "") for p in reader.pages)
+        assert reader.pages and all("PPM" in (p.extract_text() or "") for p in reader.pages)
         if name == "reports-long-portrait.pdf":
             numbers = [int(n) for n in re.findall(r"Segment_(\d+)", compact)]
             assert len(numbers) == 700 and set(numbers) == set(range(700)), "long row lost/duplicated content"

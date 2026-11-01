@@ -149,8 +149,8 @@ void history(const Project &p, JsonProjectStore &store, QTemporaryDir &dir) {
           "pre-enum immutable history missing");
     invalidValues(p);
     Document doc(store);
-    doc.open((QString(JOBS_ENUM_FIXTURES) + "/history.jobs").toStdString(), true);
-    doc.saveAs(dir.filePath("History Copy.jobs").toStdString());
+    doc.open((QString(JOBS_ENUM_FIXTURES) + "/history.ppm").toStdString(), true);
+    doc.saveAs(dir.filePath("History Copy.ppm").toStdString());
     const auto saved = *doc.project();
     doc.renameTask(8, "Enum undo edit");
     doc.undo();
@@ -179,7 +179,7 @@ void history(const Project &p, JsonProjectStore &store, QTemporaryDir &dir) {
     check(static_cast<const PlanInput &>(*restored.project()) == static_cast<const PlanInput &>(*doc.project()) &&
               restored.project()->baselines == p.baselines && restored.project()->scenarios == p.scenarios,
           "recovery changed enum history");
-    restored.saveAs(dir.filePath("Recovered Enums.jobs").toStdString());
+    restored.saveAs(dir.filePath("Recovered Enums.ppm").toStdString());
     check(store.load(restored.path()).project == *restored.project(), "recovered enum save failed");
 }
 } // namespace
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
                   "SaveAs changed old content");
             check(store.load(doc.path()).project == *doc.project(), "saved legacy project did not reopen");
             check(read(path) == bytes, "compatibility test overwrote original fixture");
-            if (name == "history.jobs")
+            if (name == "history.ppm")
                 history(p, store, dir);
         }
         std::cout << "PASS: " << checks

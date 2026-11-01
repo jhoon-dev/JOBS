@@ -65,7 +65,7 @@ class Pages {
         p_.setFont(title);
         p_.drawText(QRectF(margin_, margin_ - 5, width(), 22),
                     QFontMetricsF(title, &writer_)
-                        .elidedText("JOBS 프로젝트 보고서 · " + reportText(r_.projectName), Qt::ElideRight, width()));
+                        .elidedText("PPM 프로젝트 보고서 · " + reportText(r_.projectName), Qt::ElideRight, width()));
         auto small = font_;
         small.setPointSize(8);
         p_.setFont(small);
@@ -217,7 +217,7 @@ int exportPdf(const ProjectReport &r, const QString &path, ReportFamily family, 
         writer.setPageSize(QPageSize(options.a3 ? QPageSize::A3 : QPageSize::A4));
         writer.setPageOrientation(options.landscape ? QPageLayout::Landscape : QPageLayout::Portrait);
         writer.setPageMargins(QMarginsF(0, 0, 0, 0));
-        writer.setCreator("JOBS");
+        writer.setCreator("PPM");
         writer.setTitle(reportText(r.projectName) + " 프로젝트 보고서");
         QPainter painter(&writer);
         if (!painter.isActive())

@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
         doc.setAssignments(id, {{id, resource, 100}});
         doc.setTaskEffort(0, jobs::TaskType::FixedWork, true, 480, 48000, {});
         doc.setPredecessors(1, {id});
-        doc.saveAs(directory.filePath("Prepared.jobs").toUtf8().toStdString());
+        doc.saveAs(directory.filePath("Prepared.ppm").toUtf8().toStdString());
         const auto disk = bytes(doc.path());
         auto before = *doc.project();
         const auto initialHistory = doc.historyBytes();
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
             const auto rid = incomplete.putResource({{}, "R", "labor", 100, {}});
             incomplete.setTaskEffort(0, jobs::TaskType::FixedUnits, false, 480, {}, {});
             incomplete.setAssignments(aid, {{aid, rid, 100}});
-            incomplete.saveAs(directory.filePath("Incomplete.jobs").toUtf8().toStdString());
+            incomplete.saveAs(directory.filePath("Incomplete.ppm").toUtf8().toStdString());
             incomplete.renameTask(1, "Temporary name");
             incomplete.undo();
             const auto source = *incomplete.project();
@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
         check(prepared->state() == EditState::Failed && *doc.project() == before && bytes(doc.path()) == saved,
               "invalid prepared effort changed the source file/facts");
         auto large = performanceFixture(10000, true);
-        const auto largePath = directory.filePath("Large.jobs").toUtf8().toStdString();
+        const auto largePath = directory.filePath("Large.ppm").toUtf8().toStdString();
         store.save(largePath, large, {});
         jobs::Document big(store);
         big.open(largePath);

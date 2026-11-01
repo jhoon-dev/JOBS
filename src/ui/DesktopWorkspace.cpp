@@ -210,11 +210,11 @@ bool DesktopWorkspace::saveWorkspace(QWidget *parent, bool as) {
         auto target = path_;
         if (as || target.empty()) {
             auto selected =
-                QFileDialog::getSaveFileName(parent, "작업공간 사본 저장", {}, "JOBS 작업공간 (*.jobsworkspace)");
+                QFileDialog::getSaveFileName(parent, "작업공간 사본 저장", {}, "PPM 작업공간 (*.ppmworkspace)");
             if (selected.isEmpty())
                 return false;
-            if (!selected.endsWith(".jobsworkspace", Qt::CaseInsensitive))
-                selected += ".jobsworkspace";
+            if (!selected.endsWith(".ppmworkspace", Qt::CaseInsensitive))
+                selected += ".ppmworkspace";
             target = files_->normalizePath(selected.toStdString());
             if (as && files_->sameFile(target, path_))
                 throw AppError(ErrorCode::WORKSPACE_FILE_EXISTS);

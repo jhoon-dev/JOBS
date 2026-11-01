@@ -30,8 +30,8 @@ def lifecycle(mode):
 lifecycle('install')  # Refuses pre-existing application registration or user data.
 info = json.loads(state.read_text(encoding='utf-8'))
 target, case = Path(info['target']), Path(info['case'])
-project = case / 'Update-preserved.jobs'
-shutil.copyfile(ROOT / 'tests/fixtures/enum-compat/schema-9.jobs', project)
+project = case / 'Update-preserved.ppm'
+shutil.copyfile(ROOT / 'tests/fixtures/enum-compat/schema-9.ppm', project)
 info['project_file'] = str(project)
 state.write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding='utf-8')
 cache = Path(info['local']) / 'updates'
@@ -64,7 +64,7 @@ print('locked',flush=True)
 time.sleep(5)
 k.CloseHandle(h)
 '''
-child = subprocess.Popen([sys.executable, '-u', '-c', child_code, str(target / 'JOBS.exe')],
+child = subprocess.Popen([sys.executable, '-u', '-c', child_code, str(target / 'PPM.exe')],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                          creationflags=subprocess.CREATE_NO_WINDOW)
 try:

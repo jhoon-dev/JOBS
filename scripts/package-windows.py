@@ -48,9 +48,9 @@ def main():
     if '6.8.3' not in deploy_version:
         raise RuntimeError('Qt 6.8.3 is required for this package')
     run(['cmake', '--build', build, '--config', 'Release', '--target', 'JOBS', '--parallel', '3'], env=environment)
-    exe = next((p for p in (build / 'Release/JOBS.exe', build / 'JOBS.exe') if p.is_file()), None)
+    exe = next((p for p in (build / 'Release/PPM.exe', build / 'PPM.exe') if p.is_file()), None)
     if exe is None:
-        raise RuntimeError('Release JOBS.exe is missing')
+        raise RuntimeError('Release PPM.exe is missing')
     if 'CMAKE_BUILD_TYPE:STRING=Release' not in (build / 'CMakeCache.txt').read_text() and exe.parent.name != 'Release':
         raise RuntimeError('A Release build is required')
     binary = exe.read_bytes()
@@ -67,17 +67,17 @@ def main():
     (stage / 'install-info.ini').write_text(
         f'[JOBS]\nProductId=ToolMoa.JOBS\nVersion={version}\nSourceRevision={revision}\n', encoding='ascii')
     files = inventory(stage)
-    manifest = {'product': 'JOBS', 'version': version, 'channel': 'preview', 'architecture': 'x64',
+    manifest = {'product': 'PPM', 'version': version, 'channel': 'preview', 'architecture': 'x64',
                 'source_revision': revision, 'signed': False, 'qt': '6.8.3', 'nsis': tool_version,
-                'application_sha256': sha256(stage / 'JOBS.exe'), 'files': files,
+                'application_sha256': sha256(stage / 'PPM.exe'), 'files': files,
                 'inventory_excludes': ['package-manifest.json', 'Uninstall.exe (generated at install time)']}
     (stage / 'package-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     source = workspace / 'installer.nsi'
     source.write_text((ROOT / 'packaging/windows-installer.nsi').read_text(encoding='utf-8'), encoding='utf-8-sig')
-    installer = output / f'JOBS-{version}-Setup-win64-{revision[:8]}.exe'
+    installer = output / f'PPM-{version}-Setup-win64-{revision[:8]}.exe'
     with (workspace / 'nsis.log').open('w', encoding='utf-8') as log:
         run([nsis / 'makensis.exe', '/V3', f'/DAppVersion={version}', f'/DStageDir={stage}',
-             f'/DAppIconPath={ROOT / "packaging/icons/JOBS.ico"}',
+             f'/DAppIconPath={ROOT / "packaging/icons/PPM.ico"}',
              f'/DInstallerPath={installer}',
              f'/DInstalledSizeKiB={sum(p.stat().st_size for p in stage.rglob("*") if p.is_file()) // 1024}', source],
             stdout=log, stderr=subprocess.STDOUT)

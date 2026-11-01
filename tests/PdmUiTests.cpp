@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
         check(edge && calendar, "Gantt relation/calendar provenance missing");
         window.grab().save("pdm-main-smoke.png");
         jobs::Document readonly(store);
-        auto path = dir.filePath("pdm-ui.jobs");
+        auto path = dir.filePath("pdm-ui.ppm");
         doc.saveAs(path.toStdString());
         readonly.open(path.toStdString(), true);
         {

@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
         auto pdfBytes = read(pdf);
         rejects([&] { jobs::exportPdf(report, pdf); });
         check(read(pdf) == pdfBytes, "export overwrote PDF");
-        rejects([&] { jobs::exportXlsx(report, temporary.filePath("wrong.jobs")); });
+        rejects([&] { jobs::exportXlsx(report, temporary.filePath("wrong.ppm")); });
         rejects([&] { jobs::exportXlsx(report, temporary.filePath("missing/fail.xlsx")); });
         auto malformed = report;
         malformed.tables[0].rows[0].pop_back();
