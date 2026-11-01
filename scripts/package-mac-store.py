@@ -1,6 +1,7 @@
 """Sign a verified preparation artifact; upload only after external-folder QA."""
 import argparse
 import base64
+import contextlib
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -9,6 +10,7 @@ from pathlib import Path
 import plistlib
 import re
 import secrets
+import shlex
 import stat
 import subprocess
 import sys
@@ -116,6 +118,16 @@ def identity(lines, prefixes, fingerprints=None):
     return choices[0][1]
 
 
+@contextlib.contextmanager
+def signing_keychain_search(keychain):
+    previous = shlex.split(run(['security', 'list-keychains', '-d', 'user']))
+    try:
+        run(['security', 'list-keychains', '-d', 'user', '-s', keychain, *previous])
+        yield
+    finally:
+        run(['security', 'list-keychains', '-d', 'user', '-s', *previous])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--preparation', type=Path, required=True)
@@ -162,6 +174,7 @@ def main():
         secret_file('MAC_APP_STORE_CERTIFICATES_P12_BASE64', p12)
         keychain_password = secrets.token_urlsafe(36)
         LOCAL_SECRETS.append(keychain_password)
+        keychain_search = contextlib.ExitStack()
         try:
             run(['security', 'create-keychain', '-p', keychain_password, keychain])
             run(['security', 'set-keychain-settings', '-lut', '21600', keychain])
@@ -169,6 +182,7 @@ def main():
             run(['security', 'import', p12, '-k', keychain, '-P',
                  os.environ['MAC_APP_STORE_CERTIFICATES_PASSWORD'], '-T', '/usr/bin/codesign', '-T', '/usr/bin/productbuild'])
             run(['security', 'set-key-partition-list', '-S', 'apple-tool:,apple:', '-s', '-k', keychain_password, keychain])
+            keychain_search.enter_context(signing_keychain_search(keychain))
             app_identity = identity(run(['security', 'find-identity', '-v', '-p', 'codesigning', keychain]),
                                     ('Apple Distribution:', '3rd Party Mac Developer Application:'), fingerprints)
             installer_identity = identity(run(['security', 'find-identity', '-v', keychain]),
@@ -205,13 +219,13 @@ def main():
             api_environment = os.environ.copy()
             api_environment['API_PRIVATE_KEYS_DIR'] = str(work / 'private_keys')
             authentication = ['--apiKey', key_id, '--apiIssuer', os.environ['APP_STORE_CONNECT_API_ISSUER_ID']]
-            validation = run(['xcrun', 'altool', '--validate-app', '-f', package, *authentication],
+            validation = run(['xcrun', 'altool', '--validate-app', '-f', package, '-t', 'osx', *authentication],
                              cwd=work, environment=api_environment)
             (output / 'validation.log').write_text(validation)
             run(['ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', app, output / 'PPM-signed.app.zip'])
             if args.upload:
                 (output / 'upload.log').write_text(run([
-                    'xcrun', 'altool', '--upload-package', package, '--apple-id', '6829387727', '--bundle-id', BUNDLE,
+                    'xcrun', 'altool', '--upload-package', package, '-t', 'osx', '--apple-id', '6829387727', '--bundle-id', BUNDLE,
                     '--bundle-short-version-string', info['CFBundleShortVersionString'],
                     '--bundle-version', info['CFBundleVersion'], *authentication], cwd=work, environment=api_environment))
             result = {'source_revision': revision, 'bundle_id': BUNDLE, 'version': info['CFBundleShortVersionString'],
@@ -223,9 +237,14 @@ def main():
             (output / 'status.json').write_text(json.dumps(result, indent=2) + '\n')
             print(json.dumps(result, indent=2))
         finally:
-            if keychain.exists():
-                run(['security', 'delete-keychain', keychain])
-            LOCAL_SECRETS.clear()
+            try:
+                keychain_search.close()
+            finally:
+                try:
+                    if keychain.exists():
+                        run(['security', 'delete-keychain', keychain])
+                finally:
+                    LOCAL_SECRETS.clear()
 
 
 if __name__ == '__main__':

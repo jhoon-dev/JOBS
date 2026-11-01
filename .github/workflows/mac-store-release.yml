@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Verify signing admission and keychain cleanup contracts
+        run: python tests/test_mac_store_packaging.py
       - name: Verify preparation provenance and required credentials
         env:
           GH_TOKEN: ${{ github.token }}

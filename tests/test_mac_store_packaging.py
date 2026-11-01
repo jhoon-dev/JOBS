@@ -7,6 +7,7 @@ from pathlib import Path
 import stat
 import tempfile
 import unittest
+from unittest.mock import call, patch
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -91,6 +92,23 @@ class MacStorePackagingTests(unittest.TestCase):
         self.assertIn(mac_store.TEAM, mac_store.identity(line, ('Apple Distribution:',), {'A' * 40}))
         with self.assertRaises(ValueError):
             mac_store.identity(line + '\n' + line, ('Apple Distribution:',), {'A' * 40})
+
+    def test_signing_keychain_preserves_and_restores_search_list_on_failure(self):
+        previous = '    "/Users/runner/Library/Keychains/login.keychain-db"\n    "/path with spaces/extra.keychain-db"\n'
+        original = ['/Users/runner/Library/Keychains/login.keychain-db', '/path with spaces/extra.keychain-db']
+        for fails in (False, True):
+            with self.subTest(fails=fails), patch.object(mac_store, 'run', side_effect=[previous, '', '']) as run:
+                try:
+                    with mac_store.signing_keychain_search('/tmp/signing.keychain-db'):
+                        if fails:
+                            raise ValueError('Signing failed')
+                except ValueError:
+                    self.assertTrue(fails)
+                self.assertEqual(run.call_args_list, [
+                    call(['security', 'list-keychains', '-d', 'user']),
+                    call(['security', 'list-keychains', '-d', 'user', '-s', '/tmp/signing.keychain-db', *original]),
+                    call(['security', 'list-keychains', '-d', 'user', '-s', *original]),
+                ])
 
     def test_upload_requires_exact_source_runtime_and_external_qa(self):
         good = {'source_revision': 'revision', 'qt_appstore_compliant': True, 'sandbox_container_verified': True}
