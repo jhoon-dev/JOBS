@@ -17,6 +17,16 @@ FIELDS = {'IdentityName', 'Publisher', 'PublisherDisplayName', 'DisplayName'}
 ASSETS = {'Square44x44Logo.png': 44, 'Square150x150Logo.png': 150, 'StoreLogo.png': 50, 'StoreListing300.png': 300}
 
 
+def package_output(root, mode, requested=None):
+    root = Path(root).resolve()
+    folder = Path(requested) if requested is not None else root / 'build' / (
+        'msix-development' if mode == 'development' else 'msix-store-upload')
+    folder = folder.resolve()
+    if folder.is_relative_to((root / 'dist').resolve()):
+        raise ValueError('Unsigned MSIX files are internal build inputs; do not write them to public dist')
+    return folder
+
+
 def version(value):
     if not re.fullmatch(r'\d+\.\d+\.\d+\.0', value) or any(int(part) > 65535 for part in value.split('.')):
         raise ValueError('MSIX version must have four components in 0..65535 and a final 0')

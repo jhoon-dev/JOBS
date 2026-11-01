@@ -15,7 +15,7 @@ def main():
     parser.add_argument('--evidence', type=Path, required=True, help='Directory containing lifecycle.json and probe screenshots')
     parser.add_argument('--screenshot', action='append', choices=('01-schedule.png', '02-shared-resources.png'),
                         help='Select desktop-size real screenshots; default: 01-schedule.png')
-    parser.add_argument('--output-dir', type=Path, default=ROOT / 'dist/msix/store-preparation')
+    parser.add_argument('--output-dir', type=Path, default=ROOT / 'build/store-materials')
     args = parser.parse_args()
     evidence = args.evidence.resolve()
     report = json.loads((evidence / 'lifecycle.json').read_text(encoding='utf-8-sig'))

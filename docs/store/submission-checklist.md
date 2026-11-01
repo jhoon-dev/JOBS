@@ -1,10 +1,12 @@
 # Microsoft Store 제출 준비와 남은 절차
 
-2026-11-01. 개발자 계정 등록과 **Project Planning Manager 이름 예약**을 완료했다. 무료·지원 가능한 모든 국가가 출시 방침이다. **PPM 1.0.3.0 패키지(a0fe5b5f)를 업로드·Validated 확인 후, 사용자의 IARC 약관·성년 및 제출 승인을 받아 심사 제출했다. 현재 인증 중·사전 처리 중이며, 승인 후 자동 게시 설정이다.** 스토어 승인·게시 완료와 심사 접수를 구분한다. 개발용 MSIX는 심사용 파일이 아니다.
+2026-11-01. Windows 사용자 배포는 **Microsoft Store가 서명·제공하는 MSIX만** 사용한다. EXE/NSIS 설치기와 unsigned 개발 패키지는 배포하지 않는다. 무료·지원 가능한 모든 국가가 출시 방침이다.
+
+기존 제품 `9NDHXXVR8F2P`와 제출은 사용자 승인 후 삭제했다. 신규 `Project Planning Manager` 등록은 이름 예약/계정 권한 오류로 완료되지 않았다. 이전 패키지의 Validated·인증 접수 기록은 과거 이력이며 현재 제출 상태가 아니다. 새 제품 ID와 실제 패키지 identity를 받은 뒤 최신 소스로 다시 패키징·검증·제출해야 한다.
 
 ## 1. 지금 준비한 파일
 
-- `dist/msix/PPM-development-1.0.2.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
+- `build/msix-development/PPM-development-1.0.2.0-x64-<revision>.msix`: Windows 11 이상 관리자 테스트 전용. 개발 OID와 분리된 identity를 사용한다.
 - `scripts/package-msix.py`: 실제 Partner Center identity를 받아 unsigned Store MSIX를 생성한다. Store에서는 심사 후 Microsoft가 다시 서명하므로 별도 공인 인증서 구매를 요구하지 않는다.
 - `packaging/msix/store-identity.template.json`: 실제 ID 입력용 서식. 빈 값으로는 Store 패키지를 만들 수 없다.
 - `docs/store/listing.ko.md`, `privacy-policy.ko.md`, 벡터 아이콘과 PNG 자산, 실제 앱 화면, 검증 결과.

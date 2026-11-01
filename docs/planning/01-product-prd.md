@@ -518,3 +518,10 @@ macOS CI의 150%에서 실제 창 높이가 437 논리 픽셀로 제한되어 �
 | BRAND-04 | 공개 브랜드 변경으로 기존 사용자 데이터를 잃지 않는다. | 내부 `ToolMoa/JOBS` 저장 경로·설정·설치/업데이트 식별자는 기존 데이터와 업그레이드 호환용 값으로 유지한다. 공개 Brand 표기는 `Toolmoa`다. |
 
 같은 제품군 예시는 `PM Canvas` / `pmcanvas` / `app.toolmoa.pmcanvas`다. 이는 공통 명명 규칙을 기록한 것으로 이 저장소에서 별도 PM Canvas 저장소나 스토어 등록을 수정했다는 뜻이 아니다. 개발자 핸들은 인증서 소유자·법적 게시자 이름을 임의로 바꾸는 근거로 사용하지 않는다.
+
+
+## Windows MSIX 전용 배포 (CONFIRMED, 2026-11-01)
+
+사용자 지시로 Windows 배포는 Microsoft Store가 서명·제공하는 MSIX만 사용한다. EXE/NSIS 설치기 생성·공개 첨부·GitHub Release 다운로드·실행 업데이트 경로는 폐기한다. 이 결정은 기존 EXE 설치/자동 업데이트 및 수동 GitHub 배포 요구보다 우선한다.
+
+개발용 unsigned MSIX와 Partner Center 업로드 전 패키지는 `build/`의 비공개 준비 산출물이며 사용자 배포 파일이 아니다. CI는 설치·업그레이드·제거를 검사하지만 설치 패키지·실행 파일을 artifact에 첨부하지 않고 로그·화면·검증 결과만 보존한다. 과거 CI의 설치 패키지 포함 artifact와 로컬 `dist/`의 무서명 Windows 설치 산출물도 배포 경로에서 제거한다. Store identity 없는 개발 실행본과 개발 MSIX는 업데이트 미지원으로 표시하며 외부 릴리스 조회·다운로드를 하지 않는다. 실제 Store 배포본은 Windows.Services.Store로 확인하고 Store에서 업데이트한다. macOS는 기존 App Store 서명·업로드 절차를 유지한다.

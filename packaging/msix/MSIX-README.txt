@@ -1,6 +1,6 @@
 PPM - Microsoft Store MSIX
 
-Windows installs, updates and removes this package. No NSIS uninstaller is included.
+Windows installs, updates and removes this package. Only Microsoft Store signed packages are distributed to users. Unsigned packages are internal build inputs or CI fixtures, not public downloads.
 Projects (.ppm) and workspaces (.ppmworkspace) are saved to paths selected by you.
 Settings and automatic recovery are stored in this package's private LocalState.
 An update keeps that state; a normal uninstall removes it.

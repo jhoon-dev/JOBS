@@ -10,7 +10,7 @@ import subprocess
 import sys
 import uuid
 from windows_payload import deploy, inventory, sha256
-from msix_package import ASSETS, identity, manifest, validate_assets, validate_payload, verify_archive, version
+from msix_package import ASSETS, identity, manifest, package_output, validate_assets, validate_payload, verify_archive, version
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,7 +25,7 @@ def main():
     parser.add_argument('--qt-root', type=Path, default=ROOT / '.deps/Qt/6.8.3/mingw_64')
     parser.add_argument('--compiler-bin', type=Path, default=ROOT / '.deps/Qt/Tools/mingw1310_64/bin')
     parser.add_argument('--sdk-root', type=Path, default=ROOT / '.deps/msix-sdk')
-    parser.add_argument('--output-dir', type=Path, default=ROOT / 'dist/msix')
+    parser.add_argument('--output-dir', type=Path, help='Internal build output; not a public distribution')
     args = parser.parse_args()
     config = identity(args.mode, json.loads(args.identity.read_text(encoding='utf-8-sig')) if args.identity else None)
     if args.include_probe and args.mode != 'development':
@@ -35,7 +35,8 @@ def main():
         parser.error('Store package major version must be positive')
     if sys.platform != 'win32':
         parser.error('MakeAppx requires Windows')
-    build, qt, compiler, output = (p.resolve() for p in (args.build_dir, args.qt_root, args.compiler_bin, args.output_dir))
+    build, qt, compiler, output = (p.resolve() for p in (
+        args.build_dir, args.qt_root, args.compiler_bin, package_output(ROOT, args.mode, args.output_dir)))
     lock = json.loads((ROOT / 'packaging/msix-toolchain-lock.json').read_text())
     sdk = args.sdk_root.resolve() / lock['version']
     tools = json.loads((sdk / 'tool-info.json').read_text())

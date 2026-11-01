@@ -1,6 +1,8 @@
 # MSIX·Microsoft Store 배포 준비
 
-2026-10-29 사용자 승인. MSIX-01~06을 구현 전에 확정한다. 사용자는 개인 명의 배포를 선택했고 아직 Partner Center 앱 이름을 예약하지 않았다. 계정 가입/신원 확인·이름 예약·실제 패키지 ID·게시자 표시명·가격/대상 국가/연령 등급·최종 제출은 계정 소유자의 결정이다. 현 단계는 검증 패키지와 제출 자료, 실제 ID를 입력한 후 사용할 제출용 생성기까지다.
+2026-11-01: Windows 배포는 Microsoft Store MSIX 전용이다. EXE/NSIS 설치기 및 직접 실행 파일 배포는 폐기했다.
+
+초기 이력: 2026-10-29 사용자 승인. MSIX-01~06을 구현 전에 확정한다. 사용자는 개인 명의 배포를 선택했고 아직 Partner Center 앱 이름을 예약하지 않았다. 계정 가입/신원 확인·이름 예약·실제 패키지 ID·게시자 표시명·가격/대상 국가/연령 등급·최종 제출은 계정 소유자의 결정이다. 현 단계는 검증 패키지와 제출 자료, 실제 ID를 입력한 후 사용할 제출용 생성기까지다.
 
 Store 배포는 공인 인증서를 별도 구매하지 않는 MSIX 경로를 사용한다. 정식 Store 모드는 Partner Center의 Identity Name/Publisher/Publisher Display Name을 명시적으로 받는다. 임의의 개인명이나 ToolMoa 명칭을 검증된 게시자로 가장하지 않는다. 개발용 패키지는 이름과 publisher를 분리하고 Windows unsigned 개발 OID를 사용한다. 개발용 파일은 일반 배포/Store 업로드 대상이 아니다. 별도 인증서 설치나 OS 보안/개발자 설정 변경을 자동으로 수행하지 않는다.
 
@@ -19,6 +21,13 @@ MSIX에서 앱 상태는 package family별 LocalState 아래에 둔다. 설정�
 
 ## 공개 브랜드와 Store identity
 
-Developer `jhoon-dev`, Brand `Toolmoa`, 제품 App ID `app.toolmoa.ppm`, Display Name `Project Planning Manager`를 적용한다. Windows 실행 파일의 제품 이름·회사 이름·설명과 설치기 게시자에 이 기준을 표시한다. `ToolMoa/JOBS` 등의 내부 저장 경로와 설치 식별자는 기존 데이터·업그레이드 호환을 위해 유지한다.
+Developer `jhoon-dev`, Brand `Toolmoa`, 제품 App ID `app.toolmoa.ppm`, Display Name `Project Planning Manager`를 적용한다. MSIX 안의 실행 파일 제품 이름·회사 이름·설명에 이 기준을 표시한다. `ToolMoa/JOBS` 등의 내부 저장 경로와 설치 식별자는 기존 데이터·업그레이드 호환을 위해 유지한다.
 
 제품 App ID는 Microsoft가 발급하는 MSIX `IdentityName` 또는 `Store ID`를 대체하지 않는다. `store-identity.template.json`의 `PublisherDisplayName`은 개발자 핸들 `jhoon-dev`를 추정 입력하는 곳이 아니며, Partner Center에서 받은 실제 값이 필요하다. Apple Bundle ID는 제품 App ID와 같은 `app.toolmoa.ppm`을 사용한다.
+
+
+## 내부 패키지 출력과 CI 첨부
+
+`python scripts/package-msix.py`는 개발용 unsigned MSIX를 `build/msix-development`에 생성한다. `--mode store --identity <실제 Partner Center JSON>`은 `build/msix-store-upload`에 업로드 준비 파일을 생성한다. 이는 Microsoft가 서명하기 전의 입력 파일이며 사용자가 직접 설치하는 배포 파일이 아니다. 사용자 배포는 Store 인증·서명 후에만 진행한다.
+
+MSIX CI는 개발 패키지를 실제 설치·업그레이드·복구·제거하지만 artifact에는 로그·PNG 화면·JSON 검사 결과만 올린다. `dist/`나 MSIX/EXE/DLL/앱 payload 전체를 업로드하지 않는다. 제출용 소개·아이콘·화면 묶음은 `build/store-materials`의 내부 준비 자료다.

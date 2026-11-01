@@ -1,5 +1,8 @@
 # 최초 스토어 출시 진행 기록
 
+> 2026-11-01 배포 정책 변경: Windows는 Microsoft Store MSIX만 배포한다. EXE/NSIS 패키징·GitHub 설치기 업데이트 경로는 폐기했다. 로컬 `dist`의 EXE 17개·무서명 MSIX 6개와 관련 메타데이터·준비 자료는 내부 보관 폴더로 옮겼다. 과거 `msix-windows-x64` CI artifact 42개를 삭제했고, 조사 시점 GitHub Release는 없었다. 아래의 EXE·개발용 패키지 해시와 경로는 과거 이력이며 현재 다운로드 대상으로 안내하면 안 된다.
+
+
 > 아래 최초 등록 기록은 이력이다. 2026-11-01 사용자 요청으로 Microsoft 기존 제품 `9NDHXXVR8F2P` 및 제출을 영구 삭제했고 Apple 기존 앱 `6829146371`은 판매 해제 후 삭제했다. Apple 새 앱은 `6829387727`, Bundle ID `app.toolmoa.ppm`, SKU `PPM-MAC-20261101`이다. 기존 패키지를 새 ID에 제출한 것으로 취급하지 않는다. Microsoft 새 제품 등록 시 Entra 권한 오류가 발생하여 신규 identity와 패키지 제출은 확인되지 않았다. 최신 상태는 스토어 대시보드에서 확인한다.
 
 사용자 확정: 두 개발자 계정 등록 완료, JOBS는 신규 앱, 무료·지원 가능한 모든 국가 출시.
@@ -34,3 +37,6 @@ macOS CI에서 `std::size_t`와 `std::uint64_t`를 하나의 `auto` 선언으로
 Mac 전용 Qt 준비 workflow [41177090201](https://github.com/jhoon-dev/JOBS/actions/runs/41177090201)은 별도 universal Qt와 내장 macdeployqt 빌드·설치까지 통과했지만, 이미 qtbase에 포함된 macdeployqt를 qttools에서 다시 빌드하려는 잘못된 후속 단계에서 실패했다. 해당 단계를 제거하고 내장 도구의 존재를 검사하도록 수정했다. 수정 후 전체 준비 workflow는 재검증이 필요하다. 이 workflow의 출력은 서명·sandbox 미검증 개발용 번들이며 제출 가능한 `.pkg`가 아니다. 후속 Mac Store 업데이트 채널 검사는 로컬 `application_updates`와 clang-format 18.1.8 검사를 통과했다.
 
 Microsoft 제출은 실제 identity의 probe 없는 MSIX, 심사/설치 검증과 소개·실제 화면·등급·국가·가격 설정을 완료한 뒤 진행한다. Mac 제출은 샌드박스 파일 접근·서명/프로비저닝·Qt App Store 준수 빌드·업데이트 경로까지 검증한 후 진행한다. 개발용 패키지나 미서명 Mac 앱을 심사용 산출물로 표시하지 않는다.
+
+
+2026-11-01 MSIX 전용 전환 검증: Windows 전체 CTest 62개와 Python 패키징 계약 15개가 통과했다. 업데이트 회귀는 Store 조회·수동 재시도·취소/시간 초과 뒤 늦은 응답 무시·시작 시 여러 창의 단일 조회·환경 설정 보존·개발 실행본/개발 MSIX의 업데이트 차단을 검사한다. 실행 파일의 PE imports에서 Qt Network 제거를 확인했다. 변경·등록 C++ 파일 16개의 clang-format 검사도 통과했다. 실제 Store 승인·새 제품 게시를 뜻하지 않는다.

@@ -19,8 +19,6 @@ public:
     void setUpdates(UpdateController *updates) {
         updates_ = updates;
     }
-    bool prepareForUpdate();
-    void finishUpdate();
     MainWindow *newWindow();
     MainWindow *openProject(const std::string &path, bool readOnly = false);
     void createProject();

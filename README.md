@@ -51,9 +51,9 @@ PM Canvas는 별도 개인용 프로토타입이다. 그 코드·아키텍처·�
 
 ## 개발 시작
 
-Windows x64 설치 파일과 재현 방법은 [설치·완전 제거 안내](docs/windows-installer.md)를 따른다. 설치 파일은 로컬 `dist`에 생성한다. 제거하면 PPM 설치 폴더와 설정·캐시·자동 복구 데이터를 모두 지우며 별도 위치에 저장한 프로젝트는 보존한다.
+Windows 배포는 **Microsoft Store의 MSIX만** 사용한다. EXE/NSIS 설치기와 GitHub Release 설치 파일 배포는 폐기했다. [MSIX·Store 배포 절차](docs/msix-store.md)를 따르며, 개발용 unsigned MSIX는 `build/msix-development`의 CI 검증 전용이다. 최종 업로드 전 패키지는 `build/msix-store-upload`에 만들고, 사용자는 Microsoft Store가 서명·제공하는 패키지를 설치한다.
 
-Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklist.md)와 [패키지 계약](docs/msix-store.md)을 따른다. 앱 이름 예약 전에는 별도의 unsigned 개발 패키지를 제공하며, 실제 Partner Center ID를 넣은 Store 모드 생성기와 한국어 소개·아이콘·개인정보 처리방침을 준비한다. MSIX판 설정·복구는 패키지 LocalState에 저장하고 일반 제거 시 함께 제거한다. [검증 기록과 실제 화면](docs/validation/msix-2026-10-29/README.md)에 패키지 identity의 설치·업데이트·복구·제거 및 파일 해시를 보관한다. Store 등록·WACK·제출/승인은 아직 완료되지 않았다.
+Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklist.md)와 [패키지 계약](docs/msix-store.md)을 따른다. 앱 이름 예약 전에는 내부 CI용 unsigned 개발 패키지만 만들며, 실제 Partner Center ID를 넣은 Store 모드 생성기와 한국어 소개·아이콘·개인정보 처리방침을 준비한다. MSIX판 설정·복구는 패키지 LocalState에 저장하고 일반 제거 시 함께 제거한다. [검증 기록과 실제 화면](docs/validation/msix-2026-10-29/README.md)에 패키지 identity의 설치·업데이트·복구·제거 및 파일 해시를 보관한다. Store 등록·WACK·제출/승인은 아직 완료되지 않았다.
 
 초기 개발 기준은 C++20, CMake 3.24+, Qt 6.8.3 Core/Widgets/Concurrent다. 서버·계정 없이 WBS·기간·FS 선행·휴일을 입력하고 F9로 일정 계산한다. 추적 메뉴에서 기준선을 저장하고 상태일·실적을 보고한 뒤 계획 대비 비교를 연다. 자원 메뉴에서 가용량·배정을 입력하고 부하와 평준화 시나리오를 비교한다. `.ppm` 단일 파일에 계획·자원·기준선·실적·시나리오 입력을 저장한다. 원가 메뉴에서 유효일 단가·고정비·누적 실제원가·물리 진척을 입력하고 기준선 EVM을 분석한다. 보고서 메뉴에서 대시보드/XLSX/PDF, 자동 저장·복구 메뉴에서 체크포인트/사본 복구, 편집 메뉴에서 실행 취소/다시 실행을 사용한다. 고급 평준화·회계/환율 연계는 후속 구현이다.
 
@@ -80,6 +80,6 @@ Microsoft Store용 MSIX는 [제출 준비 절차](docs/store/submission-checklis
 
 [C++ 품질 검사](docs/cpp-quality.md): 고정 clang-format·점진적 포맷 적용과 실제 Qt 컴파일 설정을 사용하는 clang-tidy CI를 제공한다. 편집 권한 가드는 공통화하며 상태일·간트·저장/복구·읽기 전용 사본의 기존 정책을 유지한다.
 
-설정 → 업데이트에서 시작 시 새 버전 확인을 켜고 끄며 지금 확인·취소·업데이트를 진행한다. Store판은 Microsoft Store, 일반 설치판은 GitHub 정식 Release를 사용한다. 새 버전은 비차단 배너로 알리고 설치기 다운로드의 크기/SHA-256과 문서 저장 확인을 거친다. [업데이트 동작·배포 운영](docs/application-updates.md)을 따른다.
+설정 → 업데이트에서 Microsoft Store의 새 버전을 확인하고 스토어를 열어 업데이트한다. 새 버전은 비차단 배너로 알린다. 개발 실행본과 개발 MSIX는 업데이트 미지원으로 표시하며, Mac App Store판은 App Store로 연결한다. 앱 자체의 EXE 다운로드·설치기 실행·GitHub Release 조회는 제공하지 않는다. [업데이트 동작·배포 운영](docs/application-updates.md)을 따른다.
 
 [편집·간트·입력 화면 개선과 검증](docs/validation/editing-polish-2026-10-30/README.md): 작업 선택의 날짜 자동 이동, 선택 보기(Ctrl+Shift+J)·전체 일정 맞춤(Ctrl+Shift+F), 작은 화면 배치와 주요 편집기 공통 높이·인라인 오류 안내를 제공한다. 1만 작업의 변경 전후 계측과 공개 P6 XER 9개 비교 행렬을 보존하며, 전체 P6 재계산 호환성은 별도로 구분한다.

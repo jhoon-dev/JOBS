@@ -10,7 +10,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from msix_package import (DEV_OID, FOUNDATION, RESCAP, identity, manifest, validate_assets,
+from msix_package import (DEV_OID, FOUNDATION, RESCAP, identity, manifest, package_output, validate_assets,
                           validate_payload, verify_archive, version)
 from windows_payload import inventory
 
@@ -19,6 +19,17 @@ class PackagingContract(unittest.TestCase):
     def setUp(self):
         self.config = {'IdentityName': '12345.AccountJOBS', 'Publisher': 'CN=12345678-1234-1234-1234-123456789012',
                        'PublisherDisplayName': '검증 전용 & Test', 'DisplayName': 'Project Planning Manager'}
+
+    def test_unsigned_packages_cannot_be_written_to_public_distribution(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            for mode, name in [('development', 'msix-development'), ('store', 'msix-store-upload')]:
+                self.assertEqual(package_output(root, mode), root / 'build' / name)
+                for public in (root / 'dist', root / 'dist/msix', root / 'build/../dist/release'):
+                    with self.assertRaisesRegex(ValueError, 'public dist'):
+                        package_output(root, mode, public)
+                self.assertEqual(package_output(root, mode, root / 'build/custom-input'),
+                                 root / 'build/custom-input')
 
     def test_store_requires_exact_nonempty_identity(self):
         for config in (None, {}, {**self.config, 'Publisher': ''}, {**self.config, 'unexpected': 'x'},

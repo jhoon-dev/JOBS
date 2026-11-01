@@ -37,29 +37,22 @@ jobs:
       - name: Install activate update recover and uninstall with package identity
         shell: powershell
         run: |
-          $initial = (Get-Item dist/msix/PPM-development-1.0.2.0-x64-*-probe.msix).FullName
-          $upgrade = (Get-Item dist/msix/PPM-development-1.0.3.0-x64-*-probe.msix).FullName
+          $initial = (Get-Item build/msix-development/PPM-development-1.0.2.0-x64-*-probe.msix).FullName
+          $upgrade = (Get-Item build/msix-development/PPM-development-1.0.3.0-x64-*-probe.msix).FullName
           ./scripts/check-msix-lifecycle.ps1 -InitialPackage $initial -UpgradePackage $upgrade
       - name: Verify update service and native widgets
         run: |
           cmake --build build --target jobs_update_tests --parallel 3
           ctest --test-dir build -R "^application_updates$" --output-on-failure
-      - name: Package standalone updater and verify installation handoff
-        shell: pwsh
-        run: |
-          python scripts/setup-nsis-tools.py
-          python scripts/package-windows.py
-          $installer = (Get-Item dist/PPM-0.2.0-Setup-win64-*.exe).FullName
-          python scripts/check-update-install.py --installer $installer
-      - name: Preserve MSIX and actual packaged UI evidence
+      - name: Preserve package validation logs and actual UI evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: msix-windows-x64
+          name: msix-validation-windows-x64
           path: |
-            dist/
-            build/msix-acceptance/
-            build/update-install*.json
+            build/msix-acceptance/**/*.json
+            build/msix-acceptance/**/*.png
+            build/msix-acceptance/**/*.log
             build/updates-ctest.txt
             build/packages/**/makeappx.log
             build/packages/**/windeployqt.log
