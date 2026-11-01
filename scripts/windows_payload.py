@@ -13,7 +13,9 @@ def deploy(root, stage, executable, qt, compiler, environment, log):
     stage.mkdir(parents=True, exist_ok=False)
     shutil.copyfile(executable, stage / 'PPM.exe')
     with log.open('w', encoding='utf-8') as output:
+        # TUIO network touch is not used; its automatic plugin would pull Qt Network back into the package.
         subprocess.run([str(qt / 'bin/windeployqt.exe'), '--release', '--compiler-runtime', '--no-translations',
+                        '--exclude-plugins', 'qtuiotouchplugin',
                         '--dir', str(stage), str(stage / 'PPM.exe')], env=environment,
                        stdout=output, stderr=subprocess.STDOUT, check=True)
     for name in ['PPM.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'platforms/qwindows.dll',
