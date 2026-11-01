@@ -1,3 +1,4 @@
+#include "ui/SandboxAccess.h"
 #include "ui/DesktopWorkspace.h"
 #include "ui/MainWindow.h"
 #include "ui/WorkspaceDialog.h"
@@ -137,6 +138,8 @@ void DesktopWorkspace::createProject() {
     created->create();
 }
 MainWindow *DesktopWorkspace::openProject(const std::string &path, bool readOnly) {
+    if (!authorizeSandboxFile(nullptr, QString::fromStdString(path)))
+        return nullptr;
     const auto normalized = files_->normalizePath(path);
     for (const auto &session : sessions_)
         if (session->window && files_->sameFile(normalized, session->document->path())) {
@@ -215,6 +218,8 @@ bool DesktopWorkspace::saveWorkspace(QWidget *parent, bool as) {
                 return false;
             if (!selected.endsWith(".ppmworkspace", Qt::CaseInsensitive))
                 selected += ".ppmworkspace";
+            if (!authorizeSandboxFile(parent, selected))
+                return false;
             target = files_->normalizePath(selected.toStdString());
             if (as && files_->sameFile(target, path_))
                 throw AppError(ErrorCode::WORKSPACE_FILE_EXISTS);
@@ -255,6 +260,8 @@ bool DesktopWorkspace::confirmClosing(MainWindow *closing) {
     return answer == QMessageBox::Discard || saveWorkspace(closing);
 }
 void DesktopWorkspace::openWorkspace(const std::string &path, QWidget *parent) {
+    if (!authorizeSandboxFile(parent, QString::fromStdString(path)))
+        return;
     if (engaged_ && dirty()) {
         const auto answer = QMessageBox::question(
             parent, "작업공간 변경 저장", "현재 공유 자원/연결 변경을 저장한 뒤 작업공간을 여시겠습니까?",
@@ -301,7 +308,10 @@ void DesktopWorkspace::openWorkspace(const std::string &path, QWidget *parent) {
             calculationCheckpoint();
             if (!same)
                 result->lease = files->lock(normalized);
-            result->stored = JsonWorkspaceStore(*files).load(normalized);
+            result->stored = JsonWorkspaceStore(*files).load(normalized, [](const std::string &reference) {
+                if (!authorizeSandboxFile(nullptr, QString::fromStdString(reference)))
+                    throw CalculationCancelled();
+            });
             std::set<std::string> identities;
             for (const auto &reference : result->stored.workspace.projects) {
                 calculationCheckpoint();

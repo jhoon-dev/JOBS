@@ -1,3 +1,4 @@
+#include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
 #include "ui/ApplicationIcon.h"
@@ -848,7 +849,10 @@ bool MainWindow::save(bool as) {
             dialog.selectFile(qs(document_.project()->name) + ".ppm");
             if (dialog.exec() != QDialog::Accepted)
                 return false;
-            document_.saveAs(str(dialog.selectedFiles().first()));
+            const auto selected = dialog.selectedFiles().first();
+            if (!authorizeSandboxFile(this, selected))
+                return false;
+            document_.saveAs(str(selected));
         } else
             document_.save();
         refresh();
@@ -918,7 +922,7 @@ void MainWindow::create() {
 }
 void MainWindow::open() {
     auto path = QFileDialog::getOpenFileName(this, "프로젝트 열기", {}, "PPM 프로젝트 (*.ppm)");
-    if (path.isEmpty())
+    if (path.isEmpty() || !authorizeSandboxFile(this, path))
         return;
     if (workspace_) {
         try {

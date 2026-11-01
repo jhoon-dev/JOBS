@@ -1,3 +1,4 @@
+#include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "persistence/PrimaveraXer.h"
 #include "ui/MainWindow.h"
@@ -53,6 +54,8 @@ QString preview(QWidget *parent, const PrimaveraXerExchange &e, const QString &p
     layout->addWidget(error);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, [&] {
+        if (destination->text().trimmed().isEmpty() || !authorizeSandboxFile(&dialog, destination->text().trimmed()))
+            return;
         auto path = QFileInfo(destination->text().trimmed());
         if (destination->text().trimmed().isEmpty() || path.exists() || path.isSymLink() || !path.dir().exists()) {
             error->setText("존재하는 상위 폴더 아래의 새 폴더 경로를 입력하세요.");

@@ -1,6 +1,11 @@
 name: Mac App Store preparation
 on:
   workflow_dispatch:
+    inputs:
+      build_number:
+        description: Increasing Apple CFBundleVersion
+        type: string
+        default: '1'
 permissions:
   contents: read
 jobs:
@@ -48,10 +53,12 @@ jobs:
           key: qtbase-6.8.3-appstore-universal-v1-${{ runner.os }}-${{ steps.sdk.outputs.key }}
       - name: Configure and build PPM against the App Store Qt runtime
         shell: bash
+        env:
+          JOBS_MAC_BUILD_NUMBER: ${{ inputs.build_number }}
         run: |
           set -euo pipefail
           export PATH="$JOBS_QT_PREFIX/bin:$PATH"
-          cmake -S . -B build-mac-store -DCMAKE_BUILD_TYPE=Release -DJOBS_MAC_APP_STORE=ON "-DCMAKE_PREFIX_PATH=$JOBS_QT_PREFIX" '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          cmake -S . -B build-mac-store -DCMAKE_BUILD_TYPE=Release -DJOBS_MAC_APP_STORE=ON "-DJOBS_MAC_BUILD_NUMBER=$JOBS_MAC_BUILD_NUMBER" "-DCMAKE_PREFIX_PATH=$JOBS_QT_PREFIX" '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
           cmake --build build-mac-store --parallel 3
       - name: Run application regressions and native presentation capture
         shell: bash
@@ -60,6 +67,11 @@ jobs:
           export PATH="$JOBS_QT_PREFIX/bin:$PATH"
           ctest --test-dir build-mac-store --output-on-failure
           python scripts/capture-workspace-ui.py build-mac-store --store
+      - name: Verify actual signed sandbox container lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/check-mac-sandbox.py build-mac-store --qt-root "$JOBS_QT_PREFIX"
       - name: Prepare a relocatable development bundle
         shell: bash
         run: |
@@ -76,7 +88,7 @@ jobs:
           python - <<'PY'
           import json, os, subprocess
           from pathlib import Path
-          data = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'qt_version': '6.8.3', 'qt_appstore_compliant': True, 'architectures': ['arm64', 'x86_64'], 'signed': False, 'sandbox_verified': False, 'store_uploadable': False, 'submitted': False, 'purpose': 'Native runtime preparation only; distribution signing, sandbox lifecycle and provisioning remain required.'}
+          data = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'qt_version': '6.8.3', 'qt_appstore_compliant': True, 'architectures': ['arm64', 'x86_64'], 'signed': False, 'sandbox_container_verified': True, 'sandbox_verified': False, 'store_uploadable': False, 'submitted': False, 'purpose': 'Runtime preparation with signed container validation. Distribution credentials and external-folder grant/cancel/bookmark restart verification remain required.'}
           Path('dist/mac-store-preparation/status.json').write_text(json.dumps(data, indent=2) + '\n')
           PY
       - name: Preserve unsigned development bundle and native evidence
@@ -88,5 +100,6 @@ jobs:
             dist/mac-store-preparation/
             build-mac-store/Testing/Temporary/
             build-mac-store/workspace-ui/
+            build-mac-store/sandbox-validation/
             build-mac-store/CMakeCache.txt
           if-no-files-found: warn

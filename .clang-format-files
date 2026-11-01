@@ -5,3 +5,4 @@ src/application/TaskEditing.cpp
 src/application/PreparedEdit.cpp
 src/ui/AsyncEditController.cpp
 src/ui/TaskTableModel.cpp
+src/ui/SandboxAccess.mm

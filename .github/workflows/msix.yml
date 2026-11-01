@@ -26,7 +26,7 @@ jobs:
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_CXX_COMPILER=$compiler/g++.exe" "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR"
       - name: Verify packaging contracts and pinned Microsoft SDK
         run: |
-          python -m unittest discover -s tests -p test_msix_packaging.py -v
+          python -m unittest discover -s tests -p "test_*packaging.py" -v
           python scripts/setup-msix-tools.py
       - name: Build development packages and upgrade fixture
         run: |

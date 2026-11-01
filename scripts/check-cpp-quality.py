@@ -17,7 +17,7 @@ def git(*args):
 def cpp_path(name):
     path = (ROOT / name).resolve()
     relative = path.relative_to(ROOT)
-    if relative.parts[0] not in ("src", "tests") or path.suffix not in (".h", ".cpp"):
+    if relative.parts[0] not in ("src", "tests") or path.suffix not in (".h", ".cpp", ".mm"):
         raise ValueError(f"not a repository C++ source: {name}")
     return path
 
@@ -31,7 +31,7 @@ def format_paths(base=None):
         revision = git("rev-parse", "--verify", "--end-of-options", f"{base}^{{commit}}").decode().strip()
         changes += git("diff", "--name-only", "--diff-filter=ACMR", "-z", revision, "HEAD", "--", "src", "tests")
     for name in changes.decode("utf-8").split("\0"):
-        if name and Path(name).suffix in (".cpp", ".h"):
+        if name and Path(name).suffix in (".cpp", ".h", ".mm"):
             names.add(name)
     # Removed enrolled files are configuration errors, not silently skipped checks.
     paths = [cpp_path(name) for name in sorted(names)]

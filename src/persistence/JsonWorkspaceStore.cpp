@@ -182,13 +182,16 @@ Workspace decodeWorkspaceFile(const QByteArray &bytes, const QString &baseDirect
     validateWorkspace(workspace, true);
     return workspace;
 }
-StoredWorkspace JsonWorkspaceStore::load(const std::string &inputPath) const {
+StoredWorkspace JsonWorkspaceStore::load(const std::string &inputPath,
+                                         const std::function<void(const std::string &)> &authorizeReference) const {
     requireNativeFilePath(qs(inputPath), "ppmworkspace");
     const auto path = files_.normalizePath(inputPath);
     const auto bytes = read(path);
     auto workspace = decodeWorkspaceFile(bytes, QFileInfo(qs(path)).absolutePath());
     for (std::size_t i = 0; i < workspace.projects.size(); ++i) {
         auto &reference = workspace.projects[i];
+        if (authorizeReference)
+            authorizeReference(reference.path);
         reference.path = files_.normalizePath(reference.path);
         for (std::size_t j = 0; j < i; ++j)
             if (files_.sameFile(reference.path, workspace.projects[j].path))

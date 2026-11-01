@@ -1,0 +1,89 @@
+name: Mac App Store signing and upload
+on:
+  workflow_dispatch:
+    inputs:
+      preparation_run:
+        description: Successful Mac App Store preparation run ID for this exact commit
+        required: true
+        type: string
+      external_folders_verified:
+        description: External folder grant/cancel and bookmark restart have passed manual Mac QA
+        type: boolean
+        default: false
+      upload:
+        description: Upload validated signed pkg to App Store Connect (does not submit review)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ppm-mac-store-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify preparation provenance and required credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREPARATION_RUN: ${{ inputs.preparation_run }}
+          MAC_APP_STORE_CERTIFICATES_P12_BASE64: ${{ secrets.MAC_APP_STORE_CERTIFICATES_P12_BASE64 }}
+          MAC_APP_STORE_CERTIFICATES_PASSWORD: ${{ secrets.MAC_APP_STORE_CERTIFICATES_PASSWORD }}
+          MAC_APP_STORE_PROVISION_PROFILE_BASE64: ${{ secrets.MAC_APP_STORE_PROVISION_PROFILE_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          python - <<'PY'
+          import importlib.util, json, os, re, subprocess
+          spec = importlib.util.spec_from_file_location('mac_store', 'scripts/package-mac-store.py')
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          missing = [name for name in module.REQUIRED if not os.environ.get(name)]
+          if missing:
+              raise SystemExit('Configure repository Secrets: ' + ', '.join(missing))
+          run_id = os.environ['PREPARATION_RUN']
+          if not re.fullmatch(r'[1-9][0-9]*', run_id):
+              raise SystemExit('Invalid preparation run ID')
+          data = json.loads(subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{run_id}']))
+          if data['head_sha'] != os.environ['GITHUB_SHA'] or data['conclusion'] != 'success' or data['path'] != '.github/workflows/mac-store-preparation.yml':
+              raise SystemExit('Preparation must be successful and match this exact source commit and workflow')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-store-preparation
+          path: build/mac-store-preparation-input
+          run-id: ${{ inputs.preparation_run }}
+          github-token: ${{ github.token }}
+      - name: Sign validate and optionally upload
+        env:
+          MAC_APP_STORE_CERTIFICATES_P12_BASE64: ${{ secrets.MAC_APP_STORE_CERTIFICATES_P12_BASE64 }}
+          MAC_APP_STORE_CERTIFICATES_PASSWORD: ${{ secrets.MAC_APP_STORE_CERTIFICATES_PASSWORD }}
+          MAC_APP_STORE_PROVISION_PROFILE_BASE64: ${{ secrets.MAC_APP_STORE_PROVISION_PROFILE_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+          MAC_SANDBOX_EXTERNAL_VERIFIED: ${{ inputs.external_folders_verified }}
+          UPLOAD_REQUESTED: ${{ inputs.upload }}
+        run: |
+          python - <<'PY'
+          import os, subprocess, sys
+          command = [sys.executable, 'scripts/package-mac-store.py', '--preparation', 'build/mac-store-preparation-input']
+          if os.environ['UPLOAD_REQUESTED'] == 'true':
+              command.append('--upload')
+          subprocess.run(command, check=True)
+          PY
+      - name: Preserve signed deliverables and redacted validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PPM-mac-store-signed
+          path: dist/mac-app-store/
+          if-no-files-found: warn

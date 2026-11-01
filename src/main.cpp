@@ -1,3 +1,4 @@
+#include "ui/SandboxAccess.h"
 #include "persistence/JsonProjectStore.h"
 #include "ui/MainWindow.h"
 #include "ui/ApplicationIcon.h"
@@ -14,6 +15,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationVersion(jobs::appVersion());
     QCoreApplication::setOrganizationName("ToolMoa");
     QApplication::setWindowIcon(jobs::applicationIcon());
+    jobs::restoreSandboxFolders();
     auto store = std::make_shared<jobs::JsonProjectStore>();
     auto recovery = std::make_shared<jobs::JsonRecoveryStore>(jobs::JsonRecoveryStore::defaultDirectory());
     jobs::UpdateController updates(jobs::updateConfig());

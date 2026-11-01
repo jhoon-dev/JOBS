@@ -1,24 +1,44 @@
 # Mac App Store 배포 구성
 
-2026-10-31 사용자 요청으로 최초 배포를 진행한다. 앱은 `Project Planning Manager`, 전용 Bundle ID는 `com.toolmoa.jobs`이다. 기존 PM Canvas 앱과 식별자·제출 기록을 공유하지 않는다.
+전용 앱은 **Project Planning Manager**, Apple 앱 ID `6829146371`, Bundle ID `com.toolmoa.jobs`, 팀 `V6445K474Q`다. 무료·지원 가능한 모든 국가에 출시한다. 다른 앱의 기록·서명 자료를 임의로 가져오지 않는다.
 
-## 현재 준비와 실제 제출의 구분
+## 준비와 실제 제출
 
-`Mac App Store preparation` 수동 workflow는 Qt 6.8.3의 qtbase 공식 source archive와 고정 SHA-256을 검증한다. qtbase는 `-feature-appstore-compliant`를 사용해 arm64/x86_64 동적 프레임워크와 내장 macdeployqt를 함께 빌드한다. 일반 macOS용 Qt 바이너리를 그대로 스토어용으로 간주하지 않는다. 앱의 네이티브 회귀와 실제 화면 캡처를 거쳐 `macdeployqt -appstore-compliant`로 별도 개발용 번들을 만든다.
+`Mac App Store preparation`은 Qt 6.8.3 공식 qtbase archive와 고정 SHA-256을 확인하고 `-feature-appstore-compliant` universal arm64/x86_64 Qt를 사용한다. 네이티브 회귀·실제 Mac 화면·별도 서명된 sandbox 검증 앱을 실행한 다음 미서명 `PPM.app` 개발 번들을 만든다. build_number 입력은 Apple CFBundleVersion이며 업로드마다 증가시킨다. 앱 버전은 0.2.0이다.
 
-이 출력은 **미서명 개발용 앱**이며, App Sandbox·서명/프로비저닝·설치/저장/복구 검증이 끝난 제출용 `.pkg`가 아니다. 출력 status JSON에도 서명·sandbox 검증·제출 가능 여부를 각각 기록한다.
+`Mac App Store signing and upload`는 **같은 커밋의 성공한 preparation run ID**를 받는다. 임시 키체인에서 앱·설치기 배포 인증서를 선택하고, 정확한 팀·Bundle ID·유효기간·인증서가 일치하는 App Store 프로파일을 검사한다. 내장 Mach-O/framework부터 앱 순서로 서명하고 최종 entitlement·pkg 서명·Apple altool validation을 확인한다. output은 서명된 앱 zip, pkg와 비밀 값을 제외한 상태·검증 결과다. 빌드 업로드는 App Store 심사 제출과 별개다.
 
-`-DJOBS_MAC_APP_STORE=ON`은 Mac 전용 업데이트 경로를 선택한다. 앱 자체의 시작/수동 HTTP 버전 확인과 Windows Store API/설치기 다운로드를 사용하지 않고 전용 Apple 앱 레코드를 App Store에서 연다. 이 옵션만으로 sandbox나 서명을 구성하지 않는다. 회귀 검사는 네트워크·Windows Store 호출이 발생하지 않는지와 실제 UI 버튼의 URL을 확인한다.
+기본값은 업로드하지 않는다. 외부 폴더 승인·취소·재실행 bookmark 접근을 실제 Mac에서 확인한 경우에만 `external_folders_verified`를 선택한다. 이 확인 없이 upload를 요청하면 실패한다. 컨테이너 자동 검증 성공을 외부 폴더 검증으로 취급하지 않는다.
 
-`JOBS_MAC_BUILD_NUMBER`는 기본값 `1`인 양의 정수이며 재업로드 때 증가시킨다. 표시 버전은 `0.2.0`이다. `capture-workspace-ui.py build --store`는 최초 표시 후 1440×900 네이티브 창 배치를 렌더링하고 실제 PNG 크기를 검증한다. 일반 화면 크기·배율 검사를 대신하지 않는다.
+## 앱의 sandbox 파일 접근
 
-## 최종 제출에 필요한 구성
+Mac Store 구성에만 `NSOpenPanel` 폴더 선택과 app-scoped bookmark 저장·시작 시 복원·stale 갱신을 포함한다. 실제 sandbox entitlement가 활성인 프로세스에서만 동작한다. 프로젝트 저장/열기, workspace와 참조 프로젝트, XML/XER 교환, 보고서 출력의 부모 폴더를 먼저 승인받고 worker에서도 GUI 스레드로 승인 요청을 전달한다. 폴더를 취소하면 해당 작업을 중단한다. scope는 비동기 파일 작업을 위해 앱 종료까지 유지하고 종료 시 반환한다.
 
-- 앱 버전 `0.2.0`과 별도 증가하는 build 번호, 전용 Bundle ID·실제 Apple 팀의 프로파일을 일치시킨다.
-- App Sandbox와 사용자 선택 파일 읽기/쓰기, 필요한 영구 접근 bookmark를 구성한다. 프로젝트 `.lock`과 원자 저장의 임시 파일, 작업 영역의 참조 프로젝트·보고서/교환 폴더 접근을 샌드박스 상태에서 검증한다. 일반 앱의 파일 접근 성공으로 대체하지 않는다.
-- Mac App Store판은 스토어가 업데이트를 관리한다. Windows 설치기 다운로드와 GitHub 자체 업데이트 설치를 사용하지 않도록 배포 채널을 구분한다.
-- 앱과 내장 Qt frameworks/plugins를 유효한 Mac App Store 배포 identity로 서명하고 프로비저닝을 포함한다. 별도 installer 배포 identity로 `.pkg`를 만든 뒤 검증·업로드한다. 인증서와 private key는 저장소·artifact에 포함하지 않는다.
-- Apple 제출용 실제 Mac 화면, 개인정보/지원 URL, 무료 가격·지원 국가, 분류·연령 등급·암호화·심사 연락처·샌드박스 사용 설명을 완성한다. 접근성이나 언어 지원을 실제 검증보다 넓게 선언하지 않는다.
-- Qt의 LGPL 고지·소스 및 재링크/실행 권한을 배포 조건에 맞게 보존한다. 서명이나 스토어 승인이 라이선스 의무를 대체하지 않는다.
+앱 컨테이너와 앱 전용 임시 위치에는 별도 폴더 승인을 요구하지 않는다. 북마크는 컨테이너의 `mac-sandbox-folders.ini`에 저장한다. Windows 및 일반 Mac 배포판은 이 권한 흐름을 사용하지 않는다. Mac Store는 App Store 업데이트를 사용하고 자체 HTTP 버전 확인·Windows 설치기 다운로드를 실행하지 않는다.
 
-공식 근거: [Qt 6.8 macOS 배포](https://doc.qt.io/qt-6.8/macos.html), [Qt 배포 도구](https://doc.qt.io/qt-6.8/macos-deployment.html), [Apple App Sandbox 파일 접근](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox), [Qt LGPL 배포 의무](https://www.qt.io/development/open-source-lgpl-obligations).
+`check-mac-sandbox.py`는 별도 ad-hoc 서명 검증 앱으로 실제 sandbox 활성 여부, 미선택 외부 파일 쓰기 거부, 프로세스 재시작 후 프로젝트·잠금·workspace·복구·설정·PDF/XLSX·XML/XER를 검사한다. 이 검증 앱은 제품 번들에 포함하지 않는다.
+
+## 이 저장소에 설정할 GitHub Actions Secrets
+
+[Repository Secrets 설정](https://github.com/jhoon-dev/JOBS/settings/secrets/actions)에서 다음 여섯 항목을 만든다. 비밀번호·인증서 private key·API private key는 채팅·소스·artifact에 넣지 않는다.
+
+| 이름 | 값 |
+|---|---|
+| `MAC_APP_STORE_CERTIFICATES_P12_BASE64` | Mac App Store 앱/설치기 배포 인증서와 각각의 private key를 함께 내보낸 P12의 base64. 앱은 Apple Distribution 또는 3rd Party Mac Developer Application, 설치기는 3rd Party Mac Developer Installer identity가 필요하다. Developer ID 배포 인증서를 대신 쓰지 않는다. |
+| `MAC_APP_STORE_CERTIFICATES_PASSWORD` | 해당 P12의 내보내기 비밀번호 |
+| `MAC_APP_STORE_PROVISION_PROFILE_BASE64` | 정확히 com.toolmoa.jobs용 Mac App Store 배포 프로파일의 base64. development/ad-hoc/와일드카드 프로파일은 거부한다. |
+| `APP_STORE_CONNECT_API_KEY_ID` | 업로드 권한이 있는 App Store Connect 팀 API key의 10자리 ID |
+| `APP_STORE_CONNECT_API_ISSUER_ID` | 해당 팀 API key의 issuer UUID |
+| `APP_STORE_CONNECT_API_PRIVATE_KEY` | AuthKey_…p8의 PEM 원문(줄바꿈 포함) |
+
+Actions는 비밀 값을 환경 변수로 전달한다. P12·프로파일·p8은 runner 임시 폴더에 제한된 권한으로 만들며, 키체인과 임시 private key는 작업 후 제거한다. 인증서 생성이나 기존 다른 앱의 private key 접근은 자동으로 수행하지 않는다. 서명 자료가 없으면 계정 소유자가 먼저 Apple 인증서·프로파일과 API key를 준비해야 한다.
+
+## 외부 폴더 수동 검증
+
+서명된 빌드를 테스트 가능한 Mac에서 실행하여 컨테이너 밖의 한국어/공백 경로에 새 프로젝트 저장·종료·재실행·재열기·수정 저장을 확인한다. 다른 폴더의 프로젝트를 참조하는 workspace 열기, PDF/XLSX 출력과 XML/XER 교환도 확인한다. 폴더 선택을 취소한 경우 기존 파일과 편집 내용이 유지되어야 한다. 폴더 이동·북마크 복원 실패 시 재승인으로 정상 동작하는지도 확인한다. 실제 결과를 기록하기 전에는 upload를 실행하지 않는다.
+
+## 현재 스토어 초안
+
+2026-11-01: 앱 이름·설명·심사 메모·실제 1440×900 Mac 스크린샷과 사용자 입력 심사 연락처를 저장했다. 사용자 동의 후 데이터 수집 없음 답변을 게시했다. 가격·국가·카테고리·연령 등급을 설정했다. 실제 서명 빌드 업로드·선택·심사 제출은 후속 단계다.
+
+공식 참고: [Apple 파일 접근](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox), [배포 서명](https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac/), [앱 빌드 업로드](https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds), [altool 옵션](https://help.apple.com/asc/appsaltool/en.lproj/static.html), [Qt 배포 도구](https://doc.qt.io/qt-6.8/macos-deployment.html).

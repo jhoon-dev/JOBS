@@ -1,3 +1,4 @@
+#include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "ui/ReportDialog.h"
 #include <QApplication>
@@ -361,6 +362,8 @@ void ReportDialog::exportFile(bool pdf) {
         return;
     if (QFileInfo(path).suffix().isEmpty())
         path += extension;
+    if (!authorizeSandboxFile(this, path))
+        return;
     if (!current() || report_ != snapshot) {
         clear();
         message_->setText("문서가 변경되어 출력을 취소했습니다. 재계산하세요.");
