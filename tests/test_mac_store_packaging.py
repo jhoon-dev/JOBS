@@ -2,6 +2,7 @@
 import copy
 from datetime import datetime, timedelta, timezone
 import importlib.util
+import json
 from pathlib import Path
 import stat
 import tempfile
@@ -28,6 +29,34 @@ class MacStorePackagingTests(unittest.TestCase):
         self.assertEqual(len(mac_store.validate_profile(self.profile)), 1)
         self.profile['ExpirationDate'] = self.profile['ExpirationDate'].replace(tzinfo=None)
         mac_store.validate_profile(self.profile)
+
+    def test_preparation_uses_app_status_with_separate_sandbox_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            bundle = root / 'dist/mac-store-preparation'
+            bundle.mkdir(parents=True)
+            archive = bundle / 'PPM-unsigned-universal.app.zip'
+            archive.write_bytes(b'archive')
+            status = {'source_revision': 'app-revision', 'sandbox_container_verified': True}
+            (bundle / 'status.json').write_text(json.dumps(status))
+            sandbox = root / 'build-mac-store/sandbox-validation'
+            sandbox.mkdir(parents=True)
+            (sandbox / 'status.json').write_text(json.dumps({'source_revision': 'probe-revision'}))
+            self.assertEqual(mac_store.preparation_inputs(root), (status, archive))
+
+    def test_preparation_rejects_unpaired_status_and_duplicate_app_archives(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'status.json').write_text('{}')
+            bundle = root / 'app'
+            bundle.mkdir()
+            (bundle / 'PPM-unsigned-universal.app.zip').write_bytes(b'archive')
+            with self.assertRaisesRegex(ValueError, 'paired status'):
+                mac_store.preparation_inputs(root)
+            (bundle / 'status.json').write_text('{}')
+            (root / 'PPM-unsigned-universal.app.zip').write_bytes(b'another archive')
+            with self.assertRaisesRegex(ValueError, 'one verified preparation app archive'):
+                mac_store.preparation_inputs(root)
 
     def test_wrong_team_app_wildcard_and_debug_profiles(self):
         for field, value in [('com.apple.application-identifier', mac_store.TEAM + '.*'),

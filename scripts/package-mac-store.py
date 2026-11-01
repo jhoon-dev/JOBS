@@ -25,6 +25,17 @@ REQUIRED = ('MAC_APP_STORE_CERTIFICATES_P12_BASE64', 'MAC_APP_STORE_CERTIFICATES
 LOCAL_SECRETS = []
 
 
+def preparation_inputs(preparation):
+    archives = list(preparation.rglob('PPM-unsigned-universal.app.zip'))
+    if len(archives) != 1:
+        raise ValueError('Expected one verified preparation app archive')
+    archive = archives[0]
+    record = archive.parent / 'status.json'
+    if not record.is_file():
+        raise ValueError('Preparation app archive is missing its paired status.json')
+    return json.loads(record.read_text()), archive
+
+
 def validate_preparation(status, revision, upload, external_verified):
     if status.get('source_revision') != revision or not status.get('qt_appstore_compliant'):
         raise ValueError('Preparation source or Qt distribution differs from this release')
@@ -120,11 +131,7 @@ def main():
         raise ValueError('Invalid App Store Connect key ID')
     uuid.UUID(os.environ['APP_STORE_CONNECT_API_ISSUER_ID'])
     preparation = args.preparation.resolve()
-    records = list(preparation.rglob('status.json'))
-    archives = list(preparation.rglob('PPM-unsigned-universal.app.zip'))
-    if len(records) != 1 or len(archives) != 1:
-        raise ValueError('Expected one verified preparation status and app archive')
-    status = json.loads(records[0].read_text())
+    status, archive = preparation_inputs(preparation)
     revision = run(['git', 'rev-parse', 'HEAD']).strip()
     external_verified = os.environ.get('MAC_SANDBOX_EXTERNAL_VERIFIED') == 'true'
     validate_preparation(status, revision, args.upload, external_verified)
@@ -136,8 +143,8 @@ def main():
         if not work.is_relative_to(temporary_root):
             raise ValueError('Signing workspace escapes runner temporary directory')
         os.chmod(work, 0o700)
-        validate_archive(archives[0], work)
-        run(['ditto', '-xk', archives[0], work])
+        validate_archive(archive, work)
+        run(['ditto', '-xk', archive, work])
         app = work / 'PPM.app'
         info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
         if info.get('CFBundleIdentifier') != BUNDLE or info.get('PPMFileAccessPolicy') != 'app-scoped-folders-v1':

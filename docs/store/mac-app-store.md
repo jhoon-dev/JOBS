@@ -41,7 +41,11 @@ Actions는 비밀 값을 환경 변수로 전달한다. P12·프로파일·p8은
 
 ## 현재 스토어 초안
 
-2026-11-01: 사용자 요청으로 기존 Apple 앱 `6829146371`은 모든 국가에서 판매를 해제한 뒤 삭제했다. 신규 앱 `6829387727`, SKU `PPM-MAC-20261101`, Bundle ID `app.toolmoa.ppm`을 생성했다. 이전 소개와 실제 Mac 스크린샷을 복원 중이며, 심사 전화번호·이메일은 브라우저에서 마스킹되어 사용자가 새 앱에 다시 입력해야 한다. 새 레코드의 가격·국가·등급·개인정보 응답은 별도 저장이 필요하다. 실제 서명 빌드 업로드·심사 제출은 미완료다.
+2026-11-01: 사용자 요청으로 기존 Apple 앱 `6829146371`은 모든 국가에서 판매를 해제한 뒤 삭제했다. 신규 앱 `6829387727`, SKU `PPM-MAC-20261101`, Bundle ID `app.toolmoa.ppm`을 생성했다. 소개와 실제 Mac 스크린샷, 심사 연락처가 저장됐고 로그인은 필요하지 않다. 무료·175개 국가 및 향후 국가 제공, 4세 이상 등급을 확인했다. 개인정보 처리방침 URL과 ‘데이터가 수집되지 않음’ 답변도 게시됐다.
+
+계정 소유자 승인 후 PPM 전용 앱/설치기 배포 인증서와 정확한 Bundle ID의 App Store 프로파일, Developer 권한 API 키를 발급해 위 Secrets 6개에 등록했다. API 팀 키는 팀 전체 앱에 권한이 있으나 이 저장소는 PPM만 처리한다. private key와 비밀번호는 저장소 및 공개 artifact에 포함하지 않는다. 실제 Mac의 외부 폴더 승인·취소·재실행 검증은 아직 미완료이므로 서명·Apple 유효성 검사까지만 실행하고 업로드 및 심사 제출은 보류한다.
+
+preparation artifact에는 앱과 별도 Sandbox 검증의 `status.json`이 함께 있다. 서명 단계는 유일한 `PPM-unsigned-universal.app.zip`과 같은 디렉터리의 상태 파일만 읽으며, 다른 검증 상태 파일을 앱의 출처 확인에 사용하지 않는다.
 
 공식 참고: [Apple 파일 접근](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox), [배포 서명](https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac/), [앱 빌드 업로드](https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds), [altool 옵션](https://help.apple.com/asc/appsaltool/en.lproj/static.html), [Qt 배포 도구](https://doc.qt.io/qt-6.8/macos-deployment.html).
 
