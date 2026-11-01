@@ -91,7 +91,7 @@ QUrl storeUpdatesUrl() {
     return QUrl("ms-windows-store://downloadsandupdates");
 }
 QUrl macAppStoreUrl() {
-    return QUrl("macappstore://apps.apple.com/app/id6829146371");
+    return QUrl("macappstore://apps.apple.com/app/id6829387727");
 }
 bool releasePageAllowed(const QUrl &url) {
     return https(url) && url.host() == "github.com" && url.query().isEmpty() &&

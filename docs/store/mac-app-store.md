@@ -1,6 +1,6 @@
 # Mac App Store 배포 구성
 
-전용 앱은 **Project Planning Manager**, Apple 앱 ID `6829146371`, Bundle ID `com.toolmoa.jobs`, 팀 `V6445K474Q`다. 무료·지원 가능한 모든 국가에 출시한다. 다른 앱의 기록·서명 자료를 임의로 가져오지 않는다.
+전용 앱은 **Project Planning Manager**, Apple 앱 ID `6829387727`, Bundle ID `app.toolmoa.ppm`, 팀 `V6445K474Q`다. 무료·지원 가능한 모든 국가에 출시한다. 다른 앱의 기록·서명 자료를 임의로 가져오지 않는다.
 
 ## 준비와 실제 제출
 
@@ -26,7 +26,7 @@ Mac Store 구성에만 `NSOpenPanel` 폴더 선택과 app-scoped bookmark 저장
 |---|---|
 | `MAC_APP_STORE_CERTIFICATES_P12_BASE64` | Mac App Store 앱/설치기 배포 인증서와 각각의 private key를 함께 내보낸 P12의 base64. 앱은 Apple Distribution 또는 3rd Party Mac Developer Application, 설치기는 3rd Party Mac Developer Installer identity가 필요하다. Developer ID 배포 인증서를 대신 쓰지 않는다. |
 | `MAC_APP_STORE_CERTIFICATES_PASSWORD` | 해당 P12의 내보내기 비밀번호 |
-| `MAC_APP_STORE_PROVISION_PROFILE_BASE64` | 정확히 com.toolmoa.jobs용 Mac App Store 배포 프로파일의 base64. development/ad-hoc/와일드카드 프로파일은 거부한다. |
+| `MAC_APP_STORE_PROVISION_PROFILE_BASE64` | 정확히 app.toolmoa.ppm용 Mac App Store 배포 프로파일의 base64. development/ad-hoc/와일드카드 프로파일은 거부한다. |
 | `APP_STORE_CONNECT_API_KEY_ID` | 업로드 권한이 있는 App Store Connect 팀 API key의 10자리 ID |
 | `APP_STORE_CONNECT_API_ISSUER_ID` | 해당 팀 API key의 issuer UUID |
 | `APP_STORE_CONNECT_API_PRIVATE_KEY` | AuthKey_…p8의 PEM 원문(줄바꿈 포함) |
@@ -39,6 +39,15 @@ Actions는 비밀 값을 환경 변수로 전달한다. P12·프로파일·p8은
 
 ## 현재 스토어 초안
 
-2026-11-01: 앱 이름·설명·심사 메모·실제 1440×900 Mac 스크린샷과 사용자 입력 심사 연락처를 저장했다. 사용자 동의 후 데이터 수집 없음 답변을 게시했다. 가격·국가·카테고리·연령 등급을 설정했다. 실제 서명 빌드 업로드·선택·심사 제출은 후속 단계다.
+2026-11-01: 사용자 요청으로 기존 Apple 앱 `6829146371`은 모든 국가에서 판매를 해제한 뒤 삭제했다. 신규 앱 `6829387727`, SKU `PPM-MAC-20261101`, Bundle ID `app.toolmoa.ppm`을 생성했다. 이전 소개와 실제 Mac 스크린샷을 복원 중이며, 심사 전화번호·이메일은 브라우저에서 마스킹되어 사용자가 새 앱에 다시 입력해야 한다. 새 레코드의 가격·국가·등급·개인정보 응답은 별도 저장이 필요하다. 실제 서명 빌드 업로드·심사 제출은 미완료다.
 
 공식 참고: [Apple 파일 접근](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox), [배포 서명](https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac/), [앱 빌드 업로드](https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds), [altool 옵션](https://help.apple.com/asc/appsaltool/en.lproj/static.html), [Qt 배포 도구](https://doc.qt.io/qt-6.8/macos-deployment.html).
+
+
+## Windows에서 인증서 준비
+
+Mac 없이도 `scripts/prepare-apple-signing.py`로 CSR을 준비할 수 있다. `cryptography==50.0.2`가 설치된 Python과 PowerShell 7이 필요하다. `init`은 `build/apple-signing-private`에 암호화된 키·내보내기 비밀번호를 보관하고 현재 Windows 사용자·SYSTEM·Administrators만 접근하도록 제한한다. 이미 생성된 키를 덮어쓰지 않는다. 공개 CSR 두 개는 `build/apple-signing-requests`에 저장한다.
+
+Apple Developer Certificates에서 앱용 Apple Distribution과 설치기용 Mac Installer Distribution을 선택하고 각각 `PPM-application.certSigningRequest`, `PPM-installer.certSigningRequest`를 올려 공개 `.cer` 파일을 발급받는다. 새 보안 자격증명의 최종 발급은 계정 소유자가 확인한다. `assemble --application-certificate <앱.cer> --installer-certificate <설치기.cer>`는 키·팀·종류·만료를 검사하고 Windows 임시 키 저장소만 사용하여 두 인증서와 키를 합친 P12 및 base64 파일을 같은 보호 폴더에 만든다.
+
+Apple Developer Profiles에서 macOS App Store 배포 프로파일을 새로 만들고 정확히 `app.toolmoa.ppm` App ID와 앱 배포 인증서를 지정한다. 다운로드한 프로파일과 위 P12, 해당 비밀번호 및 App Store Connect API 키를 이 저장소 Secrets 6개에 등록한다. private key·비밀번호는 채팅에 붙여 넣지 않는다.

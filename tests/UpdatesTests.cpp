@@ -423,7 +423,7 @@ private slots:
         QVERIFY(!window.findChild<QCheckBox *>("updateAutomatic")->isEnabled());
         window.findChild<QPushButton *>("checkApplicationUpdate")->click();
         window.findChild<QPushButton *>("installApplicationUpdate")->click();
-        QCOMPARE(opened, QUrl("macappstore://apps.apple.com/app/id6829146371"));
+        QCOMPARE(opened, QUrl("macappstore://apps.apple.com/app/id6829387727"));
         QCOMPARE(network.requests.size(), 0);
         QCOMPARE(store->calls, 0);
     }

@@ -18,7 +18,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 TEAM = 'V6445K474Q'
-BUNDLE = 'com.toolmoa.jobs'
+BUNDLE = 'app.toolmoa.ppm'
 REQUIRED = ('MAC_APP_STORE_CERTIFICATES_P12_BASE64', 'MAC_APP_STORE_CERTIFICATES_PASSWORD',
             'MAC_APP_STORE_PROVISION_PROFILE_BASE64', 'APP_STORE_CONNECT_API_KEY_ID',
             'APP_STORE_CONNECT_API_ISSUER_ID', 'APP_STORE_CONNECT_API_PRIVATE_KEY')
@@ -204,7 +204,7 @@ def main():
             run(['ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', app, output / 'PPM-signed.app.zip'])
             if args.upload:
                 (output / 'upload.log').write_text(run([
-                    'xcrun', 'altool', '--upload-package', package, '--apple-id', '6829146371', '--bundle-id', BUNDLE,
+                    'xcrun', 'altool', '--upload-package', package, '--apple-id', '6829387727', '--bundle-id', BUNDLE,
                     '--bundle-short-version-string', info['CFBundleShortVersionString'],
                     '--bundle-version', info['CFBundleVersion'], *authentication], cwd=work, environment=api_environment))
             result = {'source_revision': revision, 'bundle_id': BUNDLE, 'version': info['CFBundleShortVersionString'],
