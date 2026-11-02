@@ -1,8 +1,10 @@
 # Microsoft Store 제출 준비와 남은 절차
 
-2026-11-01. Windows 사용자 배포는 **Microsoft Store가 서명·제공하는 MSIX만** 사용한다. EXE/NSIS 설치기와 unsigned 개발 패키지는 배포하지 않는다. 무료·지원 가능한 모든 국가가 출시 방침이다.
+2026-11-02. Windows 사용자 배포는 **Microsoft Store가 서명·제공하는 MSIX만** 사용한다. EXE/NSIS 설치기와 unsigned 개발 패키지는 배포하지 않는다. 무료·지원 가능한 모든 국가가 출시 방침이다.
 
-기존 제품 `9NDHXXVR8F2P`와 제출은 사용자 승인 후 삭제했다. 신규 `Project Planning Manager` 등록은 이름 예약/계정 권한 오류로 완료되지 않았다. 이전 패키지의 Validated·인증 접수 기록은 과거 이력이며 현재 제출 상태가 아니다. 새 제품 ID와 실제 패키지 identity를 받은 뒤 최신 소스로 다시 패키징·검증·제출해야 한다.
+기존 제품 `9NDHXXVR8F2P`와 제출은 사용자 승인 후 삭제했다. 2026-11-02 Partner Center에서 새 `Project Planning Manager` 제품 `9N0PRBD80X6B`의 첫 제출(1.0.4.0)이 Microsoft Store에 게시된 것을 확인했다. 현재 identity는 `jhoon-dev.ProjectPlanningManager`, Publisher `CN=C488F7ED-2611-417D-B3ED-C39E81B7590E`, PublisherDisplayName `JIN HOON KIM`이다. 이후 업데이트는 이 제품과 identity를 유지한다. 이전 제품의 identity를 재사용하지 않는다.
+
+같은 날 소스 `2f36a20306ac2a75f49b2a0d6dbd845ca317c374`의 Store x64 패키지 `1.0.5.0`을 새 제출 `1152921505702293596`(제출 2)에 올렸다. MakeAppx·독립 archive 검증과 Partner Center `Validated`를 확인하고, 한국어·영어 UI 수정 릴리스 노트를 저장한 뒤 인증을 위해 제출했다. 인증 통과 즉시 자동 게시하는 설정이다. 인증 접수는 업데이트의 공개 완료를 뜻하지 않는다. 패키지 SHA-256은 `2e317229ba7fcbb77636363cb9f39e670f115e307dd8afd1c04d8ec94ba20fed`이며, [설치·업데이트·제거 CI](https://github.com/jhoon-dev/JOBS/actions/runs/41389361473)가 성공했다. 로컬 WACK 실행 결과는 없다.
 
 ## 1. 지금 준비한 파일
 
@@ -17,8 +19,8 @@ Microsoft Store는 단일 아키텍처 `.msix` 제출을 지원한다. 이 파�
 
 - [x] Microsoft Partner Center 개발자 계정 등록 완료(사용자 확인).
 - [x] 기존 전용 앱에 Project Planning Manager 이름 예약 완료.
-- [ ] 제품 관리 → 제품 ID/앱 ID 화면에서 `Package/Identity/Name`, `Package/Identity/Publisher`, `Package/Properties/PublisherDisplayName`을 정확하게 복사한다. 대소문자·공백·구두점을 유지한다.
-- [ ] `DisplayName`은 예약한 앱 표시명으로 입력한다. JSON 서식의 네 필드를 모두 채운 별도 파일을 준비한다.
+- [x] 제품 관리 → 제품 ID 화면에서 현재 제품 `9N0PRBD80X6B`의 세 identity 필드를 확인했다. 대소문자·공백·구두점을 유지한다.
+- [x] `DisplayName`은 예약한 `Project Planning Manager`이며 `build/store-identity.json`에 현재 네 필드가 있다.
 - [ ] 게시자 표시명/문의, 가격(무료/유료), 출시 국가, 연령 등급, 분류, 출시 시기와 공개 범위를 결정한다. 현재 앱에는 앱 내 구매나 광고 기능이 없다.
 
 ## 3. 제출용 파일 생성
