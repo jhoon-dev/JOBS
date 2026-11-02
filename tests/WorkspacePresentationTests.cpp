@@ -3,6 +3,7 @@
 #include "ui/MainWindow.h"
 #include "ui/GanttView.h"
 #include "ui/ApplicationIcon.h"
+#include <QAbstractScrollArea>
 #include <QAction>
 #include <QComboBox>
 #include <QDir>
@@ -27,6 +28,17 @@
 #include <QScreen>
 
 namespace {
+int paneContentHeight(const QAbstractScrollArea *area) {
+    const auto *viewport = area->viewport();
+    const auto *bar = area->horizontalScrollBar();
+    const QRect viewportRect(viewport->mapTo(area, QPoint()), viewport->size());
+    const QRect barRect(bar->mapTo(area, QPoint()), bar->size());
+    // Native macOS may hide a redundant bar even with ScrollBarAlwaysOn.
+    // Compare the pane space including a reserved bar, but count overlay bars
+    // only once. The exact row origins and header heights are checked below.
+    const int reserved = bar->isVisible() && !barRect.intersects(viewportRect) ? bar->height() : 0;
+    return viewport->height() + reserved;
+}
 class PaintCoverage : public QObject {
 public:
     QRegion painted;
@@ -102,6 +114,8 @@ private slots:
         for (const auto &size : {QSize(1024, 650), QSize(1280, 720), QSize(1440, 900)}) {
             window.resize(size);
             QTest::qWait(20);
+            QTRY_COMPARE(paneContentHeight(tree), paneContentHeight(table));
+            QTRY_COMPARE(paneContentHeight(gantt) - jobs::GanttView::HeaderHeight, paneContentHeight(table));
             auto *search = window.findChild<QLineEdit *>("taskSearch");
             const int expected = search->height();
             QJsonObject positions;
@@ -117,6 +131,11 @@ private slots:
                                             {"pane_header_height", tree->header()->height()},
                                             {"row_height", tree->visualItemRect(tree->topLevelItem(0)).height()},
                                             {"table_viewport_height", table->viewport()->height()},
+                                            {"tree_viewport_height", tree->viewport()->height()},
+                                            {"gantt_viewport_height", gantt->viewport()->height()},
+                                            {"tree_pane_content_height", paneContentHeight(tree)},
+                                            {"table_pane_content_height", paneContentHeight(table)},
+                                            {"gantt_pane_content_height", paneContentHeight(gantt)},
                                             {"dpr", window.devicePixelRatioF()},
                                             {"controls", positions}});
             if (!folder.isEmpty()) {
@@ -138,8 +157,6 @@ private slots:
             QCOMPARE(tree->header()->height(), jobs::GanttView::HeaderHeight);
             QCOMPARE(tree->visualItemRect(tree->topLevelItem(0)).height(), jobs::GanttView::RowHeight);
             QCOMPARE(tree->viewport()->mapTo(&window, QPoint()).y(), table->viewport()->mapTo(&window, QPoint()).y());
-            QCOMPARE(tree->viewport()->height(), table->viewport()->height());
-            QCOMPARE(gantt->viewport()->height() - jobs::GanttView::HeaderHeight, table->viewport()->height());
             QVERIFY(table->viewport()->height() >= jobs::GanttView::RowHeight * 4);
         }
         if (!folder.isEmpty()) {
