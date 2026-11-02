@@ -1,4 +1,5 @@
 #include "ui/UpdateUi.h"
+#include "ui/EditorUi.h"
 #include "application/ProductIdentity.h"
 #include "updates/UpdateController.h"
 #include <QApplication>
@@ -121,6 +122,7 @@ void attachUpdateUi(QMainWindow &window, UpdateController &controller, UpdateUiH
                 status->setText("스토어를 열지 못했습니다. 운영체제의 스토어 앱을 직접 열어 주세요.");
         });
         refresh();
+        prepareEditorDialog(*dialog);
         dialog->show();
     });
     controller.scheduleStartup([owner = QPointer<QMainWindow>(&window)] {

@@ -1,6 +1,7 @@
 #include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/ApplicationIcon.h"
 #include "ui/DesktopWorkspace.h"
 #include "ui/GanttView.h"
@@ -172,6 +173,7 @@ MainWindow::MainWindow(Document &document, JsonRecoveryStore *recoveryStore, Des
     calculationProgressLabel_ = new QLabel;
     calculationProgressLabel_->setObjectName("scheduleProgress");
     statusBar()->addPermanentWidget(calculationProgressLabel_);
+    calculationProgressLabel_->hide();
     calculationProgressTimer_ = new QTimer(this);
     calculationProgressTimer_->setInterval(100);
     connect(calculationProgressTimer_, &QTimer::timeout, this, [this] {
@@ -615,6 +617,7 @@ void MainWindow::calculateSchedule() {
     const auto control = calculationControl_;
     calculationSession_ = document_.sessionGeneration();
     calculationProgressLabel_->setText("일정 계산 준비 중…");
+    calculationProgressLabel_->show();
     calculationProgressTimer_->start();
     refresh();
     auto *watcher = new QFutureWatcher<ScheduleResult>(this);
@@ -626,6 +629,7 @@ void MainWindow::calculateSchedule() {
                 calculating_ = false;
                 calculationProgressTimer_->stop();
                 calculationProgressLabel_->clear();
+                calculationProgressLabel_->hide();
                 calculationControl_.reset();
                 try {
                     if (document_.sessionGeneration() == session) {
@@ -775,6 +779,7 @@ void MainWindow::chooseWbs(bool moveNode) {
     layout->addRow(buttons);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return;
     try {
@@ -812,6 +817,7 @@ void MainWindow::editHolidays() {
     layout->addWidget(buttons);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return;
     std::vector<std::string> holidays;
@@ -907,6 +913,7 @@ void MainWindow::create() {
         }
         dialog.accept();
     });
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted || !confirmChanges())
         return;
     std::vector<std::string> names;

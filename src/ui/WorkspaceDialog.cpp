@@ -1,4 +1,5 @@
 #include "ui/WorkspaceDialog.h"
+#include "ui/EditorUi.h"
 #include "ui/DesktopWorkspace.h"
 #include "formatting/QtDiagnosticText.h"
 #include <QAbstractTableModel>
@@ -337,6 +338,7 @@ WorkspaceDialog::WorkspaceDialog(DesktopWorkspace &workspace, QWidget *parent)
     timer->setInterval(150);
     connect(timer, &QTimer::timeout, this, [this] { refresh(); });
     timer->start();
+    prepareEditorDialog(*this);
     refresh();
 }
 WorkspaceDialog::~WorkspaceDialog() {
@@ -482,6 +484,7 @@ void WorkspaceDialog::editResource(bool create) {
             error->setText(qErrorText(exception));
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }
@@ -549,6 +552,7 @@ void WorkspaceDialog::bindResource() {
             error->setText(qErrorText(exception));
         }
     });
+    prepareEditorDialog(dialog);
     dialog.exec();
     refresh();
 }

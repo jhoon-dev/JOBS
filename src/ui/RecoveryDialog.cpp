@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/RecoveryDialog.h"
+#include "ui/EditorUi.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -82,6 +83,7 @@ RecoveryDialog::RecoveryDialog(JsonRecoveryStore store, QWidget *parent, std::op
     connect(restore_, &QPushButton::clicked, this, &RecoveryDialog::restore);
     connect(discard_, &QPushButton::clicked, this, &RecoveryDialog::discard);
     connect(table_, &QTableWidget::itemSelectionChanged, this, &RecoveryDialog::select);
+    prepareEditorDialog(*this);
     if (initial)
         populate(std::move(*initial));
     else

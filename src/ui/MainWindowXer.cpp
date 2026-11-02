@@ -2,6 +2,7 @@
 #include "formatting/QtDiagnosticText.h"
 #include "persistence/PrimaveraXer.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/ExchangeOperation.h"
 #include <QComboBox>
 #include <QDialog>
@@ -63,12 +64,14 @@ QString preview(QWidget *parent, const PrimaveraXerExchange &e, const QString &p
         }
         dialog.accept();
     });
+    prepareEditorDialog(dialog);
     return dialog.exec() == QDialog::Accepted ? destination->text().trimmed() : QString{};
 }
 std::optional<XerEncoding> encoding(QWidget *parent) {
     QDialog dialog(parent);
     dialog.setObjectName("xerEncodingDialog");
     dialog.setWindowTitle("XER 원본 문자 인코딩");
+    dialog.resize(580, 240);
     auto *layout = new QVBoxLayout(&dialog);
     auto *label = new QLabel(
         "원본 인코딩을 선택하세요. 자동 추측하지 않습니다.\nCP949 등은 원본을 보관하고 UTF-8 사본으로 변환해야 합니다.",
@@ -83,6 +86,7 @@ std::optional<XerEncoding> encoding(QWidget *parent) {
     layout->addWidget(buttons);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return {};
     return choice->currentIndex() == 0 ? XerEncoding::Utf8 : XerEncoding::Windows1252;

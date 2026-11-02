@@ -98,7 +98,10 @@ int main(int argc, char **argv) {
         view->setDayWidth(16);
         check(view->scene()->items().size() < bound(), "zoom expanded all graphics");
         const auto before = *doc.project();
+        auto *progress = window.findChild<QLabel *>("scheduleProgress");
+        check(progress && !progress->isVisible(), "idle schedule progress occupies status bar");
         calculate->trigger();
+        check(progress->isVisible() && !progress->text().isEmpty(), "schedule progress not shown during request");
         check(cancel->isEnabled(), "cancel not enabled during request");
         cancel->trigger();
         check(wait([&] { return calculate->isEnabled(); }) &&
@@ -111,12 +114,14 @@ int main(int argc, char **argv) {
             check(item->data(1) != "task" && item->data(1) != "milestone", "cancel left normal bars");
         check(!cancel->isEnabled() && window.findChild<QLabel *>("scheduleProgress")->text().isEmpty(),
               "terminal progress not cleared");
+        check(!progress->isVisible(), "cancelled schedule progress still occupies status bar");
         window.grab().save("performance-cancel-smoke.png");
         calculate->trigger();
         check(wait([&] { return calculate->isEnabled(); }) &&
                   doc.calculation()->status == jobs::CalculationStatus::Valid &&
                   doc.calculation()->tasks.size() == 1000,
               "UI restart failed");
+        check(!progress->isVisible(), "completed schedule progress still occupies status bar");
         // A drag edit queues a fresh revision while the old snapshot is running.
         calculate->trigger();
         view->taskEdited(doc.project()->documentId, doc.project()->revision, "T0", false, "2026-10-27 09:00");

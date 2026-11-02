@@ -1,6 +1,7 @@
 #include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/ExchangeOperation.h"
 #include "persistence/ProjectXml.h"
 #include <QDialog>
@@ -63,6 +64,7 @@ QString preview(QWidget *parent, const ProjectXmlExchange &e, const QString &pro
         }
         dialog.accept();
     });
+    prepareEditorDialog(dialog);
     return dialog.exec() == QDialog::Accepted ? destination->text().trimmed() : QString{};
 }
 } // namespace

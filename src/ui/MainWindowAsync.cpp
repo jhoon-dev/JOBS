@@ -31,6 +31,7 @@ void MainWindow::setupAsyncEditing(QToolBar *tools) {
     editProgress_ = new QLabel;
     editProgress_->setObjectName("editProgress");
     statusBar()->addPermanentWidget(editProgress_);
+    editProgress_->hide();
     editProgressTimer_ = new QTimer(this);
     editProgressTimer_->setInterval(100);
     connect(cancelEdit_, &QAction::triggered, this, [this] {
@@ -48,6 +49,7 @@ void MainWindow::setupAsyncEditing(QToolBar *tools) {
     });
     editController_->stateChanged = [this] {
         const bool busy = editController_->busy();
+        editProgress_->setVisible(busy);
         const auto control = editController_->control();
         cancelEdit_->setEnabled(busy && control && !control->cancelRequested.load());
         if (busy) {

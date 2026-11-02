@@ -123,6 +123,8 @@ int main(int argc, char **argv) {
         auto before = *document.project();
         const auto disk = bytes(path);
         auto *cancel = action(window, "cancelEdit");
+        auto *editProgress = window.findChild<QLabel *>("editProgress");
+        check(editProgress && !editProgress->isVisible(), "idle edit progress occupies status bar");
         int heartbeats = 0;
         qint64 maxGapNs = 0;
         bool measuredPhase = true;
@@ -142,6 +144,7 @@ int main(int argc, char **argv) {
         elapsed.start();
         check(setCellText(table, 0, 1, "2") && controller->busy() && cancel->isEnabled(),
               "inverse edit was synchronous or cancel unavailable");
+        check(editProgress->isVisible() && !editProgress->text().isEmpty(), "busy edit progress is hidden");
         const double enqueueMs = double(elapsed.nsecsElapsed()) / 1000000;
         bool running = false;
         QTimer cancelWhenRunning;
@@ -159,6 +162,7 @@ int main(int argc, char **argv) {
               "GUI heartbeat or running cancellation failed");
         measuredPhase = false;
         cancelWhenRunning.stop();
+        check(!editProgress->isVisible(), "cancelled edit progress still occupies status bar");
         check(*document.project() == before && !document.dirty() && !document.canUndo() && bytes(path) == disk,
               "cancel modified the input/history/source file");
         std::cout << "stage: responsive running cancellation" << std::endl;
@@ -186,6 +190,7 @@ int main(int argc, char **argv) {
                   document.project()->tasks[0].workUnitMinutes == 6000 &&
                   document.project()->assignments[0].units == 50,
               "asynchronous inverse edit did not preserve work/apply assignments");
+        check(!editProgress->isVisible(), "completed edit progress still occupies status bar");
         const double settledMs = double(elapsed.nsecsElapsed()) / 1000000;
         measuredPhase = false;
         action(window, "undoEdit")->trigger();

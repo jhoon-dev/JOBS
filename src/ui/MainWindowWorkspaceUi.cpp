@@ -187,6 +187,9 @@ void MainWindow::setupWorkspaceUi(QToolBar *tools, QComboBox *zoom) {
     workspaceSplit_->setStretchFactor(1, 1);
     workspaceSplit_->setStretchFactor(2, 1);
     setStyleSheet(
+        // Native status-item frames leave bright vertical strokes around empty
+        // progress labels, especially with the Windows dark palette.
+        "QStatusBar::item { border: 0; }"
         "QToolBar { spacing: 4px; padding: 6px; border: 0; border-bottom: 1px solid palette(midlight); }"
         "QToolBar[compactWorkspace=\"true\"] { padding: 2px 6px; }"
         "QToolBar QToolButton { padding: 6px 8px; }"

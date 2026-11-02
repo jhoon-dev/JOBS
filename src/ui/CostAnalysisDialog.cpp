@@ -60,22 +60,29 @@ protected:
         p.setRenderHint(QPainter::Antialiasing);
         p.fillRect(rect(), palette().base());
         p.setPen(palette().text().color());
-        p.drawText(QRectF(12, 8, width() - 24, 30),
-                   "선택 기준선 누적 금액 · PV 계획 / EV 획득 / AC 실제 · 미정 구간은 연결하지 않습니다.");
+        const QString title = "선택 기준선 누적 금액 · PV 계획 / EV 획득 / AC 실제 · 미정 구간은 연결하지 않습니다.";
+        const auto titleHeight =
+            p.fontMetrics()
+                .boundingRect(QRect(0, 0, std::max(1, width() - 24), 1000), Qt::TextWordWrap, title)
+                .height();
+        p.drawText(QRectF(12, 8, width() - 24, titleHeight), Qt::TextWordWrap, title);
         if (days_.empty()) {
             p.drawText(rect(), Qt::AlignCenter, "표시할 기간 데이터가 없습니다.");
             return;
         }
-        const QRectF plot(115, 65, std::max(1, width() - 150), std::max(1, height() - 110));
         std::int64_t maximum = 1;
         for (const auto &d : days_)
             for (auto n : {d.pv, d.ev, d.ac})
                 if (n)
                     maximum = std::max(maximum, *n);
+        const auto maximumText = moneyui::format(maximum, currency_);
+        const int left = std::max(115, p.fontMetrics().horizontalAdvance(maximumText) + 20);
+        const int top = std::max(65, titleHeight + 46);
+        const QRectF plot(left, top, std::max(1, width() - left - 35), std::max(1, height() - top - 45));
         p.drawLine(plot.bottomLeft(), plot.topLeft());
         p.drawLine(plot.bottomLeft(), plot.bottomRight());
-        p.drawText(QRectF(5, plot.top() - 10, 105, 25), Qt::AlignRight, moneyui::format(maximum, currency_));
-        p.drawText(QRectF(5, plot.bottom() - 10, 105, 25), Qt::AlignRight, "0 " + qs(currency_));
+        p.drawText(QRectF(5, plot.top() - 10, left - 10, 25), Qt::AlignRight, maximumText);
+        p.drawText(QRectF(5, plot.bottom() - 10, left - 10, 25), Qt::AlignRight, "0 " + qs(currency_));
         auto first = QDate::fromString(qs(days_.front().date), Qt::ISODate),
              last = QDate::fromString(qs(days_.back().date), Qt::ISODate);
         const auto range = std::max<qint64>(1, first.daysTo(last));
@@ -83,7 +90,7 @@ protected:
         const QString names[]{"PV", "EV", "AC"};
         for (int series = 0; series < 3; ++series) {
             p.setPen(QPen(colors[series], 2));
-            p.drawText(QRectF(120 + series * 85, 37, 80, 25), names[series]);
+            p.drawText(QRectF(left + series * 85, top - 28, 80, 25), names[series]);
             QPainterPath path;
             bool connected = false;
             for (const auto &d : days_) {

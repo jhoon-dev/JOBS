@@ -1,5 +1,6 @@
 #include "formatting/QtDiagnosticText.h"
 #include "ui/MainWindow.h"
+#include "ui/EditorUi.h"
 #include "ui/GanttView.h"
 #include "ui/TaskInput.h"
 #include "ui/TaskViewProjection.h"
@@ -334,6 +335,7 @@ void MainWindow::insertSelectedTasks() {
     layout->addWidget(buttons);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    prepareEditorDialog(dialog);
     if (dialog.exec() != QDialog::Accepted)
         return;
     try {

@@ -1,6 +1,7 @@
 #include "ui/SandboxAccess.h"
 #include "formatting/QtDiagnosticText.h"
 #include "ui/ReportDialog.h"
+#include "ui/EditorUi.h"
 #include <QApplication>
 #include <QAbstractTableModel>
 #include <QTableView>
@@ -26,6 +27,8 @@
 #include <QCloseEvent>
 #include <QTimer>
 #include <QRegularExpression>
+#include <QResizeEvent>
+#include <algorithm>
 namespace jobs {
 namespace {
 class ReportModel final : public QAbstractTableModel {
@@ -56,6 +59,8 @@ public:
                             : Qt::AlignLeft));
         if (role == Qt::BackgroundRole && std::holds_alternative<std::monostate>(c.value))
             return QColor("#fff1cc");
+        if (role == Qt::ForegroundRole && std::holds_alternative<std::monostate>(c.value))
+            return QColor("#4f3100");
         return {};
     }
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override {
@@ -71,12 +76,48 @@ class Trend final : public QWidget {
 
 public:
     Trend(std::shared_ptr<const ProjectReport> r, QWidget *p) : QWidget(p), report_(std::move(r)) {
-        setMinimumSize(600, 280);
+        setObjectName("reportCostTrend");
+        setMinimumSize(260, 280);
     }
     void paintEvent(QPaintEvent *) override {
         QPainter painter(this);
         paintCostTrend(painter, rect(), *report_, font());
     }
+};
+class Dashboard final : public QWidget {
+public:
+    QGridLayout *cards = new QGridLayout;
+    explicit Dashboard(QWidget *parent = nullptr) : QWidget(parent) {
+        setObjectName("reportDashboard");
+        auto *body = new QVBoxLayout(this);
+        body->setSizeConstraint(QLayout::SetNoConstraint);
+        body->addLayout(cards);
+    }
+    QSize minimumSizeHint() const override {
+        return {260, layout()->minimumSize().height()};
+    }
+
+protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QWidget::resizeEvent(event);
+        const auto columns = std::clamp((width() - 24) / 230, 1, 4);
+        if (columns == columns_)
+            return;
+        columns_ = columns;
+        QList<QWidget *> widgets;
+        while (auto *item = cards->takeAt(0)) {
+            widgets.push_back(item->widget());
+            delete item;
+        }
+        for (int i = 0; i < widgets.size(); ++i)
+            cards->addWidget(widgets[i], i / columns, i % columns);
+        for (int i = 0; i < 4; ++i)
+            cards->setColumnStretch(i, i < columns ? 1 : 0);
+        updateGeometry();
+    }
+
+private:
+    int columns_ = 0;
 };
 struct Prepared {
     std::shared_ptr<const ProjectReport> report;
@@ -153,12 +194,12 @@ ReportDialog::ReportDialog(Document &d, const std::string &wbs, const std::strin
     tabs_ = new QTabWidget;
     tabs_->setObjectName("reportTabs");
     layout->addWidget(tabs_, 1);
-    auto *outputs = new QHBoxLayout;
-    layout->addLayout(outputs);
+    auto *formats = new QHBoxLayout;
+    layout->addLayout(formats);
     family_ = new QComboBox;
     family_->setObjectName("reportFamily");
     family_->addItems({"전체 보고서", "일정 보고서", "자원 보고서", "원가 보고서"});
-    outputs->addWidget(family_);
+    formats->addWidget(family_);
     paper_ = new QComboBox;
     paper_->setObjectName("reportPaper");
     paper_->addItems({"PDF A4", "PDF A3"});
@@ -167,9 +208,11 @@ ReportDialog::ReportDialog(Document &d, const std::string &wbs, const std::strin
     orientation_->setObjectName("reportOrientation");
     fontSize_ = new QComboBox;
     fontSize_->addItems({"9 pt", "10 pt", "11 pt", "12 pt"});
-    outputs->addWidget(paper_);
-    outputs->addWidget(orientation_);
-    outputs->addWidget(fontSize_);
+    formats->addWidget(paper_);
+    formats->addWidget(orientation_);
+    formats->addWidget(fontSize_);
+    auto *outputs = new QHBoxLayout;
+    layout->addLayout(outputs);
     outputs->addStretch();
     xlsx_ = new QPushButton("엑셀 내보내기…");
     xlsx_->setObjectName("exportXlsx");
@@ -204,6 +247,7 @@ ReportDialog::ReportDialog(Document &d, const std::string &wbs, const std::strin
         }
     });
     timer->start();
+    prepareEditorDialog(*this);
     prepare();
 }
 bool ReportDialog::current() const {
@@ -287,14 +331,16 @@ void ReportDialog::showReport() {
                           .arg(reportText(report_->options.reportId))
                           .arg(reportText(report_->options.generatedAt)));
     auto *scroll = new QScrollArea;
+    scroll->setObjectName("reportDashboardScroll");
+    scroll->setFrameShape(QFrame::NoFrame);
     scroll->setWidgetResizable(true);
-    auto *overview = new QWidget;
-    auto *layout = new QVBoxLayout(overview);
-    auto *grid = new QGridLayout;
-    layout->addLayout(grid);
+    auto *overview = new Dashboard;
+    auto *layout = qobject_cast<QVBoxLayout *>(overview->layout());
+    auto *grid = overview->cards;
     int n = 0;
     for (const auto &k : report_->kpis) {
         auto *card = new QFrame;
+        card->setObjectName("reportKpiCard");
         card->setStyleSheet(
             "QFrame { background: #edf3f8; border-radius: 7px; } QLabel { border: none; color: #17324d; }");
         auto *body = new QVBoxLayout(card);
@@ -311,6 +357,7 @@ void ReportDialog::showReport() {
         note->setWordWrap(true);
         note->setTextFormat(Qt::PlainText);
         title->setTextFormat(Qt::PlainText);
+        title->setWordWrap(true);
         body->addWidget(title);
         body->addWidget(value);
         body->addWidget(note);
