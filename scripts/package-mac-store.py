@@ -1,4 +1,4 @@
-"""Sign a verified preparation artifact; upload only after external-folder QA."""
+"""Sign a verified preparation artifact for TestFlight or a QA-approved release."""
 import argparse
 import base64
 import contextlib
@@ -38,12 +38,14 @@ def preparation_inputs(preparation):
     return json.loads(record.read_text()), archive
 
 
-def validate_preparation(status, revision, upload, external_verified):
+def validate_preparation(status, revision, upload, external_verified, testflight=False):
     if status.get('source_revision') != revision or not status.get('qt_appstore_compliant'):
         raise ValueError('Preparation source or Qt distribution differs from this release')
     if not status.get('sandbox_container_verified'):
         raise ValueError('Signed sandbox container lifecycle has not passed')
-    if upload and not external_verified:
+    if testflight and not upload:
+        raise ValueError('TestFlight distribution requires --upload')
+    if upload and not testflight and not external_verified:
         raise ValueError('Verify external folder grant/cancel/bookmark restart before upload')
 
 
@@ -154,6 +156,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--preparation', type=Path, required=True)
     parser.add_argument('--upload', action='store_true')
+    parser.add_argument('--testflight', action='store_true',
+                        help='Upload for beta testing; external-folder QA remains required before App Review')
     args = parser.parse_args()
     if sys.platform != 'darwin':
         parser.error('Apple signing and upload tools require macOS')
@@ -168,7 +172,7 @@ def main():
     status, archive = preparation_inputs(preparation)
     revision = run(['git', 'rev-parse', 'HEAD']).strip()
     external_verified = os.environ.get('MAC_SANDBOX_EXTERNAL_VERIFIED') == 'true'
-    validate_preparation(status, revision, args.upload, external_verified)
+    validate_preparation(status, revision, args.upload, external_verified, args.testflight)
     output = ROOT / 'dist/mac-app-store'
     output.mkdir(parents=True, exist_ok=True)
     temporary_root = Path(os.environ['RUNNER_TEMP']).resolve()
@@ -257,6 +261,7 @@ def main():
                       'external_folder_selection_verified': external_verified,
                       'external_verification_source': 'manual QA attestation' if external_verified else None,
                       'uploaded': args.upload, 'review_submitted': False,
+                      'distribution_purpose': 'testflight' if args.testflight else 'app-store',
                       'package_sha256': hashlib.sha256(package.read_bytes()).hexdigest()}
             (output / 'status.json').write_text(json.dumps(result, indent=2) + '\n')
             print(json.dumps(result, indent=2))

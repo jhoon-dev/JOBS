@@ -162,6 +162,9 @@ class MacStorePackagingTests(unittest.TestCase):
         good = {'source_revision': 'revision', 'qt_appstore_compliant': True, 'sandbox_container_verified': True}
         mac_store.validate_preparation(good, 'revision', False, False)
         mac_store.validate_preparation(good, 'revision', True, True)
+        mac_store.validate_preparation(good, 'revision', True, False, testflight=True)
+        with self.assertRaisesRegex(ValueError, 'requires --upload'):
+            mac_store.validate_preparation(good, 'revision', False, False, testflight=True)
         with self.assertRaises(ValueError):
             mac_store.validate_preparation(good, 'revision', True, False)
         for key, value in [('source_revision', 'other'), ('qt_appstore_compliant', False),
@@ -169,6 +172,8 @@ class MacStorePackagingTests(unittest.TestCase):
             bad = {**good, key: value}
             with self.assertRaises(ValueError):
                 mac_store.validate_preparation(bad, 'revision', True, True)
+            with self.assertRaises(ValueError):
+                mac_store.validate_preparation(bad, 'revision', True, False, testflight=True)
 
     def test_archive_rejects_traversal_and_external_symlink(self):
         with tempfile.TemporaryDirectory() as directory:

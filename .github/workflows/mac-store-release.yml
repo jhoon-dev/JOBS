@@ -14,6 +14,10 @@ on:
         description: Upload validated signed pkg to App Store Connect (does not submit review)
         type: boolean
         default: false
+      testflight:
+        description: Upload for TestFlight testing; does not attest manual QA or submit App Review
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
@@ -74,12 +78,15 @@ jobs:
           APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
           MAC_SANDBOX_EXTERNAL_VERIFIED: ${{ inputs.external_folders_verified }}
           UPLOAD_REQUESTED: ${{ inputs.upload }}
+          TESTFLIGHT_REQUESTED: ${{ inputs.testflight }}
         run: |
           python - <<'PY'
           import os, subprocess, sys
           command = [sys.executable, 'scripts/package-mac-store.py', '--preparation', 'build/mac-store-preparation-input']
           if os.environ['UPLOAD_REQUESTED'] == 'true':
               command.append('--upload')
+          if os.environ['TESTFLIGHT_REQUESTED'] == 'true':
+              command.append('--testflight')
           subprocess.run(command, check=True)
           PY
       - name: Preserve signed deliverables and redacted validation results

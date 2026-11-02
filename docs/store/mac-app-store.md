@@ -10,7 +10,9 @@
 
 `Mac App Store signing and upload`는 **같은 커밋의 성공한 preparation run ID**를 받는다. 임시 키체인에서 앱·설치기 배포 인증서를 선택하고, 정확한 팀·Bundle ID·유효기간·인증서가 일치하는 App Store 프로파일을 검사한다. 내장 Mach-O/framework부터 앱 순서로 서명하고 최종 entitlement·pkg 서명·Apple altool validation을 확인한다. output은 서명된 앱 zip, pkg와 비밀 값을 제외한 상태·검증 결과다. 빌드 업로드는 App Store 심사 제출과 별개다.
 
-기본값은 업로드하지 않는다. 외부 폴더 승인·취소·재실행 bookmark 접근을 실제 Mac에서 확인한 경우에만 `external_folders_verified`를 선택한다. 이 확인 없이 upload를 요청하면 실패한다. 컨테이너 자동 검증 성공을 외부 폴더 검증으로 취급하지 않는다.
+기본값은 업로드하지 않는다. 외부 폴더 승인·취소·재실행 bookmark 접근을 실제 Mac에서 확인한 경우에만 `external_folders_verified`를 선택한다. 정식 배포 목적의 upload는 이 확인 없이 요청하면 실패한다. 컨테이너 자동 검증 성공을 외부 폴더 검증으로 취급하지 않는다.
+
+TestFlight로 실제 Mac QA를 먼저 수행할 때는 `upload=true`, `testflight=true`, `external_folders_verified=false`를 사용한다. 이 경로도 동일 소스·App Store Qt·서명 sandbox·payload 권한·Apple 검증을 모두 요구하며, 상태 파일에는 베타 목적과 수동 검증 미완료를 그대로 기록한다. TestFlight 업로드는 테스터의 실행·테스트 통과나 정식 심사 제출을 뜻하지 않는다. 실제 Mac에서 폴더 승인·취소·재실행 후 접근, 프로젝트 저장·열기와 보고서 출력을 확인한 뒤 정식 App Review를 제출한다.
 
 ## 앱의 sandbox 파일 접근
 
