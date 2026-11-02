@@ -107,6 +107,28 @@ def secret_file(name, path, *, encoded=True):
         stream.write(data)
 
 
+def install_embedded_profile(path):
+    # The signed provisioning profile is public app payload, not a private key.
+    # productbuild installs it as root, so 0600 would hide it from app users.
+    secret_file('MAC_APP_STORE_PROVISION_PROFILE_BASE64', path)
+    os.chmod(path, 0o644)
+
+
+def validate_payload_permissions(app):
+    """Reject payload that only the signing/installation owner can access."""
+    for path in [app, *app.rglob('*')]:
+        mode = path.lstat().st_mode
+        if stat.S_ISLNK(mode):
+            # Internal framework link targets are checked as ordinary entries.
+            continue
+        required = 0o555 if stat.S_ISDIR(mode) else 0o444
+        if stat.S_ISREG(mode) and mode & 0o111:
+            required |= 0o111
+        if mode & required != required:
+            raise ValueError(f'App payload is not accessible to non-owner users: '
+                             f'{path.relative_to(app)} (mode {stat.S_IMODE(mode):04o})')
+
+
 def identity(lines, prefixes, fingerprints=None):
     choices = []
     for fingerprint, name in re.findall(r'\b([0-9A-F]{40})\s+"([^"]+)"', lines):
@@ -167,7 +189,7 @@ def main():
             raise ValueError('Store app contains an unexpected executable or test probe')
         run(['lipo', app / 'Contents/MacOS/PPM', '-verify_arch', 'arm64', 'x86_64'])
         profile_path = app / 'Contents/embedded.provisionprofile'
-        secret_file('MAC_APP_STORE_PROVISION_PROFILE_BASE64', profile_path)
+        install_embedded_profile(profile_path)
         profile = plistlib.loads(run(['security', 'cms', '-D', '-i', profile_path]).encode())
         fingerprints = validate_profile(profile)
         p12, keychain = work / 'identities.p12', work / 'signing.keychain-db'
@@ -210,6 +232,7 @@ def main():
             effective = plistlib.loads(signed_output[start:end].encode())
             if any(effective.get(key) != value for key, value in entitlements.items()):
                 raise ValueError('Effective signed app entitlements differ')
+            validate_payload_permissions(app)
             package = output / f'PPM-{info["CFBundleShortVersionString"]}-{info["CFBundleVersion"]}.pkg'
             run(['productbuild', '--component', app, '/Applications', '--sign', installer_identity,
                  '--keychain', keychain, package])
@@ -230,6 +253,7 @@ def main():
                     '--bundle-version', info['CFBundleVersion'], *authentication], cwd=work, environment=api_environment))
             result = {'source_revision': revision, 'bundle_id': BUNDLE, 'version': info['CFBundleShortVersionString'],
                       'build': info['CFBundleVersion'], 'signed': True, 'sandbox_container_verified': True,
+                      'payload_permissions_verified': True,
                       'external_folder_selection_verified': external_verified,
                       'external_verification_source': 'manual QA attestation' if external_verified else None,
                       'uploaded': args.upload, 'review_submitted': False,

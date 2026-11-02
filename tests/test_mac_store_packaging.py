@@ -1,8 +1,10 @@
 """Admission checks before any release credentials or Apple upload are used."""
+import base64
 import copy
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
+import os
 from pathlib import Path
 import stat
 import tempfile
@@ -25,6 +27,52 @@ class MacStorePackagingTests(unittest.TestCase):
                              'com.apple.developer.team-identifier': mac_store.TEAM},
             'DeveloperCertificates': [b'distribution certificate'],
         }
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX permissions are verified on the Mac signing runner')
+    def test_embedded_profile_is_public_but_private_signing_material_stays_private(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {
+                'MAC_APP_STORE_PROVISION_PROFILE_BASE64': base64.b64encode(b'signed public profile').decode(),
+                'MAC_APP_STORE_CERTIFICATES_P12_BASE64': base64.b64encode(b'private p12').decode(),
+                'APP_STORE_CONNECT_API_PRIVATE_KEY': 'private API key'}):
+            root = Path(directory)
+            profile = root / 'embedded.provisionprofile'
+            mac_store.install_embedded_profile(profile)
+            p12, key = root / 'identities.p12', root / 'AuthKey.p8'
+            mac_store.secret_file('MAC_APP_STORE_CERTIFICATES_P12_BASE64', p12)
+            mac_store.secret_file('APP_STORE_CONNECT_API_PRIVATE_KEY', key, encoded=False)
+            self.assertEqual(profile.read_bytes(), b'signed public profile')
+            self.assertEqual(stat.S_IMODE(profile.stat().st_mode), 0o644)
+            self.assertEqual(stat.S_IMODE(p12.stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE(key.stat().st_mode), 0o600)
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX permissions are verified on the Mac signing runner')
+    def test_payload_rejects_owner_only_files_directories_and_executables(self):
+        with tempfile.TemporaryDirectory() as directory:
+            app = Path(directory) / 'PPM.app'
+            app.mkdir(mode=0o755)
+            app.chmod(0o755)
+            payload = app / 'Contents'
+            payload.mkdir(mode=0o755)
+            payload.chmod(0o755)
+            profile, binary = payload / 'embedded.provisionprofile', payload / 'PPM'
+            profile.write_bytes(b'profile')
+            binary.write_bytes(b'executable')
+            profile.chmod(0o644)
+            binary.chmod(0o755)
+            # Real Qt frameworks contain internal directory and file symlinks.
+            (payload / 'Current').symlink_to('.', target_is_directory=True)
+            (payload / 'PPM-link').symlink_to('PPM')
+            mac_store.validate_payload_permissions(app)
+            for path, mode, restore in ((profile, 0o600, 0o644), (payload, 0o700, 0o755),
+                                        (app, 0o700, 0o755), (binary, 0o744, 0o755)):
+                with self.subTest(path=path.name, mode=oct(mode)):
+                    path.chmod(mode)
+                    try:
+                        with self.assertRaisesRegex(ValueError, 'non-owner users'):
+                            mac_store.validate_payload_permissions(app)
+                    finally:
+                        path.chmod(restore)
+            mac_store.validate_payload_permissions(app)
 
     def test_exact_distribution_profile(self):
         self.assertEqual(len(mac_store.validate_profile(self.profile)), 1)
